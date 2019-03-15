@@ -2651,8 +2651,8 @@ the user before returning from the signal handler. If you want to
 let the user decide whether or not to accept the certificate, you
 would have to return %FALSE from the signal handler on the first
 attempt, and then after the connection attempt returns a
-%G_TLS_ERROR_HANDSHAKE, you can interact with the user, and if
-the user decides to accept the certificate, remember that fact,
+%G_TLS_ERROR_BAD_CERTIFICATE, you can interact with the user, and
+if the user decides to accept the certificate, remember that fact,
 create a new connection, and return %TRUE from the signal handler
 the next time.
 
@@ -2684,6 +2684,17 @@ no one else overrides it.
 
 </return>
 </signal>
+
+<property name="GDtlsConnection:advertised-protocols">
+<description>
+The list of application-layer protocols that the connection
+advertises that it is willing to speak. See
+g_dtls_connection_set_advertised_protocols().
+
+Since: 2.60
+
+</description>
+</property>
 
 <property name="GDtlsConnection:base-socket">
 <description>
@@ -2723,6 +2734,16 @@ database need to interact with the user. This will be used to prompt the
 user for passwords where necessary.
 
 Since: 2.48
+
+</description>
+</property>
+
+<property name="GDtlsConnection:negotiated-protocol">
+<description>
+The application-layer protocol negotiated during the TLS
+handshake. See g_dtls_connection_get_negotiated_protocol().
+
+Since: 2.60
 
 </description>
 </property>
@@ -3274,6 +3295,9 @@ if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_FAILED))
 but should instead treat all unrecognized error codes the same as
 #G_IO_ERROR_FAILED.
 
+See also #GPollableReturn for a cheaper way of returning
+%G_IO_ERROR_WOULD_BLOCK to callers without allocating a #GError.
+
 </description>
 <parameters>
 <parameter name="G_IO_ERROR_FAILED">
@@ -3640,6 +3664,45 @@ Since: 2.22
 The `sin6_flowinfo` field, for IPv6 addresses.
 
 Since: 2.32
+
+</description>
+</property>
+
+<property name="GKeyfileSettingsBackend:default-dir">
+<description>
+The directory where the system defaults and locks are located.
+
+Defaults to `/etc/glib-2.0/settings`.
+
+</description>
+</property>
+
+<property name="GKeyfileSettingsBackend:filename">
+<description>
+The location where the settings are stored on disk.
+
+Defaults to `$XDG_CONFIG_HOME/glib-2.0/settings/keyfile`.
+
+</description>
+</property>
+
+<property name="GKeyfileSettingsBackend:root-group">
+<description>
+If @root_group is non-%NULL then it specifies the name of the keyfile
+group used for keys that are written directly below the root path.
+
+Defaults to NULL.
+
+</description>
+</property>
+
+<property name="GKeyfileSettingsBackend:root-path">
+<description>
+All settings read to or written from the backend must fall under the
+path given in @root_path (which must start and end with a slash and
+not contain two consecutive slashes).  @root_path may be &quot;/&quot;.
+
+Defaults to &quot;/&quot;.
 
 </description>
 </property>
@@ -4360,6 +4423,37 @@ g_permission_release().
 </description>
 </property>
 
+<enum name="GPollableReturn">
+<description>
+Return value for various IO operations that signal errors via the
+return value and not necessarily via a #GError.
+
+This enum exists to be able to return errors to callers without having to
+allocate a #GError. Allocating #GErrors can be quite expensive for
+regularly happening errors like %G_IO_ERROR_WOULD_BLOCK.
+
+In case of %G_POLLABLE_RETURN_FAILED a #GError should be set for the
+operation to give details about the error that happened.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="G_POLLABLE_RETURN_FAILED">
+<parameter_description> Generic error condition for when an operation fails.
+</parameter_description>
+</parameter>
+<parameter name="G_POLLABLE_RETURN_OK">
+<parameter_description> The operation was successfully finished.
+</parameter_description>
+</parameter>
+<parameter name="G_POLLABLE_RETURN_WOULD_BLOCK">
+<parameter_description> The operation would block.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <property name="GPropertyAction:enabled">
 <description>
 If @action is currently enabled.
@@ -4519,6 +4613,29 @@ be looked up due to a network error or similar problem
 </parameter>
 <parameter name="G_RESOLVER_ERROR_INTERNAL">
 <parameter_description> unknown error
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GResolverNameLookupFlags">
+<description>
+Flags to modify lookup behavior.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="G_RESOLVER_NAME_LOOKUP_FLAGS_DEFAULT">
+<parameter_description> default behavior (same as g_resolver_lookup_by_name())
+</parameter_description>
+</parameter>
+<parameter name="G_RESOLVER_NAME_LOOKUP_FLAGS_IPV4_ONLY">
+<parameter_description> only resolve ipv4 addresses
+</parameter_description>
+</parameter>
+<parameter name="G_RESOLVER_NAME_LOOKUP_FLAGS_IPV6_ONLY">
+<parameter_description> only resolve ipv6 addresses
 </parameter_description>
 </parameter>
 </parameters>
@@ -5918,8 +6035,8 @@ the user before returning from the signal handler. If you want to
 let the user decide whether or not to accept the certificate, you
 would have to return %FALSE from the signal handler on the first
 attempt, and then after the connection attempt returns a
-%G_TLS_ERROR_HANDSHAKE, you can interact with the user, and if
-the user decides to accept the certificate, remember that fact,
+%G_TLS_ERROR_BAD_CERTIFICATE, you can interact with the user, and
+if the user decides to accept the certificate, remember that fact,
 create a new connection, and return %TRUE from the signal handler
 the next time.
 
@@ -5951,6 +6068,17 @@ no one else overrides it.
 
 </return>
 </signal>
+
+<property name="GTlsConnection:advertised-protocols">
+<description>
+The list of application-layer protocols that the connection
+advertises that it is willing to speak. See
+g_tls_connection_set_advertised_protocols().
+
+Since: 2.60
+
+</description>
+</property>
 
 <property name="GTlsConnection:base-io-stream">
 <description>
@@ -5993,6 +6121,16 @@ database need to interact with the user. This will be used to prompt the
 user for passwords where necessary.
 
 Since: 2.30
+
+</description>
+</property>
+
+<property name="GTlsConnection:negotiated-protocol">
+<description>
+The application-layer protocol negotiated during the TLS
+handshake. See g_tls_connection_get_negotiated_protocol().
+
+Since: 2.60
 
 </description>
 </property>
@@ -6112,7 +6250,8 @@ Since: 2.28
 </parameter_description>
 </parameter>
 <parameter name="G_TLS_ERROR_BAD_CERTIFICATE">
-<parameter_description> A certificate could not be parsed
+<parameter_description> The certificate presented could not
+be parsed or failed validation.
 </parameter_description>
 </parameter>
 <parameter name="G_TLS_ERROR_NOT_TLS">
@@ -8172,6 +8311,10 @@ registered to handle the specified uri. Synchronous I/O
 is done on the uri to detect the type of the file if
 required.
 
+The D-Bus–activated applications don't have to be started if your application
+terminates too soon after this function. To prevent this, use
+g_app_info_launch_default_for_uri() instead.
+
 
 </description>
 <parameters>
@@ -8200,6 +8343,10 @@ This version is useful if you are interested in receiving
 error information in the case where the application is
 sandboxed and the portal may present an application chooser
 dialog to the user.
+
+This is also useful if you want to be sure that the D-Bus–activated
+applications are really started before termination and if you are interested
+in receiving error information from their activation.
 
 Since: 2.50
 
@@ -8285,6 +8432,73 @@ no way to detect this.
 </parameter>
 </parameters>
 <return> %TRUE on successful launch, %FALSE otherwise.
+</return>
+</function>
+
+<function name="g_app_info_launch_uris_async">
+<description>
+Async version of g_app_info_launch_uris().
+
+The @callback is invoked immediately after the application launch, but it
+waits for activation in case of D-Bus–activated applications and also provides
+extended error information for sandboxed applications, see notes for
+g_app_info_launch_default_for_uri_async().
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="appinfo">
+<parameter_description> a #GAppInfo
+</parameter_description>
+</parameter>
+<parameter name="uris">
+<parameter_description> a #GList containing URIs to launch.
+</parameter_description>
+</parameter>
+<parameter name="context">
+<parameter_description> a #GAppLaunchContext or %NULL
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback to call when the request is done
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data to pass to @callback
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_app_info_launch_uris_finish">
+<description>
+Finishes a g_app_info_launch_uris_async() operation.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="appinfo">
+<parameter_description> a #GAppInfo
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on successful launch, %FALSE otherwise.
+
 </return>
 </function>
 
@@ -12104,6 +12318,22 @@ object with g_object_unref()
 </return>
 </function>
 
+<function name="g_content_type_get_mime_dirs">
+<description>
+Get the list of directories which MIME data is loaded from. See
+g_content_type_set_mime_dirs() for details.
+
+Since: 2.60
+
+</description>
+<parameters>
+</parameters>
+<return> %NULL-terminated list of
+directories to load MIME data from, including any `mime/` subdirectory,
+and with the first directory to try listed first
+</return>
+</function>
+
 <function name="g_content_type_get_mime_type">
 <description>
 Gets the mime type for the content type, if one is registered.
@@ -12267,11 +12497,51 @@ or octet-stream.
 </return>
 </function>
 
+<function name="g_content_type_set_mime_dirs">
+<description>
+Set the list of directories used by GIO to load the MIME database.
+If @dirs is %NULL, the directories used are the default:
+
+- the `mime` subdirectory of the directory in `$XDG_DATA_HOME`
+- the `mime` subdirectory of every directory in `$XDG_DATA_DIRS`
+
+This function is intended to be used when writing tests that depend on
+information stored in the MIME database, in order to control the data.
+
+Typically, in case your tests use %G_TEST_OPTION_ISOLATE_DIRS, but they
+depend on the system’s MIME database, you should call this function
+with @dirs set to %NULL before calling g_test_init(), for instance:
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
+// Load MIME data from the system
+g_content_type_set_mime_dirs (NULL);
+// Isolate the environment
+g_test_init (&amp;argc, &amp;argv, G_TEST_OPTION_ISOLATE_DIRS, NULL);
+
+…
+
+return g_test_run ();
+]|
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="dirs">
+<parameter_description> %NULL-terminated list of
+directories to load MIME data from, including any `mime/` subdirectory,
+and with the first directory to try listed first
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_content_types_get_registered">
 <description>
 Gets a list of strings containing all the registered content types
 known to the system. The list and its data should be freed using
-g_list_free_full (list, g_free).
+`g_list_free_full (list, g_free)`.
 
 
 </description>
@@ -15289,6 +15559,24 @@ Since: 2.26
 </parameters>
 <return> whether the process is terminated when @connection is
 closed by the remote peer
+
+</return>
+</function>
+
+<function name="g_dbus_connection_get_flags">
+<description>
+Gets the flags used to construct this connection
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="connection">
+<parameter_description> a #GDBusConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> zero or more flags from the #GDBusConnectionFlags enumeration
 
 </return>
 </function>
@@ -22912,6 +23200,30 @@ Since: 2.48
 </return>
 </function>
 
+<function name="g_dtls_connection_get_negotiated_protocol">
+<description>
+Gets the name of the application-layer protocol negotiated during
+the handshake.
+
+If the peer did not use the ALPN extension, or did not advertise a
+protocol that matched one of @conn's protocols, or the TLS backend
+does not support ALPN, then this will be %NULL. See
+g_dtls_connection_set_advertised_protocols().
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> the negotiated protocol, or %NULL
+
+</return>
+</function>
+
 <function name="g_dtls_connection_get_peer_certificate">
 <description>
 Gets @conn's peer's certificate after the handshake has completed.
@@ -23104,6 +23416,36 @@ Since: 2.48
 case @error will be set.
 
 </return>
+</function>
+
+<function name="g_dtls_connection_set_advertised_protocols">
+<description>
+Sets the list of application-layer protocols to advertise that the
+caller is willing to speak on this connection. The
+Application-Layer Protocol Negotiation (ALPN) extension will be
+used to negotiate a compatible protocol with the peer; use
+g_dtls_connection_get_negotiated_protocol() to find the negotiated
+protocol after the handshake.  Specifying %NULL for the the value
+of @protocols will disable ALPN negotiation.
+
+See [IANA TLS ALPN Protocol IDs](https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids)
+for a list of registered protocol IDs.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="protocols">
+<parameter_description> a %NULL-terminated
+array of ALPN protocol names (eg, &quot;http/1.1&quot;, &quot;h2&quot;), or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_dtls_connection_set_certificate">
@@ -26754,7 +27096,8 @@ Sinze: 2.22
 </parameter_description>
 </parameter>
 <parameter name="attr_value">
-<parameter_description> a %NULL terminated array of UTF-8 strings.
+<parameter_description> a %NULL
+terminated array of UTF-8 strings.
 </parameter_description>
 </parameter>
 </parameters>
@@ -28972,6 +29315,62 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 <return> a #GAppInfo if the handle was found,
 %NULL if there were errors.
 When you are done with it, release it with g_object_unref()
+</return>
+</function>
+
+<function name="g_file_query_default_handler_async">
+<description>
+Async version of g_file_query_default_handler().
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> a #GFile to open
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback to call when the request is done
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data to pass to @callback
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_file_query_default_handler_finish">
+<description>
+Finishes a g_file_query_default_handler_async() operation.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> a #GFile to open
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GAppInfo if the handle was found,
+%NULL if there were errors.
+When you are done with it, release it with g_object_unref()
+
 </return>
 </function>
 
@@ -33890,6 +34289,11 @@ There is no checking done for your key namespace clashing with the
 syntax of the key file format.  For example, if you have '[' or ']'
 characters in your path names or '=' in your key names you may be in
 trouble.
+
+The backend reads default values from a keyfile called `defaults` in
+the directory specified by the #GKeyfileSettingsBackend:defaults-dir property,
+and a list of locked keys from a text file with the name `locks` in
+the same location.
 
 
 </description>
@@ -39144,6 +39548,323 @@ ignore.
 </return>
 </function>
 
+<function name="g_output_stream_writev">
+<description>
+Tries to write the bytes contained in the @n_vectors @vectors into the
+stream. Will block during the operation.
+
+If @n_vectors is 0 or the sum of all bytes in @vectors is 0, returns 0 and
+does nothing.
+
+On success, the number of bytes written to the stream is returned.
+It is not an error if this is not the same as the requested size, as it
+can happen e.g. on a partial I/O error, or if there is not enough
+storage in the stream. All writes block until at least one byte
+is written or an error occurs; 0 is never returned (unless
+@n_vectors is 0 or the sum of all bytes in @vectors is 0).
+
+If @cancellable is not %NULL, then the operation can be cancelled by
+triggering the cancellable object from another thread. If the operation
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. If an
+operation was partially finished when the operation was cancelled the
+partial result will be returned, without an error.
+
+Some implementations of g_output_stream_writev() may have limitations on the
+aggregate buffer size, and will return %G_IO_ERROR_INVALID_ARGUMENT if these
+are exceeded. For example, when writing to a local file on UNIX platforms,
+the aggregate buffer size must not exceed %G_MAXSSIZE bytes.
+
+Virtual: writev_fn
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GOutputStream.
+</parameter_description>
+</parameter>
+<parameter name="vectors">
+<parameter_description> the buffer containing the #GOutputVectors to write.
+</parameter_description>
+</parameter>
+<parameter name="n_vectors">
+<parameter_description> the number of vectors to write
+</parameter_description>
+</parameter>
+<parameter name="bytes_written">
+<parameter_description> location to store the number of bytes that were
+written to the stream
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional cancellable object
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> location to store the error occurring, or %NULL to ignore
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE if there was an error
+
+</return>
+</function>
+
+<function name="g_output_stream_writev_all">
+<description>
+Tries to write the bytes contained in the @n_vectors @vectors into the
+stream. Will block during the operation.
+
+This function is similar to g_output_stream_writev(), except it tries to
+write as many bytes as requested, only stopping on an error.
+
+On a successful write of all @n_vectors vectors, %TRUE is returned, and
+@bytes_written is set to the sum of all the sizes of @vectors.
+
+If there is an error during the operation %FALSE is returned and @error
+is set to indicate the error status.
+
+As a special exception to the normal conventions for functions that
+use #GError, if this function returns %FALSE (and sets @error) then
+@bytes_written will be set to the number of bytes that were
+successfully written before the error was encountered.  This
+functionality is only available from C. If you need it from another
+language then you must write your own loop around
+g_output_stream_write().
+
+The content of the individual elements of @vectors might be changed by this
+function.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GOutputStream.
+</parameter_description>
+</parameter>
+<parameter name="vectors">
+<parameter_description> the buffer containing the #GOutputVectors to write.
+</parameter_description>
+</parameter>
+<parameter name="n_vectors">
+<parameter_description> the number of vectors to write
+</parameter_description>
+</parameter>
+<parameter name="bytes_written">
+<parameter_description> location to store the number of bytes that were
+written to the stream
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> location to store the error occurring, or %NULL to ignore
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE if there was an error
+
+</return>
+</function>
+
+<function name="g_output_stream_writev_all_async">
+<description>
+Request an asynchronous write of the bytes contained in the @n_vectors @vectors into
+the stream. When the operation is finished @callback will be called.
+You can then call g_output_stream_writev_all_finish() to get the result of the
+operation.
+
+This is the asynchronous version of g_output_stream_writev_all().
+
+Call g_output_stream_writev_all_finish() to collect the result.
+
+Any outstanding I/O request with higher priority (lower numerical
+value) will be executed before an outstanding request with lower
+priority. Default priority is %G_PRIORITY_DEFAULT.
+
+Note that no copy of @vectors will be made, so it must stay valid
+until @callback is called. The content of the individual elements
+of @vectors might be changed by this function.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> A #GOutputStream
+</parameter_description>
+</parameter>
+<parameter name="vectors">
+<parameter_description> the buffer containing the #GOutputVectors to write.
+</parameter_description>
+</parameter>
+<parameter name="n_vectors">
+<parameter_description> the number of vectors to write
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the I/O priority of the request
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> callback to call when the request is satisfied
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_output_stream_writev_all_finish">
+<description>
+Finishes an asynchronous stream write operation started with
+g_output_stream_writev_all_async().
+
+As a special exception to the normal conventions for functions that
+use #GError, if this function returns %FALSE (and sets @error) then
+@bytes_written will be set to the number of bytes that were
+successfully written before the error was encountered.  This
+functionality is only available from C.  If you need it from another
+language then you must write your own loop around
+g_output_stream_writev_async().
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GOutputStream
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="bytes_written">
+<parameter_description> location to store the number of bytes that were written to the stream
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError location to store the error occurring, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE if there was an error
+
+</return>
+</function>
+
+<function name="g_output_stream_writev_async">
+<description>
+Request an asynchronous write of the bytes contained in @n_vectors @vectors into
+the stream. When the operation is finished @callback will be called.
+You can then call g_output_stream_writev_finish() to get the result of the
+operation.
+
+During an async request no other sync and async calls are allowed,
+and will result in %G_IO_ERROR_PENDING errors.
+
+On success, the number of bytes written will be passed to the
+@callback. It is not an error if this is not the same as the
+requested size, as it can happen e.g. on a partial I/O error,
+but generally we try to write as many bytes as requested.
+
+You are guaranteed that this method will never fail with
+%G_IO_ERROR_WOULD_BLOCK — if @stream can't accept more data, the
+method will just wait until this changes.
+
+Any outstanding I/O request with higher priority (lower numerical
+value) will be executed before an outstanding request with lower
+priority. Default priority is %G_PRIORITY_DEFAULT.
+
+The asynchronous methods have a default fallback that uses threads
+to implement asynchronicity, so they are optional for inheriting
+classes. However, if you override one you must override all.
+
+For the synchronous, blocking version of this function, see
+g_output_stream_writev().
+
+Note that no copy of @vectors will be made, so it must stay valid
+until @callback is called.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> A #GOutputStream.
+</parameter_description>
+</parameter>
+<parameter name="vectors">
+<parameter_description> the buffer containing the #GOutputVectors to write.
+</parameter_description>
+</parameter>
+<parameter name="n_vectors">
+<parameter_description> the number of vectors to write
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the I/O priority of the request.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> callback to call when the request is satisfied
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_output_stream_writev_finish">
+<description>
+Finishes a stream writev operation.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GOutputStream.
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult.
+</parameter_description>
+</parameter>
+<parameter name="bytes_written">
+<parameter_description> location to store the number of bytes that were written to the stream
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError location to store the error occurring, or %NULL to
+ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE if there was an error
+
+</return>
+</function>
+
 <function name="g_permission_acquire">
 <description>
 Attempts to acquire the permission represented by @permission.
@@ -39660,7 +40381,8 @@ may happen if you call this method after a source triggers due
 to having been cancelled.
 
 Also note that if %G_IO_ERROR_WOULD_BLOCK is returned some underlying
-transports like D/TLS require that you send the same @buffer and @count.
+transports like D/TLS require that you re-send the same @buffer and
+@count in the next write call.
 
 Virtual: write_nonblocking
 
@@ -39690,6 +40412,65 @@ data from
 </parameters>
 <return> the number of bytes written, or -1 on error (including
 %G_IO_ERROR_WOULD_BLOCK).
+</return>
+</function>
+
+<function name="g_pollable_output_stream_writev_nonblocking">
+<description>
+Attempts to write the bytes contained in the @n_vectors @vectors to @stream,
+as with g_output_stream_writev(). If @stream is not currently writable,
+this will immediately return %@G_POLLABLE_RETURN_WOULD_BLOCK, and you can
+use g_pollable_output_stream_create_source() to create a #GSource
+that will be triggered when @stream is writable. @error will *not* be
+set in that case.
+
+Note that since this method never blocks, you cannot actually
+use @cancellable to cancel it. However, it will return an error
+if @cancellable has already been cancelled when you call, which
+may happen if you call this method after a source triggers due
+to having been cancelled.
+
+Also note that if %G_POLLABLE_RETURN_WOULD_BLOCK is returned some underlying
+transports like D/TLS require that you re-send the same @vectors and
+@n_vectors in the next write call.
+
+Virtual: writev_nonblocking
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GPollableOutputStream
+</parameter_description>
+</parameter>
+<parameter name="vectors">
+<parameter_description> the buffer containing the #GOutputVectors to write.
+</parameter_description>
+</parameter>
+<parameter name="n_vectors">
+<parameter_description> the number of vectors to write
+</parameter_description>
+</parameter>
+<parameter name="bytes_written">
+<parameter_description> location to store the number of bytes that were
+written to the stream
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %@G_POLLABLE_RETURN_OK on success, %G_POLLABLE_RETURN_WOULD_BLOCK
+if the stream is not currently writable (and @error is *not* set), or
+%G_POLLABLE_RETURN_FAILED if there was an error in which case @error will
+be set.
+
 </return>
 </function>
 
@@ -40748,6 +41529,117 @@ a value from #GResolverError. If the operation was cancelled,
 @error will be set to %G_IO_ERROR_CANCELLED.
 
 Since: 2.22
+
+</description>
+<parameters>
+<parameter name="resolver">
+<parameter_description> a #GResolver
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> the result passed to your #GAsyncReadyCallback
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GList
+of #GInetAddress, or %NULL on error. See g_resolver_lookup_by_name()
+for more details.
+
+</return>
+</function>
+
+<function name="g_resolver_lookup_by_name_with_flags">
+<description>
+This differs from g_resolver_lookup_by_name() in that you can modify
+the lookup behavior with @flags. For example this can be used to limit
+results with #G_RESOLVER_NAME_LOOKUP_FLAGS_IPV4_ONLY.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="resolver">
+<parameter_description> a #GResolver
+</parameter_description>
+</parameter>
+<parameter name="hostname">
+<parameter_description> the hostname to look up
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> extra #GResolverNameLookupFlags for the lookup
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a non-empty #GList
+of #GInetAddress, or %NULL on error. You
+must unref each of the addresses and free the list when you are
+done with it. (You can use g_resolver_free_addresses() to do this.)
+
+</return>
+</function>
+
+<function name="g_resolver_lookup_by_name_with_flags_async">
+<description>
+Begins asynchronously resolving @hostname to determine its
+associated IP address(es), and eventually calls @callback, which
+must call g_resolver_lookup_by_name_with_flags_finish() to get the result.
+See g_resolver_lookup_by_name() for more details.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="resolver">
+<parameter_description> a #GResolver
+</parameter_description>
+</parameter>
+<parameter name="hostname">
+<parameter_description> the hostname to look up the address of
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> extra #GResolverNameLookupFlags for the lookup
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> callback to call after resolution completes
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data for @callback
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_resolver_lookup_by_name_with_flags_finish">
+<description>
+Retrieves the result of a call to
+g_resolver_lookup_by_name_with_flags_async().
+
+If the DNS resolution failed, @error (if non-%NULL) will be set to
+a value from #GResolverError. If the operation was cancelled,
+@error will be set to %G_IO_ERROR_CANCELLED.
+
+Since: 2.60
 
 </description>
 <parameters>
@@ -45242,6 +46134,8 @@ Asynchronously retrieves the next #GSocketAddress from @enumerator
 and then calls @callback, which must call
 g_socket_address_enumerator_next_finish() to get the result.
 
+It is an error to call this multiple times before the previous callback has finished.
+
 </description>
 <parameters>
 <parameter name="enumerator">
@@ -46496,21 +47390,21 @@ Since: 2.22
 
 <function name="g_socket_condition_timed_wait">
 <description>
-Waits for up to @timeout microseconds for @condition to become true
+Waits for up to @timeout_us microseconds for @condition to become true
 on @socket. If the condition is met, %TRUE is returned.
 
 If @cancellable is cancelled before the condition is met, or if
-@timeout (or the socket's #GSocket:timeout) is reached before the
+@timeout_us (or the socket's #GSocket:timeout) is reached before the
 condition is met, then %FALSE is returned and @error, if non-%NULL,
 is set to the appropriate value (%G_IO_ERROR_CANCELLED or
 %G_IO_ERROR_TIMED_OUT).
 
 If you don't want a timeout, use g_socket_condition_wait().
-(Alternatively, you can pass -1 for @timeout.)
+(Alternatively, you can pass -1 for @timeout_us.)
 
-Note that although @timeout is in microseconds for consistency with
+Note that although @timeout_us is in microseconds for consistency with
 other GLib APIs, this function actually only has millisecond
-resolution, and the behavior is undefined if @timeout is not an
+resolution, and the behavior is undefined if @timeout_us is not an
 exact number of milliseconds.
 
 Since: 2.32
@@ -46525,7 +47419,7 @@ Since: 2.32
 <parameter_description> a #GIOCondition mask to wait for
 </parameter_description>
 </parameter>
-<parameter name="timeout">
+<parameter name="timeout_us">
 <parameter_description> the maximum time (in microseconds) to wait, or -1
 </parameter_description>
 </parameter>
@@ -48770,6 +49664,73 @@ on error
 </return>
 </function>
 
+<function name="g_socket_send_message_with_timeout">
+<description>
+This behaves exactly the same as g_socket_send_message(), except that
+the choice of timeout behavior is determined by the @timeout_us argument
+rather than by @socket's properties.
+
+On error %G_POLLABLE_RETURN_FAILED is returned and @error is set accordingly, or
+if the socket is currently not writable %G_POLLABLE_RETURN_WOULD_BLOCK is
+returned. @bytes_written will contain 0 in both cases.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="socket">
+<parameter_description> a #GSocket
+</parameter_description>
+</parameter>
+<parameter name="address">
+<parameter_description> a #GSocketAddress, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="vectors">
+<parameter_description> an array of #GOutputVector structs
+</parameter_description>
+</parameter>
+<parameter name="num_vectors">
+<parameter_description> the number of elements in @vectors, or -1
+</parameter_description>
+</parameter>
+<parameter name="messages">
+<parameter_description> a pointer to an
+array of #GSocketControlMessages, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="num_messages">
+<parameter_description> number of elements in @messages, or -1.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> an int containing #GSocketMsgFlags flags
+</parameter_description>
+</parameter>
+<parameter name="timeout_us">
+<parameter_description> the maximum time (in microseconds) to wait, or -1
+</parameter_description>
+</parameter>
+<parameter name="bytes_written">
+<parameter_description> location to store the number of bytes that were written to the socket
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a %GCancellable or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %G_POLLABLE_RETURN_OK if all data was successfully written,
+%G_POLLABLE_RETURN_WOULD_BLOCK if the socket is currently not writable, or
+%G_POLLABLE_RETURN_FAILED if an error happened and @error is set.
+
+</return>
+</function>
+
 <function name="g_socket_send_messages">
 <description>
 Send multiple data messages from @socket in one go.  This is the most
@@ -49721,6 +50682,9 @@ Complete an invocation of g_subprocess_communicate_async().
 <description>
 Like g_subprocess_communicate(), but validates the output of the
 process as UTF-8, and returns it as a regular NUL terminated string.
+
+On error, @stdout_buf and @stderr_buf will be set to undefined values and
+should not be used.
 
 </description>
 <parameters>
@@ -50866,6 +51830,9 @@ to wait for a #GSource to trigger. Attaches @source to @task's
 #GMainContext with @task's [priority][io-priority], and sets @source's
 callback to @callback, with @task as the callback's `user_data`.
 
+It will set the @source’s name to the task’s name (as set with
+g_task_set_name()), if one has been set.
+
 This takes a reference on @task until @source is destroyed.
 
 Since: 2.36
@@ -50964,6 +51931,23 @@ Since: 2.36
 </parameters>
 <return> @task's #GMainContext
 
+</return>
+</function>
+
+<function name="g_task_get_name">
+<description>
+Gets @task’s name. See g_task_set_name().
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="task">
+<parameter_description> a #GTask
+</parameter_description>
+</parameter>
+</parameters>
+<return> @task’s name, or %NULL
 </return>
 </function>
 
@@ -51593,6 +52577,34 @@ Since: 2.36
 <parameter name="check_cancellable">
 <parameter_description> whether #GTask will check the state of
 its #GCancellable for you.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_task_set_name">
+<description>
+Sets @task’s name, used in debugging and profiling. The name defaults to
+%NULL.
+
+The task name should describe in a human readable way what the task does.
+For example, ‘Open file’ or ‘Connect to network host’. It is used to set the
+name of the #GSource used for idle completion of the task.
+
+This function may only be called before the @task is first used in a thread
+other than the one it was constructed in.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="task">
+<parameter_description> a #GTask
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> a human readable name for the task, or %NULL to unset it
 </parameter_description>
 </parameter>
 </parameters>
@@ -52888,6 +53900,30 @@ Since: 2.30
 </return>
 </function>
 
+<function name="g_tls_connection_get_negotiated_protocol">
+<description>
+Gets the name of the application-layer protocol negotiated during
+the handshake.
+
+If the peer did not use the ALPN extension, or did not advertise a
+protocol that matched one of @conn's protocols, or the TLS backend
+does not support ALPN, then this will be %NULL. See
+g_tls_connection_set_advertised_protocols().
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GTlsConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> the negotiated protocol, or %NULL
+
+</return>
+</function>
+
 <function name="g_tls_connection_get_peer_certificate">
 <description>
 Gets @conn's peer's certificate after the handshake has completed.
@@ -53104,6 +54140,36 @@ Since: 2.28
 case @error will be set.
 
 </return>
+</function>
+
+<function name="g_tls_connection_set_advertised_protocols">
+<description>
+Sets the list of application-layer protocols to advertise that the
+caller is willing to speak on this connection. The
+Application-Layer Protocol Negotiation (ALPN) extension will be
+used to negotiate a compatible protocol with the peer; use
+g_tls_connection_get_negotiated_protocol() to find the negotiated
+protocol after the handshake.  Specifying %NULL for the the value
+of @protocols will disable ALPN negotiation.
+
+See [IANA TLS ALPN Protocol IDs](https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids)
+for a list of registered protocol IDs.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GTlsConnection
+</parameter_description>
+</parameter>
+<parameter name="protocols">
+<parameter_description> a %NULL-terminated
+array of ALPN protocol names (eg, &quot;http/1.1&quot;, &quot;h2&quot;), or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_tls_connection_set_certificate">

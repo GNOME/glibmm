@@ -4993,7 +4993,8 @@ This function assumes that @str contains only a number of the given
 @base that is within inclusive bounds limited by @min and @max. If
 this is true, then the converted number is stored in @out_num. An
 empty string is not a valid input. A string with leading or
-trailing whitespace is also an invalid input.
+trailing whitespace is also an invalid input. A string with a leading sign
+(`-` or `+`) is not a valid input for the unsigned parser.
 
 @base can be between 2 and 36 inclusive. Hexadecimal numbers must
 not be prefixed with &quot;0x&quot; or &quot;0X&quot;. Such a problem does not exist
@@ -5171,6 +5172,11 @@ does in the C locale. It does this without actually
 changing the current locale, since that would not be
 thread-safe.
 
+Note that input with a leading minus sign (`-`) is accepted, and will return
+the negation of the parsed number, unless that would overflow a #guint64.
+Critically, this means you cannot assume that a short fixed length input will
+never result in a low return value, as the input could have a leading `-`.
+
 This function is typically used when reading configuration
 files or other non-user input that should be locale independent.
 To handle input from the user you should normally use the
@@ -5341,7 +5347,7 @@ Since: 2.16
 </parameter>
 <parameter name="cmp">
 <parameter_description> The comparison operator to use.
-One of ==, !=, &lt;, &gt;, &lt;=, &gt;=.
+One of `==`, `!=`, `&lt;`, `&gt;`, `&lt;=`, `&gt;=`.
 </parameter_description>
 </parameter>
 <parameter name="n2">
@@ -5399,7 +5405,7 @@ Since: 2.16
 </parameter>
 <parameter name="cmp">
 <parameter_description> The comparison operator to use.
-One of ==, !=, &lt;, &gt;, &lt;=, &gt;=.
+One of `==`, `!=`, `&lt;`, `&gt;`, `&lt;=`, `&gt;=`.
 </parameter_description>
 </parameter>
 <parameter name="n2">
@@ -5429,7 +5435,7 @@ Since: 2.16
 </parameter>
 <parameter name="cmp">
 <parameter_description> The comparison operator to use.
-One of ==, !=, &lt;, &gt;, &lt;=, &gt;=.
+One of `==`, `!=`, `&lt;`, `&gt;`, `&lt;=`, `&gt;=`.
 </parameter_description>
 </parameter>
 <parameter name="n2">
@@ -5505,7 +5511,7 @@ Since: 2.16
 </parameter>
 <parameter name="cmp">
 <parameter_description> The comparison operator to use.
-One of ==, !=, &lt;, &gt;, &lt;=, &gt;=.
+One of `==`, `!=`, `&lt;`, `&gt;`, `&lt;=`, `&gt;=`.
 </parameter_description>
 </parameter>
 <parameter name="s2">
@@ -5535,11 +5541,38 @@ Since: 2.16
 </parameter>
 <parameter name="cmp">
 <parameter_description> The comparison operator to use.
-One of ==, !=, &lt;, &gt;, &lt;=, &gt;=.
+One of `==`, `!=`, `&lt;`, `&gt;`, `&lt;=`, `&gt;=`.
 </parameter_description>
 </parameter>
 <parameter name="n2">
 <parameter_description> another unsigned integer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_assert_cmpvariant">
+<description>
+Debugging macro to compare two #GVariants. If the comparison fails,
+an error message is logged and the application is either terminated
+or the testcase marked as failed. The variants are compared using
+g_variant_equal().
+
+The effect of `g_assert_cmpvariant (v1, v2)` is the same as
+`g_assert_true (g_variant_equal (v1, v2))`. The advantage of this macro is
+that it can produce a message that includes the actual values of @v1 and @v2.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="v1">
+<parameter_description> pointer to a #GVariant
+</parameter_description>
+</parameter>
+<parameter name="v2">
+<parameter_description> pointer to another #GVariant
 </parameter_description>
 </parameter>
 </parameters>
@@ -5559,7 +5592,7 @@ error message and code.
 
 This can only be used to test for a specific error. If you want to
 test that @err is set, but don't care what it's set to, just use
-`g_assert (err != NULL)`
+`g_assert_nonnull (err)`.
 
 Since: 2.20
 
@@ -5724,27 +5757,29 @@ Since: 2.38
 
 <function name="g_assertion_message_expr">
 <description>
+Internal function used to print messages from the public g_assert() and
+g_assert_not_reached() macros.
 
 </description>
 <parameters>
 <parameter name="domain">
-<parameter_description>
+<parameter_description> log domain
 </parameter_description>
 </parameter>
 <parameter name="file">
-<parameter_description>
+<parameter_description> file containing the assertion
 </parameter_description>
 </parameter>
 <parameter name="line">
-<parameter_description>
+<parameter_description> line number of the assertion
 </parameter_description>
 </parameter>
 <parameter name="func">
-<parameter_description>
+<parameter_description> function containing the assertion
 </parameter_description>
 </parameter>
 <parameter name="expr">
-<parameter_description>
+<parameter_description> expression which failed
 </parameter_description>
 </parameter>
 </parameters>
@@ -6938,6 +6973,9 @@ reference counting semantics to it.
 The data will be freed when its reference count drops to
 zero.
 
+The allocated data is guaranteed to be suitably aligned for any
+built-in type.
+
 Since: 2.58
 
 </description>
@@ -6961,6 +6999,9 @@ The contents of the returned data is set to zero.
 
 The data will be freed when its reference count drops to
 zero.
+
+The allocated data is guaranteed to be suitably aligned for any
+built-in type.
 
 Since: 2.58
 
@@ -7170,7 +7211,7 @@ Since: 2.58
 
 <function name="g_atomic_ref_count_init">
 <description>
-Atomically initializes a reference count variable.
+Initializes a reference count variable.
 
 Since: 2.58
 
@@ -8562,8 +8603,8 @@ loaded in memory
 <function name="g_bookmark_file_load_from_data_dirs">
 <description>
 This function looks for a desktop bookmark file named @file in the
-paths returned from g_get_user_data_dir() and g_get_system_data_dirs(), 
-loads the file into @bookmark and returns the file's full path in 
+paths returned from g_get_user_data_dir() and g_get_system_data_dirs(),
+loads the file into @bookmark and returns the file's full path in
 @full_path.  If the file could not be loaded then @error is
 set to either a #GFileError or #GBookmarkFileError.
 
@@ -9081,7 +9122,7 @@ Sets the time the bookmark for @uri was last visited.
 
 If no bookmark for @uri is found then it is created.
 
-The &quot;visited&quot; time should only be set if the bookmark was launched, 
+The &quot;visited&quot; time should only be set if the bookmark was launched,
 either using the command line retrieved by g_bookmark_file_get_app_info()
 or by the default application for the bookmark's MIME type, retrieved
 using g_bookmark_file_get_mime_type().  Changing the &quot;visited&quot; time
@@ -18975,7 +19016,9 @@ an error occurred
 Formats a size (for example the size of a file) into a human readable
 string.  Sizes are rounded to the nearest size prefix (kB, MB, GB)
 and are displayed rounded to the nearest tenth. E.g. the file size
-3292528 bytes will be converted into the string &quot;3.2 MB&quot;.
+3292528 bytes will be converted into the string &quot;3.2 MB&quot;. The returned string
+is UTF-8, and may use a non-breaking space to separate the number and units,
+to ensure they aren’t separated when line wrapped.
 
 The prefix units base is 1000 (i.e. 1 kB is 1000 bytes).
 
@@ -23100,7 +23143,9 @@ If @key is %NULL then @comment will be read from above
 @group_name. If both @key and @group_name are %NULL, then
 @comment will be read from above the first group in the file.
 
-Note that the returned string includes the '#' comment markers.
+Note that the returned string does not include the '#' comment markers,
+but does include any whitespace after them (on each line). It includes
+the line breaks between lines, but does not include the final line break.
 
 Since: 2.6
 
@@ -30505,9 +30550,11 @@ will be updated as well. The @transform_from function is only used in case
 of bidirectional bindings, otherwise it will be ignored
 
 The binding will automatically be removed when either the @source or the
-@target instances are finalized. To remove the binding without affecting the
-@source and the @target you can just call g_object_unref() on the returned
-#GBinding instance.
+@target instances are finalized. This will release the reference that is
+being held on the #GBinding instance; if you want to hold on to the
+#GBinding instance, you will need to hold a reference to it.
+
+To remove the binding, call g_binding_unbind().
 
 A #GObject can have multiple bindings.
 
@@ -36124,6 +36171,27 @@ Since: 2.14
 <return></return>
 </function>
 
+<function name="g_queue_clear_full">
+<description>
+Convenience method, which frees all the memory used by a #GQueue,
+and calls the provided @free_func on each item in the #GQueue.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a pointer to a #GQueue
+</parameter_description>
+</parameter>
+<parameter name="free_func">
+<parameter_description> the function to be called to free memory allocated
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_queue_copy">
 <description>
 Copies a @queue. Note that is a shallow copy. If the elements in the
@@ -37309,6 +37377,9 @@ counting semantics to it.
 The data will be freed when its reference count drops to
 zero.
 
+The allocated data is guaranteed to be suitably aligned for any
+built-in type.
+
 Since: 2.58
 
 </description>
@@ -37332,6 +37403,9 @@ The contents of the returned data is set to zero.
 
 The data will be freed when its reference count drops to
 zero.
+
+The allocated data is guaranteed to be suitably aligned for any
+built-in type.
 
 Since: 2.58
 
@@ -37614,6 +37688,70 @@ Since: 2.32
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_rec_mutex_locker_free">
+<description>
+Unlock @locker's recursive mutex. See g_rec_mutex_locker_new() for details.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="locker">
+<parameter_description> a GRecMutexLocker
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_rec_mutex_locker_new">
+<description>
+Lock @rec_mutex and return a new #GRecMutexLocker. Unlock with
+g_rec_mutex_locker_free(). Using g_rec_mutex_unlock() on @rec_mutex
+while a #GRecMutexLocker exists can lead to undefined behaviour.
+
+This is intended to be used with g_autoptr().  Note that g_autoptr()
+is only available when using GCC or clang, so the following example
+will only work with those compilers:
+|[
+typedef struct
+{
+...
+GRecMutex rec_mutex;
+...
+} MyObject;
+
+static void
+my_object_do_stuff (MyObject *self)
+{
+g_autoptr(GRecMutexLocker) locker = g_rec_mutex_locker_new (&amp;self-&gt;rec_mutex);
+
+// Code with rec_mutex locked here
+
+if (cond)
+// No need to unlock
+return;
+
+// Optionally early unlock
+g_clear_pointer (&amp;locker, g_rec_mutex_locker_free);
+
+// Code with rec_mutex unlocked here
+}
+]|
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="rec_mutex">
+<parameter_description> a recursive mutex to lock
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GRecMutexLocker
+</return>
 </function>
 
 <function name="g_rec_mutex_trylock">
@@ -39080,7 +39218,7 @@ Resets the cache used for g_get_user_special_dir(), so
 that the latest on-disk version is used. Call this only
 if you just changed the data on disk yourself.
 
-Due to threadsafety issues this may cause leaking of strings
+Due to thread safety issues this may cause leaking of strings
 that were previously returned from g_get_user_special_dir()
 that can't be freed. We ensure to only leak the data for
 the directories that actually changed value though.
@@ -39224,19 +39362,21 @@ Any unrelated failures can be skipped over in
 
 <function name="g_return_if_fail_warning">
 <description>
+Internal function used to print messages from the public g_return_if_fail()
+and g_return_val_if_fail() macros.
 
 </description>
 <parameters>
 <parameter name="log_domain">
-<parameter_description>
+<parameter_description> log domain
 </parameter_description>
 </parameter>
 <parameter name="pretty_function">
-<parameter_description>
+<parameter_description> function containing the assertion
 </parameter_description>
 </parameter>
 <parameter name="expression">
-<parameter_description>
+<parameter_description> expression which failed
 </parameter_description>
 </parameter>
 </parameters>
@@ -45335,7 +45475,7 @@ eventually calls) paste the argument vector elements together into
 a command line, and the C runtime startup code does a corresponding
 reconstruction of an argument vector from the command line, to be
 passed to main(). Complications arise when you have argument vector
-elements that contain spaces of double quotes. The spawn*() functions
+elements that contain spaces or double quotes. The `spawn*()` functions
 don't do any quoting or escaping, but on the other hand the startup
 code does do unquoting and unescaping in order to enable receiving
 arguments with embedded spaces or double quotes. To work around this
@@ -47130,13 +47270,15 @@ it if necessary.
 
 <function name="g_string_append_len">
 <description>
-Appends @len bytes of @val to @string. Because @len is
-provided, @val may contain embedded nuls and need not
-be nul-terminated.
+Appends @len bytes of @val to @string.
 
-Since this function does not stop at nul bytes, it is
-the caller's responsibility to ensure that @val has at
-least @len addressable bytes.
+If @len is positive, @val may contain embedded nuls and need
+not be nul-terminated. It is the caller's responsibility to
+ensure that @val has at least @len addressable bytes.
+
+If @len is negative, @val must be nul-terminated and @len
+is considered to request the entire string length. This
+makes g_string_append_len() equivalent to g_string_append().
 
 
 </description>
@@ -47150,7 +47292,7 @@ least @len addressable bytes.
 </parameter_description>
 </parameter>
 <parameter name="len">
-<parameter_description> number of bytes of @val to use
+<parameter_description> number of bytes of @val to use, or -1 for all of @val
 </parameter_description>
 </parameter>
 </parameters>
@@ -47658,13 +47800,15 @@ Inserts a byte into a #GString, expanding it if necessary.
 <function name="g_string_insert_len">
 <description>
 Inserts @len bytes of @val into @string at @pos.
-Because @len is provided, @val may contain embedded
-nuls and need not be nul-terminated. If @pos is -1,
-bytes are inserted at the end of the string.
 
-Since this function does not stop at nul bytes, it is
-the caller's responsibility to ensure that @val has at
-least @len addressable bytes.
+If @len is positive, @val may contain embedded nuls and need
+not be nul-terminated. It is the caller's responsibility to
+ensure that @val has at least @len addressable bytes.
+
+If @len is negative, @val must be nul-terminated and @len
+is considered to request the entire string length.
+
+If @pos is -1, bytes are inserted at the end of the string.
 
 
 </description>
@@ -47683,7 +47827,7 @@ happen, or -1 for at the end
 </parameter_description>
 </parameter>
 <parameter name="len">
-<parameter_description> number of bytes of @val to insert
+<parameter_description> number of bytes of @val to insert, or -1 for all of @val
 </parameter_description>
 </parameter>
 </parameters>
@@ -47862,12 +48006,14 @@ expanding it if necessary.
 <function name="g_string_prepend_len">
 <description>
 Prepends @len bytes of @val to @string.
-Because @len is provided, @val may contain
-embedded nuls and need not be nul-terminated.
 
-Since this function does not stop at nul bytes,
-it is the caller's responsibility to ensure that
-@val has at least @len addressable bytes.
+If @len is positive, @val may contain embedded nuls and need
+not be nul-terminated. It is the caller's responsibility to
+ensure that @val has at least @len addressable bytes.
+
+If @len is negative, @val must be nul-terminated and @len
+is considered to request the entire string length. This
+makes g_string_prepend_len() equivalent to g_string_prepend().
 
 
 </description>
@@ -47881,7 +48027,7 @@ it is the caller's responsibility to ensure that
 </parameter_description>
 </parameter>
 <parameter name="len">
-<parameter_description> number of bytes in @val to prepend
+<parameter_description> number of bytes in @val to prepend, or -1 for all of @val
 </parameter_description>
 </parameter>
 </parameters>
@@ -48643,6 +48789,32 @@ Since: 2.44
 </return>
 </function>
 
+<function name="g_strv_equal">
+<description>
+Checks if @strv1 and @strv2 contain exactly the same elements in exactly the
+same order. Elements are compared using g_str_equal(). To match independently
+of order, sort the arrays first (using g_qsort_with_data() or similar).
+
+Two empty arrays are considered equal. Neither @strv1 not @strv2 may be
+%NULL.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="strv1">
+<parameter_description> a %NULL-terminated array of strings
+</parameter_description>
+</parameter>
+<parameter name="strv2">
+<parameter_description> another %NULL-terminated array of strings
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @strv1 and @strv2 are equal
+</return>
+</function>
+
 <function name="g_strv_length">
 <description>
 Returns the length of the given %NULL-terminated
@@ -48716,6 +48888,10 @@ If @testpath includes the component &quot;subprocess&quot; anywhere in it,
 the test will be skipped by default, and only run if explicitly
 required via the `-p` command-line option or g_test_trap_subprocess().
 
+No component of @testpath may start with a dot (`.`) if the
+%G_TEST_OPTION_ISOLATE_DIRS option is being used; and it is recommended to
+do so even if it isn’t.
+
 Since: 2.16
 
 </description>
@@ -48775,6 +48951,10 @@ slash-separated portions of @testpath.
 If @testpath includes the component &quot;subprocess&quot; anywhere in it,
 the test will be skipped by default, and only run if explicitly
 required via the `-p` command-line option or g_test_trap_subprocess().
+
+No component of @testpath may start with a dot (`.`) if the
+%G_TEST_OPTION_ISOLATE_DIRS option is being used; and it is recommended to
+do so even if it isn’t.
 
 Since: 2.16
 
@@ -49209,6 +49389,14 @@ that appropriate assertions or warnings are given (the default).
 
 - `--debug-log`: Debug test logging output.
 
+Options which can be passed to @... are:
+
+- `&quot;no_g_set_prgname&quot;`: Causes g_test_init() to not call g_set_prgname().
+- %G_TEST_OPTION_ISOLATE_DIRS: Creates a unique temporary directory for each
+unit test and uses g_set_user_dirs() to set XDG directories to point into
+that temporary directory for the duration of the unit test. See the
+documentation for %G_TEST_OPTION_ISOLATE_DIRS.
+
 Since 2.58, if tests are compiled with `G_DISABLE_ASSERT` defined,
 g_test_init() will print an error and exit. This is to prevent no-op tests
 from being executed, as g_assert() is commonly (erroneously) used in unit
@@ -49230,9 +49418,7 @@ Any parameters understood by g_test_init() stripped before return.
 </parameter_description>
 </parameter>
 <parameter name="Varargs">
-<parameter_description> %NULL-terminated list of special options. Currently the only
-defined option is `&quot;no_g_set_prgname&quot;`, which
-will cause g_test_init() to not call g_set_prgname().
+<parameter_description> %NULL-terminated list of special options, documented below.
 </parameter_description>
 </parameter>
 </parameters>
@@ -60529,7 +60715,7 @@ In the event that @dictionary has the type a{sv}, the @expected_type
 string specifies what type of value is expected to be inside of the
 variant. If the value inside the variant has a different type then
 %NULL is returned. In the event that @dictionary has a value type other
-than v then @expected_type must directly match the key type and it is
+than v then @expected_type must directly match the value type and it is
 used to unpack the value directly or an error occurs.
 
 In either case, if @key is not found in @dictionary, %NULL is returned.
@@ -60860,6 +61046,10 @@ called from various functions in gvariant.c.
 
 A reference is taken on @bytes.
 
+The data in @bytes must be aligned appropriately for the @type being loaded.
+Otherwise this function will internally create a copy of the memory (since
+GLib 2.60) or (in older versions) fail and exit the process.
+
 Since: 2.36
 
 </description>
@@ -60908,6 +61098,11 @@ endianness. g_variant_byteswap() can be used to recover the original values.
 @notify will be called with @user_data when @data is no longer
 needed.  The exact time of this call is unspecified and might even be
 before this function returns.
+
+Note: @data must be backed by memory that is aligned appropriately for the
+@type being loaded. Otherwise this function will internally create a copy of
+the memory (since GLib 2.60) or (in older versions) fail and exit the
+process.
 
 Since: 2.24
 
@@ -62800,27 +62995,29 @@ Since: 2.16
 
 <function name="g_warn_message">
 <description>
+Internal function used to print messages from the public g_warn_if_reached()
+and g_warn_if_fail() macros.
 
 </description>
 <parameters>
 <parameter name="domain">
-<parameter_description>
+<parameter_description> log domain
 </parameter_description>
 </parameter>
 <parameter name="file">
-<parameter_description>
+<parameter_description> file containing the warning
 </parameter_description>
 </parameter>
 <parameter name="line">
-<parameter_description>
+<parameter_description> line number of the warning
 </parameter_description>
 </parameter>
 <parameter name="func">
-<parameter_description>
+<parameter_description> function containing the warning
 </parameter_description>
 </parameter>
 <parameter name="warnexpr">
-<parameter_description>
+<parameter_description> expression which failed
 </parameter_description>
 </parameter>
 </parameters>
@@ -63326,6 +63523,15 @@ Since: 2.58
 A standard boolean type.
 Variables of this type should only contain the value
 %TRUE or %FALSE.
+
+Never directly compare the contents of a #gboolean variable with the values
+%TRUE or %FALSE. Use `if (condition)` to check a #gboolean is &quot;true&quot;, instead
+of `if (condition == TRUE)`. Likewise use `if (!condition)` to check a
+#gboolean is &quot;false&quot;.
+
+There is no validation when assigning to a #gboolean variable and so it could
+contain any value represented by a #gint. This is why the use of `if
+(condition)` is recommended. All non-zero values in C evaluate to &quot;true&quot;.
 
 </description>
 <parameters>
