@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([glibmm], [2.58.0],
+AC_INIT([glibmm], [2.58.1],
         [https://gitlab.gnome.org/GNOME/glibmm/issues],
         [glibmm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -43,7 +43,7 @@ MM_CONFIG_DOCTOOL_DIR([docs])
 AC_SUBST([LIBGLIBMM_SO_VERSION], [4:0:3])
 
 AC_PROG_CXX
-MM_AX_CXX_COMPILE_STDCXX([11], [noext],[mandatory])
+MM_AX_CXX_COMPILE_STDCXX([11], [noext], [mandatory])
 
 AC_DISABLE_STATIC
 LT_INIT([win32-dll])
