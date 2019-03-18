@@ -71,7 +71,10 @@ public:
 
   _WRAP_METHOD(void copy_session_state(const Glib::RefPtr<TlsClientConnection>& source), g_tls_client_connection_copy_session_state)
 
-  _WRAP_PROPERTY("accepted-cas", std::vector< Glib::RefPtr<Glib::ByteArray> >)
+  // property_accepted_cas() won't work unless a Glib::Value<std::vector<Glib::RefPtr<Glib::ByteArray>>>
+  // specialization is added. Workaround: Use get_accepted_cas().
+  _WRAP_PROPERTY("accepted-cas", std::vector< Glib::RefPtr<Glib::ByteArray> >,
+    deprecated "property_accepted_cas() does not work. Use get_accepted_cas() instead.")
   _WRAP_PROPERTY("server-identity", Glib::RefPtr<SocketConnectable>)
   _WRAP_PROPERTY("use-ssl3", bool, deprecated "SSL 3.0 is insecure, and this property does not generally enable or disable it, despite its name.")
   _WRAP_PROPERTY("validation-flags", TlsCertificateFlags)
