@@ -18,6 +18,7 @@ _DEFS(glibmm,glib)
 
 #include <glibmmconfig.h>
 #include <glibmm/refptr.h>
+#include <glibmm/timezone.h>
 #include <glibmm/ustring.h>
 #include <glib.h>
 
@@ -29,7 +30,6 @@ namespace Glib
 {
 
 struct TimeVal;
-class TimeZone;
 
 /** A value representing an interval of time, in microseconds.  As GTimeSpan,
  * its underlying type is gint64.
@@ -66,7 +66,7 @@ class DateTime
   _IGNORE(g_date_time_ref, g_date_time_unref)
 
 public:
- _WRAP_METHOD(static DateTime create_now(const TimeZone& tz), g_date_time_new_now)
+  _WRAP_METHOD(static DateTime create_now(const TimeZone& tz), g_date_time_new_now)
   _WRAP_METHOD(static DateTime create_now_local(), g_date_time_new_now_local)
   _WRAP_METHOD(static DateTime create_now_utc(), g_date_time_new_now_utc)
 
@@ -143,6 +143,8 @@ public:
   _WRAP_METHOD(gint64 to_unix() const, g_date_time_to_unix)
   _WRAP_METHOD(bool to_timeval(TimeVal& tv) const, g_date_time_to_timeval)
   _WRAP_METHOD(TimeSpan get_utc_offset() const, g_date_time_get_utc_offset)
+#m4 _CONVERSION(`GTimeZone*',`TimeZone',`Glib::wrap($3, true)')
+  _WRAP_METHOD(TimeZone get_timezone() const, g_date_time_get_timezone, newin "2,60")
   _WRAP_METHOD(Glib::ustring get_timezone_abbreviation() const, g_date_time_get_timezone_abbreviation)
   _WRAP_METHOD(bool is_daylight_savings() const, g_date_time_is_daylight_savings)
   _WRAP_METHOD(DateTime to_timezone(const TimeZone& tz) const, g_date_time_to_timezone)
