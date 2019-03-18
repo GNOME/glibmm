@@ -30,11 +30,15 @@ unwrap_objectbase_custom(const Glib::RefPtr<Glib::ObjectBase>& cpp_instance)
 Glib::RefPtr<Glib::ObjectBase>
 AsyncResult::get_source_object_base()
 {
+  // Glib::wrap(cobj) can't be used here. See tests/giomm_asyncresult_sourceobject
+  // for a case where it would fail, and an explanation of why.
+  // In short, the source object is not necessarily a Glib::Object. It may be
+  // a Glib::Interface.
+
   auto cobj = g_async_result_get_source_object(gobj());
   auto cppobj = Glib::wrap_auto(cobj); // ObjectBase::_get_current_wrapper(cobj);
   return Glib::RefPtr<Glib::ObjectBase>(
     cppobj); // g_async_result_get_source_object() gives us a ref, unusually.
-  // TODO: For some reason this fails: Glib::wrap(cobj);
 }
 
 Glib::RefPtr<const Glib::ObjectBase>
