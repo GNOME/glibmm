@@ -401,6 +401,57 @@ ObjectBase::thaw_notify()
   g_object_thaw_notify(gobj());
 }
 
+void ObjectBase::add_custom_interface_class(const Interface_Class* iface_class)
+{
+  // The GObject is not instantiated yet. Add to the custom_interface_classes
+  // and add the interface in the Glib::Object constructor.
+  std::lock_guard<std::mutex> lock(extra_object_base_data_mutex);
+  extra_object_base_data[this].custom_interface_classes.emplace_back(iface_class);
+}
+
+void ObjectBase::add_custom_class_init_function(GClassInitFunc class_init_func, void* class_data)
+{
+  std::lock_guard<std::mutex> lock(extra_object_base_data_mutex);
+  extra_object_base_data[this].custom_class_init_functions.emplace_back(
+    std::make_tuple(class_init_func, class_data));
+}
+
+void ObjectBase::set_custom_instance_init_function(GInstanceInitFunc instance_init_func)
+{
+  std::lock_guard<std::mutex> lock(extra_object_base_data_mutex);
+  extra_object_base_data[this].custom_instance_init_function = instance_init_func;
+}
+
+const Class::interface_class_vector_type* ObjectBase::get_custom_interface_classes() const
+{
+  std::lock_guard<std::mutex> lock(extra_object_base_data_mutex);
+  const auto iter = extra_object_base_data.find(this);
+  return (iter != extra_object_base_data.end()) ? &iter->second.custom_interface_classes : nullptr;
+}
+
+const Class::class_init_funcs_type* ObjectBase::get_custom_class_init_functions() const
+{
+  std::lock_guard<std::mutex> lock(extra_object_base_data_mutex);
+  const auto iter = extra_object_base_data.find(this);
+  return (iter != extra_object_base_data.end()) ? &iter->second.custom_class_init_functions : nullptr;
+}
+
+GInstanceInitFunc ObjectBase::get_custom_instance_init_function() const
+{
+  std::lock_guard<std::mutex> lock(extra_object_base_data_mutex);
+  const auto iter = extra_object_base_data.find(this);
+  return (iter != extra_object_base_data.end()) ? iter->second.custom_instance_init_function : nullptr;
+}
+
+void ObjectBase::custom_class_init_finished()
+{
+  std::lock_guard<std::mutex> lock(extra_object_base_data_mutex);
+  const auto iter = extra_object_base_data.find(this);
+  if (iter != extra_object_base_data.end())
+    extra_object_base_data.erase(iter);
+}
+
+/**** Global function *****************************************************/
 bool
 _gobject_cppinstance_already_deleted(GObject* gobject)
 {

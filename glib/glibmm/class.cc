@@ -86,12 +86,20 @@ Class::register_derived_type(GType base_type, GTypeModule* module)
 GType
 Class::clone_custom_type(const char* custom_type_name) const
 {
-  return clone_custom_type(custom_type_name, interface_class_vector_type());
+  return clone_custom_type(custom_type_name, nullptr, nullptr, nullptr);
 }
 
 GType
 Class::clone_custom_type(
   const char* custom_type_name, const interface_class_vector_type& interface_classes) const
+{
+  return clone_custom_type(custom_type_name, &interface_classes, nullptr, nullptr);
+}
+
+GType
+Class::clone_custom_type(
+  const char* custom_type_name, const interface_class_vector_type* interface_classes,
+  const class_init_funcs_type* class_init_funcs, GInstanceInitFunc instance_init_func) const
 {
   std::string full_name("gtkmm__CustomObject_");
   Glib::append_canonical_typename(full_name, custom_type_name);
@@ -117,30 +125,43 @@ Class::clone_custom_type(
     // GTypeQuery::instance_size is guint but GTypeInfo::instance_size is guint16.
     const guint16 instance_size = (guint16)base_query.instance_size;
 
+    // Let the wrapper's class_init_function() be the first one to call.
+    auto all_class_init_funcs = new class_init_funcs_type(
+      1, std::tuple<GClassInitFunc, void*>(class_init_func_, nullptr));
+    if (class_init_funcs)
+      all_class_init_funcs->insert(all_class_init_funcs->end(),
+        class_init_funcs->begin(), class_init_funcs->end());
+
     const GTypeInfo derived_info = {
       class_size,
       nullptr, // base_init
       &Class::custom_class_base_finalize_function, // base_finalize
       &Class::custom_class_init_function,
       nullptr, // class_finalize
-      this, // class_data
+      all_class_init_funcs, // class_data
       instance_size,
       0, // n_preallocs
-      nullptr, // instance_init
+      instance_init_func, // instance_init
       nullptr, // value_table
     };
+
+    // custom_class_init_function() is called when the first object of the custom
+    // class is created, which is after clone_custom_type() has returned.
+    // Let custom_class_init_function() delete all_class_init_funcs.
 
     custom_type =
       g_type_register_static(base_type, full_name.c_str(), &derived_info, GTypeFlags(0));
 
     // Add derived versions of interfaces, if the C type implements any interfaces.
     // For instance, TreeModel_Class::add_interface().
-    for (interface_class_vector_type::size_type i = 0; i < interface_classes.size(); i++)
+    if (interface_classes)
     {
-      const Interface_Class* interface_class = interface_classes[i];
-      if (interface_class)
+      for (auto interface_class : *interface_classes)
       {
-        interface_class->add_interface(custom_type);
+        if (interface_class)
+        {
+          interface_class->add_interface(custom_type);
+        }
       }
     }
   }
@@ -176,18 +197,35 @@ Class::custom_class_base_finalize_function(void* g_class)
 void
 Class::custom_class_init_function(void* g_class, void* class_data)
 {
-  // The class_data pointer is set to 'this' by clone_custom_type().
-  const Class* const self = static_cast<Class*>(class_data);
+  // clone_custom_type() sets the class data pointer to a pointer to a vector
+  // of pointers to functions to be called.
+  const class_init_funcs_type& class_init_funcs =
+    *static_cast<class_init_funcs_type*>(class_data);
 
-  g_return_if_fail(self->class_init_func_ != nullptr);
+  g_return_if_fail(!class_init_funcs.empty() && std::get<0>(class_init_funcs[0]) != nullptr);
 
   // Call the wrapper's class_init_function() to redirect
   // the vfunc and default signal handler callbacks.
-  (*self->class_init_func_)(g_class, nullptr);
+  GClassInitFunc init_func = std::get<0>(class_init_funcs[0]);
+  (*init_func)(g_class, nullptr);
 
   GObjectClass* const gobject_class = static_cast<GObjectClass*>(g_class);
   gobject_class->get_property = &Glib::custom_get_property_callback;
   gobject_class->set_property = &Glib::custom_set_property_callback;
+
+  // Call extra class init functions, if any.
+  for (std::size_t i = 1; i < class_init_funcs.size(); ++i)
+  {
+    if (GClassInitFunc extra_init_func = std::get<0>(class_init_funcs[i]))
+    {
+      void* extra_class_data = std::get<1>(class_init_funcs[i]);
+      (*extra_init_func)(g_class, extra_class_data);
+    }
+  }
+
+  // Assume that this function is called exactly once for each type.
+  // Delete the class_init_funcs_type that was created in clone_custom_type().
+  delete static_cast<class_init_funcs_type*>(class_data);
 
   // Override the properties of implemented interfaces, if any.
   const GType object_type = G_TYPE_FROM_CLASS(g_class);

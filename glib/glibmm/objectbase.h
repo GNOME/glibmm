@@ -219,20 +219,15 @@ protected:
 
   bool is_anonymous_custom_() const;
 
-  // TODO: At the next ABI break, replace extra_object_base_data by a non-static
-  // data member.
-  // This is a new data member that can't be added as instance data to
-  // ObjectBase now, because it would break ABI.
-  struct ExtraObjectBaseData
-  {
-    Class::interface_class_vector_type custom_interface_classes;
-  };
-
-  using extra_object_base_data_type = std::map<const ObjectBase*, ExtraObjectBaseData>;
-  static extra_object_base_data_type extra_object_base_data;
-  // ObjectBase instances may be used in different threads.
-  // Accesses to extra_object_base_data must be thread-safe.
-  static std::mutex extra_object_base_data_mutex;
+  // The following 7 methods are used by Glib::ExtraClassInit, Glib::Interface
+  // and Glib::Object during construction of a named custom type.
+  void add_custom_interface_class(const Interface_Class* iface_class);
+  void add_custom_class_init_function(GClassInitFunc class_init_func, void* class_data = nullptr);
+  void set_custom_instance_init_function(GInstanceInitFunc instance_init_func);
+  const Class::interface_class_vector_type* get_custom_interface_classes() const;
+  const Class::class_init_funcs_type* get_custom_class_init_functions() const;
+  GInstanceInitFunc get_custom_instance_init_function() const;
+  void custom_class_init_finished();
 
 public:
   //  is_derived_() must be public, so that overridden vfuncs and signal handlers can call it
@@ -261,6 +256,28 @@ protected:
 private:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   virtual void set_manage(); // calls g_error()
+
+  // TODO: At the next ABI break, replace extra_object_base_data by a non-static
+  // data member.
+  // Private part of implementation.
+  // Used only during construction of named custom types.
+  // This is a new data member that can't be added as instance data to
+  // ObjectBase now, because it would break ABI.
+  struct ExtraObjectBaseData
+  {
+    // Pointers to the interfaces of custom types.
+    Class::interface_class_vector_type custom_interface_classes;
+    // Pointers to extra class init functions.
+    Class::class_init_funcs_type custom_class_init_functions;
+    // Pointer to the instance init function.
+    GInstanceInitFunc custom_instance_init_function = nullptr;
+  };
+
+  using extra_object_base_data_type = std::map<const ObjectBase*, ExtraObjectBaseData>;
+  static extra_object_base_data_type extra_object_base_data;
+  // ObjectBase instances may be used in different threads.
+  // Accesses to extra_object_base_data must be thread-safe.
+  static std::mutex extra_object_base_data_mutex;
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
