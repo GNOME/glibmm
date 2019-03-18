@@ -43,7 +43,7 @@ namespace DBus
 
 _WRAP_ENUM(BusType, GBusType)
 _WRAP_ENUM(CallFlags, GDBusCallFlags, s#^DBUS_##, NO_GTYPE)
-_WRAP_ENUM(ConnectionFlags, GDBusConnectionFlags, s#^DBUS_##, NO_GTYPE)
+_WRAP_ENUM(ConnectionFlags, GDBusConnectionFlags, s#^DBUS_##, gtype_func g_dbus_connection_flags_get_type)
 _WRAP_ENUM(SendMessageFlags, GDBusSendMessageFlags, s#^DBUS_##, NO_GTYPE)
 _WRAP_ENUM(SignalFlags, GDBusSignalFlags, s#^DBUS_##, NO_GTYPE)
 _WRAP_ENUM(SubtreeFlags, GDBusSubtreeFlags, s#^DBUS_##, NO_GTYPE)
@@ -590,6 +590,7 @@ public:
   _WRAP_METHOD(Glib::ustring get_unique_name() const, g_dbus_connection_get_unique_name)
 
   _WRAP_METHOD(CapabilityFlags get_capabilities() const, g_dbus_connection_get_capabilities)
+  _WRAP_METHOD(ConnectionFlags get_flags() const, g_dbus_connection_get_flags, newin "2,60")
 
   _WRAP_METHOD(Glib::RefPtr<Credentials> get_peer_credentials(), g_dbus_connection_get_peer_credentials, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Credentials> get_peer_credentials() const, g_dbus_connection_get_peer_credentials, refreturn, constversion)
@@ -1022,7 +1023,7 @@ public:
   _WRAP_PROPERTY("capabilities", CapabilityFlags)
   _WRAP_PROPERTY("closed", bool)
   _WRAP_PROPERTY("exit-on-close", bool)
-  //_WRAP_PROPERTY("flags", ConnectionFlags) // write-only construct-only
+  _WRAP_PROPERTY("flags", ConnectionFlags, newin "2,60")
   _WRAP_PROPERTY("guid", std::string)
   _WRAP_PROPERTY("stream", Glib::RefPtr<IOStream>)
   _WRAP_PROPERTY("unique-name", Glib::ustring)
