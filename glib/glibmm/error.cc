@@ -78,6 +78,11 @@ Error::~Error() noexcept
     g_error_free(gobject_);
 }
 
+Error::operator bool() const
+{
+  return gobject_ != nullptr;
+}
+
 GQuark
 Error::domain() const
 {
@@ -182,6 +187,22 @@ Error::throw_exception(GError* gobject)
 
   // Doesn't copy, because error-returning functions return a newly allocated GError for us.
   throw Glib::Error(gobject);
+}
+
+// Glib::Value<Glib::Error>
+GType Value<Error>::value_type()
+{
+  return g_error_get_type();
+}
+
+void Value<Error>::set(const CppType& data)
+{
+  set_boxed(data.gobj());
+}
+
+Value<Error>::CppType Value<Error>::get() const
+{
+  return Glib::Error(static_cast<CType>(get_boxed()), true);
 }
 
 } // namespace Glib

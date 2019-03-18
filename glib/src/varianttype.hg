@@ -18,6 +18,7 @@ _DEFS(glibmm,glib)
 
 #include <glibmmconfig.h>
 #include <glib-object.h> //For gsize
+#include <glibmm/value.h>
 #include <string>
 #include <vector>
 
@@ -244,6 +245,21 @@ extern const VariantType VARIANT_TYPE_BYTESTRING;
 
 extern const VariantType VARIANT_TYPE_BYTESTRING_ARRAY;
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+// This is needed so Glib::VariantType can be used with
+// Glib::Value and _WRAP_PROPERTY in Gio::Action and elsewhere.
+template <>
+class Value<Glib::VariantType> : public ValueBase_Boxed
+{
+public:
+  using CppType = Glib::VariantType;
+  using CType = GVariantType*;
 
+  static GType value_type();
+
+  void set(const CppType& data);
+  CppType get() const;
+};
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } // namespace Glib

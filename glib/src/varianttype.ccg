@@ -136,4 +136,22 @@ std::vector<VariantType> VariantType::get_item_types() const
   return result;
 }
 
+// Glib::Value<Glib::VariantType>
+GType Value<VariantType>::value_type()
+{
+  // The type function is *not* called g_variant_type_get_type().
+  // Use the macro in order to avoid using the non-standard function name here.
+  return G_TYPE_VARIANT_TYPE;
+}
+
+void Value<VariantType>::set(const CppType& data)
+{
+  set_boxed(data.gobj());
+}
+
+Value<VariantType>::CppType Value<VariantType>::get() const
+{
+  return Glib::wrap(static_cast<CType>(get_boxed()), true);
+}
+
 } // namespace GLib
