@@ -60,11 +60,10 @@ public:
   _WRAP_METHOD(void set_require_close_notify(bool require_close_notify = true), g_tls_connection_set_require_close_notify)
   _WRAP_METHOD(bool get_require_close_notify() const, g_tls_connection_get_require_close_notify)
 
-  // Deprecated in glib 2.60, but not in glibmm 2.58.
-  _WRAP_METHOD_DOCS_ONLY(g_tls_connection_set_rehandshake_mode)
-  void set_rehandshake_mode(TlsRehandshakeMode mode);
-  _WRAP_METHOD_DOCS_ONLY(g_tls_connection_get_rehandshake_mode)
-  TlsRehandshakeMode get_rehandshake_mode() const;
+  _WRAP_METHOD(void set_rehandshake_mode(TlsRehandshakeMode mode), g_tls_connection_set_rehandshake_mode,
+    deprecated "Changing the rehandshake mode is no longer required for compatibility. Also, rehandshaking has been removed from the TLS protocol in TLS 1.3.")
+  _WRAP_METHOD(TlsRehandshakeMode get_rehandshake_mode() const, g_tls_connection_get_rehandshake_mode,
+    deprecated "Changing the rehandshake mode is no longer required for compatibility. Also, rehandshaking has been removed from the TLS protocol in TLS 1.3.")
 
   _WRAP_METHOD(void set_use_system_certdb(bool use_system_certdb = true), g_tls_connection_set_use_system_certdb,
     deprecated "Use set_database() instead.")
@@ -94,7 +93,8 @@ public:
   _WRAP_PROPERTY("interaction", Glib::RefPtr<TlsInteraction>)
   _WRAP_PROPERTY("peer-certificate", Glib::RefPtr<TlsCertificate>)
   _WRAP_PROPERTY("peer-certificate-errors", TlsCertificateFlags)
-  _WRAP_PROPERTY("rehandshake-mode", TlsRehandshakeMode)
+  _WRAP_PROPERTY("rehandshake-mode", TlsRehandshakeMode,
+    deprecated "Changing the rehandshake mode is no longer required for compatibility. Also, rehandshaking has been removed from the TLS protocol in TLS 1.3.")
   _WRAP_PROPERTY("require-close-notify", bool)
   _WRAP_PROPERTY("use-system-certdb", bool, deprecated "Use property_database() instead.")
 
