@@ -44,6 +44,10 @@ class ThemedIcon
   _IMPLEMENTS_INTERFACE(Icon)
 
 protected:
+  //TODO: When we can break ABI, change the type of icon names to Glib::ustring
+  // in methods where it is std::string. Gtkmm consistently uses Glib::ustring
+  // for icon names, but Gio::ThemedIcon is inconsistent.
+
   /** Creates a new themed icon for @a iconname, and optionally all the names that can be created by shortening @a iconname at '-' characters.
    *
    * @param iconname A string containing an icon name.
@@ -51,6 +55,15 @@ protected:
    */
   explicit ThemedIcon(const std::string& iconname, bool use_default_fallbacks = false);
   _IGNORE(g_themed_icon_new, g_themed_icon_new_with_default_fallbacks)
+
+  /** Creates a new themed icon for @a iconnames.
+   *
+   * @param iconnames A vector of strings containing icon names.
+   *
+   * @newin{2,60}
+   */
+  explicit ThemedIcon(const std::vector<Glib::ustring>& iconnames);
+  _IGNORE(g_themed_icon_new_from_names)
 
 public:
   /** Creates a new themed icon for @a iconname, and optionally all the names that can be created by shortening @a iconname at '-' characters.
@@ -72,7 +85,13 @@ public:
    */
   _WRAP_CREATE(const std::string& iconname, bool use_default_fallbacks = false)
 
-  //TODO: GIcon *g_themed_icon_new_from_names (char **iconnames, int len);
+  /** Creates a new themed icon for @a iconnames.
+   *
+   * @param iconnames A vector of strings containing icon names.
+   *
+   * @newin{2,60}
+   */
+  _WRAP_CREATE(const std::vector<Glib::ustring>& iconnames)
 
   _WRAP_METHOD(void prepend_name(const std::string& iconname), g_themed_icon_prepend_name)
   _WRAP_METHOD(void append_name(const std::string& iconname), g_themed_icon_append_name)
