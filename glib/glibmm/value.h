@@ -22,6 +22,7 @@
 #include <glibmm/ustring.h>
 #include <glibmm/enums.h>
 #include <glib-object.h>
+#include <vector>
 
 namespace Glib
 {
@@ -318,6 +319,36 @@ public:
 
   void set(const Glib::ustring& data);
   Glib::ustring get() const { return get_cstring(); }
+};
+
+/** Specialization for vectors of strings.
+ * @ingroup glibmmValue
+ */
+template <>
+class Value<std::vector<std::string>> : public ValueBase_Boxed
+{
+public:
+  using CppType = std::vector<std::string>;
+
+  static GType value_type();
+
+  void set(const CppType& data);
+  CppType get() const;
+};
+
+/** Specialization for vectors of UTF-8 strings.
+ * @ingroup glibmmValue
+ */
+template <>
+class Value<std::vector<Glib::ustring>> : public ValueBase_Boxed
+{
+public:
+  using CppType = std::vector<Glib::ustring>;
+
+  static GType value_type();
+
+  void set(const CppType& data);
+  CppType get() const;
 };
 
 /** Base class of Glib::Value<T> specializations for enum types.
