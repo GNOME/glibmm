@@ -1,5 +1,3 @@
-dnl $Id$
-
 dnl
 dnl _CLASS_OPAQUE_REFCOUNTED(Coverage, PangoCoverage, pango_coverage_new, pango_coverage_ref, pango_coverage_unref)
 dnl
@@ -13,11 +11,31 @@ define(`__CNAME__',`$2')
 define(`__OPAQUE_FUNC_NEW',`$3')
 define(`__OPAQUE_FUNC_REF',`$4')
 define(`__OPAQUE_FUNC_UNREF',`$5')
+undefine(`__OPAQUE_FUNC_GTYPE__')
 
 _POP()
 _SECTION(SECTION_CLASS2)
 ')dnl End of _CLASS_OPAQUE_REFCOUNTED.
 
+dnl _IS_REFCOUNTED_BOXEDTYPE(gtype_func)
+dnl
+dnl Generates a *_get_type() function and a Glib::Value specialization.
+dnl A Glib::Value specialization is required, if the C++ class is used in
+dnl _WRAP_PROPERTY. The C class must have been registered in the GType system
+dnl with g_boxed_type_register_static().
+dnl
+dnl Optional parameter gtype_func:
+dnl 1. If not defined or an empty string, _GET_TYPE_FUNC() generates the
+dnl    function name from the name of the C type, e.g.
+dnl    GSettingsSchema -> g_settings_schema_get_type
+dnl 2. If anything else, it's assumed to be the name of the *_get_type() function.
+dnl
+define(`_IS_REFCOUNTED_BOXEDTYPE',`dnl
+_PUSH()
+dnl Define this macro to be tested for later.
+define(`__OPAQUE_FUNC_GTYPE__',`$1')
+_POP()
+')
 
 dnl
 dnl _END_CLASS_OPAQUE_REFCOUNTED()
@@ -30,16 +48,27 @@ _SECTION(SECTION_HEADER3)
 namespace Glib
 {
 
-  /** A Glib::wrap() method for this object.
-   *
-   * @param object The C instance.
-   * @param take_copy False if the result should take ownership of the C instance. True if it should take a new copy or ref.
-   * @result A C++ instance that wraps this C instance.
-   *
-   * @relates __NAMESPACE__::__CPPNAME__
-   */
-  Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__CNAME__* object, bool take_copy = false);
+/** A Glib::wrap() method for this object.
+ *
+ * @param object The C instance.
+ * @param take_copy False if the result should take ownership of the C instance. True if it should take a new copy or ref.
+ * @result A C++ instance that wraps this C instance.
+ *
+ * @relates __NAMESPACE__::__CPPNAME__
+ */
+Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__CNAME__* object, bool take_copy = false);
 
+ifdef(`__OPAQUE_FUNC_GTYPE__',`dnl
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+template <>
+class Value<Glib::RefPtr<__NAMESPACE__::__CPPNAME__>> : public Glib::Value_RefPtrBoxed<__NAMESPACE__::__CPPNAME__>
+{
+public:
+  CppType get() const { return Glib::wrap(static_cast<__CNAME__*>(get_boxed()), true); }
+};
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+')dnl endif __OPAQUE_FUNC_GTYPE__
 } // namespace Glib
 
 _SECTION(SECTION_SRC_GENERATED)
@@ -77,7 +106,18 @@ __NAMESPACE_BEGIN__
 dnl
 dnl The implementation:
 dnl
+ifdef(`__OPAQUE_FUNC_GTYPE__',`dnl
+// static
+GType __CPPNAME__::get_type()
+{
+ifelse(__OPAQUE_FUNC_GTYPE__,,`dnl
+  return _GET_TYPE_FUNC(__CNAME__);
+',`dnl
+  return __OPAQUE_FUNC_GTYPE__`'();
+')dnl
+}
 
+')dnl endif __OPAQUE_FUNC_GTYPE__
 ifelse(__OPAQUE_FUNC_NEW,NONE,`dnl
 ',`dnl else
 // static
@@ -86,8 +126,8 @@ Glib::RefPtr<__CPPNAME__> __CPPNAME__::create()
   // See the comment at the top of this file, if you want to know why the cast works.
   return Glib::RefPtr<__CPPNAME__>(reinterpret_cast<__CPPNAME__*>(__OPAQUE_FUNC_NEW`'()));
 }
-')dnl endif __OPAQUE_FUNC_NEW
 
+')dnl endif __OPAQUE_FUNC_NEW
 void __CPPNAME__::reference() const
 {
   // See the comment at the top of this file, if you want to know why the cast works.
@@ -141,6 +181,12 @@ public:
   using BaseObjectType = __CNAME__;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
+ifdef(`__OPAQUE_FUNC_GTYPE__',`dnl
+  /** Get the GType for this class, for use with the underlying GObject type system.
+   */
+  static GType get_type() G_GNUC_CONST;
+
+')dnl endif __OPAQUE_FUNC_GTYPE__
 ifelse(__OPAQUE_FUNC_NEW,NONE,`dnl
 ',`dnl else
   static Glib::RefPtr<__CPPNAME__> create();

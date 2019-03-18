@@ -233,6 +233,7 @@ namespace Glib
 template <class T>
 class Value_Boxed : public ValueBase_Boxed
 {
+// Used by _CLASS_BOXEDTYPE and _CLASS_BOXEDTYPE_STATIC
 public:
   using CppType = T;
   using CType = typename T::BaseObjectType*;
@@ -241,6 +242,26 @@ public:
 
   void set(const CppType& data) { set_boxed(data.gobj()); }
   CppType get() const { return CppType(static_cast<CType>(get_boxed())); }
+};
+
+/**
+ * @ingroup glibmmValue
+ */
+template <class T>
+class Value_RefPtrBoxed : public ValueBase_Boxed
+{
+// Used by _CLASS_OPAQUE_REFCOUNTED with _IS_REFCOUNTED_BOXEDTYPE
+public:
+  using CppType = Glib::RefPtr<T>;
+
+  static GType value_type() { return T::get_type(); }
+
+  // Equivalent to set_boxed(Glib::unwrap(data)) without including wrap.h.
+  void set(const CppType& data) { set_boxed(data ? data->gobj() : nullptr); }
+
+  // get() is defined in the Value<> specializations. It requires the declaration
+  // of Glib::wrap(T::BaseObjectType*, bool) to be visible.
+  // CppType get() const { return Glib::wrap(static_cast<typename T::BaseObjectType*>(get_boxed()), true); }
 };
 
 // More spec-compliant compilers (such as Tru64) need this to be near Glib::Object instead.
