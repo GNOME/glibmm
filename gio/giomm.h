@@ -48,6 +48,7 @@
 #include <giomm/dbuserror.h>
 #include <giomm/dbuserrorutils.h>
 #include <giomm/dbusinterface.h>
+#include <giomm/dbusinterfaceskeleton.h>
 #include <giomm/dbusinterfacevtable.h>
 #include <giomm/dbusintrospection.h>
 #include <giomm/dbusmenumodel.h>
@@ -101,6 +102,7 @@
 #include <giomm/mount.h>
 #include <giomm/mountoperation.h>
 #include <giomm/networkaddress.h>
+#include <giomm/networkmonitor.h>
 #include <giomm/networkservice.h>
 #include <giomm/notification.h>
 #include <giomm/outputstream.h>
