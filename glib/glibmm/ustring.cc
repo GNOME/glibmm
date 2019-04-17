@@ -1221,7 +1221,7 @@ ustring::validate(ustring::const_iterator& first_invalid) const
 ustring
 ustring::make_valid() const
 {
-  return ustring(g_utf8_make_valid(string_.data(), string_.size()));
+  return convert_return_gchar_ptr_to_ustring(g_utf8_make_valid(string_.data(), string_.size()));
 }
 
 bool
