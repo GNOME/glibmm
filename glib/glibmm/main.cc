@@ -149,13 +149,23 @@ SourceCallbackData::destroy_notify_callback(void* data)
 static SourceCallbackData*
 glibmm_source_get_callback_data(GSource* source)
 {
-  g_return_val_if_fail(source->callback_funcs != nullptr, nullptr);
+  /* There is race between iteration of sources in main loop
+   * that checks whether they are still active and source
+   * destruction happening in other threads.
+   */
+  gpointer callback_data = source->callback_data;
+  GSourceCallbackFuncs* callback_funcs = source->callback_funcs;
+
+  g_return_val_if_fail(callback_funcs != nullptr, nullptr);
+
+  if (g_source_is_destroyed(source))
+    return nullptr;
 
   GSourceFunc func;
   void* user_data = nullptr;
 
   // Retrieve the callback function and data.
-  (*source->callback_funcs->get)(source->callback_data, source, &func, &user_data);
+  (*callback_funcs->get)(callback_data, source, &func, &user_data);
 
   return static_cast<SourceCallbackData*>(user_data);
 }
@@ -920,7 +930,10 @@ Source::~Source() noexcept
   if (gobject_)
   {
     SourceCallbackData* const data = glibmm_source_get_callback_data(gobject_);
-    data->wrapper = nullptr;
+
+    if (data) {
+      data->wrapper = nullptr;
+    }
 
     GSource* const tmp_gobject = gobject_;
     gobject_ = nullptr;
@@ -940,7 +953,10 @@ Source::connect_generic(const sigc::slot_base& slot)
   // Don't override the callback data.  Reuse the existing one
   // calling SourceCallbackData::set_node() to register conn_node.
   SourceCallbackData* const data = glibmm_source_get_callback_data(gobject_);
-  data->set_node(conn_node);
+
+  if (data) {
+    data->set_node(conn_node);
+  }
 
   conn_node->install(gobject_);
   return connection;
@@ -972,7 +988,7 @@ inline // static
   Source::get_wrapper(GSource* source)
 {
   SourceCallbackData* const data = glibmm_source_get_callback_data(source);
-  return data->wrapper;
+  return (data) ? data->wrapper : nullptr;
 }
 
 // static
@@ -982,7 +998,7 @@ Source::prepare_vfunc(GSource* source, int* timeout)
   try
   {
     Source* const self = get_wrapper(source);
-    return self->prepare(*timeout);
+    return (self) ? self->prepare(*timeout) : 0;
   }
   catch (...)
   {
@@ -999,7 +1015,7 @@ Source::check_vfunc(GSource* source)
   try
   {
     Source* const self = get_wrapper(source);
-    return self->check();
+    return (self) ? self->check() : 0;
   }
   catch (...)
   {
