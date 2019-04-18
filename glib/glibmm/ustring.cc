@@ -1236,37 +1236,32 @@ ustring::is_ascii() const
 ustring
 ustring::normalize(NormalizeMode mode) const
 {
-  const auto buf = make_unique_ptr_gfree(
+  return convert_return_gchar_ptr_to_ustring(
     g_utf8_normalize(string_.data(), string_.size(), static_cast<GNormalizeMode>(int(mode))));
-  return ustring(buf.get());
 }
 
 ustring
 ustring::uppercase() const
 {
-  const auto buf = make_unique_ptr_gfree(g_utf8_strup(string_.data(), string_.size()));
-  return ustring(buf.get());
+  return convert_return_gchar_ptr_to_ustring(g_utf8_strup(string_.data(), string_.size()));
 }
 
 ustring
 ustring::lowercase() const
 {
-  const auto buf = make_unique_ptr_gfree(g_utf8_strdown(string_.data(), string_.size()));
-  return ustring(buf.get());
+  return convert_return_gchar_ptr_to_ustring(g_utf8_strdown(string_.data(), string_.size()));
 }
 
 ustring
 ustring::casefold() const
 {
-  const auto buf = make_unique_ptr_gfree(g_utf8_casefold(string_.data(), string_.size()));
-  return ustring(buf.get());
+  return convert_return_gchar_ptr_to_ustring(g_utf8_casefold(string_.data(), string_.size()));
 }
 
 std::string
 ustring::collate_key() const
 {
-  const auto buf = make_unique_ptr_gfree(g_utf8_collate_key(string_.data(), string_.size()));
-  return std::string(buf.get());
+  return convert_return_gchar_ptr_to_stdstring(g_utf8_collate_key(string_.data(), string_.size()));
 }
 
 std::string
