@@ -17,7 +17,6 @@
 _DEFS(glibmm,glib)
 
 #include <glibmmconfig.h>
-#include <glibmm/refptr.h>
 #include <glibmm/timezone.h>
 #include <glibmm/ustring.h>
 #include <glib.h>
@@ -49,9 +48,6 @@ using TimeSpan = GTimeSpan;
  * functions can fail due to the date or time going out of range, in which case
  * <tt>0</tt> will be returned.
  *
- * DateTime is reference counted.  When the reference count drops to 0, the
- * resources allocated by the DateTime structure are released.
- *
  * Many parts of the API may produce non-obvious results. As an example, adding
  * two months to January 31st will yield March 31st whereas adding one month
  * and then one month again will yield either March 28th or March 29th. Also
@@ -62,7 +58,11 @@ using TimeSpan = GTimeSpan;
  */
 class DateTime
 {
-  _CLASS_OPAQUE_COPYABLE(DateTime, GDateTime, NONE, g_date_time_ref, g_date_time_unref)
+  // GDateTime is refcounted, but Glib::DateTime is not.
+  // GDateTime is immutable. Therefore, there is no problem having several
+  // Glib::DateTime instances wrap the same GDateTime, and it's easier to use
+  // Glib::DateTime without Glib::RefPtr.
+  _CLASS_BOXEDTYPE(DateTime, GDateTime, NONE, g_date_time_ref, g_date_time_unref)
   _IGNORE(g_date_time_ref, g_date_time_unref)
 
 public:

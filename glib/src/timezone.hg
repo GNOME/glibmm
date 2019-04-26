@@ -17,7 +17,6 @@
 _DEFS(glibmm,glib)
 
 #include <glibmmconfig.h>
-#include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 #include <glib.h>
 
@@ -32,7 +31,7 @@ _WRAP_ENUM(TimeType, GTimeType, NO_GTYPE)
 
 /** TimeZone - A structure representing a time zone.
  * TimeZone is a structure that represents a time zone, at no particular point
- * in time. It is refcounted and immutable.
+ * in time. It is immutable.
  *
  * A time zone contains a number of intervals. Each interval has an
  * abbreviation to describe it, an offet to UTC and a flag indicating if the
@@ -53,7 +52,11 @@ _WRAP_ENUM(TimeType, GTimeType, NO_GTYPE)
  */
 class TimeZone
 {
-  _CLASS_OPAQUE_COPYABLE(TimeZone, GTimeZone, NONE, g_time_zone_ref, g_time_zone_unref)
+  // GTimeZone is refcounted, but Glib::TimeZone is not.
+  // GTimeZone is immutable. Therefore, there is no problem having several
+  // Glib::TimeZone instances wrap the same GTimeZone, and it's easier to use
+  // Glib::TimeZone without Glib::RefPtr.
+  _CLASS_BOXEDTYPE(TimeZone, GTimeZone, NONE, g_time_zone_ref, g_time_zone_unref)
   _IGNORE(g_time_zone_ref, g_time_zone_unref)
 
 public:
