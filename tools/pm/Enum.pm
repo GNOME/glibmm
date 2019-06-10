@@ -212,13 +212,15 @@ sub parse_values($$)
       # enum.pl generates nick names from the C names of the enum constants.
       # A nick name consists of the trailing part of the enum name.
       # The leading part which is common for each constant of an enum type
-      # has been removed. The remaining part is then tranform to lowercase
+      # has been removed. The remaining part is then transformed to lowercase
       # and hyphens.
-      # Transform the nick name with lowercase letters and hyphens
-      # back to a short name with uppercase letters and underscores.
-      # The short names are suitable for 'enum class' definitions.
-      $nick_name =~ tr/a-z-/A-Z_/;
-      push(@$elem_short_names, $nick_name);
+      # The nick names would have been suitable for 'enum class' definitions
+      # if they had not been transformed to lowercase and hyphens.
+      # But the length of the nick names can be used. Create short names
+      # consisting of the trailing part of the names with the same length
+      # as the nick names.
+      my $short_name = substr($name, length($name) - length($nick_name));
+      push(@$elem_short_names, $short_name);
       push(@$elem_names, $name);
       push(@$elem_values, $value);
     }
