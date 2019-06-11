@@ -169,6 +169,7 @@ private:
  *   Glib::Property<bool> property_mybool;
  *   // or private, and combined with Glib::PropertyProxy<>.
  *   Glib::PropertyProxy<int> property_myint() { return property_myint_.get_proxy(); }
+ *   Glib::PropertyProxy_ReadOnly<int> property_myint() const { return property_myint_.get_proxy(); }
  *
  * private:
  *   Glib::Property<int> property_myint_;
@@ -227,6 +228,10 @@ public:
   /** Returns a proxy object that can be used to read or write this property.
    */
   inline Glib::PropertyProxy<T> get_proxy();
+
+  /** Returns a proxy object that can be used to read this property.
+   */
+  inline Glib::PropertyProxy_ReadOnly<T> get_proxy() const;
 };
 
 /** See Property.
@@ -403,6 +408,13 @@ inline Glib::PropertyProxy<T>
 Property<T>::get_proxy()
 {
   return Glib::PropertyProxy<T>(object_, get_name_internal());
+}
+
+template <class T>
+inline Glib::PropertyProxy_ReadOnly<T>
+Property<T>::get_proxy() const
+{
+  return Glib::PropertyProxy_ReadOnly<T>(object_, get_name_internal());
 }
 
 /**** Glib::Property_ReadOnly<T> ****************************************************/
