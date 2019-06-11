@@ -224,7 +224,7 @@ public:
    */
   inline operator PropertyType() const;
 
-  /** Returns a proxy object that can be used to manipulate this property.
+  /** Returns a proxy object that can be used to read or write this property.
    */
   inline Glib::PropertyProxy<T> get_proxy();
 };
@@ -271,7 +271,7 @@ public:
    */
   inline operator PropertyType() const;
 
-  /** Returns a proxy object that can be used to manipulate this property.
+  /** Returns a proxy object that can be used to read this property.
    */
   inline Glib::PropertyProxy_ReadOnly<T> get_proxy();
 };
@@ -320,7 +320,7 @@ public:
    */
   inline Property_WriteOnly<T>& operator=(const PropertyType& data);
 
-  /** Returns a proxy object that can be used to manipulate this property.
+  /** Returns a proxy object that can be used to write this property.
    */
   inline Glib::PropertyProxy_WriteOnly<T> get_proxy();
 };
