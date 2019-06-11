@@ -273,7 +273,7 @@ public:
 
   /** Returns a proxy object that can be used to read this property.
    */
-  inline Glib::PropertyProxy_ReadOnly<T> get_proxy();
+  inline Glib::PropertyProxy_ReadOnly<T> get_proxy() const;
 };
 
 /** See Property.
@@ -462,7 +462,7 @@ inline Property_ReadOnly<T>::operator T() const
 
 template <class T>
 inline Glib::PropertyProxy_ReadOnly<T>
-Property_ReadOnly<T>::get_proxy()
+Property_ReadOnly<T>::get_proxy() const
 {
   return Glib::PropertyProxy_ReadOnly<T>(object_, get_name_internal());
 }
