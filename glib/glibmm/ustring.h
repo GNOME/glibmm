@@ -714,6 +714,54 @@ public:
   template <class... Ts>
   static inline ustring format(const Ts&... args);
 
+  /*! Substitute placeholders in a format string with the referenced arguments.
+   *
+   * This function takes a template string in the format used by C’s
+   * <tt>printf()</tt> family of functions and an arbitrary number of arguments,
+   * replaces each placeholder in the template with the formatted version of its
+   * corresponding argument at the same ordinal position in the list of
+   * subsequent arguments, and returns the result in a new Glib::ustring.
+   *
+   * Note: You must pass the correct number/types/order of arguments to match
+   * the format string, as when calling <tt>printf()</tt> directly. glibmm does
+   * not check this for you. Breaking this contract invokes undefined behavior.
+   *
+   * The exception is that glibmm special-cases std::string and Glib::ustring,
+   * so you can pass them in positions corresponding to <tt>%s</tt> placeholders
+   * without having to call their .c_str() functions; glibmm does that for you.
+   *
+   * Said restriction also makes sprintf() unsuitable for translatable strings,
+   * as translators cannot reorder the placeholders to suit their language. If
+   * you wish to support translation, you should instead use compose(), as its
+   * placeholders are numbered rather than ordinal, so they can be moved freely.
+   *
+   * @par Example:
+   * @code
+   *
+   * const auto greeting = std::string{"Hi"};
+   * const auto name = Glib::ustring{"Dennis"};
+   * const auto your_cows = 3;
+   * const auto my_cows = 11;
+   * const auto cow_percentage = 100.0 * your_cows / my_cows;
+   *
+   * const auto text = Glib::ustring::sprintf(
+   *   "%s, %s! You have %d cows. That's about %0.2f%% of the %d cows I have.",
+   *   greeting, name, your_cows, cow_percentage, my_cows);
+   *
+   * std::cout << text;
+   * // Hi, Dennis! You have 2 cows. That's about 27.27% of the 11 cows I have.
+   * @endcode
+   *
+   * @param fmt The template string, in the format used by <tt>printf()</tt> et al.
+   * @param args A set of arguments having the number and types required by @a fmt.
+   *
+   * @return The substituted message string.
+   *
+   * @newin{2,56}
+   */
+  template <class... Ts>
+  static inline ustring sprintf(const ustring& fmt, const Ts&... args);
+
   //! @}
 
 private:
@@ -739,6 +787,10 @@ private:
   static ustring compose_private(const ustring& fmt, std::initializer_list<const ustring*> ilist);
 
   class FormatStream;
+
+  template<class T> static inline const T& sprintify(const T& arg);
+  static inline const char* sprintify(const ustring& arg);
+  static inline const char* sprintify(const std::string& arg);
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
@@ -1156,6 +1208,33 @@ public:
   inline const ustring& ref() const { return string_; }
 };
 
+/* These helper functions used by ustring::sprintf() let users pass C++ strings
+ * to match %s placeholders, without the hassle of writing .c_str() in user code
+ */
+template<typename T>
+inline // static
+  const T&
+  ustring::sprintify(const T& arg)
+{
+  return arg;
+}
+
+inline // static
+  const char*
+  ustring::sprintify(const ustring& arg)
+{
+  return arg.c_str();
+}
+
+inline // static
+  const char*
+  ustring::sprintify(const std::string& arg)
+{
+  return arg.c_str();
+}
+
+// Public methods
+
 inline // static
   ustring
   ustring::compose(const ustring& fmt)
@@ -1172,6 +1251,18 @@ inline // static
                 "ustring::compose only supports up to 9 placeholders.");
 
   return compose_private(fmt, {&Stringify<Ts>(args).ref()...});
+}
+
+template <class... Ts>
+inline // static
+  ustring
+  ustring::sprintf(const ustring& fmt, const Ts&... args)
+{
+  auto c_str = g_strdup_printf(fmt.c_str(), sprintify(args)...);
+  Glib::ustring ustr(c_str);
+  g_free(c_str);
+
+  return ustr;
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
