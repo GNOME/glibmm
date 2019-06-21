@@ -764,6 +764,24 @@ public:
   template <class... Ts>
   static inline ustring sprintf(const ustring& fmt, const Ts&... args);
 
+  /* Overload of sprintf() taking a string literal.
+   *
+   * The main benefit of this is not constructing a temporary ustring if @p fmt
+   * is a string literal. A secondary effect is that it might encourage compilers
+   * to check if the given format @p fmt matches the variadic arguments @p args.
+   * The latter effect is a convenience at best; you must not rely on it to find
+   * errors in your code, as your compiler might not always be able to do so.
+   *
+   * @param fmt The template string, in the format used by <tt>printf()</tt> et al.
+   * @param args A set of arguments having the count/types/order required by @a fmt.
+   *
+   * @return The substituted string.
+   *
+   * @newin{2,62}
+   */
+  template <class... Ts>
+  static inline ustring sprintf(const char* fmt, const Ts&... args);
+
   /*! Overload of sprintf() for a format string only, which returns it unchanged.
    *
    * If no @p args to be substituted are given, there is nothing to do, so the
@@ -777,6 +795,16 @@ public:
    * @newin{2,62}
    */
   static inline ustring sprintf(const ustring& fmt);
+
+  /*! Overload of sprintf() for a format string only, which returns it unchanged
+   * and avoids creating a temporary ustring as the argument.
+   *
+   * @param fmt The string
+   * @return The same string, as a ustring.
+   *
+   * @newin{2,62}
+   */
+  static inline ustring sprintf(const char* fmt);
 
   //! @}
 
@@ -1274,7 +1302,15 @@ inline // static
   ustring
   ustring::sprintf(const ustring& fmt, const Ts&... args)
 {
-  auto c_str = g_strdup_printf(fmt.c_str(), sprintify(args)...);
+  return sprintf(fmt.c_str(), args...);
+}
+
+template <class... Ts>
+inline // static
+  ustring
+  ustring::sprintf(const char* fmt, const Ts&... args)
+{
+  auto c_str = g_strdup_printf(fmt, sprintify(args)...);
   Glib::ustring ustr(c_str);
   g_free(c_str);
 
@@ -1286,6 +1322,13 @@ inline // static
   ustring::sprintf(const ustring& fmt)
 {
   return fmt;
+}
+
+inline // static
+  ustring
+  ustring::sprintf(const char* fmt)
+{
+  return ustring(fmt);
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
