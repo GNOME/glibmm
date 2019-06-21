@@ -724,11 +724,13 @@ public:
    *
    * Note: You must pass the correct number/types/order of arguments to match
    * the format string, as when calling <tt>printf()</tt> directly. glibmm does
-   * not check this for you. Breaking this contract invokes undefined behavior.
+   * not check this for you. Breaking this contract invokes undefined behavior
+   * and is a security risk.
    *
    * The exception is that glibmm special-cases std::string and Glib::ustring,
    * so you can pass them in positions corresponding to <tt>%s</tt> placeholders
    * without having to call their .c_str() functions; glibmm does that for you.
+   * glibmm also overloads sprintf() with @p fmt but no @p args to avoid risks.
    *
    * Said restriction also makes sprintf() unsuitable for translatable strings,
    * as translators cannot reorder the placeholders to suit their language. If
@@ -761,6 +763,20 @@ public:
    */
   template <class... Ts>
   static inline ustring sprintf(const ustring& fmt, const Ts&... args);
+
+  /*! Overload of sprintf() for a format string only, which returns it unchanged.
+   *
+   * If no @p args to be substituted are given, there is nothing to do, so the
+   * @p fmt string is returned as-is without substitution. This is an obvious
+   * case of mismatched format/args that we can check. Not doing so causes
+   * warnings/errors with common compiler options, as it is a security risk.
+   *
+   * @param fmt The string
+   * @return The same string.
+   *
+   * @newin{2,62}
+   */
+  static inline ustring sprintf(const ustring& fmt);
 
   //! @}
 
@@ -1263,6 +1279,13 @@ inline // static
   g_free(c_str);
 
   return ustr;
+}
+
+inline // static
+  ustring
+  ustring::sprintf(const ustring& fmt)
+{
+  return fmt;
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
