@@ -722,7 +722,7 @@ public:
    * corresponding argument at the same ordinal position in the list of
    * subsequent arguments, and returns the result in a new Glib::ustring.
    *
-   * Note: You must pass the correct number/types/order of arguments to match
+   * Note: You must pass the correct count/types/order of arguments to match
    * the format string, as when calling <tt>printf()</tt> directly. glibmm does
    * not check this for you. Breaking this contract invokes undefined behavior
    * and is a security risk.
@@ -755,7 +755,7 @@ public:
    * @endcode
    *
    * @param fmt The template string, in the format used by <tt>printf()</tt> et al.
-   * @param args A set of arguments having the number and types required by @a fmt.
+   * @param args A set of arguments having the count/types/order required by @a fmt.
    *
    * @return The substituted string.
    *
