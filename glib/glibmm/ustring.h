@@ -757,7 +757,7 @@ public:
    * @param fmt The template string, in the format used by <tt>printf()</tt> et al.
    * @param args A set of arguments having the number and types required by @a fmt.
    *
-   * @return The substituted message string.
+   * @return The substituted string.
    *
    * @newin{2,62}
    */
