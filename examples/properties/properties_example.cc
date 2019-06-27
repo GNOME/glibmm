@@ -74,6 +74,8 @@ main(int, char**)
   p.property_firstname().signal_changed().connect(sigc::ptr_fun(&on_firstname_changed));
   p.property_lastname().signal_changed().connect(sigc::ptr_fun(&on_lastname_changed));
   p.property_age().signal_changed().connect(sigc::ptr_fun(&on_age_changed));
+  std::cout << "Name, age: " << p.property_firstname() << " " << p.property_lastname()
+            << ", " << p.property_age() << std::endl;
 
   // now change the properties and see that the handlers get called
   std::cout << "Changing the properties of 'p'" << std::endl;
@@ -81,6 +83,8 @@ main(int, char**)
   p.property_lastname() = "Doe";
   p.property_age() = 43;
   std::cout << "Done changing the properties of 'p'" << std::endl;
+  std::cout << "Name, age: " << p.property_firstname() << " " << p.property_lastname()
+            << ", " << p.property_age() << std::endl;
 
   return 0;
 }
