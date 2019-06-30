@@ -70,7 +70,9 @@ class ConstructParams
 public:
   const Glib::Class& glibmm_class;
   unsigned int n_parameters;
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   GParameter* parameters;
+G_GNUC_END_IGNORE_DEPRECATIONS
 
   explicit ConstructParams(const Glib::Class& glibmm_class_);
   ConstructParams(const Glib::Class& glibmm_class_, const char* first_property_name,

@@ -91,10 +91,12 @@ ConstructParams::ConstructParams(
       break;
     }
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     if (n_parameters >= n_alloced_params)
       parameters = g_renew(GParameter, parameters, n_alloced_params += 8);
 
     GParameter& param = parameters[n_parameters];
+G_GNUC_END_IGNORE_DEPRECATIONS
 
     param.name = name;
     param.value.g_type = 0;
@@ -132,6 +134,7 @@ ConstructParams::~ConstructParams() noexcept
  * usage contexts.  This implementation is fully functional, but unlikely
  * to be ever actually called due to optimization.
  */
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 ConstructParams::ConstructParams(const ConstructParams& other)
 : glibmm_class(other.glibmm_class),
   n_parameters(other.n_parameters),
@@ -146,6 +149,7 @@ ConstructParams::ConstructParams(const ConstructParams& other)
     g_value_copy(&other.parameters[i].value, &parameters[i].value);
   }
 }
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**** Glib::Object_Class ***************************************************/
 
@@ -230,7 +234,7 @@ Object::Object(const Glib::ConstructParams& construct_params)
 
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   //TODO: Replace g_object_newv() by g_object_new_with_properties() when we can
-  // require glib 2.54. GParameter is also deprecated (only mentioned in a comment).
+  // require glib 2.54. GParameter is also deprecated.
   // Don't use it in ConstructParams when we can break ABI.
   void* const new_object =
     g_object_newv(object_type, construct_params.n_parameters, construct_params.parameters);

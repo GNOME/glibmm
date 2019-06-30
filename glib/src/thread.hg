@@ -26,6 +26,7 @@ _IS_DEPRECATED // This whole file is deprecated.
 
 // We use GThreadFunctions in the (deprecated) API, so we must temporarily undef G_DISABLE_DEPRECATED.
 // Temporarily undef G_DISABLE_DEPRECATED, redefining it later if appropriate.
+// GLib ignores G_DISABLE_DEPRECATED since glib 2.61.2.
 #if defined(G_DISABLE_DEPRECATED) && !defined(GLIBMM_G_DISABLE_DEPRECATED_UNDEFED)
 //Stop the deprecation ifdef guards around the API declarations:
 #undef G_DISABLE_DEPRECATED
@@ -46,6 +47,9 @@ _IS_DEPRECATED // This whole file is deprecated.
 #include <sigc++/sigc++.h>
 
 #include <cstddef>
+
+// Necessary for glib 2.61.2 and newer.
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 
 /* Shadow THREAD_PRIORITY_NORMAL macro (from winbase.h).
  */
@@ -1082,3 +1086,4 @@ void Private<T>::set(T* data)
 
 } // namespace Glib
 
+G_GNUC_END_IGNORE_DEPRECATIONS
