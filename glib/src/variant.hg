@@ -26,6 +26,7 @@ _DEFS(glibmm,glib)
 #include <utility>
 #include <vector>
 #include <map>
+#include <memory>
 #include <tuple>
 #include <stdexcept>
 #include <typeinfo>
@@ -1512,13 +1513,13 @@ Variant<std::tuple<Types...>>::create(const std::tuple<Types...>& data)
   detail::expand_tuple(variants, data, std::index_sequence_for<Types...>{});
 
   using var_ptr = GVariant*;
-  var_ptr* const var_array = new var_ptr[sizeof... (Types)];
+  auto var_array = std::make_unique<var_ptr[]>(sizeof... (Types));
 
   for (std::vector<VariantBase>::size_type i = 0; i < variants.size(); i++)
     var_array[i] = const_cast<GVariant*>(variants[i].gobj());
 
   Variant<std::tuple<Types...>> result = Variant<std::tuple<Types...>>(
-          g_variant_new_tuple(var_array, variants.size()));
+          g_variant_new_tuple(var_array.get(), variants.size()));
 
   return result;
 }
