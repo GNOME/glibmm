@@ -12,17 +12,17 @@
 # GTK object conventions) and generates a set of scheme defs.
 #
 # h2def searches through a header file looking for function prototypes and
-# generates a scheme style defenition for each prototype.
+# generates a scheme style definition for each prototype.
 # Basically the operation of h2def is:
 #
 # - read each .h file into a buffer which is scrubbed of extraneous data
-# - find all object defenitions:
+# - find all object definitions:
 #   - find all structures that may represent a GtkObject
 #   - find all structures that might represent a class
 #   - find all structures that may represent a GtkObject subclass
 #   - find all structures that might represent a class/Iface inherited from
 #     GTypeInterface
-# - find all enum defenitions
+# - find all enum definitions
 # - write out the defs
 #
 # The command line options are:
@@ -294,8 +294,7 @@ def clean_func(buf):
     buf = pat.sub('', buf)
 
     #typedefs, structs, and enums
-    pat = re.compile(r"""^(typedef|struct|enum)(\s|.|\n)*?;\s*""",
-                     re.MULTILINE)
+    pat = re.compile(r"""^(typedef|struct|enum)(\s|.|\n)*?;\s*""", re.MULTILINE)
     buf = pat.sub('', buf)
 
     #strip DECLS macros
@@ -306,27 +305,23 @@ def clean_func(buf):
     pat = re.compile(r"""G_GNUC_WARN_UNUSED_RESULT|G_INLINE_FUNC""", re.MULTILINE)
     buf = pat.sub('', buf)
 
-    #strip *_DEPRECATED_IN_*_FOR (*)
-    #e.g. GDK_DEPRECATED_IN_*_FOR (*) and GDK_PIXBUF_DEPRECATED_IN_*_FOR (*)
-    pat = re.compile(r"""([A-Z]+_){1,2}?DEPRECATED_IN_[0-9]_([0-9]*)_FOR\s*\(.*\)\S*""", re.MULTILINE)
+    #strip G_GNUC_BEGIN_IGNORE_DEPRECATIONS and G_GNUC_END_IGNORE_DEPRECATIONS
+    pat = re.compile(r"""G_GNUC_(BEGIN|END)_IGNORE_DEPRECATIONS""", re.MULTILINE)
     buf = pat.sub('', buf)
 
-    #strip *_DEPRECATED*
-    pat = re.compile(r"""([A-Z]+_){1,2}?DEPRECATED\S*""", re.MULTILINE)
+    #strip *_DEPRECATED[_IN_n_m][_FOR (*)]
+    #e.g. GDK_DEPRECATED_IN_*_FOR (*) and GDK_PIXBUF_DEPRECATED_IN_*_FOR (*)
+    pat = re.compile(r"""([A-Z]+_){1,2}?DEPRECATED(_IN_[0-9]_[0-9]+)?(_FOR\s*\(.*?\))?""", re.MULTILINE)
     buf = pat.sub('', buf)
 
     #strip *_AVAILABLE_IN_*
-    pat = re.compile(r"""([A-Z]+_){1,2}?AVAILABLE_IN_[0-9]_[0-9]\S*""", re.MULTILINE)
+    pat = re.compile(r"""([A-Z]+_){1,2}?AVAILABLE_IN_[A-Z_0-9]+""", re.MULTILINE)
     buf = pat.sub('', buf)
 
-    #strip *_AVAILABLE_IN_ALL
-    pat = re.compile(r"""([A-Z]+_){1,2}?AVAILABLE_IN_ALL\S*""", re.MULTILINE)
+    #strip G_DECLARE_FINAL_TYPE (*) and G_DECLARE_INTERFACE (*)
+    pat = re.compile(r"""G_DECLARE_(FINAL_TYPE|INTERFACE)\s*\(.*?\)""", re.MULTILINE)
     buf = pat.sub('', buf)
 
-    #strip G_DECLARE_FINAL_TYPE (*)
-    pat = re.compile(r"""G_DECLARE_FINAL_TYPE\s*\(.*?\)""", re.MULTILINE)
-    buf = pat.sub('', buf)
-    
     #we are not stripping G_GNUC_INTERNAL
 
     #extern "C"
@@ -375,7 +370,7 @@ def clean_func(buf):
                 start = match.start()
             bracket_cnt += 1
         else:
-            if (bracket_cnt == 0): 
+            if (bracket_cnt == 0):
                 continue
             if (bracket_cnt == 1):
                 buf = buf.replace(buf[start:match.start()+1], "\n")

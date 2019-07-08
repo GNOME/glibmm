@@ -68,6 +68,7 @@ sub parse($)
   my $from = 0;
   # 1, if only right bracket was found, not name.
   my $rbracket_only = 0;
+
   while(<$fd>)
   {
     my $tmp_rawline = $_;
@@ -116,7 +117,10 @@ sub parse($)
       }
       next;
     }
-    # XXX: what does it do?
+    # Replace the enumerator values ',' and '}' by strings that won't confuse
+    # process(). They are reset to the original strings when they are written
+    # to the output file.
+    # typedef enum { V1 = ',', V2 = '}' } E1; // is a legal definition.
     s/','/\%\%COMMA\%\%/;
     s/'}'/\%\%RBRACE\%\%/;
     # we have found an enum.
@@ -136,11 +140,14 @@ sub parse($)
        # between '}' and ';'.
        if (/;/)
        {
-         my $def = ($rbracket_only ? ("} " . $_) : ($_));
+         unless ($omit and /[A-Z]+_DEPRECATED_TYPE/)
+         {
+           my $def = ($rbracket_only ? ("} " . $_) : ($_));
+           print ";; Original typedef:\n";
+           print $raw_line . "\n";
+           process($line, $def);
+         }
          $enum = 0;
-         print ";; Original typedef:\n";
-         print $raw_line . "\n";
-         process($line, $def);
          $line = "";
          $raw_line = "";
          $rbracket_only = 0;
@@ -170,10 +177,11 @@ sub parse($)
 sub process($$)
 {
   my ($line,$def) = @_;
-  # strip whitespace and closing bracket before the name and whitespace and
-  # colon after the name.
-  $def =~ s/\s*\}\s*//g;
-  $def =~ s/\s*;\s*$//;
+  # The name is the first word after the closing bracket.
+  # The name can be followed by *_DEPRECATED_TYPE* or *_AVAILABLE_TYPE*
+  # before the semicolon.
+  $def =~ /^.*?(\w+)/;
+  $def = $1;
   my $c_name = $def;
   # replace all excessive whitespaces with one space.
   $line =~ s/\s+/ /g;
@@ -206,6 +214,12 @@ sub process($$)
 
   while ($iter < scalar @lines)
   {
+    # The enumerator name can be followed by *_DEPRECATED_ENUMERATOR*,
+    # *_DEPRECATED_ENUMERATOR*_FOR(*) or *_AVAILABLE_ENUMERATOR* before
+    # the equal sign or comma.
+    my $omit_enumerator = ($omit and $lines[$iter] =~ /[A-Z]+_DEPRECATED_ENUMERATOR/);
+    $lines[$iter] =~ s/^\s*(\w+)\s+\w+?_(:?DEPRECATED|AVAILABLE)_ENUMERATOR\w*(:?\s*\(.*?\))?/$1/;
+
     my $brackets_count = 0;
     my $begin = $iter;
 
@@ -224,6 +238,8 @@ sub process($$)
         $iter++;
       } while ($iter < scalar @lines && $brackets_count != 0);
     }
+
+    next if ($omit_enumerator);
 
     my $i = join(',', @lines[$begin..$iter-1]);
 
@@ -370,13 +386,14 @@ sub process($$)
       $unknown_flag = 0;
       $e_h{"enum"}++;
     }
-    # if... XXX: I do not know what is matched here.
+    # if it's one of the char values that were replaced by
+    # \%\%COMMA\%\% or \%\%RBRACE\%\%.
     elsif ($i =~ /^(\S+)\s*=\s*(\%\%[A-Z]+\%\%)$/)
     {
       my $tmp = $1;
       $_ = $2;
       s/\%\%COMMA\%\%/,/;
-      s/\%\%RBRACE\%\%/]/;
+      s/\%\%RBRACE\%\%/}/;
       push(@c_names, $tmp);
       push(@numbers, "\'$_\'");
       $val = ord($_);
