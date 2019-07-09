@@ -22,10 +22,12 @@ namespace Glib
 
 /** Initialize glibmm.
  *
- * You may call this more than once. Calls after the first one have no effect.
- * Sets the global locale as specified by set_init_to_users_preferred_locale().
- * You do not need to call %Glib::init() if you are using Gtk::Application,
- * because it calls %Glib::init() for you.
+ * Call it before you use other parts of glibmm. You may call it more than once.
+ * Calls after the first one have no effect. %Glib::init() sets the global locale
+ * as specified by set_init_to_users_preferred_locale().
+ *
+ * You do not need to call %Glib::init() if you are using Gtk::Application or
+ * Gio::init(), because they call %Glib::init() for you.
  *
  * @see set_init_to_users_preferred_locale()
  */
