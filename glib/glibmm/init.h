@@ -1,8 +1,5 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_INIT_H
 #define _GLIBMM_INIT_H
-
-/* $Id$ */
 
 /* Copyright (C) 2002 The gtkmm Development Team
  *
@@ -24,9 +21,12 @@ namespace Glib
 {
 
 /** Initialize glibmm.
- * You may call this more than once.
- * You do not need to call this if you are using Glib::MainLoop or Gtk::Main,
- * because they call it for you.
+ *
+ * Call it before you use other parts of glibmm. You may call it more than once.
+ * Calls after the first one have no effect.
+ *
+ * You do not need to call %Glib::init() if you are using Gtk::Application or
+ * Gio::init(), because they call %Glib::init() for you.
  */
 void init();
 

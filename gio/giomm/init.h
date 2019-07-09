@@ -24,7 +24,13 @@
 namespace Gio
 {
 
-/** Initialize giomm.
+/** Initialize giomm and glibmm.
+ *
+ * Call it before you use other parts of giomm. You may call it more than once.
+ * Calls after the first one have no effect. %Gio::init() calls Glib::init().
+ *
+ * You do not need to call %Gio::init() if you are using Gtk::Application,
+ * because it calls %Gio::init() for you.
  */
 void init();
 
