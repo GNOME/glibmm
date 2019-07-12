@@ -132,18 +132,18 @@ private:
  */
 gunichar get_unichar_from_std_iterator(std::string::const_iterator pos) G_GNUC_PURE;
 
-/** Glib::ustring has much the same interface as std::string, but contains
+/** %Glib::ustring has much the same interface as std::string, but contains
  * %Unicode characters encoded as UTF-8.
  *
  * @par About UTF-8 and ASCII
  * @par
  * The standard character set ANSI_X3.4-1968&nbsp;-- more commonly known as
  * ASCII&nbsp;-- is a subset of UTF-8.  So, if you want to, you can use
- * Glib::ustring without even thinking about UTF-8.
+ * %Glib::ustring without even thinking about UTF-8.
  * @par
  * Whenever ASCII is mentioned in this manual, we mean the @em real ASCII
  * (i.e. as defined in ANSI_X3.4-1968), which contains only 7-bit characters.
- * Glib::ustring can @em not be used with ASCII-compatible extended 8-bit
+ * %Glib::ustring can @em not be used with ASCII-compatible extended 8-bit
  * charsets like ISO-8859-1.  It's a good idea to avoid string literals
  * containing non-ASCII characters (e.g. German umlauts) in source code,
  * or at least you should use UTF-8 literals.
@@ -153,18 +153,28 @@ gunichar get_unichar_from_std_iterator(std::string::const_iterator pos) G_GNUC_P
  *
  * @par Glib::ustring vs. std::string
  * @par
- * Glib::ustring has implicit type conversions to and from std::string.
+ * %Glib::ustring has implicit type conversions to and from std::string.
  * These conversions do @em not convert to/from the current locale (see
  * Glib::locale_from_utf8() and Glib::locale_to_utf8() if you need that).  You
- * can always use std::string instead of Glib::ustring&nbsp;-- however, using
+ * can always use std::string instead of %Glib::ustring&nbsp;-- however, using
  * std::string with multi-byte characters is quite hard.  For instance,
  * <tt>std::string::operator[]</tt> might return a byte in the middle of a
  * character, and <tt>std::string::length()</tt> returns the number of bytes
  * rather than characters.  So don't do that without a good reason.
  * @par
- * Many member functions and operators of Glib::ustring and Glib::ustring_Iterator
+ * You cannot always use %Glib::ustring instead of std::string.
+ * @code
+ * Glib::ustring u("a_string_with_underscores");
+ * std::replace(u.begin(), u.end(), '_', ' ');  // does not compile
+ * @endcode
+ * You can't use a Glib::ustring::iterator for writing to a %Glib::ustring.
+ * See the documentation of Glib::ustring_Iterator for differences between it
+ * and std::string::iterator.
+ * @par
+ * Many member functions and operators of %Glib::ustring and Glib::ustring_Iterator
  * assume that the string contains only valid UTF-8 data. If it does not, memory
- * outside the bounds of the string can be accessed.
+ * outside the bounds of the string can be accessed. If you're uncertain, use
+ * validate() and/or make_valid().
  * @par
  * In a perfect world the C++ Standard Library would contain a UTF-8 string
  * class.  Unfortunately, the C++98 standard doesn't mention UTF-8 at all.
@@ -204,7 +214,7 @@ gunichar get_unichar_from_std_iterator(std::string::const_iterator pos) G_GNUC_P
  *
  * @par Implementation notes
  * @par
- * Glib::ustring does not inherit from std::string, because std::string was
+ * %Glib::ustring does not inherit from std::string, because std::string was
  * intended to be a final class.  For instance, it does not have a virtual
  * destructor.  Also, a HAS-A relationship is more appropriate because
  * ustring can't just enhance the std::string interface.  Rather, it has to
@@ -595,8 +605,8 @@ public:
   bool validate(const_iterator& first_invalid) const;
 
   /*! Return a copy that is a valid UTF-8 string replacing invalid bytes in the
-   *  original with Unicode replacement character (U+FFFD).
-   *  If the string is valid - return it's copy.
+   *  original with %Unicode replacement character (U+FFFD).
+   *  If the string is valid, return a copy of it.
    */
   ustring make_valid() const;
 
