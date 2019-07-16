@@ -18,7 +18,22 @@
 #include <giomm/dbusinterface.h>
 #include <glibmm/vectorutils.h>
 
-namespace Gio
+namespace
 {
+// Used in call to g_list_copy_deep().
+void* list_copy_ref(const void* src, void* /* data */)
+{
+  return g_object_ref(const_cast<void*>(src));
+}
+} // anonymous namespace
 
-} // namespace Gio
+namespace Glib
+{
+// Define a unwrap_copy() overload.
+// Can't use the template function in glibmm/wrap.h, because interface classes
+// don't override Glib::ObjectBase::gobj_copy(), which returns a GObject*.
+GDBusInterface* unwrap_copy(const Glib::RefPtr<Gio::DBus::Interface>& ptr)
+{
+  return ptr ? reinterpret_cast<GDBusInterface*>(ptr->gobj_copy()) : nullptr;
+}
+} // namespace Glib
