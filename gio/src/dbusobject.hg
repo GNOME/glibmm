@@ -48,11 +48,11 @@ class Object : public Glib::Interface
 public:
   _WRAP_METHOD(Glib::ustring get_object_path() const, g_dbus_object_get_object_path)
 
-#m4 _CONVERSION(`GList*',`std::vector< Glib::RefPtr<Gio::DBus::Interface> >',`Glib::ListHandler< Glib::RefPtr<Gio::DBus::Interface> >::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
-  _WRAP_METHOD(std::vector< Glib::RefPtr<Gio::DBus::Interface> > get_interfaces(), g_dbus_object_get_interfaces)
+#m4 _CONVERSION(`GList*',`std::vector<Glib::RefPtr<Gio::DBus::Interface>>',`Glib::ListHandler<Glib::RefPtr<Gio::DBus::Interface>>::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<Glib::RefPtr<Gio::DBus::Interface>> get_interfaces(), g_dbus_object_get_interfaces)
 
-#m4 _CONVERSION(`GList*',`std::vector< Glib::RefPtr<const Gio::DBus::Interface> >',`Glib::ListHandler< Glib::RefPtr<const Gio::DBus::Interface> >::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
-  _WRAP_METHOD(std::vector< Glib::RefPtr<const Gio::DBus::Interface> > get_interfaces() const, g_dbus_object_get_interfaces)
+#m4 _CONVERSION(`GList*',`std::vector<Glib::RefPtr<const Gio::DBus::Interface>>',`Glib::ListHandler<Glib::RefPtr<const Gio::DBus::Interface>>::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<Glib::RefPtr<const Gio::DBus::Interface>> get_interfaces() const, g_dbus_object_get_interfaces)
 
   _WRAP_METHOD(Glib::RefPtr<Gio::DBus::Interface> get_interface(const Glib::ustring& interface_name), g_dbus_object_get_interface)
   _WRAP_METHOD(Glib::RefPtr<const Gio::DBus::Interface> get_interface(const Glib::ustring& interface_name) const, g_dbus_object_get_interface, constversion)
@@ -68,10 +68,11 @@ public:
 #m4 _CONVERSION(`Glib::ustring',`const gchar*',`$3.c_str()')
   _WRAP_VFUNC(Glib::ustring get_object_path() const, "get_object_path", keep_return)
 
-#m4 _CONVERSION(`std::vector< Glib::RefPtr<Gio::DBus::Interface> >',`GList*',`g_list_copy(Glib::ListHandler< Glib::RefPtr<Gio::DBus::Interface> >::vector_to_list($3).data())')
-  _WRAP_VFUNC(std::vector< Glib::RefPtr<Gio::DBus::Interface> > get_interfaces() const, "get_interfaces")
+#m4 _CONVERSION(`std::vector<Glib::RefPtr<Gio::DBus::Interface>>',`GList*',
+#m4  `g_list_copy_deep(Glib::ListHandler<Glib::RefPtr<Gio::DBus::Interface>>::vector_to_list($3).data(), list_copy_ref, nullptr)')
+  _WRAP_VFUNC(std::vector<Glib::RefPtr<Gio::DBus::Interface>> get_interfaces() const, "get_interfaces")
 
-  _WRAP_VFUNC(Glib::RefPtr<Gio::DBus::Interface> get_interface(const Glib::ustring& interface_name) const, "get_interface")
+  _WRAP_VFUNC(Glib::RefPtr<Gio::DBus::Interface> get_interface(const Glib::ustring& interface_name) const, "get_interface", refreturn_ctype)
 };
 
 } // namespace DBus
