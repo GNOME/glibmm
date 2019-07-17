@@ -1275,7 +1275,7 @@ option: `--name arg` or combined in a single argument: `--name=arg`.
 </parameter_description>
 </parameter>
 <parameter name="G_OPTION_ARG_STRING">
-<parameter_description> The option takes a string argument.
+<parameter_description> The option takes a UTF-8 string argument.
 </parameter_description>
 </parameter>
 <parameter name="G_OPTION_ARG_INT">
@@ -1288,7 +1288,8 @@ option: `--name arg` or combined in a single argument: `--name=arg`.
 </parameter_description>
 </parameter>
 <parameter name="G_OPTION_ARG_FILENAME">
-<parameter_description> The option takes a filename as argument.
+<parameter_description> The option takes a filename as argument, which will
+       be in the GLib filename encoding rather than UTF-8.
 </parameter_description>
 </parameter>
 <parameter name="G_OPTION_ARG_STRING_ARRAY">
@@ -2167,7 +2168,7 @@ Error codes returned by spawning processes.
 </parameter_description>
 </parameter>
 <parameter name="G_SPAWN_ERROR_2BIG">
-<parameter_description> deprecated alias for %G_SPAWN_ERROR_TOO_BIG
+<parameter_description> deprecated alias for %G_SPAWN_ERROR_TOO_BIG (deprecated since GLib 2.32)
 </parameter_description>
 </parameter>
 <parameter name="G_SPAWN_ERROR_NOEXEC">
@@ -2363,7 +2364,7 @@ later tests with g_test_trap_assert_stderr().
 Test traps are guards around forked tests.
 These flags determine what traps to set.
 
-Deprecated: #GTestTrapFlags is used only with g_test_trap_fork(),
+Deprecated: 2.38: #GTestTrapFlags is used only with g_test_trap_fork(),
 which is deprecated. g_test_trap_subprocess() uses
 #GTestSubprocessFlags.
 
@@ -4052,6 +4053,81 @@ Adds @len elements onto the end of the array.
 </parameter>
 </parameters>
 <return> the #GArray
+</return>
+</function>
+
+<function name="g_array_binary_search">
+<description>
+Checks whether @target exists in @array by performing a binary
+search based on the given comparison function @compare_func which
+get pointers to items as arguments. If the element is found, %TRUE
+is returned and the element’s index is returned in @out_match_index
+(if non-%NULL). Otherwise, %FALSE is returned and @out_match_index
+is undefined. If @target exists multiple times in @array, the index
+of the first instance is returned. This search is using a binary
+search, so the @array must absolutely be sorted to return a correct
+result (if not, the function may produce false-negative).
+
+This example defines a comparison function and search an element in a #GArray:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+static gint*
+cmpint (gconstpointer a, gconstpointer b)
+{
+const gint *_a = a;
+const gint *_b = b;
+
+return *_a - *_b;
+}
+...
+gint i = 424242;
+guint matched_index;
+gboolean result = g_array_binary_search (garray, &amp;i, cmpint, &amp;matched_index);
+...
+]|
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="array">
+<parameter_description> a #GArray.
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description> a pointer to the item to look up.
+</parameter_description>
+</parameter>
+<parameter name="compare_func">
+<parameter_description> A #GCompareFunc used to locate @target.
+</parameter_description>
+</parameter>
+<parameter name="out_match_index">
+<parameter_description> return location
+for the index of the element, if found.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @target is one of the elements of @array, %FALSE otherwise.
+
+</return>
+</function>
+
+<function name="g_array_copy">
+<description>
+Create a shallow copy of a #GArray. If the array elements consist of
+pointers to data, the pointers are copied but the actual data is not.
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="array">
+<parameter_description> A #GArray.
+</parameter_description>
+</parameter>
+</parameters>
+<return> A copy of @array.
+
 </return>
 </function>
 
@@ -7019,7 +7095,7 @@ Since: 2.58
 
 <function name="g_atomic_rc_box_dup">
 <description>
-Allocates a new block of data with atomit reference counting
+Allocates a new block of data with atomic reference counting
 semantics, and copies @block_size bytes of @mem_block
 into it.
 
@@ -7231,6 +7307,8 @@ Helper to declare a variable with automatic cleanup.
 
 The variable is cleaned up in a way appropriate to its type when the
 variable goes out of scope.  The type must support this.
+The way to clean up the type must have been defined using one of the macros
+G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC() or G_DEFINE_AUTO_CLEANUP_FREE_FUNC().
 
 This feature is only supported on GCC and clang.  This macro is not
 defined on other compilers and should not be used in programs that
@@ -7243,7 +7321,7 @@ g_autoptr().
 This macro can be used to avoid having to do explicit cleanups of
 local variables when exiting functions.  It often vastly simplifies
 handling of error conditions, removing the need for various tricks
-such as 'goto out' or repeating of cleanup code.  It is also helpful
+such as `goto out` or repeating of cleanup code.  It is also helpful
 for non-error cases.
 
 Consider the following example:
@@ -7270,8 +7348,8 @@ return g_variant_builder_end (&amp;builder);
 }
 ]|
 
-You must initialize the variable in some way -- either by use of an
-initialiser or by ensuring that an _init function will be called on
+You must initialize the variable in some way — either by use of an
+initialiser or by ensuring that an `_init` function will be called on
 it unconditionally before it goes out of scope.
 
 Since: 2.44
@@ -7298,7 +7376,7 @@ of using a type-specific lookup, this macro always calls g_free() directly.
 This means it's useful for any type that is returned from
 g_malloc().
 
-Otherwise, this macro has similar constraints as g_autoptr() - only
+Otherwise, this macro has similar constraints as g_autoptr(): only
 supported on GCC and clang, the variable must be initialized, etc.
 
 |[
@@ -7336,13 +7414,13 @@ defined on other compilers and should not be used in programs that
 are intended to be portable to those compilers.
 
 This is meant to be used to declare lists of a type with a cleanup
-function.  The type of the variable is a GList *.  You
-must not add your own '*'.
+function.  The type of the variable is a `GList *`.  You
+must not add your own `*`.
 
 This macro can be used to avoid having to do explicit cleanups of
 local variables when exiting functions.  It often vastly simplifies
 handling of error conditions, removing the need for various tricks
-such as 'goto out' or repeating of cleanup code.  It is also helpful
+such as `goto out` or repeating of cleanup code.  It is also helpful
 for non-error cases.
 
 See also g_autoslist(), g_autoptr() and g_steal_pointer().
@@ -7365,6 +7443,8 @@ Helper to declare a pointer variable with automatic cleanup.
 
 The variable is cleaned up in a way appropriate to its type when the
 variable goes out of scope.  The type must support this.
+The way to clean up the type must have been defined using the macro
+G_DEFINE_AUTOPTR_CLEANUP_FUNC().
 
 This feature is only supported on GCC and clang.  This macro is not
 defined on other compilers and should not be used in programs that
@@ -7372,12 +7452,12 @@ are intended to be portable to those compilers.
 
 This is meant to be used to declare pointers to types with cleanup
 functions.  The type of the variable is a pointer to @TypeName.  You
-must not add your own '*'.
+must not add your own `*`.
 
 This macro can be used to avoid having to do explicit cleanups of
 local variables when exiting functions.  It often vastly simplifies
 handling of error conditions, removing the need for various tricks
-such as 'goto out' or repeating of cleanup code.  It is also helpful
+such as `goto out` or repeating of cleanup code.  It is also helpful
 for non-error cases.
 
 Consider the following example:
@@ -7407,13 +7487,48 @@ return g_access (path, R_OK) == 0;
 }
 ]|
 
-You must initialise the variable in some way -- either by use of an
+You must initialise the variable in some way — either by use of an
 initialiser or by ensuring that it is assigned to unconditionally
 before it goes out of scope.
 
 See also g_auto(), g_autofree() and g_steal_pointer().
 
 Since: 2.44
+
+</description>
+<parameters>
+<parameter name="TypeName">
+<parameter_description> a supported variable type
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_autoqueue">
+<description>
+Helper to declare a double-ended queue variable with automatic deep cleanup.
+
+The queue is deeply freed, in a way appropriate to the specified type, when the
+variable goes out of scope.  The type must support this.
+
+This feature is only supported on GCC and clang.  This macro is not
+defined on other compilers and should not be used in programs that
+are intended to be portable to those compilers.
+
+This is meant to be used to declare queues of a type with a cleanup
+function.  The type of the variable is a `GQueue *`.  You
+must not add your own `*`.
+
+This macro can be used to avoid having to do explicit cleanups of
+local variables when exiting functions.  It often vastly simplifies
+handling of error conditions, removing the need for various tricks
+such as `goto out` or repeating of cleanup code.  It is also helpful
+for non-error cases.
+
+See also g_autolist(), g_autoptr() and g_steal_pointer().
+
+Since: 2.62
 
 </description>
 <parameters>
@@ -7437,13 +7552,13 @@ defined on other compilers and should not be used in programs that
 are intended to be portable to those compilers.
 
 This is meant to be used to declare lists of a type with a cleanup
-function.  The type of the variable is a GSList *.  You
-must not add your own '*'.
+function.  The type of the variable is a `GSList *`.  You
+must not add your own `*`.
 
 This macro can be used to avoid having to do explicit cleanups of
 local variables when exiting functions.  It often vastly simplifies
 handling of error conditions, removing the need for various tricks
-such as 'goto out' or repeating of cleanup code.  It is also helpful
+such as `goto out` or repeating of cleanup code.  It is also helpful
 for non-error cases.
 
 See also g_autolist(), g_autoptr() and g_steal_pointer().
@@ -12865,6 +12980,33 @@ pointer
 </parameter>
 <parameter name="destroy">
 <parameter_description> a function to which a gpointer can be passed, to destroy *@pp
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_clear_signal_handler">
+<description>
+Disconnects a handler from @instance so it will not be called during
+any future or currently ongoing emissions of the signal it has been
+connected to. The @handler_id_ptr is then set to zero, which is never a valid handler ID value (see g_signal_connect()).
+
+If the handler ID is 0 then this function does nothing.
+
+A macro is also included that allows this function to be used without
+pointer casts.
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="handler_id_ptr">
+<parameter_description> A pointer to a handler ID (of type #gulong) of the handler to be disconnected.
+</parameter_description>
+</parameter>
+<parameter name="instance">
+<parameter_description> The instance to remove the signal handler from.
 </parameter_description>
 </parameter>
 </parameters>
@@ -19245,6 +19387,41 @@ of the character set. This string must be freed with g_free().
 </return>
 </function>
 
+<function name="g_get_console_charset">
+<description>
+Obtains the character set used by the console attached to the process,
+which is suitable for printing output to the terminal.
+
+Usually this matches the result returned by g_get_charset(), but in
+environments where the locale's character set does not match the encoding
+of the console this function tries to guess a more suitable value instead.
+
+On Windows the character set returned by this function is the
+output code page used by the console associated with the calling process.
+If the codepage can't be determined (for example because there is no
+console attached) UTF-8 is assumed.
+
+The return value is %TRUE if the locale's encoding is UTF-8, in that
+case you can perhaps avoid calling g_convert().
+
+The string returned in @charset is not allocated, and should not be
+freed.
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="charset">
+<parameter_description> return location for character set
+name, or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the returned charset is UTF-8
+
+</return>
+</function>
+
 <function name="g_get_current_dir">
 <description>
 Gets the current directory.
@@ -19544,7 +19721,8 @@ taking the last component of @argv[0].
 </description>
 <parameters>
 </parameters>
-<return> the name of the program. The returned string belongs 
+<return> the name of the program, or %NULL if it has not been
+set yet. The returned string belongs
 to GLib and must not be modified or freed.
 </return>
 </function>
@@ -21927,6 +22105,10 @@ can be compared for equality by comparing the pointers, instead of
 using strcmp(). g_intern_static_string() does not copy the string,
 therefore @string must not be freed or modified.
 
+This function must not be used before library constructors have finished
+running. In particular, this means it cannot be used to initialize global
+variables in C++.
+
 Since: 2.10
 
 </description>
@@ -21946,6 +22128,10 @@ Since: 2.10
 Returns a canonical representation for @string. Interned strings
 can be compared for equality by comparing the pointers, instead of
 using strcmp().
+
+This function must not be used before library constructors have finished
+running. In particular, this means it cannot be used to initialize global
+variables in C++.
 
 Since: 2.10
 
@@ -25073,6 +25259,34 @@ is inserted or %NULL to insert at the end of the list
 </return>
 </function>
 
+<function name="g_list_insert_before_link">
+<description>
+Inserts @link_ into the list before the given position.
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a pointer to a #GList, this must point to the top of the list
+</parameter_description>
+</parameter>
+<parameter name="sibling">
+<parameter_description> the list element before which the new element
+is inserted or %NULL to insert at the end of the list
+</parameter_description>
+</parameter>
+<parameter name="link_">
+<parameter_description> the list element to be added, which must not be part of
+any other list
+</parameter_description>
+</parameter>
+</parameters>
+<return> the (possibly changed) start of the #GList
+
+</return>
+</function>
+
 <function name="g_list_insert_sorted">
 <description>
 Inserts a new element into the list, using the given comparison 
@@ -26565,7 +26779,7 @@ the first one found will be returned.
 <description>
 Finds a #GSource given a pair of context and ID.
 
-It is a programmer error to attempt to lookup a non-existent source.
+It is a programmer error to attempt to look up a non-existent source.
 
 More specifically: source IDs can be reissued after a source has been
 destroyed and therefore it is never valid to use this function with a
@@ -31145,9 +31359,15 @@ or %NULL if no such data exists.
 
 <function name="g_object_get_property">
 <description>
-Gets a property of an object. @value must have been initialized to the
-expected type of the property (or a type to which the expected type can be
-transformed) using g_value_init().
+Gets a property of an object.
+
+The @value can be:
+
+- an empty #GValue initialized by %G_VALUE_INIT, which will be
+automatically initialized with the expected type of the property
+- a #GValue initialized with the expected type of the property
+- a #GValue initialized with a type to which the expected type
+of the property can be transformed
 
 In general, a copy is made of the property contents and the caller is
 responsible for freeing the memory by calling g_value_unset().
@@ -31273,7 +31493,7 @@ interface, or the default vtable for the interface
 </parameter_description>
 </parameter>
 <parameter name="property_name">
-<parameter_description> name of a property to lookup.
+<parameter_description> name of a property to look up.
 </parameter_description>
 </parameter>
 </parameters>
@@ -31689,6 +31909,9 @@ It’s up to the caller to free this as needed, which may
 or may not include using @old_destroy as sometimes replacement
 should not destroy the object in the normal way.
 
+See g_object_set_data() for guidance on using a small, bounded set of values
+for @key.
+
 Since: 2.34
 
 </description>
@@ -31826,6 +32049,11 @@ strings to pointers.  This function lets you set an association.
 
 If the object already had an association with that name,
 the old association will be destroyed.
+
+Internally, the @key is converted to a #GQuark using g_quark_from_string().
+This means a copy of @key is kept permanently (even after @object has been
+finalized) — so it is recommended to only use a small, bounded set of values
+for @key in your program, to avoid the #GQuark storage growing unbounded.
 
 </description>
 <parameters>
@@ -32253,6 +32481,10 @@ If &quot;[P]roceed&quot; is selected, the function returns.
 
 This function may cause different actions on non-UNIX platforms.
 
+On Windows consider using the `G_DEBUGGER` environment
+variable (see [Running GLib Applications](glib-running.html)) and
+calling g_on_error_stack_trace() instead.
+
 </description>
 <parameters>
 <parameter name="prg_name">
@@ -32275,6 +32507,12 @@ with g_get_prgname(), assuming that you have called gtk_init() or
 gdk_init().
 
 This function may cause different actions on non-UNIX platforms.
+
+When running on Windows, this function is *not* called by
+g_on_error_query(). If called directly, it will raise an
+exception, which will crash the program. If the `G_DEBUGGER` environment
+variable is set, a debugger will be invoked to attach and
+handle that exception (see [Running GLib Applications](glib-running.html)).
 
 </description>
 <parameters>
@@ -35457,6 +35695,107 @@ in size automatically if necessary.
 <return></return>
 </function>
 
+<function name="g_ptr_array_copy">
+<description>
+Makes a full (deep) copy of a #GPtrArray.
+
+@func, as a #GCopyFunc, takes two arguments, the data to be copied
+and a @user_data pointer. On common processor architectures, it's safe to
+pass %NULL as @user_data if the copy function takes only one argument. You
+may get compiler warnings from this though if compiling with GCC’s
+`-Wcast-function-type` warning.
+
+If @func is %NULL, then only the pointers (and not what they are
+pointing to) are copied to the new #GPtrArray.
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="array">
+<parameter_description> #GPtrArray to duplicate
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> a copy function used to copy every element in the array
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to the copy function @func, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a deep copy of the initial #GPtrArray.
+
+</return>
+</function>
+
+<function name="g_ptr_array_extend">
+<description>
+Adds all pointers of @array to the end of the array @array_to_extend.
+The array will grow in size automatically if needed. @array_to_extend is
+modified in-place.
+
+@func, as a #GCopyFunc, takes two arguments, the data to be copied
+and a @user_data pointer. On common processor architectures, it's safe to
+pass %NULL as @user_data if the copy function takes only one argument. You
+may get compiler warnings from this though if compiling with GCC’s
+`-Wcast-function-type` warning.
+
+If @func is %NULL, then only the pointers (and not what they are
+pointing to) are copied to the new #GPtrArray.
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="array_to_extend">
+<parameter_description> a #GPtrArray.
+</parameter_description>
+</parameter>
+<parameter name="array">
+<parameter_description> a #GPtrArray to add to the end of @array_to_extend.
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> a copy function used to copy every element in the array
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to the copy function @func, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_ptr_array_extend_and_steal">
+<description>
+Adds all the pointers in @array to the end of @array_to_extend, transferring
+ownership of each element from @array to @array_to_extend and modifying
+@array_to_extend in-place. @array is then freed.
+
+As with g_ptr_array_free(), @array will be destroyed if its reference count
+is 1. If its reference count is higher, it will be decremented and the
+length of @array set to zero.
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="array_to_extend">
+<parameter_description> a #GPtrArray.
+</parameter_description>
+</parameter>
+<parameter name="array">
+<parameter_description> a #GPtrArray to add to the end of
+@array_to_extend.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_ptr_array_find">
 <description>
 Checks whether @needle exists in @haystack. If the element is found, %TRUE is
@@ -36087,6 +36426,10 @@ statically allocated memory in dynamically loaded modules, if you
 expect to ever unload the module again (e.g. do not use this
 function in GTK+ theme engines).
 
+This function must not be used before library constructors have finished
+running. In particular, this means it cannot be used to initialize global
+variables in C++.
+
 
 </description>
 <parameters>
@@ -36104,6 +36447,10 @@ function in GTK+ theme engines).
 Gets the #GQuark identifying the given string. If the string does
 not currently have an associated #GQuark, a new #GQuark is created,
 using a copy of the string.
+
+This function must not be used before library constructors have finished
+running. In particular, this means it cannot be used to initialize global
+variables in C++.
 
 
 </description>
@@ -36140,6 +36487,9 @@ Gets the #GQuark associated with the given string, or 0 if string is
 
 If you want the GQuark to be created if it doesn't already exist,
 use g_quark_from_string() or g_quark_from_static_string().
+
+This function must not be used before library constructors have finished
+running.
 
 
 </description>
@@ -36446,6 +36796,33 @@ push at the head of the queue.
 <return></return>
 </function>
 
+<function name="g_queue_insert_after_link">
+<description>
+Inserts @link_ into @queue after @sibling.
+
+@sibling must be part of @queue.
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GQueue
+</parameter_description>
+</parameter>
+<parameter name="sibling">
+<parameter_description> a #GList link that must be part of @queue, or %NULL to
+push at the head of the queue.
+</parameter_description>
+</parameter>
+<parameter name="link_">
+<parameter_description> a #GList link to insert which must not be part of any other list.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_queue_insert_before">
 <description>
 Inserts @data into @queue before @sibling.
@@ -36468,6 +36845,33 @@ push at the tail of the queue.
 </parameter>
 <parameter name="data">
 <parameter_description> the data to insert
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_queue_insert_before_link">
+<description>
+Inserts @link_ into @queue before @sibling.
+
+@sibling must be part of @queue.
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GQueue
+</parameter_description>
+</parameter>
+<parameter name="sibling">
+<parameter_description> a #GList link that must be part of @queue, or %NULL to
+push at the tail of the queue.
+</parameter_description>
+</parameter>
+<parameter name="link_">
+<parameter_description> a #GList link to insert which must not be part of any other list.
 </parameter_description>
 </parameter>
 </parameters>
@@ -39535,8 +39939,10 @@ Since: 2.32
 <function name="g_rw_lock_reader_lock">
 <description>
 Obtain a read lock on @rw_lock. If another thread currently holds
-the write lock on @rw_lock or blocks waiting for it, the current
-thread will block. Read locks can be taken recursively.
+the write lock on @rw_lock, the current thread will block. If another thread
+does not hold the write lock, but is waiting for it, it is implementation
+defined whether the reader or writer will block. Read locks can be taken
+recursively.
 
 It is implementation-defined how many threads are allowed to
 hold read locks on the same lock simultaneously. If the limit is hit,
@@ -39552,6 +39958,46 @@ Since: 2.32
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_rw_lock_reader_locker_free">
+<description>
+Release a read lock on @locker's read-write lock. See
+g_rw_lock_reader_locker_new() for details.
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="locker">
+<parameter_description> a GRWLockReaderLocker
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_rw_lock_reader_locker_new">
+<description>
+Obtain a read lock on @rw_lock and return a new #GRWLockReaderLocker.
+Unlock with g_rw_lock_reader_locker_free(). Using g_rw_lock_reader_unlock()
+on @rw_lock while a #GRWLockReaderLocker exists can lead to undefined
+behaviour.
+
+This is intended to be used with g_autoptr(). For a code sample, see
+g_rw_lock_writer_locker_new().
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="rw_lock">
+<parameter_description> a #GRWLock
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GRWLockReaderLocker
+</return>
 </function>
 
 <function name="g_rw_lock_reader_trylock">
@@ -39609,6 +40055,102 @@ Since: 2.32
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_rw_lock_writer_locker_free">
+<description>
+Release a write lock on @locker's read-write lock. See
+g_rw_lock_writer_locker_new() for details.
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="locker">
+<parameter_description> a GRWLockWriterLocker
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_rw_lock_writer_locker_new">
+<description>
+Obtain a write lock on @rw_lock and return a new #GRWLockWriterLocker.
+Unlock with g_rw_lock_writer_locker_free(). Using g_rw_lock_writer_unlock()
+on @rw_lock while a #GRWLockWriterLocker exists can lead to undefined
+behaviour.
+
+This is intended to be used with g_autoptr().  Note that g_autoptr()
+is only available when using GCC or clang, so the following example
+will only work with those compilers:
+|[
+typedef struct
+{
+...
+GRWLock rw_lock;
+GPtrArray *array;
+...
+} MyObject;
+
+static gchar *
+my_object_get_data (MyObject *self, guint index)
+{
+g_autoptr(GRWLockReaderLocker) locker = g_rw_lock_reader_locker_new (&amp;self-&gt;rw_lock);
+
+// Code with a read lock obtained on rw_lock here
+
+if (self-&gt;array == NULL)
+// No need to unlock
+return NULL;
+
+if (index &lt; self-&gt;array-&gt;len)
+// No need to unlock
+return g_ptr_array_index (self-&gt;array, index);
+
+// Optionally early unlock
+g_clear_pointer (&amp;locker, g_rw_lock_reader_locker_free);
+
+// Code with rw_lock unlocked here
+return NULL;
+}
+
+static void
+my_object_set_data (MyObject *self, guint index, gpointer data)
+{
+g_autoptr(GRWLockWriterLocker) locker = g_rw_lock_writer_locker_new (&amp;self-&gt;rw_lock);
+
+// Code with a write lock obtained on rw_lock here
+
+if (self-&gt;array == NULL)
+self-&gt;array = g_ptr_array_new ();
+
+if (cond)
+// No need to unlock
+return;
+
+if (index &gt;= self-&gt;array-&gt;len)
+g_ptr_array_set_size (self-&gt;array, index+1);
+g_ptr_array_index (self-&gt;array, index) = data;
+
+// Optionally early unlock
+g_clear_pointer (&amp;locker, g_rw_lock_writer_locker_free);
+
+// Code with rw_lock unlocked here
+}
+]|
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="rw_lock">
+<parameter_description> a #GRWLock
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GRWLockWriterLocker
+</return>
 </function>
 
 <function name="g_rw_lock_writer_trylock">
@@ -40725,7 +41267,7 @@ Since: 2.28
 </parameter_description>
 </parameter>
 <parameter name="data">
-<parameter_description> data to lookup
+<parameter_description> data to look up
 </parameter_description>
 </parameter>
 <parameter name="cmp_func">
@@ -40766,7 +41308,7 @@ Since: 2.28
 </parameter_description>
 </parameter>
 <parameter name="data">
-<parameter_description> data to lookup
+<parameter_description> data to look up
 </parameter_description>
 </parameter>
 <parameter name="iter_cmp">
@@ -42676,8 +43218,14 @@ If 0 is used for @class_offset subclasses cannot override the class handler
 in their class_init method by doing super_class-&gt;signal_handler = my_signal_handler.
 Instead they will have to use g_signal_override_class_handler().
 
-If c_marshaller is %NULL, g_cclosure_marshal_generic() will be used as
-the marshaller for this signal.
+If @c_marshaller is %NULL, g_cclosure_marshal_generic() will be used as
+the marshaller for this signal. In some simple cases, g_signal_new()
+will use a more optimized c_marshaller and va_marshaller for the signal
+instead of g_cclosure_marshal_generic().
+
+If @c_marshaller is non-%NULL, you need to also specify a va_marshaller
+using g_signal_set_va_marshaller() or the generic va_marshaller will
+be used.
 
 
 </description>
@@ -44444,6 +44992,9 @@ Removes a source from its #GMainContext, if any, and mark it as
 destroyed.  The source cannot be subsequently added to another
 context. It is safe to call this on sources which have already been
 removed from their context.
+
+This does not unref the #GSource: if you still hold a reference, use
+g_source_unref() to drop it.
 
 </description>
 <parameters>
@@ -46818,8 +47369,15 @@ For each character in @string, if the character is not in @valid_chars,
 replaces the character with @substitutor. Modifies @string in place,
 and return @string itself, not a copy. The return value is to allow
 nesting such as
-|[&lt;!-- language=&quot;C&quot; --&gt; 
+|[&lt;!-- language=&quot;C&quot; --&gt;
 g_ascii_strup (g_strcanon (str, &quot;abc&quot;, '?'))
+]|
+
+In order to modify a copy, you may use `g_strdup()`:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+reformatted = g_strcanon (g_strdup (const_str), &quot;abc&quot;, '?');
+...
+g_free (reformatted);
 ]|
 
 
@@ -46994,8 +47552,15 @@ Any characters in @string which are found in @delimiters are
 changed to the @new_delimiter character. Modifies @string in place,
 and returns @string itself, not a copy. The return value is to
 allow nesting such as
-|[&lt;!-- language=&quot;C&quot; --&gt; 
+|[&lt;!-- language=&quot;C&quot; --&gt;
 g_ascii_strup (g_strdelimit (str, &quot;abc&quot;, '?'))
+]|
+
+In order to modify a copy, you may use `g_strdup()`:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+reformatted = g_strdelimit (g_strdup (const_str), &quot;abc&quot;, '?');
+...
+g_free (reformatted);
 ]|
 
 
@@ -49000,6 +49565,7 @@ Bug URIs are constructed from a base URI set with g_test_bug_base()
 and @bug_uri_snippet.
 
 Since: 2.16
+See also: g_test_summary()
 
 </description>
 <parameters>
@@ -49998,6 +50564,41 @@ Since: 2.16
 </parameter>
 <parameter name="nestedsuite">
 <parameter_description> another #GTestSuite
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_test_summary">
+<description>
+Set the summary for a test, which describes what the test checks, and how it
+goes about checking it. This may be included in test report output, and is
+useful documentation for anyone reading the source code or modifying a test
+in future. It must be a single line.
+
+This should be called at the top of a test function.
+
+For example:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+static void
+test_array_sort (void)
+{
+g_test_summary (&quot;Test my_array_sort() sorts the array correctly and stably, &quot;
+&quot;including testing zero length and one-element arrays.&quot;);
+
+…
+}
+]|
+
+Since: 2.62
+See also: g_test_bug()
+
+</description>
+<parameters>
+<parameter name="summary">
+<parameter_description> One or two sentences summarising what the test checks, and how it
+checks it.
 </parameter_description>
 </parameter>
 </parameters>
@@ -51954,6 +52555,23 @@ fractional part.
 </return>
 </function>
 
+<function name="g_timer_is_active">
+<description>
+Exposes whether the timer is currently active.
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="timer">
+<parameter_description> a #GTimer.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the timer is running, %FALSE otherwise
+</return>
+</function>
+
 <function name="g_timer_new">
 <description>
 Creates a new timer, and starts timing (i.e. g_timer_start() is
@@ -53343,7 +53961,7 @@ implementors of fundamental types.
 
 <function name="g_type_from_name">
 <description>
-Lookup the type ID from a given type name, returning 0 if no type
+Look up the type ID from a given type name, returning 0 if no type
 has been registered under this name (this is the preferred method
 to find out by name whether a specific type has been registered
 yet).
@@ -53352,7 +53970,7 @@ yet).
 </description>
 <parameters>
 <parameter name="name">
-<parameter_description> type name to lookup
+<parameter_description> type name to look up
 </parameter_description>
 </parameter>
 </parameters>
@@ -56242,9 +56860,9 @@ less capable Unicode handling.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated string, that is the
-normalized form of @str, or %NULL if @str is not
-valid UTF-8.
+<return> a newly allocated string, that
+is the normalized form of @str, or %NULL if @str
+is not valid UTF-8.
 </return>
 </function>
 
@@ -56347,7 +56965,7 @@ If @len is -1, allow unbounded search.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %NULL if the string does not contain the character, 
+<return> %NULL if the string does not contain the character,
 otherwise, a pointer to the start of the leftmost occurrence
 of the character in the string.
 </return>
@@ -56455,7 +57073,7 @@ If @len is -1, allow unbounded search.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %NULL if the string does not contain the character, 
+<return> %NULL if the string does not contain the character,
 otherwise, a pointer to the start of the rightmost occurrence
 of the character in the string.
 </return>
@@ -58140,8 +58758,8 @@ Since: 2.26
 <function name="g_value_take_boxed">
 <description>
 Sets the contents of a %G_TYPE_BOXED derived #GValue to @v_boxed
-and takes over the ownership of the callers reference to @v_boxed;
-the caller doesn't have to unref it any more.
+and takes over the ownership of the caller’s reference to @v_boxed;
+the caller doesn’t have to unref it any more.
 
 Since: 2.4
 
@@ -58162,8 +58780,8 @@ Since: 2.4
 <function name="g_value_take_object">
 <description>
 Sets the contents of a %G_TYPE_OBJECT derived #GValue to @v_object
-and takes over the ownership of the callers reference to @v_object;
-the caller doesn't have to unref it any more (i.e. the reference
+and takes over the ownership of the caller’s reference to @v_object;
+the caller doesn’t have to unref it any more (i.e. the reference
 count of the object is not increased).
 
 If you want the #GValue to hold its own reference to @v_object, use
@@ -58188,8 +58806,8 @@ Since: 2.4
 <function name="g_value_take_param">
 <description>
 Sets the contents of a %G_TYPE_PARAM #GValue to @param and takes
-over the ownership of the callers reference to @param; the caller
-doesn't have to unref it any more.
+over the ownership of the caller’s reference to @param; the caller
+doesn’t have to unref it any more.
 
 Since: 2.4
 
@@ -58902,7 +59520,7 @@ Since: 2.40
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the key to lookup in the dictionary
+<parameter_description> the key to look up in the dictionary
 </parameter_description>
 </parameter>
 </parameters>
@@ -59049,7 +59667,7 @@ Since: 2.40
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the key to lookup in the dictionary
+<parameter_description> the key to look up in the dictionary
 </parameter_description>
 </parameter>
 <parameter name="format_string">
@@ -59089,7 +59707,7 @@ Since: 2.40
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the key to lookup in the dictionary
+<parameter_description> the key to look up in the dictionary
 </parameter_description>
 </parameter>
 <parameter name="expected_type">
@@ -60686,7 +61304,7 @@ Since: 2.28
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the key to lookup in the dictionary
+<parameter_description> the key to look up in the dictionary
 </parameter_description>
 </parameter>
 <parameter name="format_string">
@@ -60736,7 +61354,7 @@ Since: 2.28
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the key to lookup in the dictionary
+<parameter_description> the key to look up in the dictionary
 </parameter_description>
 </parameter>
 <parameter name="expected_type">
@@ -63494,6 +64112,58 @@ Since: 2.8
 </parameters>
 <return> The converted filename, or %NULL on conversion
 failure and lack of short names.
+
+</return>
+</function>
+
+<function name="g_win32_readlink_utf8">
+<description>
+Tries to read the reparse point indicated by @filename, filling
+@buf or @alloc_buf with the path that the reparse point redirects to.
+The path will be UTF-8-encoded, and an extended path prefix
+or a NT object manager prefix will be removed from it, if
+possible, but otherwise the path is returned as-is. Specifically,
+it could be a &quot;\\\\Volume{GUID}\\&quot; path. It also might use
+backslashes as path separators.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="filename">
+<parameter_description> a pathname in UTF-8
+</parameter_description>
+</parameter>
+<parameter name="buf">
+<parameter_description> a buffer to receive the reparse point
+target path. Mutually-exclusive
+with @alloc_buf.
+</parameter_description>
+</parameter>
+<parameter name="buf_size">
+<parameter_description> size of the @buf, in bytes
+</parameter_description>
+</parameter>
+<parameter name="alloc_buf">
+<parameter_description> points to a location where internally-allocated buffer
+pointer will be written. That buffer receives the
+link data. Mutually-exclusive with @buf.
+</parameter_description>
+</parameter>
+<parameter name="terminate">
+<parameter_description> ensures that the buffer is NUL-terminated if
+it isn't already. If %FALSE, the returned string
+might not be NUL-terminated (depends entirely on
+what the contents of the filesystem are).
+</parameter_description>
+</parameter>
+</parameters>
+<return> -1 on error (sets errno), 0 if there's no (recognizable)
+path in the reparse point (@alloc_buf will not be allocated in that case,
+and @buf will be left unmodified),
+or the number of bytes placed into @buf otherwise,
+including NUL-terminator (if present or if @terminate is TRUE).
+The buffer returned via @alloc_buf should be freed with g_free().
 
 </return>
 </function>
