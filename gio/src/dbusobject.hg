@@ -72,7 +72,10 @@ public:
 #m4  `g_list_copy_deep(Glib::ListHandler<Glib::RefPtr<Gio::DBus::Interface>>::vector_to_list($3).data(), list_copy_ref, nullptr)')
   _WRAP_VFUNC(std::vector<Glib::RefPtr<Gio::DBus::Interface>> get_interfaces() const, "get_interfaces")
 
-  _WRAP_VFUNC(Glib::RefPtr<Gio::DBus::Interface> get_interface(const Glib::ustring& interface_name) const, "get_interface", refreturn_ctype)
+  // Can't use refreturn_ctype here. It generates a call to Glib::unwrap_copy(), which
+  // can't be used for Glib::Interface classes. They have no gobj_copy() method.
+#m4 _CONVERSION(`Glib::RefPtr<Gio::DBus::Interface>',`GDBusInterface*',`local_unwrap_copy($3)')
+  _WRAP_VFUNC(Glib::RefPtr<Gio::DBus::Interface> get_interface(const Glib::ustring& interface_name) const, "get_interface")
 };
 
 } // namespace DBus
