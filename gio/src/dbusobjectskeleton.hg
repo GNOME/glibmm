@@ -1,0 +1,83 @@
+/* Copyright (C) 2019 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/dbusobject.h>
+#include <giomm/dbusinterfaceskeleton.h>
+#include <giomm/dbusmethodinvocation.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+namespace DBus
+{
+//The GMMPROC_EXTRA_NAMESPACE() macro is a hint to generate_wrap_init.pl to put it in the DBus sub-namespace
+_GMMPROC_EXTRA_NAMESPACE(DBus)
+
+/** Service-side D-Bus object.
+ *
+ * A %Gio::DBus::ObjectSkeleton instance is essentially a group of D-Bus
+ * interfaces. The set of exported interfaces on the object may be
+ * dynamic and change at runtime.
+ *
+ * This type is intended to be used with Gio::DBus::ObjectManager.
+ *
+ * @newin{2,62}
+ * @ingroup DBus
+ */
+class ObjectSkeleton : public Glib::Object, public Object
+{
+  _CLASS_GOBJECT(ObjectSkeleton, GDBusObjectSkeleton, G_DBUS_OBJECT_SKELETON, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(DBus::Object)
+
+protected:
+  _WRAP_CTOR(ObjectSkeleton(const Glib::ustring& object_path), g_dbus_object_skeleton_new)
+
+public:
+  /** Creates a new %Gio::DBus::ObjectSkeleton.
+   *
+   * @param object_path An object path.
+   * @return A new %Gio::DBus::ObjectSkeleton.
+   */
+  _WRAP_CREATE(const Glib::ustring& object_path)
+
+  // The parameter name 'interface' can cause compilation errors with MinGW.
+  // See https://bugzilla.gnome.org/show_bug.cgi?id=735137
+  // The parameter names in glib are 'interface_' and 'interface'.
+  _WRAP_METHOD(void flush(), g_dbus_object_skeleton_flush)
+  _WRAP_METHOD(void add_interface(const Glib::RefPtr<Gio::DBus::InterfaceSkeleton>& iface),
+    g_dbus_object_skeleton_add_interface)
+  _WRAP_METHOD(void remove_interface(const Glib::RefPtr<Gio::DBus::InterfaceSkeleton>& iface),
+    g_dbus_object_skeleton_remove_interface)
+  _WRAP_METHOD(void remove_interface(const Glib::ustring& interface_name),
+    g_dbus_object_skeleton_remove_interface_by_name)
+  _WRAP_METHOD(void set_object_path(const Glib::ustring& object_path),
+    g_dbus_object_skeleton_set_object_path)
+
+ _WRAP_PROPERTY("g-object-path", Glib::ustring)
+
+#m4 _CONVERSION(`GDBusInterfaceSkeleton*',`const Glib::RefPtr<Gio::DBus::InterfaceSkeleton>&',`Glib::wrap($3, true)')
+#m4 _CONVERSION(`GDBusMethodInvocation*',`const Glib::RefPtr<Gio::DBus::MethodInvocation>&',`Glib::wrap($3, true)')
+ _WRAP_SIGNAL(bool authorize_method(const Glib::RefPtr<Gio::DBus::InterfaceSkeleton>& iface,
+   const Glib::RefPtr<Gio::DBus::MethodInvocation>& invocation), "authorize-method")
+};
+
+} //namespace
+
+} // namespace Gio

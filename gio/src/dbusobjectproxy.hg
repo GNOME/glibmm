@@ -1,0 +1,71 @@
+/* Copyright (C) 2019 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/dbusobject.h>
+#include <giomm/dbusconnection.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+namespace DBus
+{
+//The GMMPROC_EXTRA_NAMESPACE() macro is a hint to generate_wrap_init.pl to put it in the DBus sub-namespace
+_GMMPROC_EXTRA_NAMESPACE(DBus)
+
+/** Client-side D-Bus object.
+ *
+ * A %Gio::DBus::ObjectProxy is an object used to represent a remote object
+ * with one or more D-Bus interfaces. Normally, you don't instantiate
+ * a %Gio::DBus::ObjectProxy yourself - typically Gio::DBus::ObjectManagerClient
+ * is used to obtain it.
+ *
+ * @newin{2,62}
+ * @ingroup DBus
+ */
+class ObjectProxy : public Glib::Object, public Object
+{
+  _CLASS_GOBJECT(ObjectProxy, GDBusObjectProxy, G_DBUS_OBJECT_PROXY, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(DBus::Object)
+
+protected:
+  _WRAP_CTOR(ObjectProxy(const Glib::RefPtr<Connection>& connection,
+    const Glib::ustring& object_path), g_dbus_object_proxy_new)
+
+public:
+  /** Creates a new %Gio::DBus::ObjectProxy for the given connection and
+   * object path.
+   *
+   * @param connection A %Gio::DBus::Connection.
+   * @param object_path The object path.
+   * @return A new %Gio::DBus::ObjectProxy.
+   */
+  _WRAP_CREATE(const Glib::RefPtr<Connection>& connection, const Glib::ustring& object_path)
+
+  _WRAP_METHOD(Glib::RefPtr<Connection> get_connection(), g_dbus_object_proxy_get_connection, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Connection> get_connection() const,
+    g_dbus_object_proxy_get_connection, refreturn, constversion)
+
+ _WRAP_PROPERTY("g-connection", Glib::RefPtr<Connection>)
+ _WRAP_PROPERTY("g-object-path", Glib::ustring)
+};
+
+} //namespace
+
+} // namespace Gio
