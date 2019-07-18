@@ -1,0 +1,154 @@
+/* Copyright (C) 2019 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gio/gio.h>
+
+namespace
+{
+GType get_proxy_type_callback(GDBusObjectManagerClient* manager,
+  const gchar* object_path, const gchar* interface_name, gpointer user_data)
+{
+  auto slot_proxy_type = static_cast<Gio::DBus::ObjectManagerClient::SlotProxyType*>(user_data);
+  try
+  {
+    return (*slot_proxy_type)(Glib::wrap(manager, true),
+           Glib::convert_const_gchar_ptr_to_ustring(object_path),
+           Glib::convert_const_gchar_ptr_to_ustring(interface_name));
+  }
+  catch (...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  return 0;
+}
+
+} // anonymous namespace
+
+namespace Gio
+{
+
+namespace DBus
+{
+using MapChangedProperties = ObjectManagerClient::MapChangedProperties;
+using Flags = ObjectManagerClient::Flags;
+
+ObjectManagerClient::ObjectManagerClient(const Glib::RefPtr<Connection>& connection,
+  const Glib::ustring& name, const Glib::ustring& object_path,
+  const SlotAsyncReady& slot_async_ready,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  const SlotProxyType& slot_proxy_type, Flags flags)
+: _CONSTRUCT("connection", Glib::unwrap(connection),
+  "flags", static_cast<GDBusObjectManagerClientFlags>(flags),
+  "name", Glib::c_str_or_nullptr(name),
+  "object-path", Glib::c_str_or_nullptr(object_path),
+  "get-proxy-type-func", slot_proxy_type ? get_proxy_type_callback : nullptr,
+  "get-proxy-type-user-data",  slot_proxy_type ? new SlotProxyType(slot_proxy_type) : nullptr,
+  "get-proxy-type-destroy-notify", slot_proxy_type ? Glib::destroy_notify_delete<SlotProxyType> : nullptr
+)
+{
+  if (slot_async_ready)
+  {
+    // Asynchronous construction
+    if (cancellable)
+      init_async(slot_async_ready, cancellable);
+    else
+      init_async(slot_async_ready);
+  }
+  else
+  {
+    // Synchronous construction
+    if (cancellable)
+      init(cancellable);
+    else
+      init();
+  }
+}
+
+ObjectManagerClient::ObjectManagerClient(BusType bus_type,
+  const Glib::ustring& name, const Glib::ustring& object_path,
+  const SlotAsyncReady& slot_async_ready,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  const SlotProxyType& slot_proxy_type, Flags flags)
+: _CONSTRUCT("bus-type", bus_type,
+  "flags", static_cast<GDBusObjectManagerClientFlags>(flags),
+  "name", Glib::c_str_or_nullptr(name),
+  "object-path", Glib::c_str_or_nullptr(object_path),
+  "get-proxy-type-func", slot_proxy_type ? get_proxy_type_callback : nullptr,
+  "get-proxy-type-user-data",  slot_proxy_type ? new SlotProxyType(slot_proxy_type) : nullptr,
+  "get-proxy-type-destroy-notify", slot_proxy_type ? Glib::destroy_notify_delete<SlotProxyType> : nullptr
+)
+{
+  if (slot_async_ready)
+  {
+    // Asynchronous construction
+    if (cancellable)
+      init_async(slot_async_ready, cancellable);
+    else
+      init_async(slot_async_ready);
+  }
+  else
+  {
+    // Synchronous construction
+    if (cancellable)
+      init(cancellable);
+    else
+      init();
+  }
+}
+
+void ObjectManagerClient::create(const Glib::RefPtr<Connection>& connection,
+  const Glib::ustring& name, const Glib::ustring& object_path,
+  const SlotAsyncReady& slot_async_ready,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  const SlotProxyType& slot_proxy_type, Flags flags)
+{
+  // This does not return anything, because it is async - see create_finish().
+  ObjectManagerClient(connection, name, object_path, slot_async_ready, cancellable, slot_proxy_type, flags);
+}
+
+Glib::RefPtr<Gio::DBus::ObjectManagerClient> ObjectManagerClient::create_sync(
+  const Glib::RefPtr<Connection>& connection,
+  const Glib::ustring& name, const Glib::ustring& object_path,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  const SlotProxyType& slot_proxy_type, Flags flags)
+{
+  return Glib::make_refptr_for_instance<ObjectManagerClient>(
+    new ObjectManagerClient(connection, name, object_path, {}, cancellable, slot_proxy_type, flags));
+}
+
+void ObjectManagerClient::create_for_bus(BusType bus_type,
+  const Glib::ustring& name, const Glib::ustring& object_path,
+  const SlotAsyncReady& slot_async_ready,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  const SlotProxyType& slot_proxy_type, Flags flags)
+{
+  // This does not return anything, because it is async - see create_for_bus_finish().
+  ObjectManagerClient(bus_type, name, object_path, slot_async_ready, cancellable, slot_proxy_type, flags);
+}
+
+Glib::RefPtr<Gio::DBus::ObjectManagerClient> ObjectManagerClient::create_for_bus_sync(
+  BusType bus_type,
+  const Glib::ustring& name, const Glib::ustring& object_path,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  const SlotProxyType& slot_proxy_type, Flags flags)
+{
+  return Glib::make_refptr_for_instance<ObjectManagerClient>(
+    new ObjectManagerClient(bus_type, name, object_path, {}, cancellable, slot_proxy_type, flags));
+}
+
+} // namespace DBus
+
+} // namespace Gio

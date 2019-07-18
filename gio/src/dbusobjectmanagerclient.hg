@@ -1,0 +1,337 @@
+/* Copyright (C) 2019 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/asyncresult.h>
+#include <giomm/dbusobjectmanager.h>
+#include <giomm/initable.h>
+#include <giomm/asyncinitable.h>
+#include <giomm/dbusconnection.h>
+#include <giomm/dbusobjectproxy.h>
+#include <giomm/dbusproxy.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+namespace DBus
+{
+//The GMMPROC_EXTRA_NAMESPACE() macro is a hint to generate_wrap_init.pl to put it in the DBus sub-namespace
+_GMMPROC_EXTRA_NAMESPACE(DBus)
+
+/** Client-side object manager.
+ *
+ * %Gio::DBus::ObjectManagerClient is used to create, monitor and delete object
+ * proxies for remote objects exported by a Gio::DBus::ObjectManagerServer (or any
+ * code implementing the
+ * <a href="http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-objectmanager">
+ * org.freedesktop.DBus.ObjectManager</a> interface.
+ *
+ * Once an instance of this type has been created, you can connect to
+ * Gio::DBus::ObjectManager::signal_object_added() and
+ * Gio::DBus::ObjectManager::signal_object_removed() and inspect the
+ * Gio::DBus::Object objects returned by Gio::DBus::ObjectManager::get_objects().
+ *
+ * If the name for a %Gio::DBus::ObjectManagerClient is not owned by anyone at
+ * object construction time, the default behavior is to request the
+ * message bus to launch an owner for the name. This behavior can be
+ * disabled using the Gio::DBus::ObjectManagerClient::Flags::DO_NOT_AUTO_START
+ * flag. It's also worth noting that this only works if the name of
+ * interest is activatable in the first place. E.g. in some cases it
+ * is not possible to launch an owner for the requested name. In this
+ * case, %ObjectManagerClient object construction still succeeds but
+ * there will be no object proxies
+ * (e.g. get_objects() returns an empty vector) and
+ * property_name_owner() is an empty string.
+ *
+ * The owner of the requested name can come and go (for example
+ * consider a system service being restarted) – %ObjectManagerClient
+ * handles this case too; simply connect to property_name_owner().signal_changed()
+ * to watch for changes on property_name_owner().
+ * When the name owner vanishes, the behavior is that
+ * property_name_owner() is set to an empty string (this includes
+ * emission of signal_changed()) and then
+ * signal_object_removed() signals are synthesized
+ * for all currently existing object proxies. Since
+ * property_name_owner() is an empty string when this happens, you can
+ * use this information to disambiguate a synthesized signal from a
+ * genuine signal caused by object removal on the remote
+ * Gio::DBus::ObjectManager. Similarly, when a new name owner appears,
+ * signal_object_added() signals are synthesized
+ * while property_namename_owner() is still an empty string. Only when all
+ * object proxies have been added, property_name_owner()
+ * is set to the new name owner (this includes emission of the
+ * signal_changed()). Furthermore, you are guaranteed that
+ * property_name_owner() will alternate between a name owner
+ * (e.g. `:1.42`) and an empty string even in the case where
+ * the name of interest is atomically replaced.
+ *
+ * Ultimately, %ObjectManagerClient is used to obtain Gio::DBus::Proxy
+ * instances. All signals (including the
+ * org.freedesktop.DBus.Properties::PropertiesChanged signal)
+ * delivered to Gio::DBus::Proxy instances are guaranteed to originate
+ * from the name owner. This guarantee along with the behavior
+ * described above, means that certain race conditions including the
+ * "half the proxy is from the old owner and the other half is from
+ * the new owner" problem cannot happen.
+ *
+ * To avoid having the application connect to signals on the returned
+ * Gio::DBus::Object and Gio::DBus::Proxy objects,
+ * Gio::DBus::Object::signal_interface_added(),
+ * Gio::DBus::Object::signal_interface_removed(),
+ * Gio::DBus::Proxy::signal_properties_changed() and
+ * Gio::DBus::Proxy::signal_signal()
+ * are also emitted on the %ObjectManagerClient instance managing these
+ * objects. The signals emitted are
+ * signal_interface_added(), signal_interface_removed(),
+ * signal_interface_proxy_properties_changed() and
+ * signal_interface_proxy_signal().
+ *
+ * Note that all callbacks and signals are emitted in the
+ * thread-default main context
+ * that the %ObjectManagerClient object was constructed
+ * in. Additionally, the Gio::DBus::ObjectProxy and Gio::DBus::Proxy objects
+ * originating from the %ObjectManagerClient object will be created in
+ * the same context and, consequently, will deliver signals in the
+ * same main loop.
+ *
+ * @newin{2,62}
+ * @ingroup DBus
+ */
+class ObjectManagerClient
+: public Glib::Object,
+  public Initable,
+  public AsyncInitable,
+  public ObjectManager
+{
+  _CLASS_GOBJECT(ObjectManagerClient, GDBusObjectManagerClient, G_DBUS_OBJECT_MANAGER_CLIENT, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(Initable)
+  _IMPLEMENTS_INTERFACE(AsyncInitable)
+  _IMPLEMENTS_INTERFACE(DBus::ObjectManager)
+
+public:
+  _WRAP_ENUM(Flags, GDBusObjectManagerClientFlags, gtype_func g_dbus_object_manager_client_flags_get_type)
+
+  /** A slot that will be called to determine the GType to use for an interface proxy
+   * (if interface_name is not an empty string) or object proxy (if interface_name is
+   * an empty string).
+   *
+   * This function is called in the thread-default main loop that @a manager was constructed in.
+   *
+   * For instance:
+   * @code
+   * GType on_proxy_type(const Glib::RefPtr<Gio::DBus::ObjectManagerClient>& manager,
+   *       const Glib::ustring& object_path, const Glib::ustring& interface_name);
+   * @endcode
+   *
+   * @param manager A Gio::DBus::ObjectManagerClient.
+   * @param object_path The object path of the remote object.
+   * @param interface_name The interface name of the remote object, or an empty
+   *        string if a GDBusObjectProxy GType is requested.
+   * @returns A GType to use for the remote object. The returned type must be
+   *          a GDBusProxy or GDBusObjectProxy-derived type.
+   */
+  using SlotProxyType = sigc::slot<GType(const Glib::RefPtr<Gio::DBus::ObjectManagerClient>&,
+        const Glib::ustring&, const Glib::ustring&)>;
+
+protected:
+  ObjectManagerClient(const Glib::RefPtr<Connection>& connection,
+    const Glib::ustring& name,
+    const Glib::ustring& object_path,
+    const SlotAsyncReady& slot_async_ready,
+    const Glib::RefPtr<Cancellable>& cancellable,
+    const SlotProxyType& slot_proxy_type, Flags flags);
+
+  ObjectManagerClient(BusType bus_type,
+    const Glib::ustring& name,
+    const Glib::ustring& object_path,
+    const SlotAsyncReady& slot_async_ready,
+    const Glib::RefPtr<Cancellable>& cancellable,
+    const SlotProxyType& slot_proxy_type, Flags flags);
+  _IGNORE(g_dbus_object_manager_client_new, g_dbus_object_manager_client_new_for_bus,
+          g_dbus_object_manager_client_new_sync, g_dbus_object_manager_client_new_for_bus_sync)
+
+public:
+  /** Creates a new %Gio::DBus::ObjectManagerClient object.
+   *
+   * This is an asynchronous failable constructor. When the result is
+   * ready, @a slot_async_ready will be invoked in the
+   * thread-default main context of the thread you are calling this method from.
+   * You can then call create_finish() to get the result.
+   * See create_sync() for the synchronous version.
+   *
+   * @param connection A Gio::DBus::Connection.
+   * @param name The owner of the control object (unique or well-known name).
+   * @param object_path The object path of the control object.
+   * @param slot_async_ready A SlotAsyncReady slot to call when the request is satisfied.
+   * @param cancellable A Cancellable or an empty Glib::RefPtr.
+   * @param slot_proxy_type A SlotProxyType slot, or an empty slot to always construct
+   *        GDBusProxy or GDBusObjectProxy proxies.
+   * @param flags Zero or more flags from the Gio::DBus::ObjectManagerClient::Flags enumeration.
+   */
+  static void create(const Glib::RefPtr<Connection>& connection,
+    const Glib::ustring& name,
+    const Glib::ustring& object_path,
+    const SlotAsyncReady& slot_async_ready,
+    const Glib::RefPtr<Cancellable>& cancellable = {},
+    const SlotProxyType& slot_proxy_type = {},
+    Flags flags = Flags::NONE);
+
+  // g_dbus_object_manager_client_new_finish() and g_dbus_object_manager_client_new_for_bus_finish()
+  // return GDBusObjectManager pointers, although they are GDBusObjectManagerClient pointers.
+#m4 _CONVERSION(`GDBusObjectManager*',`Glib::RefPtr<Gio::DBus::ObjectManagerClient>',`Glib::wrap((GDBusObjectManagerClient*)($3))')
+  /** Finishes an operation started with create().
+   *
+   * @param res An AsyncResult obtained from the SlotAsyncReady passed to create().
+   * @return A %Gio::DBus::ObjectManagerClient object. If an error has occurred,
+   *         a Glib::Error is thrown and nothing is returned.
+   * @throw Glib::Error.
+   */
+  _WRAP_METHOD(static Glib::RefPtr<Gio::DBus::ObjectManagerClient> create_finish(const Glib::RefPtr<AsyncResult>& res),
+    g_dbus_object_manager_client_new_finish, errthrow)
+
+  /** Creates a new %Gio::DBus::ObjectManagerClient object.
+   *
+   * This is a synchronous failable constructor - the calling thread is
+   * blocked until a reply is received. See create() for the asynchronous version.
+   *
+   * @param connection A Gio::DBus::Connection.
+   * @param name The owner of the control object (unique or well-known name).
+   * @param object_path The object path of the control object.
+   * @param cancellable A Cancellable or an empty Glib::RefPtr.
+   * @param slot_proxy_type A SlotProxyType slot, or an empty slot to always construct
+   *        GDBusProxy or GDBusObjectProxy proxies.
+   * @param flags Zero or more flags from the Gio::DBus::ObjectManagerClient::Flags enumeration.
+   * @throw Glib::Error
+   */
+  static Glib::RefPtr<Gio::DBus::ObjectManagerClient> create_sync(
+    const Glib::RefPtr<Connection>& connection,
+    const Glib::ustring& name,
+    const Glib::ustring& object_path,
+    const Glib::RefPtr<Cancellable>& cancellable = {},
+    const SlotProxyType& slot_proxy_type = {},
+    Flags flags = Flags::NONE);
+
+  /** Creates a new %Gio::DBus::ObjectManagerClient object.
+   *
+   * Like create() but takes a Gio::DBus::BusType instead of a Gio::DBus::Connection.
+   *
+   * This is an asynchronous failable constructor. When the result is
+   * ready, @a slot_async_ready will be invoked in the
+   * thread-default main context of the thread you are calling this method from.
+   * You can then call create_for_bus_finish() to get the result.
+   * See create_for_bus_sync() for the synchronous version.
+   *
+   * @param bus_type A Gio::DBus::BusType.
+   * @param name The owner of the control object (unique or well-known name).
+   * @param object_path The object path of the control object.
+   * @param slot_async_ready A SlotAsyncReady slot to call when the request is satisfied.
+   * @param cancellable A Cancellable or an empty Glib::RefPtr.
+   * @param slot_proxy_type A SlotProxyType slot, or an empty slot to always construct
+   *        GDBusProxy or GDBusObjectProxy proxies.
+   * @param flags Zero or more flags from the Gio::DBus::ObjectManagerClient::Flags enumeration.
+   */
+  static void create_for_bus(BusType bus_type,
+    const Glib::ustring& name,
+    const Glib::ustring& object_path,
+    const SlotAsyncReady& slot_async_ready,
+    const Glib::RefPtr<Cancellable>& cancellable = {},
+    const SlotProxyType& slot_proxy_type = {},
+    Flags flags = Flags::NONE);
+
+  /** Finishes an operation started with create_for_bus().
+   * 
+   * @param res An AsyncResult obtained from the SlotAsyncReady passed to create_for_bus().
+   * @return A %Gio::DBus::ObjectManagerClient object. If an error has occurred,
+   *         a Glib::Error is thrown and nothing is returned.
+   * @throw Glib::Error.
+   */
+  _WRAP_METHOD(static Glib::RefPtr<Gio::DBus::ObjectManagerClient> create_for_bus_finish(const Glib::RefPtr<AsyncResult>& res),
+    g_dbus_object_manager_client_new_for_bus_finish, errthrow)
+
+  /** Creates a new %Gio::DBus::ObjectManagerClient object.
+   *
+   * Like create_sync() but takes a Gio::DBus::BusType instead of a
+   * Gio::DBus::Connection.
+   *
+   * This is a synchronous failable constructor - the calling thread is
+   * blocked until a reply is received. See create_for_bus()
+   * for the asynchronous version.
+   *
+   * @param bus_type A Gio::DBus::BusType.
+   * @param name The owner of the control object (unique or well-known name).
+   * @param object_path The object path of the control object.
+   * @param cancellable A Cancellable or an empty Glib::RefPtr.
+   * @param slot_proxy_type A SlotProxyType slot, or an empty slot to always construct
+   *        GDBusProxy or GDBusObjectProxy proxies.
+   * @param flags Zero or more flags from the Gio::DBus::ObjectManagerClient::Flags enumeration.
+   * @throw Glib::Error
+   */
+  static Glib::RefPtr<Gio::DBus::ObjectManagerClient> create_for_bus_sync(
+    BusType bus_type,
+    const Glib::ustring& name,
+    const Glib::ustring& object_path,
+    const Glib::RefPtr<Cancellable>& cancellable = {},
+    const SlotProxyType& slot_proxy_type = {},
+    Flags flags = Flags::NONE);
+
+  _WRAP_METHOD(Glib::RefPtr<Connection> get_connection(), g_dbus_object_manager_client_get_connection, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Connection> get_connection() const, g_dbus_object_manager_client_get_connection, refreturn, constversion)
+
+  _WRAP_METHOD(Flags get_flags() const, g_dbus_object_manager_client_get_flags)
+
+  _WRAP_METHOD(Glib::ustring get_name() const, g_dbus_object_manager_client_get_name)
+  _WRAP_METHOD(Glib::ustring get_name_owner() const, g_dbus_object_manager_client_get_name_owner)
+
+ _WRAP_PROPERTY("connection", Glib::RefPtr<Connection>)
+ _WRAP_PROPERTY("flags", Flags)
+ _WRAP_PROPERTY("object-path", Glib::ustring)
+ _WRAP_PROPERTY("name", Glib::ustring)
+ _WRAP_PROPERTY("name-owner", Glib::ustring)
+ //_WRAP_PROPERTY("bus-type", BusType) // write-only construct-only
+ // The get-proxy-type-func, get-proxy-type-user-data and get-proxy-type-destroy-notify properties
+ // can't be wrapped individually. Perhaps add set_slot_proxy_type() and get_slot_proxy_type() methods?
+
+#m4 _CONVERSION(`GDBusObjectProxy*',`const Glib::RefPtr<Gio::DBus::ObjectProxy>&',`Glib::wrap($3, true)')
+#m4 _CONVERSION(`GDBusProxy*',`const Glib::RefPtr<Gio::DBus::Proxy>&',`Glib::wrap($3, true)')
+#m4 _CONVERSION(`GVariant*', `const Glib::VariantContainerBase&', `Glib::VariantContainerBase($3, true)')
+#m4 _CONVERSION(`const Glib::VariantContainerBase&', `GVariant*', `const_cast<GVariant*>(($3).gobj())')
+  _WRAP_SIGNAL(void interface_proxy_signal(
+    const Glib::RefPtr<Gio::DBus::ObjectProxy>& object_proxy,
+    const Glib::RefPtr<Gio::DBus::Proxy>& interface_proxy,
+    const Glib::ustring& sender_name, const Glib::ustring& signal_name,
+    const Glib::VariantContainerBase& parameters), "interface-proxy-signal")
+
+  using MapChangedProperties = std::map<Glib::ustring, Glib::VariantBase>;
+
+  // The DBus API ensures that the variant changed_properties is of type "DICT<STRING,VARIANT>"
+#m4 _CONVERSION(`GVariant*', `const MapChangedProperties&', `Glib::Variant<MapChangedProperties>($3, true).get()')
+#m4 _CONVERSION(`const MapChangedProperties&', `GVariant*', `const_cast<GVariant*>(Glib::Variant<MapChangedProperties>::create($3).gobj())')
+#m4 _CONVERSION(`const std::vector<Glib::ustring>&', `const gchar*const*',`Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data()')
+#m4 _CONVERSION(`const gchar*const*', `const std::vector<Glib::ustring>&', `Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_NONE)')
+  _WRAP_SIGNAL(void interface_proxy_properties_changed(
+    const Glib::RefPtr<Gio::DBus::ObjectProxy>& object_proxy,
+    const Glib::RefPtr<Gio::DBus::Proxy>& interface_proxy,
+    const MapChangedProperties& changed_properties,
+    const std::vector<Glib::ustring>& invalidated_properties),
+    "interface-proxy-properties-changed")
+};
+
+} //namespace
+
+} // namespace Gio

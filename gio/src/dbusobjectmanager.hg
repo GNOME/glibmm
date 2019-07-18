@@ -1,0 +1,107 @@
+/* Copyright (C) 2019 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/interface.h>
+#include <glibmm/ustring.h>
+#include <vector>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/interface_p.h)
+_PINCLUDE(gio/gio.h)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GDBusObjectManagerIface GDBusObjectManagerIface;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+namespace Gio
+{
+
+namespace DBus
+{
+class Interface;
+class Object;
+
+_GMMPROC_EXTRA_NAMESPACE(DBus)
+
+/** Base type for D-Bus object managers.
+ *
+ * The %Gio::DBus::ObjectManager type is the base type for service- and
+ * client-side implementations of the standardized
+ * <a href="http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-objectmanager">
+ * org.freedesktop.DBus.ObjectManager</a> interface.
+ *
+ * See Gio::DBus::ObjectManagerClient for the client-side implementation
+ * and Gio::DBus::ObjectManagerServer for the service-side implementation.
+ *
+ * @newin{2,62}
+ * @ingroup DBus
+ */
+class ObjectManager : public Glib::Interface
+{
+  _CLASS_INTERFACE(ObjectManager, GDBusObjectManager, G_DBUS_OBJECT_MANAGER, GDBusObjectManagerIface)
+
+public:
+  _WRAP_METHOD(Glib::ustring get_object_path() const, g_dbus_object_manager_get_object_path)
+
+#m4 _CONVERSION(`GList*',`std::vector<Glib::RefPtr<Gio::DBus::Object>>',
+#m4   `Glib::ListHandler<Glib::RefPtr<Gio::DBus::Object>>::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<Glib::RefPtr<Gio::DBus::Object>> get_objects(), g_dbus_object_manager_get_objects)
+#m4 _CONVERSION(`GList*',`std::vector<Glib::RefPtr<const Gio::DBus::Object>>',
+#m4   `Glib::ListHandler<Glib::RefPtr<const Gio::DBus::Object>>::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<Glib::RefPtr<const Gio::DBus::Object>> get_objects() const, g_dbus_object_manager_get_objects)
+
+  _WRAP_METHOD(Glib::RefPtr<Gio::DBus::Object> get_object(const Glib::ustring& object_path), g_dbus_object_manager_get_object)
+  _WRAP_METHOD(Glib::RefPtr<const Gio::DBus::Object> get_object(const Glib::ustring& object_path) const,
+    g_dbus_object_manager_get_object, constversion)
+
+  _WRAP_METHOD(Glib::RefPtr<Gio::DBus::Interface> get_interface(const Glib::ustring& object_path,
+    const Glib::ustring& interface_name), g_dbus_object_manager_get_interface)
+  _WRAP_METHOD(Glib::RefPtr<const Gio::DBus::Interface> get_interface(const Glib::ustring& object_path,
+    const Glib::ustring& interface_name) const, g_dbus_object_manager_get_interface, constversion)
+
+#m4 _CONVERSION(`GDBusObject*',`const Glib::RefPtr<Gio::DBus::Object>&',`Glib::wrap($3, true)')
+  _WRAP_SIGNAL(void object_added(const Glib::RefPtr<Gio::DBus::Object>& object), "object-added")
+  _WRAP_SIGNAL(void object_removed(const Glib::RefPtr<Gio::DBus::Object>& object), "object-removed")
+
+  // The parameter name 'interface' can cause compilation errors with MinGW.
+  // See https://bugzilla.gnome.org/show_bug.cgi?id=735137
+  // The parameter name in glib is 'interface'.
+#m4 _CONVERSION(`GDBusInterface*',`const Glib::RefPtr<Gio::DBus::Interface>&',`Glib::wrap($3, true)')
+  _WRAP_SIGNAL(void interface_added(const Glib::RefPtr<Gio::DBus::Object>& object,
+    const Glib::RefPtr<Gio::DBus::Interface>& iface), "interface-added")
+  _WRAP_SIGNAL(void interface_removed(const Glib::RefPtr<Gio::DBus::Object>& object,
+    const Glib::RefPtr<Gio::DBus::Interface>& iface), "interface-removed")
+
+protected:
+#m4 _CONVERSION(`Glib::ustring', `const gchar*', `$3.c_str()')
+  _WRAP_VFUNC(Glib::ustring get_object_path() const, "get_object_path", keep_return)
+
+#m4 _CONVERSION(`std::vector<Glib::RefPtr<Gio::DBus::Object>>',`GList*',
+#m4   `g_list_copy_deep(Glib::ListHandler<Glib::RefPtr<Gio::DBus::Object>>::vector_to_list($3).data(), list_copy_ref, nullptr)')
+  _WRAP_VFUNC(std::vector<Glib::RefPtr<Gio::DBus::Object>> get_objects() const, "get_objects")
+
+  // Can't use refreturn_ctype here. It generates a call to Glib::unwrap_copy(), which
+  // can't be used for Glib::Interface classes. They have no gobj_copy() method.
+#m4 _CONVERSION(`Glib::RefPtr<Gio::DBus::Object>',`GDBusObject*',`local_unwrap_copy($3)')
+  _WRAP_VFUNC(Glib::RefPtr<Gio::DBus::Object> get_object(const Glib::ustring& object_path) const, "get_object")
+#m4 _CONVERSION(`Glib::RefPtr<Gio::DBus::Interface>',`GDBusInterface*',`local_unwrap_copy($3)')
+  _WRAP_VFUNC(Glib::RefPtr<Gio::DBus::Interface> get_interface(const Glib::ustring& object_path,
+    const Glib::ustring& interface_name) const, "get_interface")
+};
+
+} // namespace DBus
+
+} // namespace Gio
