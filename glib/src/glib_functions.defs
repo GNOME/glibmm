@@ -978,6 +978,10 @@
     '("medefaidrin" "G_UNICODE_SCRIPT_MEDEFAIDRIN")
     '("old-sogdian" "G_UNICODE_SCRIPT_OLD_SOGDIAN")
     '("sogdian" "G_UNICODE_SCRIPT_SOGDIAN")
+    '("elymaic" "G_UNICODE_SCRIPT_ELYMAIC")
+    '("nandinagari" "G_UNICODE_SCRIPT_NANDINAGARI")
+    '("nyiakeng-puachue-hmong" "G_UNICODE_SCRIPT_NYIAKENG_PUACHUE_HMONG")
+    '("wancho" "G_UNICODE_SCRIPT_WANCHO")
   )
 )
 
@@ -1127,6 +1131,12 @@
   )
 )
 
+(define-method copy
+  (of-object "GArray")
+  (c-name "g_array_copy")
+  (return-type "GArray*")
+)
+
 (define-method free
   (of-object "GArray")
   (c-name "g_array_free")
@@ -1241,6 +1251,17 @@
   )
 )
 
+(define-method binary_search
+  (of-object "GArray")
+  (c-name "g_array_binary_search")
+  (return-type "gboolean")
+  (parameters
+    '("gconstpointer" "target")
+    '("GCompareFunc" "compare_func")
+    '("guint*" "out_match_index")
+  )
+)
+
 (define-method set_clear_func
   (of-object "GArray")
   (c-name "g_array_set_clear_func")
@@ -1261,6 +1282,16 @@
   (return-type "GPtrArray*")
   (parameters
     '("GDestroyNotify" "element_free_func")
+  )
+)
+
+(define-method copy
+  (of-object "GPtrArray")
+  (c-name "g_ptr_array_copy")
+  (return-type "GPtrArray*")
+  (parameters
+    '("GCopyFunc" "func")
+    '("gpointer" "user_data")
   )
 )
 
@@ -1391,6 +1422,26 @@
   (return-type "none")
   (parameters
     '("gpointer" "data")
+  )
+)
+
+(define-method extend
+  (of-object "GPtrArray")
+  (c-name "g_ptr_array_extend")
+  (return-type "none")
+  (parameters
+    '("GPtrArray*" "array")
+    '("GCopyFunc" "func")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method extend_and_steal
+  (of-object "GPtrArray")
+  (c-name "g_ptr_array_extend_and_steal")
+  (return-type "none")
+  (parameters
+    '("GPtrArray*" "array")
   )
 )
 
@@ -2738,6 +2789,14 @@
 (define-function g_get_codeset
   (c-name "g_get_codeset")
   (return-type "gchar*")
+)
+
+(define-function g_get_console_charset
+  (c-name "g_get_console_charset")
+  (return-type "gboolean")
+  (parameters
+    '("const-char**" "charset")
+  )
 )
 
 (define-function g_get_language_names
@@ -6199,6 +6258,16 @@
   (return-type "none")
 )
 
+(define-function g_crash_handler_win32_init
+  (c-name "g_crash_handler_win32_init")
+  (return-type "none")
+)
+
+(define-function g_crash_handler_win32_deinit
+  (c-name "g_crash_handler_win32_deinit")
+  (return-type "none")
+)
+
 
 
 ;; From glibintl.h
@@ -6408,6 +6477,16 @@
   (parameters
     '("GList*" "sibling")
     '("gpointer" "data")
+  )
+)
+
+(define-method insert_before_link
+  (of-object "GList")
+  (c-name "g_list_insert_before_link")
+  (return-type "GList*")
+  (parameters
+    '("GList*" "sibling")
+    '("GList*" "link_")
   )
 )
 
@@ -8918,6 +8997,16 @@
   )
 )
 
+(define-method insert_before_link
+  (of-object "GQueue")
+  (c-name "g_queue_insert_before_link")
+  (return-type "none")
+  (parameters
+    '("GList*" "sibling")
+    '("GList*" "link_")
+  )
+)
+
 (define-method insert_after
   (of-object "GQueue")
   (c-name "g_queue_insert_after")
@@ -8925,6 +9014,16 @@
   (parameters
     '("GList*" "sibling")
     '("gpointer" "data")
+  )
+)
+
+(define-method insert_after_link
+  (of-object "GQueue")
+  (c-name "g_queue_insert_after_link")
+  (return-type "none")
+  (parameters
+    '("GList*" "sibling")
+    '("GList*" "link_")
   )
 )
 
@@ -11939,6 +12038,14 @@
   )
 )
 
+(define-function g_test_summary
+  (c-name "g_test_summary")
+  (return-type "none")
+  (parameters
+    '("const-char*" "summary")
+  )
+)
+
 (define-function g_test_timer_start
   (c-name "g_test_timer_start")
   (return-type "none")
@@ -12573,6 +12680,30 @@
   (return-type "none")
 )
 
+(define-method writer_locker_new
+  (of-object "GRWLock")
+  (c-name "g_rw_lock_writer_locker_new")
+  (return-type "GRWLockWriterLocker*")
+)
+
+(define-method free
+  (of-object "GRWLockWriterLocker")
+  (c-name "g_rw_lock_writer_locker_free")
+  (return-type "none")
+)
+
+(define-method reader_locker_new
+  (of-object "GRWLock")
+  (c-name "g_rw_lock_reader_locker_new")
+  (return-type "GRWLockReaderLocker*")
+)
+
+(define-method free
+  (of-object "GRWLockReaderLocker")
+  (c-name "g_rw_lock_reader_locker_free")
+  (return-type "none")
+)
+
 
 
 ;; From gthreadpool.h
@@ -12740,6 +12871,12 @@
   (parameters
     '("gulong*" "microseconds")
   )
+)
+
+(define-method is_active
+  (of-object "GTimer")
+  (c-name "g_timer_is_active")
+  (return-type "gboolean")
 )
 
 (define-function g_usleep
