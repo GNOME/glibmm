@@ -21,6 +21,14 @@
 #include <giomm/tlsinteraction.h>
 #include "slot_async.h"
 
-
 using VerifyFlags = Gio::TlsDatabase::VerifyFlags;
 using LookupFlags = Gio::TlsDatabase::LookupFlags;
+
+namespace
+{
+// Used in call to g_list_copy_deep().
+void* list_copy_ref(const void* src, void* /* data */)
+{
+  return g_object_ref(const_cast<void*>(src));
+}
+} // anonymous namespace

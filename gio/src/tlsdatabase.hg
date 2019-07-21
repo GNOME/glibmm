@@ -92,8 +92,8 @@ protected:
 #m4 _CONVERSION(`GSocketConnectable*',`const Glib::RefPtr<const SocketConnectable>&',`Glib::wrap($3, true)')
 #m4 _CONVERSION(`GTlsInteraction*',`const Glib::RefPtr<TlsInteraction>&',`Glib::wrap($3, true)')
 
-  _WRAP_VFUNC(TlsCertificateFlags verify_chain(const Glib::RefPtr<TlsCertificate>& chain, const Glib::ustring& purpose, const Glib::RefPtr<const SocketConnectable>& identity, const Glib::RefPtr<TlsInteraction>& interaction, const Glib::RefPtr<Cancellable>& cancellable{.?}, VerifyFlags flags{.}) const, "verify_chain", errthrow)
-  _WRAP_VFUNC(void verify_chain_async(const Glib::RefPtr<TlsCertificate>& chain, const Glib::ustring& purpose, const Glib::RefPtr<const SocketConnectable>& identity, const Glib::RefPtr<TlsInteraction>& interaction, const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.?}, VerifyFlags flags{.}) const, "verify_chain_async", slot_name slot, slot_callback SignalProxy_async_callback)
+  _WRAP_VFUNC(TlsCertificateFlags verify_chain(const Glib::RefPtr<TlsCertificate>& chain, const Glib::ustring& purpose, const Glib::RefPtr<const SocketConnectable>& identity, const Glib::RefPtr<TlsInteraction>& interaction, const Glib::RefPtr<Cancellable>& cancellable{.}, VerifyFlags flags{.}) const, "verify_chain", errthrow)
+  _WRAP_VFUNC(void verify_chain_async(const Glib::RefPtr<TlsCertificate>& chain, const Glib::ustring& purpose, const Glib::RefPtr<const SocketConnectable>& identity, const Glib::RefPtr<TlsInteraction>& interaction, const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.}, VerifyFlags flags{.}) const, "verify_chain_async", slot_name slot, slot_callback SignalProxy_async_callback)
 
 #m4 _CONVERSION(`GAsyncResult*',`const Glib::RefPtr<AsyncResult>&',`Glib::wrap($3, true)')
 
@@ -107,22 +107,41 @@ dnl// because that could be caused by an intermediate empty ustring from an init
 #m4 _CONVERSION(`gchar*',`Glib::ustring',`Glib::convert_return_gchar_ptr_to_ustring($3)')
   _WRAP_VFUNC(Glib::ustring create_certificate_handle(const Glib::RefPtr<const TlsCertificate>& certificate) const, "create_certificate_handle")
 
-#m4 _CONVERSION(`Glib::RefPtr<TlsCertificate>',`GTlsCertificate*',`G_TLS_CERTIFICATE(g_object_ref(Glib::unwrap($3)))')
+  _WRAP_VFUNC(Glib::RefPtr<TlsCertificate> lookup_certificate_for_handle(
+    const Glib::ustring& handle, const Glib::RefPtr<TlsInteraction>& interaction,
+    const Glib::RefPtr<Cancellable>& cancellable{.}, LookupFlags flags{.}),
+    "lookup_certificate_for_handle", errthrow, refreturn_ctype)
+  _WRAP_VFUNC(void lookup_certificate_for_handle_async(
+    const Glib::ustring& handle, const Glib::RefPtr<TlsInteraction>& interaction,
+    const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.}, LookupFlags flags{.}),
+    "lookup_certificate_for_handle_async", slot_name slot, slot_callback SignalProxy_async_callback)
+  _WRAP_VFUNC(Glib::RefPtr<TlsCertificate> lookup_certificate_for_handle_finish(
+    const Glib::RefPtr<AsyncResult>& result), "lookup_certificate_for_handle_finish", errthrow, refreturn_ctype)
 
-  _WRAP_VFUNC(Glib::RefPtr<TlsCertificate> lookup_certificate_for_handle(const Glib::ustring& handle, const Glib::RefPtr<TlsInteraction>& interaction, const Glib::RefPtr<Cancellable>& cancellable{.?}, LookupFlags flags{.}), "lookup_certificate_for_handle", errthrow)
-  _WRAP_VFUNC(void lookup_certificate_for_handle_async(const Glib::ustring& handle, const Glib::RefPtr<TlsInteraction>& interaction, const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.?}, LookupFlags flags{.}), "lookup_certificate_for_handle_async", slot_name slot, slot_callback SignalProxy_async_callback)
-  _WRAP_VFUNC(Glib::RefPtr<TlsCertificate> lookup_certificate_for_handle_finish(const Glib::RefPtr<AsyncResult>& result), "lookup_certificate_for_handle_finish", errthrow)
+  _WRAP_VFUNC(Glib::RefPtr<TlsCertificate> lookup_certificate_issuer(
+    const Glib::RefPtr<TlsCertificate>& certificate, const Glib::RefPtr<TlsInteraction>& interaction,
+    const Glib::RefPtr<Cancellable>& cancellable{.}, LookupFlags flags{.}),
+    "lookup_certificate_issuer", errthrow, refreturn_ctype)
+  _WRAP_VFUNC(void lookup_certificate_issuer_async(
+    const Glib::RefPtr<TlsCertificate>& certificate, const Glib::RefPtr<TlsInteraction>& interaction,
+    const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.}, LookupFlags flags{.}),
+    "lookup_certificate_issuer_async", slot_name slot, slot_callback SignalProxy_async_callback)
+  _WRAP_VFUNC(Glib::RefPtr<TlsCertificate> lookup_certificate_issuer_finish(
+    const Glib::RefPtr<AsyncResult>& result), "lookup_certificate_issuer_finish", errthrow, refreturn_ctype)
 
-  _WRAP_VFUNC(Glib::RefPtr<TlsCertificate> lookup_certificate_issuer(const Glib::RefPtr<TlsCertificate>& certificate, const Glib::RefPtr<TlsInteraction>& interaction, const Glib::RefPtr<Cancellable>& cancellable{.?}, LookupFlags flags{.}), "lookup_certificate_issuer", errthrow)
-  _WRAP_VFUNC(void lookup_certificate_issuer_async(const Glib::RefPtr<TlsCertificate>& certificate, const Glib::RefPtr<TlsInteraction>& interaction, const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.?}, LookupFlags flags{.}), "lookup_certificate_issuer_async", slot_name slot, slot_callback SignalProxy_async_callback)
-  _WRAP_VFUNC(Glib::RefPtr<TlsCertificate> lookup_certificate_issuer_finish(const Glib::RefPtr<AsyncResult>& result), "lookup_certificate_issuer_finish", errthrow)
-
-#m4 _CONVERSION(`std::vector< Glib::RefPtr<TlsCertificate> >',`GList*',`g_list_copy(Glib::ListHandler< Glib::RefPtr<TlsCertificate> >::vector_to_list($3).data())')
+#m4 _CONVERSION(`std::vector< Glib::RefPtr<TlsCertificate> >',`GList*',
+#m4  `g_list_copy_deep(Glib::ListHandler< Glib::RefPtr<TlsCertificate> >::vector_to_list($3).data(), list_copy_ref, nullptr)')
 #m4 _CONVERSION(`GByteArray*',`const Glib::RefPtr<Glib::ByteArray>&',`Glib::wrap($3, true)')
 
-  _WRAP_VFUNC(std::vector< Glib::RefPtr<TlsCertificate> > lookup_certificates_issued_by(const Glib::RefPtr<Glib::ByteArray>& issuer_raw_dn, const Glib::RefPtr<TlsInteraction>& interaction, const Glib::RefPtr<Cancellable>& cancellable{.?}, LookupFlags flags{.}), "lookup_certificates_issued_by", errthrow)
-  _WRAP_VFUNC(void lookup_certificates_issued_by_async(const Glib::RefPtr<Glib::ByteArray>& issuer_raw_dn, const Glib::RefPtr<TlsInteraction>& interaction, const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.?}, LookupFlags flags{.}), "lookup_certificates_issued_by_async", slot_name slot, slot_callback SignalProxy_async_callback)
-  _WRAP_VFUNC(std::vector< Glib::RefPtr<TlsCertificate> > lookup_certificates_issued_by_finish(const Glib::RefPtr<AsyncResult>& result), "lookup_certificates_issued_by_finish", errthrow)
+  _WRAP_VFUNC(std::vector< Glib::RefPtr<TlsCertificate> > lookup_certificates_issued_by(
+    const Glib::RefPtr<Glib::ByteArray>& issuer_raw_dn, const Glib::RefPtr<TlsInteraction>& interaction,
+    const Glib::RefPtr<Cancellable>& cancellable{.}, LookupFlags flags{.}), "lookup_certificates_issued_by", errthrow)
+  _WRAP_VFUNC(void lookup_certificates_issued_by_async(
+    const Glib::RefPtr<Glib::ByteArray>& issuer_raw_dn, const Glib::RefPtr<TlsInteraction>& interaction,
+    const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.}, LookupFlags flags{.}),
+    "lookup_certificates_issued_by_async", slot_name slot, slot_callback SignalProxy_async_callback)
+  _WRAP_VFUNC(std::vector< Glib::RefPtr<TlsCertificate> > lookup_certificates_issued_by_finish(
+    const Glib::RefPtr<AsyncResult>& result), "lookup_certificates_issued_by_finish", errthrow)
 };
 
 } // namespace Gio
