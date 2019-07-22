@@ -1038,7 +1038,7 @@
     '("left-paren" "G_TOKEN_LEFT_PAREN" "'('")
     '("right-paren" "G_TOKEN_RIGHT_PAREN" "')'")
     '("left-curly" "G_TOKEN_LEFT_CURLY" "'{'")
-    '("right-curly" "G_TOKEN_RIGHT_CURLY" "'}'")
+    '("right-curly" "G_TOKEN_RIGHT_CURLY" "']'")
     '("left-brace" "G_TOKEN_LEFT_BRACE" "'['")
     '("right-brace" "G_TOKEN_RIGHT_BRACE" "']'")
     '("equal-sign" "G_TOKEN_EQUAL_SIGN" "'='")
@@ -1119,7 +1119,9 @@
 ;;   G_SPAWN_ERROR_ACCES,  /* execv() returned EACCES */
 ;;   G_SPAWN_ERROR_PERM,   /* execv() returned EPERM */
 ;;   G_SPAWN_ERROR_TOO_BIG,/* execv() returned E2BIG */
-;;   G_SPAWN_ERROR_2BIG GLIB_DEPRECATED_ENUMERATOR_IN_2_32_FOR(G_SPAWN_ERROR_TOO_BIG) = G_SPAWN_ERROR_TOO_BIG,
+;; #ifndef G_DISABLE_DEPRECATED
+;;   G_SPAWN_ERROR_2BIG = G_SPAWN_ERROR_TOO_BIG,
+;; #endif
 ;;   G_SPAWN_ERROR_NOEXEC, /* execv() returned ENOEXEC */
 ;;   G_SPAWN_ERROR_NAMETOOLONG, /* ""  "" ENAMETOOLONG */
 ;;   G_SPAWN_ERROR_NOENT,       /* ""  "" ENOENT */
@@ -1258,7 +1260,7 @@
 ;;   G_TEST_TRAP_SILENCE_STDOUT    = 1 << 7,
 ;;   G_TEST_TRAP_SILENCE_STDERR    = 1 << 8,
 ;;   G_TEST_TRAP_INHERIT_STDIN     = 1 << 9
-;; } GTestTrapFlags GLIB_DEPRECATED_TYPE_IN_2_38_FOR(GTestSubprocessFlags);
+;; } GTestTrapFlags;
 
 (define-flags-extended TestTrapFlags
   (in-module "G")
@@ -1715,7 +1717,7 @@
 ;;   G_UNICODE_SCRIPT_KHUDAWADI,              /* Sind */
 ;;   G_UNICODE_SCRIPT_LINEAR_A,               /* Lina */
 ;;   G_UNICODE_SCRIPT_MAHAJANI,               /* Mahj */
-;;   G_UNICODE_SCRIPT_MANICHAEAN,             /* Mani */
+;;   G_UNICODE_SCRIPT_MANICHAEAN,             /* Manu */
 ;;   G_UNICODE_SCRIPT_MENDE_KIKAKUI,          /* Mend */
 ;;   G_UNICODE_SCRIPT_MODI,                   /* Modi */
 ;;   G_UNICODE_SCRIPT_MRO,                    /* Mroo */
@@ -1759,13 +1761,7 @@
 ;;   G_UNICODE_SCRIPT_MAKASAR,                /* Maka */
 ;;   G_UNICODE_SCRIPT_MEDEFAIDRIN,            /* Medf */
 ;;   G_UNICODE_SCRIPT_OLD_SOGDIAN,            /* Sogo */
-;;   G_UNICODE_SCRIPT_SOGDIAN,                /* Sogd */
-;; 
-;;   /* Unicode 12.0 additions */
-;;   G_UNICODE_SCRIPT_ELYMAIC,                /* Elym */
-;;   G_UNICODE_SCRIPT_NANDINAGARI,            /* Nand */
-;;   G_UNICODE_SCRIPT_NYIAKENG_PUACHUE_HMONG, /* Rohg */
-;;   G_UNICODE_SCRIPT_WANCHO                  /* Wcho */
+;;   G_UNICODE_SCRIPT_SOGDIAN                 /* Sogd */
 ;; } GUnicodeScript;
 
 (define-enum-extended UnicodeScript
@@ -1922,10 +1918,6 @@
     '("medefaidrin" "G_UNICODE_SCRIPT_MEDEFAIDRIN" "146")
     '("old-sogdian" "G_UNICODE_SCRIPT_OLD_SOGDIAN" "147")
     '("sogdian" "G_UNICODE_SCRIPT_SOGDIAN" "148")
-    '("elymaic" "G_UNICODE_SCRIPT_ELYMAIC" "149")
-    '("nandinagari" "G_UNICODE_SCRIPT_NANDINAGARI" "150")
-    '("nyiakeng-puachue-hmong" "G_UNICODE_SCRIPT_NYIAKENG_PUACHUE_HMONG" "151")
-    '("wancho" "G_UNICODE_SCRIPT_WANCHO" "152")
   )
 )
 
@@ -2135,7 +2127,7 @@
 ;;   G_THREAD_PRIORITY_NORMAL,
 ;;   G_THREAD_PRIORITY_HIGH,
 ;;   G_THREAD_PRIORITY_URGENT
-;; } GThreadPriority GLIB_DEPRECATED_TYPE_IN_2_32;
+;; } GThreadPriority;
 
 (define-enum-extended ThreadPriority
   (in-module "G")
