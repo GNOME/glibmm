@@ -108,9 +108,8 @@ public:
    */
   void set_parse (const Glib::ustring& str);
 
-
   _DEPRECATE_IFDEF_START
-
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   //Avoid a build problem in the case that std::time_t is equivalent to gint32 (GTime is also gint32)
   //That would make the set_time() method overload impossible.
   #ifdef GLIBMM_HAVE_C_STD_TIME_T_IS_NOT_INT32
@@ -118,13 +117,12 @@ public:
    *
    * @param time GTime value to set.
    *
-   * @deprecated Please use set_time(std::time_t) or set_time(const GTimeVal&).
+   * @deprecated Please use set_time(std::time_t) instead.
    */
   void set_time(GTime time);
   #endif //GLIBMM_HAVE_C_STD_TIME_T_IS_NOT_INT32
-
+  G_GNUC_END_IGNORE_DEPRECATIONS
   _DEPRECATE_IFDEF_END
-
 
   /** Sets the value of a date from a <type>std::time_t</type> value.
    *
@@ -136,6 +134,9 @@ public:
    */
   void set_time(std::time_t timet);
 
+  //TODO: Deprecate set_time() in the next minor stable release (glibmm 2.62.0?).
+  // GTimeVal is deprecated.
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   /** Sets the value of a date from a GTimeVal value.  Note that the
    * tv_usec member is ignored, because Glib::Date can't make use of the
    * additional precision.
@@ -147,6 +148,7 @@ public:
    * Since: 2.10
    */
   void set_time(const GTimeVal& timeval);
+  G_GNUC_END_IGNORE_DEPRECATIONS
 
   /** Set this Glib::Date to the current time.
    */

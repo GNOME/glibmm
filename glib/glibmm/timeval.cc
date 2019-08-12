@@ -20,7 +20,7 @@
 
 namespace Glib
 {
-
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 void
 TimeVal::assign_current_time()
 {
@@ -32,6 +32,7 @@ TimeVal::assign_from_iso8601(const Glib::ustring& iso_date)
 {
   return g_time_val_from_iso8601(iso_date.c_str(), this);
 }
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 void
 TimeVal::add(const TimeVal& rhs)
@@ -110,6 +111,7 @@ TimeVal::subtract_milliseconds(long milliseconds)
   add_milliseconds(-1 * milliseconds);
 }
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 void
 TimeVal::add_microseconds(long microseconds)
 {
@@ -134,5 +136,6 @@ TimeVal::as_iso8601() const
   }
   return Glib::ustring();
 }
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 } // namespace Glib

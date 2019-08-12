@@ -17,3 +17,24 @@
 #include <glibmm/utility.h>
 #include <glibmm/timeval.h>
 #include <glibmm/wrap.h>
+
+namespace Glib
+{
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+DateTime DateTime::create_now_local(const TimeVal& tv)
+{
+  return Glib::wrap(g_date_time_new_from_timeval_local(&(tv)));
+}
+
+DateTime DateTime::create_now_utc(const TimeVal& tv)
+{
+  return Glib::wrap(g_date_time_new_from_timeval_utc(&(tv)));
+}
+
+bool DateTime::to_timeval(TimeVal& tv) const
+{
+  return g_date_time_to_timeval(const_cast<GDateTime*>(gobj()), &(tv));
+}
+G_GNUC_END_IGNORE_DEPRECATIONS
+
+} // namespace Glib

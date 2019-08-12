@@ -74,8 +74,17 @@ public:
   _WRAP_METHOD(static DateTime create_now_local(gint64 t), g_date_time_new_from_unix_local)
   _WRAP_METHOD(static DateTime create_now_utc(gint64 t), g_date_time_new_from_unix_utc)
 
-  _WRAP_METHOD(static DateTime create_now_local(const TimeVal& tv), g_date_time_new_from_timeval_local)
-  _WRAP_METHOD(static DateTime create_now_utc(const TimeVal& tv), g_date_time_new_from_timeval_utc)
+  _WRAP_METHOD_DOCS_ONLY(g_date_time_new_from_timeval_local)
+  static DateTime create_now_local(const TimeVal& tv);
+//TODO: Deprecate in the next minor stable release (glibmm 2.62.0?).
+//  _WRAP_METHOD(static DateTime create_now_local(const TimeVal& tv), g_date_time_new_from_timeval_local,
+//    deprecated "Use create_now_local(gint64 t) instead.")
+
+  _WRAP_METHOD_DOCS_ONLY(g_date_time_new_from_timeval_utc)
+  static DateTime create_now_utc(const TimeVal& tv);
+//TODO: Deprecate in the next minor stable release (glibmm 2.62.0?).
+//  _WRAP_METHOD(static DateTime create_now_utc(const TimeVal& tv), g_date_time_new_from_timeval_utc,
+//    deprecated "Use create_now_utc(gint64 t) instead.")
 
   _WRAP_METHOD(static DateTime create(const TimeZone& tz, int year, int month, int day, int hour, int minute, double seconds), g_date_time_new)
   _WRAP_METHOD(static DateTime create_local(int year, int month, int day, int hour, int minute, double seconds), g_date_time_new_local)
@@ -142,7 +151,13 @@ public:
   _WRAP_METHOD(int get_microsecond() const, g_date_time_get_microsecond)
   _WRAP_METHOD(double get_seconds() const, g_date_time_get_seconds)
   _WRAP_METHOD(gint64 to_unix() const, g_date_time_to_unix)
-  _WRAP_METHOD(bool to_timeval(TimeVal& tv) const, g_date_time_to_timeval)
+
+  _WRAP_METHOD_DOCS_ONLY(g_date_time_to_timeval)
+  bool to_timeval(TimeVal& tv) const;
+//TODO: Deprecate in the next minor stable release (glibmm 2.62.0?).
+//  _WRAP_METHOD(bool to_timeval(TimeVal& tv) const, g_date_time_to_timeval,
+//    deprecated "Use to_unix() instead.")
+
   _WRAP_METHOD(TimeSpan get_utc_offset() const, g_date_time_get_utc_offset)
 #m4 _CONVERSION(`GTimeZone*',`TimeZone',`Glib::wrap($3, true)')
   _WRAP_METHOD(TimeZone get_timezone() const, g_date_time_get_timezone, newin "2,60")

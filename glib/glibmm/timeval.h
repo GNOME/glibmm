@@ -25,6 +25,12 @@
 namespace Glib
 {
 
+//TODO: Deprecate TimeVal in the next minor stable release (glibmm 2.62.0?).
+// GTimeVal is deprecated.
+// Note: Before TimeVal is deprecated, check what will happen with
+// Gdk::PixbufAnimationIter::advance(const Glib::TimeVal& current_time),
+// especially if GLIBMM_DISABLE_DEPRECATED is defined but GDKMM_DISABLE_DEPRECATED is not.
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 /** Glib::TimeVal is a wrapper around the glib structure GTimeVal.
  * The glib structure GTimeVal itself is equivalent to struct timeval,
  * which is returned by the gettimeofday() UNIX call. Additionally
@@ -234,6 +240,7 @@ operator>=(const TimeVal& lhs, const TimeVal& rhs)
 {
   return ((lhs.tv_sec > rhs.tv_sec) || (lhs.tv_sec == rhs.tv_sec && lhs.tv_usec >= rhs.tv_usec));
 }
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 } // namespace Glib
 
