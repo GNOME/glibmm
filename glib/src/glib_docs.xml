@@ -3537,6 +3537,22 @@ Old South Arabian. Since 2.26
 <parameter_description>              Sogdian. Since: 2.58
 </parameter_description>
 </parameter>
+<parameter name="G_UNICODE_SCRIPT_ELYMAIC">
+<parameter_description>              Elym. Since: 2.62
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_NANDINAGARI">
+<parameter_description>          Nand. Since: 2.62
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_NYIAKENG_PUACHUE_HMONG">
+<parameter_description> Rohg. Since: 2.62
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_WANCHO">
+<parameter_description>               Wcho. Since: 2.62
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -5716,6 +5732,29 @@ Since: 2.38
 <return></return>
 </function>
 
+<function name="g_assert_finalize_object">
+<description>
+Assert that @object is non-%NULL, then release one reference to it with
+g_object_unref() and assert that it has been finalized (i.e. that there
+are no more references).
+
+If assertions are disabled via `G_DISABLE_ASSERT`,
+this macro just calls g_object_unref() without any further checks.
+
+This macro should only be used in regression tests.
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> an object
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_assert_no_error">
 <description>
 Debugging macro to check that a #GError is not set.
@@ -6330,7 +6369,7 @@ Pops data from the @queue. If the queue is empty, blocks until
 
 If no data is received before @end_time, %NULL is returned.
 
-To easily calculate @end_time, a combination of g_get_current_time()
+To easily calculate @end_time, a combination of g_get_real_time()
 and g_time_val_add() can be used.
 
 Deprecated: use g_async_queue_timeout_pop().
@@ -6359,7 +6398,7 @@ Pops data from the @queue. If the queue is empty, blocks until
 
 If no data is received before @end_time, %NULL is returned.
 
-To easily calculate @end_time, a combination of g_get_current_time()
+To easily calculate @end_time, a combination of g_get_real_time()
 and g_time_val_add() can be used.
 
 This function must be called while holding the @queue's lock.
@@ -14001,7 +14040,7 @@ If @abs_time is %NULL, g_cond_timed_wait() acts like g_cond_wait().
 This function can be used even if g_thread_init() has not yet been
 called, and, in that case, will immediately return %TRUE.
 
-To easily calculate @abs_time a combination of g_get_current_time()
+To easily calculate @abs_time a combination of g_get_real_time()
 and g_time_val_add() can be used.
 
 Deprecated:2.32: Use g_cond_wait_until() instead.
@@ -15882,6 +15921,8 @@ additional precision.
 The time to date conversion is done using the user's current timezone.
 
 Since: 2.10
+Deprecated: 2.62: #GTimeVal is not year-2038-safe. Use g_date_set_time_t()
+instead.
 
 </description>
 <parameters>
@@ -16455,6 +16496,27 @@ should be freed with g_free().
 </return>
 </function>
 
+<function name="g_date_time_format_iso8601">
+<description>
+Format @datetime in [ISO 8601 format](https://en.wikipedia.org/wiki/ISO_8601),
+including the date, time and time zone, and return that as a UTF-8 encoded
+string.
+
+Since: 2.62
+
+</description>
+<parameters>
+<parameter name="datetime">
+<parameter_description> A #GDateTime
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated string formatted in ISO 8601 format
+or %NULL in the case that there was an error. The string
+should be freed with g_free().
+</return>
+</function>
+
 <function name="g_date_time_get_day_of_month">
 <description>
 Retrieves the day of the month represented by @datetime in the gregorian
@@ -16995,6 +17057,8 @@ You should release the return value by calling g_date_time_unref()
 when you are done with it.
 
 Since: 2.26
+Deprecated: 2.62: #GTimeVal is not year-2038-safe. Use
+g_date_time_new_from_unix_local() instead.
 
 </description>
 <parameters>
@@ -17022,6 +17086,8 @@ You should release the return value by calling g_date_time_unref()
 when you are done with it.
 
 Since: 2.26
+Deprecated: 2.62: #GTimeVal is not year-2038-safe. Use
+g_date_time_new_from_unix_utc() instead.
 
 </description>
 <parameters>
@@ -17293,6 +17359,8 @@ out of range.
 On systems where 'long' is 64bit, this function never fails.
 
 Since: 2.26
+Deprecated: 2.62: #GTimeVal is not year-2038-safe. Use
+g_date_time_to_unix() instead.
 
 </description>
 <parameters>
@@ -19448,6 +19516,9 @@ the current directory is the target of a symbolic link.
 Equivalent to the UNIX gettimeofday() function, but portable.
 
 You may find g_get_real_time() to be more convenient.
+
+Deprecated: 2.62: #GTimeVal is not year-2038-safe. Use g_get_real_time()
+instead.
 
 </description>
 <parameters>
@@ -31365,6 +31436,7 @@ The @value can be:
 
 - an empty #GValue initialized by %G_VALUE_INIT, which will be
 automatically initialized with the expected type of the property
+(since GLib 2.60)
 - a #GValue initialized with the expected type of the property
 - a #GValue initialized with a type to which the expected type
 of the property can be transformed
@@ -35707,6 +35779,9 @@ may get compiler warnings from this though if compiling with GCC’s
 
 If @func is %NULL, then only the pointers (and not what they are
 pointing to) are copied to the new #GPtrArray.
+
+The copy of @array will have the same #GDestroyNotify for its elements as
+@array.
 
 Since: 2.62
 
@@ -51768,6 +51843,9 @@ This function is often used as a method to make busy wait less evil.
 Adds the given number of microseconds to @time_. @microseconds can
 also be negative to decrease the value of @time_.
 
+Deprecated: 2.62: #GTimeVal is not year-2038-safe. Use `guint64` for
+representing microseconds since the epoch, or use #GDateTime.
+
 </description>
 <parameters>
 <parameter name="time_">
@@ -51794,7 +51872,17 @@ timestamp is assumed to be in local time.)
 
 Any leading or trailing space in @iso_date is ignored.
 
+This function was deprecated, along with #GTimeVal itself, in GLib 2.62.
+Equivalent functionality is available using code like:
+|[
+GDateTime *dt = g_date_time_new_from_iso8601 (iso8601_string, NULL);
+gint64 time_val = g_date_time_to_unix (dt);
+g_date_time_unref (dt);
+]|
+
 Since: 2.12
+Deprecated: 2.62: #GTimeVal is not year-2038-safe. Use
+g_date_time_new_from_iso8601() instead.
 
 </description>
 <parameters>
@@ -51838,12 +51926,20 @@ variation of ISO 8601 format is required.
 If @time_ represents a date which is too large to fit into a `struct tm`,
 %NULL will be returned. This is platform dependent. Note also that since
 `GTimeVal` stores the number of seconds as a `glong`, on 32-bit systems it
-is subject to the year 2038 problem.
+is subject to the year 2038 problem. Accordingly, since GLib 2.62, this
+function has been deprecated. Equivalent functionality is available using:
+|[
+GDateTime *dt = g_date_time_new_from_unix_utc (time_val);
+iso8601_string = g_date_time_format_iso8601 (dt);
+g_date_time_unref (dt);
+]|
 
 The return value of g_time_val_to_iso8601() has been nullable since GLib
 2.54; before then, GLib would crash under the same conditions.
 
 Since: 2.12
+Deprecated: 2.62: #GTimeVal is not year-2038-safe. Use
+g_date_time_format_iso8601(dt) instead.
 
 </description>
 <parameters>
