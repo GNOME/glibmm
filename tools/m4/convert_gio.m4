@@ -204,8 +204,6 @@ _CONVERSION(`GFileEnumerator*',`Glib::RefPtr<FileEnumerator>',`Glib::wrap($3)')
 _CONVERSION(`GFileInfo*',`Glib::RefPtr<FileInfo>',`Glib::wrap($3)')
 _CONVERSION(`Glib::RefPtr<FileInfo>&',`GFileInfo*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<FileInfo>&',`GFileInfo*',__CONVERT_REFPTR_TO_P)
-_CONVERSION(`Glib::TimeVal&', `GTimeVal*', static_cast<$2>(&$3))
-_CONVERSION(`const Glib::TimeVal&', `GTimeVal*', const_cast<GTimeVal*>(static_cast<const GTimeVal*>(&$3)))
 _CONVERSION(`const Glib::RefPtr<FileAttributeMatcher>&',`GFileAttributeMatcher*',__CONVERT_CONST_REFPTR_TO_P)
 
 # FileInputStream

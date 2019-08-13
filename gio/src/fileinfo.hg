@@ -16,7 +16,6 @@
 
 #include <glibmm/datetime.h>
 #include <glibmm/object.h>
-#include <glibmm/timeval.h>
 #include <giomm/fileattributeinfolist.h>
 #include <giomm/icon.h>
 
@@ -71,6 +70,7 @@ public:
 class FileInfo : public Glib::Object
 {
   _CLASS_GOBJECT(FileInfo, GFileInfo, G_FILE_INFO, Glib::Object, GObject)
+  _IGNORE(g_file_info_get_modification_time, g_file_info_set_modification_time)dnl // deprecated
 
 public:
   _CTOR_DEFAULT()
@@ -165,8 +165,7 @@ public:
 
   _WRAP_METHOD(goffset get_size() const, g_file_info_get_size)
 
-  Glib::TimeVal modification_time() const;
-  _IGNORE(g_file_info_get_modification_time)
+  _WRAP_METHOD(Glib::DateTime get_modification_date_time() const, g_file_info_get_modification_date_time)
 
   _WRAP_METHOD(std::string get_symlink_target() const, g_file_info_get_symlink_target)
 
@@ -195,7 +194,7 @@ public:
 
   _WRAP_METHOD(void set_size(goffset size), g_file_info_set_size)
 
-  _WRAP_METHOD(void set_modification_time(const Glib::TimeVal& mtime), g_file_info_set_modification_time)
+  _WRAP_METHOD(void set_modification_date_time(const Glib::DateTime& mtime), g_file_info_set_modification_date_time)
   _WRAP_METHOD(void set_symlink_target(const std::string& symlink_target), g_file_info_set_symlink_target)
   _WRAP_METHOD(void set_sort_order(gint32 sort_order), g_file_info_set_sort_order)
 };

@@ -107,6 +107,7 @@ dnl DateTime
 _CONVERSION(`GDateTime*',`DateTime',`Glib::wrap($3)')
 _CONVERSION(`GDateTime*',`Glib::DateTime',`Glib::wrap($3)')
 _CONVERSION(`const DateTime&',`GDateTime*',`const_cast<$2>($3.gobj())')
+_CONVERSION(`const Glib::DateTime&',`GDateTime*',`const_cast<$2>($3.gobj())')
 
 dnl KeyFile
 _CONVERSION(`const Glib::RefPtr<Glib::KeyFile>&',`GKeyFile*',__CONVERT_REFPTR_TO_P)
@@ -139,10 +140,6 @@ _CONVERSION(`GRegex*',`Glib::RefPtr<const Regex>',`Glib::wrap($3)')
 
 #Source
 _CONVERSION(`GSource*',`Glib::RefPtr<Glib::Source>',`Glib::wrap($3)')
-
-dnl TimeVal
-_CONVERSION(`const TimeVal&',`const GTimeVal*',`&($3)')
-_CONVERSION(`TimeVal&',`GTimeVal*',`&($3)')
 
 dnl TimeZone
 _CONVERSION(`GTimeZone*',`TimeZone',`Glib::wrap($3)')

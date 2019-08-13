@@ -39,12 +39,11 @@
  * - Glib::Regex: Regular expression string matching.
  * - Glib::KeyFile: Parsing and writing of key files (similar to .ini files)
  * - Glib::Checksum
- * - Glib::Date, Glib::Timer, Glib::TimeVal
+ * - Glib::Date, Glib::DateTime, Glib::Timer
  * - Glib::Dispatcher: Inter-thread communication
  * - @ref FileUtils and @ref UriUtils
  * - @ref MainLoop
  * - @ref Spawn
- * - @ref Threads
  * - @ref MiscUtils
  *
  * giomm (part of the glibmm project) also contains:
@@ -129,7 +128,6 @@
 #include <glibmm/spawn.h>
 #include <glibmm/stringutils.h>
 #include <glibmm/timer.h>
-#include <glibmm/timeval.h>
 #include <glibmm/timezone.h>
 #include <glibmm/uriutils.h>
 #include <glibmm/ustring.h>
