@@ -19,5 +19,45 @@
 
 namespace Gio
 {
+// static
+std::set<SocketControlMessage::DeserializeFunc> SocketControlMessage::m_deserialize_funcs;
+
+GSocketControlMessage* SocketControlMessage_Class::deserialize_vfunc_callback(
+  int level, int type, gsize size, gpointer data)
+{
+  // Loop through all registered deserialize functions.
+  // Accept the returned message from the first function that has been able to
+  // deserialize the message. g_socket_control_message_deserialize() loops
+  // through all subclasses of GSocketControlMessage in this way.
+  for (auto deserialize_func : CppObjectType::m_deserialize_funcs)
+  {
+    try // Trap C++ exceptions which would normally be lost because this is a C callback.
+    {
+      // Call the function which has been registered with add_deserialize_func().
+      Glib::RefPtr<SocketControlMessage> msg = deserialize_func(level, type, size, data);
+      if (msg)
+      {
+        msg->reference(); // Give the caller a reference.
+        return msg->gobj();
+      }
+    }
+    catch (...)
+    {
+      Glib::exception_handlers_invoke();
+    }
+  }
+
+  // Don't call the original underlying C function (GSocketControlMessage.deserialize()).
+  // Let g_socket_control_message_deserialize() do that as a last resort,
+  // if it's appropriate.
+  return nullptr;
+}
+
+// static
+void SocketControlMessage::add_deserialize_func(DeserializeFunc func)
+{
+  // std::set never contains duplicates.
+  m_deserialize_funcs.insert(func);
+}
 
 } // namespace Gio
