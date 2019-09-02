@@ -22,8 +22,8 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gio
 {
 
-/** SocketControlMessage - A Socket control message.
- * A SocketControlMessage is a special-purpose utility message that can be
+/** A Socket control message.
+ * A %SocketControlMessage is a special-purpose utility message that can be
  * sent to or received from a Socket. These types of messages are often
  * called "ancillary data".
  *
@@ -35,7 +35,8 @@ namespace Gio
  * Gio::Socket::receive().
  *
  * To extend the set of control message that can be sent, subclass this class
- * and override the get_size, get_level, get_type and serialize methods.
+ * and override the get_size_vfunc(), get_level_vfunc(), get_type_vfunc() and
+ * serialize_vfunc() methods.
  *
  * To extend the set of control messages that can be received, subclass this
  * class and implement the deserialize method. Also, make sure your class is
@@ -59,14 +60,31 @@ public:
   _WRAP_METHOD(gsize get_size() const, g_socket_control_message_get_size)
   _WRAP_METHOD(void serialize(gpointer data), g_socket_control_message_serialize)
 
-  //TODO: The deserialize vfunc does not have a GSocketControlMessage for its
-  //first parameter so it is difficult to wrap.
-  //_WRAP_VFUNC(Glib::RefPtr<SocketControlMessage> deserialize(int level, int type, gsize size, gpointer data), "deserialize")
-
   _WRAP_VFUNC(gsize get_size() const, "get_size")
   _WRAP_VFUNC(int get_level() const, "get_level")
   _WRAP_VFUNC(int get_type() const, "get_type")
   _WRAP_VFUNC(void serialize(gpointer data), "serialize")
+
+protected:
+  // The deserialize vfunc in GLib is a class virtual function (not associated
+  // with an instance). Such functions don't exist in C++.
+  // But it must be wrapped in one way or another. g_socket_control_message_deserialize()
+  // assumes that all subclasses of GSocketControlMessage override this vfunc.
+  // A user-program can crash, if any subclass does not.
+  // https://gitlab.gnome.org/GNOME/glibmm/issues/52
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  klass->deserialize = &deserialize_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  //TODO: Uncomment when we can add API.
+  //static GSocketControlMessage* deserialize_vfunc_callback(
+  //  int level, int type, gsize size, gpointer data);
+  _POP()
+#m4end
+
+  //TODO: When we can add API, add protected DeserializeFunc,
+  // add_deserialize_func() and private m_deserialize_funcs from the master branch.
+  // And update the last paragraph of the class description.
 };
 
 } // namespace Gio

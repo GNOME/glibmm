@@ -17,7 +17,24 @@
 #include <gio/gio.h>
 #include <glibmm/exceptionhandler.h>
 
-namespace Gio
+namespace
 {
 
+GSocketControlMessage* deserialize_vfunc_callback(
+  int /* level */, int /* type */, gsize /* size */, gpointer /* data */)
+{
+  // Do nothing.
+
+  // Don't call the original underlying C function (GSocketControlMessage.deserialize()).
+  // Let g_socket_control_message_deserialize() do that as a last resort,
+  // if it's appropriate.
+  return nullptr;
+}
+
+} // anonymous namespace
+
+namespace Gio
+{
+//TODO: When we can add API, copy add_deserialize_func(),
+// deserialize_vfunc_callback() and m_deserialize_funcs from the master branch.
 } // namespace Gio
