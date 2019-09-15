@@ -812,6 +812,99 @@ public:
   template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
   static inline ustring format(const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5,
     const T6& a6, const T7& a7, const T8& a8);
+
+  /*! Substitute placeholders in a format string with the referenced arguments.
+   *
+   * This function takes a template string in the format used by C’s
+   * <tt>printf()</tt> family of functions and an arbitrary number of arguments,
+   * replaces each placeholder in the template with the formatted version of its
+   * corresponding argument at the same ordinal position in the list of
+   * subsequent arguments, and returns the result in a new Glib::ustring.
+   *
+   * Note: You must pass the correct count/types/order of arguments to match
+   * the format string, as when calling <tt>printf()</tt> directly. glibmm does
+   * not check this for you. Breaking this contract invokes undefined behavior
+   * and is a security risk.
+   *
+   * The exception is that glibmm special-cases std::string and Glib::ustring,
+   * so you can pass them in positions corresponding to <tt>%s</tt> placeholders
+   * without having to call their .c_str() functions; glibmm does that for you.
+   * glibmm also overloads sprintf() with @p fmt but no @p args to avoid risks.
+   *
+   * Said restriction also makes sprintf() unsuitable for translatable strings,
+   * as translators cannot reorder the placeholders to suit their language. If
+   * you wish to support translation, you should instead use compose(), as its
+   * placeholders are numbered rather than ordinal, so they can be moved freely.
+   *
+   * @par Example:
+   * @code
+   *
+   * const auto greeting = std::string{"Hi"};
+   * const auto name = Glib::ustring{"Dennis"};
+   * const auto your_cows = 3;
+   * const auto my_cows = 11;
+   * const auto cow_percentage = 100.0 * your_cows / my_cows;
+   *
+   * const auto text = Glib::ustring::sprintf(
+   *   "%s, %s! You have %d cows. That's about %0.2f%% of the %d cows I have.",
+   *   greeting, name, your_cows, cow_percentage, my_cows);
+   *
+   * std::cout << text;
+   * // Hi, Dennis! You have 3 cows. That's about 27.27% of the 11 cows I have.
+   * @endcode
+   *
+   * @param fmt The template string, in the format used by <tt>printf()</tt> et al.
+   * @param args A set of arguments having the count/types/order required by @a fmt.
+   *
+   * @return The substituted string.
+   *
+   * @newin{2,62}
+   */
+  template <class... Ts>
+  static inline ustring sprintf(const ustring& fmt, const Ts&... args);
+
+  /*! Overload of sprintf() taking a string literal.
+   *
+   * The main benefit of this is not constructing a temporary ustring if @p fmt
+   * is a string literal. A secondary effect is that it might encourage compilers
+   * to check if the given format @p fmt matches the variadic arguments @p args.
+   * The latter effect is a convenience at best; you must not rely on it to find
+   * errors in your code, as your compiler might not always be able to do so.
+   *
+   * @param fmt The template string, in the format used by <tt>printf()</tt> et al.
+   * @param args A set of arguments having the count/types/order required by @a fmt.
+   *
+   * @return The substituted string.
+   *
+   * @newin{2,62}
+   */
+  template <class... Ts>
+  static inline ustring sprintf(const char* fmt, const Ts&... args);
+
+  /*! Overload of sprintf() for a format string only, which returns it unchanged.
+   *
+   * If no @p args to be substituted are given, there is nothing to do, so the
+   * @p fmt string is returned as-is without substitution. This is an obvious
+   * case of mismatched format/args that we can check. Not doing so causes
+   * warnings/errors with common compiler options, as it is a security risk.
+   *
+   * @param fmt The string
+   * @return The same string.
+   *
+   * @newin{2,62}
+   */
+  static inline ustring sprintf(const ustring& fmt);
+
+  /*! Overload of sprintf() for a format string only, which returns it unchanged
+   * and avoids creating a temporary ustring as the argument.
+   *
+   * @param fmt The string
+   * @return The same string, as a ustring.
+   *
+   * @newin{2,62}
+   */
+  static inline ustring sprintf(const char* fmt);
+
   //! @}
 
 private:
@@ -836,6 +929,10 @@ private:
   class FormatStream;
 
   static ustring compose_argv(const ustring& fmt, int argc, const ustring* const* argv);
+
+  template<class T> static inline const T& sprintify(const T& arg);
+  static inline const char* sprintify(const ustring& arg);
+  static inline const char* sprintify(const std::string& arg);
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
@@ -1365,6 +1462,33 @@ inline // static
   return ustring::compose_argv(fmt, 0, nullptr);
 }
 
+/* These helper functions used by ustring::sprintf() let users pass C++ strings
+ * to match %s placeholders, without the hassle of writing .c_str() in user code
+ */
+template<typename T>
+inline // static
+  const T&
+  ustring::sprintify(const T& arg)
+{
+  return arg;
+}
+
+inline // static
+  const char*
+  ustring::sprintify(const ustring& arg)
+{
+  return arg.c_str();
+}
+
+inline // static
+  const char*
+  ustring::sprintify(const std::string& arg)
+{
+  return arg.c_str();
+}
+
+// Public methods
+
 template <class T1>
 inline // static
   ustring
@@ -1506,6 +1630,40 @@ inline // static
   const ustring* const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr(),
     s7.ptr(), s8.ptr(), s9.ptr() };
   return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+}
+
+template <class... Ts>
+inline // static
+  ustring
+  ustring::sprintf(const ustring& fmt, const Ts&... args)
+{
+  return sprintf(fmt.c_str(), args...);
+}
+
+template <class... Ts>
+inline // static
+  ustring
+  ustring::sprintf(const char* fmt, const Ts&... args)
+{
+  auto c_str = g_strdup_printf(fmt, sprintify(args)...);
+  Glib::ustring ustr(c_str);
+  g_free(c_str);
+
+  return ustr;
+}
+
+inline // static
+  ustring
+  ustring::sprintf(const ustring& fmt)
+{
+  return fmt;
+}
+
+inline // static
+  ustring
+  ustring::sprintf(const char* fmt)
+{
+  return ustring(fmt);
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
