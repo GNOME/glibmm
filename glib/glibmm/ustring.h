@@ -175,7 +175,7 @@ gunichar get_unichar_from_std_iterator(std::string::const_iterator pos) G_GNUC_P
  * Many member functions and operators of %Glib::ustring and Glib::ustring_Iterator
  * assume that the string contains only valid UTF-8 data. If it does not, memory
  * outside the bounds of the string can be accessed. If you're uncertain, use
- * validate().
+ * validate() and/or make_valid().
  * @par
  * In a perfect world the C++ Standard Library would contain a UTF-8 string
  * class.  Unfortunately, the C++98 standard doesn't mention UTF-8 at all.
@@ -602,6 +602,12 @@ public:
 
   /*! Check whether the string is valid UTF-8. */
   bool validate(const_iterator& first_invalid) const;
+
+  /*! Return a copy that is a valid UTF-8 string replacing invalid bytes
+   * in the original with %Unicode replacement character (U+FFFD).
+   * If the string is valid, return a copy of it.
+   */
+  ustring make_valid() const;
 
   /*! Check whether the string is plain 7-bit ASCII. @par
    * Unlike any other ustring method, is_ascii() is safe to use on invalid

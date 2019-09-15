@@ -37,6 +37,7 @@ check_PROGRAMS =				\
 	glibmm_objectbase_move/test			\
 	glibmm_ustring_compose/test		\
 	glibmm_ustring_format/test		\
+	glibmm_ustring_make_valid/test \
 	glibmm_ustring_sprintf/test		\
 	glibmm_value/test			\
 	glibmm_valuearray/test			\
@@ -103,6 +104,7 @@ glibmm_object_move_test_SOURCES          = glibmm_object_move/main.cc
 glibmm_objectbase_move_test_SOURCES      = glibmm_objectbase_move/main.cc
 glibmm_ustring_compose_test_SOURCES      = glibmm_ustring_compose/main.cc
 glibmm_ustring_format_test_SOURCES       = glibmm_ustring_format/main.cc
+glibmm_ustring_make_valid_test_SOURCES   = glibmm_ustring_make_valid/main.cc
 glibmm_ustring_sprintf_test_SOURCES      = glibmm_ustring_sprintf/main.cc
 glibmm_value_test_SOURCES                = glibmm_value/glibmm_value.cc glibmm_value/main.cc
 glibmm_valuearray_test_SOURCES           = glibmm_valuearray/main.cc
