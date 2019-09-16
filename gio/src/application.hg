@@ -278,10 +278,39 @@ public:
     gchar short_name = '\0', const Glib::ustring& description = Glib::ustring(),
     const Glib::ustring& arg_description = Glib::ustring(), int flags = 0);
 
-  // _WRAP_METHOD(void add_option_group(Glib::OptionGroup& group), g_application_add_option_group)
-  // add_option_group() is probably not very useful. If implemented, it must probably
-  // be custom-implemented. See https://bugzilla.gnome.org/show_bug.cgi?id=727822#c10
-  _IGNORE(g_application_add_option_group)
+  // GApplication takes ownership of the GOptionGroup, unrefing it later.
+#m4 _CONVERSION(`Glib::OptionGroup&',`GOptionGroup*',`($3).gobj_give_ownership()')
+  /** Adds a Glib::OptionGroup to the commandline handling of the application.
+   *
+   * This function is comparable to Glib::OptionContext::add_group().
+   *
+   * Unlike add_main_option_entry(), this function never transmits options to the
+   * primary instance.
+   *
+   * The reason for that is because, by the time the options arrive at the
+   * primary instance, it is typically too late to do anything with them.
+   * Taking the GTK option group as an example: GTK will already have been
+   * initialised by the time the signal_command_line() handler runs.
+   * In the case that this is not the first-running instance of the
+   * application, the existing instance may already have been running for
+   * a very long time.
+   *
+   * This means that the options from Glib::OptionGroup are only really usable
+   * in the case that the instance of the application being run is the
+   * first instance. Passing options like `--display=` or `--gdk-debug=`
+   * on future runs will have no effect on the existing primary instance.
+   *
+   * Calling this function will cause the options in the supplied option
+   * group to be parsed, but it does not cause you to be "opted in" to the
+   * new functionality whereby unrecognised options are rejected even if
+   * Gio::APPLICATION_HANDLES_COMMAND_LINE was given.
+   *
+   * @newin{2,62}
+   *
+   * @param group A Glib::OptionGroup.
+   * @note The group will not be copied, so it should exist for as long as the application exists.
+   */
+  _WRAP_METHOD(void add_option_group(Glib::OptionGroup& group), g_application_add_option_group)
 
   _WRAP_METHOD(void set_option_context_parameter_string(const Glib::ustring& parameter_string{NULL}), g_application_set_option_context_parameter_string)
   _WRAP_METHOD(void set_option_context_summary(const Glib::ustring& summary{NULL}), g_application_set_option_context_summary)
