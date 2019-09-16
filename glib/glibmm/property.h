@@ -271,9 +271,14 @@ public:
    */
   inline operator PropertyType() const;
 
+  //TODO: Remove the non-const get_proxy() when we can break ABI.
   /** Returns a proxy object that can be used to read this property.
    */
   inline Glib::PropertyProxy_ReadOnly<T> get_proxy();
+
+  /** Returns a proxy object that can be used to read this property.
+   */
+  inline Glib::PropertyProxy_ReadOnly<T> get_proxy() const;
 };
 
 /** See Property.
@@ -463,6 +468,13 @@ inline Property_ReadOnly<T>::operator T() const
 template <class T>
 inline Glib::PropertyProxy_ReadOnly<T>
 Property_ReadOnly<T>::get_proxy()
+{
+  return Glib::PropertyProxy_ReadOnly<T>(object_, get_name_internal());
+}
+
+template <class T>
+inline Glib::PropertyProxy_ReadOnly<T>
+Property_ReadOnly<T>::get_proxy() const
 {
   return Glib::PropertyProxy_ReadOnly<T>(object_, get_name_internal());
 }
