@@ -15,6 +15,7 @@
  */
 
 #include <glibmm/object.h>
+#include <set>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -39,8 +40,9 @@ namespace Gio
  * serialize_vfunc() methods.
  *
  * To extend the set of control messages that can be received, subclass this
- * class and implement the deserialize method. Also, make sure your class is
- * registered with the GType typesystem before calling
+ * class and implement a DeserializeFunc function. Typically it would be a
+ * static class method. Also, make sure you register the DeserializeFunc
+ * function with a call to add_deserialize_func() before calling
  * Gio::Socket::receive() to read such a message.
  *
  * @ingroup NetworkIO
@@ -76,15 +78,44 @@ protected:
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
   klass->deserialize = &deserialize_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
-  //TODO: Uncomment when we can add API.
-  //static GSocketControlMessage* deserialize_vfunc_callback(
-  //  int level, int type, gsize size, gpointer data);
+  static GSocketControlMessage* deserialize_vfunc_callback(
+    int level, int type, gsize size, gpointer data);
   _POP()
 #m4end
 
-  //TODO: When we can add API, add protected DeserializeFunc,
-  // add_deserialize_func() and private m_deserialize_funcs from the master branch.
-  // And update the last paragraph of the class description.
+  /** Pointer to a function that can be called from deserialize() or
+   * g_socket_control_message_deserialize().
+   *
+   * For instance,
+   * @code
+   * Glib::RefPtr<SocketControlMessage> my_deserialize_func(
+   *   int level, int type, gsize size, gpointer data);
+   * @endcode
+   *
+   * @param level A socket level.
+   * @param type A socket control message type for the given @a level.
+   * @param size The size of the data in bytes.
+   * @param data Pointer to the message data (element-type guint8).
+   * @return The deserialized message or an empty Glib::RefPtr.
+   *         The returned message can be a subclass of %SocketControlMessage.
+   */
+  using DeserializeFunc = Glib::RefPtr<SocketControlMessage> (*)
+    (int level, int type, gsize size, gpointer data);
+
+  /** Register a deserialize function.
+   *
+   * If the same function is registered multiple times, only the first
+   * registration has an effect.
+   *
+   * In GLib, %deserialize() is a class virtual function (not associated
+   * with an instance). Such functions don't exist in C++. A function registered
+   * with %add_deserialize_func() is a kind of replacement.
+   */
+  static void add_deserialize_func(DeserializeFunc func);
+
+private:
+  // Functions registered with add_deserialize_func().
+  static std::set<DeserializeFunc> m_deserialize_funcs;
 };
 
 } // namespace Gio
