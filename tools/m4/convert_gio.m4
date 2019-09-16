@@ -9,10 +9,11 @@ _CONV_ENUM(G,DataStreamByteOrder)
 _CONV_ENUM(G,DataStreamNewlineType)
 _CONV_ENUM(GDBus,CallFlags)
 _CONV_ENUM(GDBus,CapabilityFlags)
-_CONV_ENUM(GDBus, InterfaceSkeletonFlags)
+_CONV_ENUM(GDBus,InterfaceSkeletonFlags)
 _CONV_ENUM(GDBus,MessageFlags)
 _CONV_ENUM(GDBus,MessageHeaderField)
 _CONV_ENUM(GDBus,MessageType)
+_CONV_ENUM(GDBus,ObjectManagerClientFlags)
 _CONV_ENUM(GDBus,ProxyFlags)
 _CONV_ENUM(GDBus,ConnectionFlags)
 _CONV_ENUM(GDBus,SendMessageFlags)
@@ -136,13 +137,16 @@ _CONVERSION(`const Glib::RefPtr<Gio::DBus::InterfaceSkeleton>&',`GDBusInterfaceS
 _CONVERSION(`const Glib::RefPtr<MethodInvocation>&',`GDBusMethodInvocation*',`Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gio::DBus::MethodInvocation>&',`GDBusMethodInvocation*',`Glib::unwrap($3)')
 
-# DBusObject
+# DBusObject, DBusObjectProxy, DBusObjectSkeleton
 _CONVERSION(`GDBusObject*',`Glib::RefPtr<Gio::DBus::Object>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gio::DBus::Object>&',`GDBusObject*',`Glib::unwrap($3)')
 _CONVERSION(`Glib::RefPtr<Gio::DBus::Object>',`GDBusObject*',`Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gio::DBus::ObjectProxy>&',`GDBusObjectProxy*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<Gio::DBus::ObjectSkeleton>&',`GDBusObjectSkeleton*',__CONVERT_REFPTR_TO_P)
 
 # DBusProxy
 _CONVERSION(`GDBusProxy*',`Glib::RefPtr<Gio::DBus::Proxy>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gio::DBus::Proxy>&',`GDBusProxy*',__CONVERT_REFPTR_TO_P)
 
 # DesktopAppInfo
 _CONVERSION(`GDesktopAppInfo*', `Glib::RefPtr<DesktopAppInfo>', `Glib::wrap($3)')

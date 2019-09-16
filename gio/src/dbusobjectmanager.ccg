@@ -1,0 +1,42 @@
+/* Copyright (C) 2019 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gio/gio.h>
+#include <giomm/dbusobject.h>
+#include <giomm/dbusinterface.h>
+
+namespace
+{
+// Used in call to g_list_copy_deep().
+void* list_copy_ref(const void* src, void* /* data */)
+{
+  return g_object_ref(const_cast<void*>(src));
+}
+
+// Define some replacements for Glib::unwrap_copy().
+// Can't use the template function in glibmm/wrap.h, because interface classes
+// don't override Glib::ObjectBase::gobj_copy(), which returns a GObject*.
+GDBusObject* local_unwrap_copy(const Glib::RefPtr<Gio::DBus::Object>& ptr)
+{
+  return ptr ? reinterpret_cast<GDBusObject*>(ptr->gobj_copy()) : nullptr;
+}
+
+GDBusInterface* local_unwrap_copy(const Glib::RefPtr<Gio::DBus::Interface>& ptr)
+{
+  return ptr ? reinterpret_cast<GDBusInterface*>(ptr->gobj_copy()) : nullptr;
+}
+
+} // anonymous namespace

@@ -1,0 +1,103 @@
+/* Copyright (C) 2019 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/dbusobjectmanager.h>
+#include <giomm/dbusconnection.h>
+#include <giomm/dbusobjectskeleton.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+namespace DBus
+{
+//The GMMPROC_EXTRA_NAMESPACE() macro is a hint to generate_wrap_init.pl to put it in the DBus sub-namespace
+_GMMPROC_EXTRA_NAMESPACE(DBus)
+
+/** Service-side object manager.
+ *
+ * %Gio::DBus::ObjectManagerServer is used to export Gio::DBus::Object instances using
+ * the standardized
+ * <a href="http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-objectmanager">
+ * org.freedesktop.DBus.ObjectManager</a> interface.
+ * For example, remote D-Bus clients can get all objects
+ * and properties in a single call. Additionally, any change in the
+ * object hierarchy is broadcast using signals. This means that D-Bus
+ * clients can keep caches up to date by only listening to D-Bus signals.
+ *
+ * The recommended path to export an object manager at is the path form of the
+ * well-known name of a D-Bus service, or below. For example, if a D-Bus service
+ * is available at the well-known name `net.example.ExampleService1`, the object
+ * manager should typically be exported at `/net/example/ExampleService1`, or
+ * below (to allow for multiple object managers in a service).
+ *
+ * It is supported, but not recommended, to export an object manager at the root
+ * path, `/`.
+ *
+ * See Gio::DBus::ObjectManagerClient for the client-side code that is
+ * intended to be used with %ObjectManagerServer or any D-Bus
+ * object implementing the org.freedesktop.DBus.ObjectManager interface.
+ *
+ * @newin{2,62}
+ * @ingroup DBus
+ */
+class ObjectManagerServer : public Glib::Object, public ObjectManager
+{
+  _CLASS_GOBJECT(ObjectManagerServer, GDBusObjectManagerServer, G_DBUS_OBJECT_MANAGER_SERVER, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(DBus::ObjectManager)
+
+protected:
+  _WRAP_CTOR(ObjectManagerServer(const Glib::ustring& object_path), g_dbus_object_manager_server_new)
+
+public:
+  /** Creates a new %Gio::DBus::ObjectManagerServer object.
+   *
+   * The returned server isn't yet exported on any connection. To do so,
+   * use set_connection(). Normally you want to export all of your objects
+   * before doing so to avoid Gio::DBus::ObjectManager::signal_interface_added()
+   * signals being emitted.
+   *
+   * @param object_path The object path to export the manager object at.
+   * @return A new %Gio::DBus::ObjectManagerServer object.
+   */
+  _WRAP_CREATE(const Glib::ustring& object_path)
+
+  _WRAP_METHOD(Glib::RefPtr<Connection> get_connection(), g_dbus_object_manager_server_get_connection)
+  _WRAP_METHOD(Glib::RefPtr<const Connection> get_connection() const,
+    g_dbus_object_manager_server_get_connection, constversion)
+  _WRAP_METHOD(void set_connection(const Glib::RefPtr<Connection>& connection),
+    g_dbus_object_manager_server_set_connection)
+
+  // The method can't be called export(). 'export' is a keyword in C++.
+  _WRAP_METHOD(void export_object(const Glib::RefPtr<Gio::DBus::ObjectSkeleton>& object),
+    g_dbus_object_manager_server_export)
+  _WRAP_METHOD(void export_uniquely(const Glib::RefPtr<Gio::DBus::ObjectSkeleton>& object),
+    g_dbus_object_manager_server_export_uniquely)
+  _WRAP_METHOD(bool is_exported(const Glib::RefPtr<Gio::DBus::ObjectSkeleton>& object) const,
+    g_dbus_object_manager_server_is_exported)
+  _WRAP_METHOD(bool unexport(const Glib::ustring& object_path),
+    g_dbus_object_manager_server_unexport)
+
+ _WRAP_PROPERTY("connection", Glib::RefPtr<Connection>)
+ _WRAP_PROPERTY("object-path", Glib::ustring)
+};
+
+} //namespace
+
+} // namespace Gio
