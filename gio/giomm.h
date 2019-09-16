@@ -55,6 +55,8 @@
 #include <giomm/dbusmessage.h>
 #include <giomm/dbusmethodinvocation.h>
 #include <giomm/dbusobject.h>
+#include <giomm/dbusobjectproxy.h>
+#include <giomm/dbusobjectskeleton.h>
 #include <giomm/dbusownname.h>
 #include <giomm/dbusproxy.h>
 #include <giomm/dbusserver.h>

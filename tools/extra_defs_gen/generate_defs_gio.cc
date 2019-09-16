@@ -39,6 +39,7 @@ main(int, char**)
   // g_type_init();
 
   // Until the glib bug https://bugzilla.gnome.org/show_bug.cgi?id=465631
+  // (https://gitlab.gnome.org/GNOME/glib/issues/100)
   // is fixed, get_defs() must be called for a GObject before it's
   // called for a GInterface.
   (void)get_defs(G_TYPE_APPLICATION);
@@ -77,9 +78,6 @@ main(int, char**)
             << get_defs(G_TYPE_SIMPLE_ACTION) << get_defs(G_TYPE_SIMPLE_IO_STREAM)
             << get_defs(G_TYPE_SUBPROCESS) << get_defs(G_TYPE_SUBPROCESS_LAUNCHER)
             << get_defs(G_TYPE_THEMED_ICON)
-
-            // TODO: This causes a g_warning:
-            // GLib-GObject-CRITICAL **: g_param_spec_pool_list: assertion `pool != NULL' failed"
             << get_defs(G_TYPE_VOLUME)
 
             << get_defs(G_TYPE_VOLUME_MONITOR) << get_defs(G_TYPE_ZLIB_COMPRESSOR)
@@ -113,7 +111,13 @@ main(int, char**)
             << get_defs(G_TYPE_DBUS_ARG_INFO) << get_defs(G_TYPE_DBUS_MENU_MODEL)
             << get_defs(G_TYPE_DBUS_METHOD_INFO) << get_defs(G_TYPE_DBUS_SIGNAL_INFO)
             << get_defs(G_TYPE_DBUS_PROPERTY_INFO) << get_defs(G_TYPE_DBUS_INTERFACE_INFO)
-            << get_defs(G_TYPE_DBUS_INTERFACE_SKELETON) << get_defs(G_TYPE_DBUS_OBJECT)
+            << get_defs(G_TYPE_DBUS_INTERFACE_SKELETON)
+            << get_defs(G_TYPE_DBUS_OBJECT)
+            << get_defs(G_TYPE_DBUS_OBJECT_MANAGER)
+            << get_defs(G_TYPE_DBUS_OBJECT_MANAGER_CLIENT)
+            << get_defs(G_TYPE_DBUS_OBJECT_MANAGER_SERVER)
+            << get_defs(G_TYPE_DBUS_OBJECT_PROXY)
+            << get_defs(G_TYPE_DBUS_OBJECT_SKELETON)
             << get_defs(G_TYPE_DBUS_NODE_INFO) << get_defs(G_TYPE_DBUS_MESSAGE)
             << get_defs(G_TYPE_DBUS_METHOD_INVOCATION) << get_defs(G_TYPE_DBUS_PROXY)
             << get_defs(G_TYPE_DBUS_SERVER)
