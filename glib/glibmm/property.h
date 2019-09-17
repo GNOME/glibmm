@@ -129,7 +129,7 @@ private:
  *  * The default value and the minimum and maximum bounds (depending on the type of the property).
  *  * Flags, defining, among other things, whether the property can be read or written.
  *
- * This Property class currently supports the name, nick name, description default value and flags.
+ * This %Property class currently supports the name, nick name, description, default value and flags.
  * The minimum and maximum bounds are set to the full range of the value.
  * Because of internal implementation, flags shouldn't be set to values: Glib::PARAM_STATIC_NAME,
  * Glib::PARAM_STATIC_NICK, Glib::PARAM_STATIC_BLURB, Glib::PARAM_CONSTRUCT and
@@ -146,7 +146,7 @@ private:
  * declare all properties as direct data members of the type.
  *
  * You may register new properties for your class (actually for the underlying GType)
- * simply by adding a Property instance as a class member.
+ * simply by adding a %Property instance as a class member.
  * However, your constructor must call the Glib::ObjectBase constructor with a new GType name,
  * in order to register a new GType.
  *
@@ -175,6 +175,14 @@ private:
  *   Glib::Property<int> property_myint_;
  * };
  * @endcode
+ *
+ * @par %Glib::Property and Gtk::Builder
+ * The new GType is registered, and the properties installed in the GType, when
+ * the first instance of the class is created. When the underlying GObject-derived
+ * instance is created before the wrapping Glib::Object-derived instance, you may
+ * have to first create a dummy instance just to register the GType.
+ * See the description of Gtk::Builder for instructions how to combine %Property
+ * with Gtk::Builder.
  */
 template <class T>
 class Property : public PropertyBase

@@ -19,6 +19,7 @@
 #include <glibmm/object.h>
 #include <glibmm/class.h>
 #include <cstddef>
+#include <map>
 
 // Temporary hack till GLib gets fixed.
 #undef G_STRLOC
@@ -76,19 +77,34 @@ destroy_notify_obj_iface_props(void* data)
   }
 }
 
-// The type that holds pointers to the custom properties of custom types.
-using custom_properties_type = std::vector<Glib::PropertyBase*>;
+struct custom_properties_type
+{
+  // Pointers to the custom properties of custom types.
+  std::vector<Glib::PropertyBase*> prop_base_vector;
+
+  // Property values, set by custom_set_property_callback() before a
+  // Glib::PropertyBase wrapper has been created. E.g. if the containing
+  // custom GObject has been created by GtkBuilder.
+  std::map<unsigned int, GValue*> prop_value_map;
+};
+
 // The quark used for storing/getting the custom properties of custom types.
 static const GQuark custom_properties_quark =
   g_quark_from_string("gtkmm_CustomObject_custom_properties");
 
-// Delete the vector of pointers to custom properties when an object of
-// a custom type is finalized.
-void
-destroy_notify_obj_custom_props(void* data)
+// Delete the custom properties data when an object of a custom type is finalized.
+void destroy_notify_obj_custom_props(void* data)
 {
-  // Shallow deletion. The vector does not own the objects pointed to.
-  delete static_cast<custom_properties_type*>(data);
+  auto obj_custom_props = static_cast<custom_properties_type*>(data);
+  // prop_base_vector does not own the objects pointed to.
+  // prop_value_map owns the objects pointed to.
+  const auto map_end = obj_custom_props->prop_value_map.end();
+  for (auto it = obj_custom_props->prop_value_map.begin(); it != map_end; ++it)
+  {
+    g_value_unset(it->second);
+    g_free(it->second);
+  }
+  delete obj_custom_props;
 }
 
 custom_properties_type*
@@ -139,18 +155,31 @@ custom_get_property_callback(
   }
   else
   {
+    auto obj_custom_props = get_obj_custom_props(object);
+    const unsigned index = property_id - iface_props_size - 1;
+
     if (Glib::ObjectBase* const wrapper = Glib::ObjectBase::_get_current_wrapper(object))
     {
-      auto obj_custom_props =
-        static_cast<custom_properties_type*>(g_object_get_qdata(object, custom_properties_quark));
-      const unsigned index = property_id - iface_props_size - 1;
-
-      if (obj_custom_props && index < obj_custom_props->size() &&
-          (*obj_custom_props)[index]->object_ == wrapper &&
-          (*obj_custom_props)[index]->param_spec_ == param_spec)
-        g_value_copy((*obj_custom_props)[index]->value_.gobj(), value);
+      if (obj_custom_props && index < obj_custom_props->prop_base_vector.size())
+      {
+        const Glib::PropertyBase* prop_base = (obj_custom_props->prop_base_vector)[index];
+        if (prop_base->object_ == wrapper && prop_base->param_spec_ == param_spec)
+          g_value_copy(prop_base->value_.gobj(), value);
+        else
+          G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, param_spec);
+      }
       else
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, param_spec);
+    }
+    else
+    {
+      // No C++ wrapper exists. Check if there is a value in obj_custom_props->prop_value_map.
+      auto it = obj_custom_props->prop_value_map.find(index);
+      if (it != obj_custom_props->prop_value_map.end())
+        g_value_copy(it->second, value);
+      else
+        // else return the property's default value.
+        g_value_copy(g_param_spec_get_default_value(param_spec), value);
     }
   }
 }
@@ -164,7 +193,7 @@ custom_set_property_callback(
 
   GType custom_type = G_OBJECT_TYPE(object);
 
-  Class::iface_properties_type* iface_props = static_cast<Class::iface_properties_type*>(
+  auto iface_props = static_cast<Class::iface_properties_type*>(
     g_type_get_qdata(custom_type, Class::iface_properties_quark));
 
   Class::iface_properties_type::size_type iface_props_size = 0;
@@ -176,7 +205,7 @@ custom_set_property_callback(
   {
     // If the object does not have interface property values,
     // copy the class's default values to the object.
-    Class::iface_properties_type* obj_iface_props = static_cast<Class::iface_properties_type*>(
+    auto obj_iface_props = static_cast<Class::iface_properties_type*>(
       g_object_get_qdata(object, Class::iface_properties_quark));
     if (!obj_iface_props)
     {
@@ -197,21 +226,39 @@ custom_set_property_callback(
   }
   else
   {
+    auto obj_custom_props = get_obj_custom_props(object);
+    const unsigned index = property_id - iface_props_size - 1;
+
     if (Glib::ObjectBase* const wrapper = Glib::ObjectBase::_get_current_wrapper(object))
     {
-      auto obj_custom_props =
-        static_cast<custom_properties_type*>(g_object_get_qdata(object, custom_properties_quark));
-      const unsigned index = property_id - iface_props_size - 1;
-
-      if (obj_custom_props && index < obj_custom_props->size() &&
-          (*obj_custom_props)[index]->object_ == wrapper &&
-          (*obj_custom_props)[index]->param_spec_ == param_spec)
+      if (obj_custom_props && index < obj_custom_props->prop_base_vector.size())
       {
-        g_value_copy(value, (*obj_custom_props)[index]->value_.gobj());
-        g_object_notify_by_pspec(object, param_spec);
+        Glib::PropertyBase* prop_base = (obj_custom_props->prop_base_vector)[index];
+        if (prop_base->object_ == wrapper && prop_base->param_spec_ == param_spec)
+        {
+          g_value_copy(value, prop_base->value_.gobj());
+          g_object_notify_by_pspec(object, param_spec);
+        }
+        else
+          G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, param_spec);
       }
       else
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, param_spec);
+    }
+    else
+    {
+      // No C++ wrapper exists. Store the value in obj_custom_props->prop_value_map.
+      auto it = obj_custom_props->prop_value_map.find(index);
+      if (it != obj_custom_props->prop_value_map.end())
+        g_value_copy(value, it->second);
+      else
+      {
+        GValue* g_value = g_new0(GValue, 1);
+        g_value_init(g_value, G_VALUE_TYPE(value));
+        g_value_copy(value, g_value);
+        obj_custom_props->prop_value_map[index] = g_value;
+      }
+      g_object_notify_by_pspec(object, param_spec);
     }
   }
 }
@@ -244,7 +291,16 @@ PropertyBase::lookup_property(const Glib::ustring& name)
     g_assert(G_PARAM_SPEC_VALUE_TYPE(param_spec_) == G_VALUE_TYPE(value_.gobj()));
     g_param_spec_ref(param_spec_);
 
-    get_obj_custom_props(object_->gobj())->emplace_back(this);
+    auto obj_custom_props = get_obj_custom_props(object_->gobj());
+    const unsigned int pos_in_obj_custom_props = obj_custom_props->prop_base_vector.size();
+    obj_custom_props->prop_base_vector.emplace_back(this);
+
+    // If a value has been set by a call to custom_set_property_callback()
+    // before this Glib::PropertyBase wrapper was creared, copy that value
+    // to value_.
+    auto it = obj_custom_props->prop_value_map.find(pos_in_obj_custom_props);
+    if (it != obj_custom_props->prop_value_map.end())
+      g_value_copy(it->second, value_.gobj());
   }
 
   return (param_spec_ != nullptr);
@@ -270,8 +326,8 @@ PropertyBase::install_property(GParamSpec* param_spec)
 
   auto obj_custom_props = get_obj_custom_props(object_->gobj());
 
-  const unsigned int pos_in_obj_custom_props = obj_custom_props->size();
-  obj_custom_props->emplace_back(this);
+  const unsigned int pos_in_obj_custom_props = obj_custom_props->prop_base_vector.size();
+  obj_custom_props->prop_base_vector.emplace_back(this);
 
   // We need to offset by 1 as zero is an invalid property id.
   const unsigned int property_id = pos_in_obj_custom_props + iface_props_size + 1;
