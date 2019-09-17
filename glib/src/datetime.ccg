@@ -20,21 +20,10 @@
 
 namespace Glib
 {
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-DateTime DateTime::create_now_local(const TimeVal& tv)
-{
-  return Glib::wrap(g_date_time_new_from_timeval_local(&(tv)));
-}
 
-DateTime DateTime::create_now_utc(const TimeVal& tv)
+DateTime::operator bool() const
 {
-  return Glib::wrap(g_date_time_new_from_timeval_utc(&(tv)));
+  return (gobject_ != nullptr);
 }
-
-bool DateTime::to_timeval(TimeVal& tv) const
-{
-  return g_date_time_to_timeval(const_cast<GDateTime*>(gobj()), &(tv));
-}
-G_GNUC_END_IGNORE_DEPRECATIONS
 
 } // namespace Glib

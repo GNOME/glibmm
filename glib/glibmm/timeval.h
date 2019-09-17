@@ -25,16 +25,18 @@
 namespace Glib
 {
 
-//TODO: Deprecate TimeVal in the next minor stable release (glibmm 2.62.0?).
 // GTimeVal is deprecated.
-// Note: Before TimeVal is deprecated, check what will happen with
-// Gdk::PixbufAnimationIter::advance(const Glib::TimeVal& current_time),
-// especially if GLIBMM_DISABLE_DEPRECATED is defined but GDKMM_DISABLE_DEPRECATED is not.
+// The deprecated GTimeVal is used in the non-deprecated gdk_pixbuf_animation_iter_advance().
+// That's why not all of struct Glib::TimeVal is surrounded by
+// #ifndef GLIBMM_DISABLE_DEPRECATED/#endif. It would result in compilation errors,
+// if you define GLIBMM_DISABLE_DEPRECATED and include gdkmm/pixbufanimationiter.h.
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 /** Glib::TimeVal is a wrapper around the glib structure GTimeVal.
  * The glib structure GTimeVal itself is equivalent to struct timeval,
  * which is returned by the gettimeofday() UNIX call. Additionally
  * this wrapper provides an assortment of time manipulation functions.
+ *
+ * @deprecated Use Glib::DateTime instead.
  */
 struct TimeVal : public GTimeVal
 {
@@ -44,6 +46,7 @@ struct TimeVal : public GTimeVal
   inline TimeVal(const GTimeVal& gtimeval);
   inline TimeVal& operator=(const GTimeVal& gtimeval);
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
   /** Assigns the current time to the TimeVal instance.
    * Equivalent to the UNIX gettimeofday() function, but is portable and
    * works also on Win32.
@@ -93,6 +96,7 @@ struct TimeVal : public GTimeVal
    * Returns true if the stored time / time interval is positive.
    */
   inline bool valid() const;
+#endif // GLIBMM_DISABLE_DEPRECATED
 };
 
 inline TimeVal::TimeVal()
@@ -121,6 +125,7 @@ TimeVal::operator=(const GTimeVal& gtimeval)
   return *this;
 }
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
 inline TimeVal&
 TimeVal::operator+=(const TimeVal& gtimeval)
 {
@@ -240,6 +245,7 @@ operator>=(const TimeVal& lhs, const TimeVal& rhs)
 {
   return ((lhs.tv_sec > rhs.tv_sec) || (lhs.tv_sec == rhs.tv_sec && lhs.tv_usec >= rhs.tv_usec));
 }
+#endif // GLIBMM_DISABLE_DEPRECATED
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 } // namespace Glib

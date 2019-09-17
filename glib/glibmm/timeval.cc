@@ -20,6 +20,7 @@
 
 namespace Glib
 {
+#ifndef GLIBMM_DISABLE_DEPRECATED
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 void
 TimeVal::assign_current_time()
@@ -137,5 +138,6 @@ TimeVal::as_iso8601() const
   return Glib::ustring();
 }
 G_GNUC_END_IGNORE_DEPRECATIONS
+#endif // GLIBMM_DISABLE_DEPRECATED
 
 } // namespace Glib

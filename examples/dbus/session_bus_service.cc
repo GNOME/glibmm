@@ -48,7 +48,7 @@ static Glib::ustring introspection_xml = "<node>"
 guint registered_id = 0;
 
 // Stores the current alarm.
-static Glib::TimeVal curr_alarm;
+static Glib::DateTime curr_alarm;
 
 } // anonymous namespace
 
@@ -61,10 +61,9 @@ on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /* connection */,
 {
   if (method_name == "GetTime")
   {
-    Glib::TimeVal curr_time;
-    curr_time.assign_current_time();
+    Glib::DateTime curr_time = Glib::DateTime::create_now_local();
 
-    const Glib::ustring time_str = curr_time.as_iso8601();
+    const Glib::ustring time_str = curr_time.format_iso8601();
     const auto time_var = Glib::Variant<Glib::ustring>::create(time_str);
 
     // Create the tuple.
@@ -86,7 +85,8 @@ on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /* connection */,
     // Get the time string.
     const Glib::ustring time_str = param.get();
 
-    if (!curr_alarm.assign_from_iso8601(time_str))
+    curr_alarm = Glib::DateTime::create_from_iso8601(time_str);
+    if (!curr_alarm)
     {
       // If setting alarm was not successful, return an error.
       Gio::DBus::Error error(

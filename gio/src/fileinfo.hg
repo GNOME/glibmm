@@ -181,11 +181,12 @@ public:
 
   _WRAP_METHOD(goffset get_size() const, g_file_info_get_size)
 
-  //TODO: In the next minor stable release (glibmm 2.62.0?), deprecate modification_time()
-  // and add get_modification_date_time().
+_DEPRECATE_IFDEF_START
+  /// @deprecated Use get_modification_date_time() instead.
   Glib::TimeVal modification_time() const;
+_DEPRECATE_IFDEF_END
   _IGNORE(g_file_info_get_modification_time)
-  //_WRAP_METHOD(Glib::DateTime get_modification_date_time() const, g_file_info_get_modification_date_time)
+  _WRAP_METHOD(Glib::DateTime get_modification_date_time() const, g_file_info_get_modification_date_time)
 
   _WRAP_METHOD(std::string get_symlink_target() const, g_file_info_get_symlink_target)
 
@@ -218,13 +219,9 @@ public:
 
   _WRAP_METHOD(void set_size(goffset size), g_file_info_set_size)
 
-  //TODO: In the next minor stable release (glibmm 2.62.0?), deprecate set_modification_time()
-  // and add set_modification_date_time().
-  _WRAP_METHOD_DOCS_ONLY(g_file_info_set_modification_time)
-  void set_modification_time(const Glib::TimeVal& mtime);
-  //_WRAP_METHOD(void set_modification_time(const Glib::TimeVal& mtime), g_file_info_set_modification_time,
-  //  deprecated "Use set_modification_date_time() instead.")
-  //_WRAP_METHOD(void set_modification_date_time(const Glib::DateTime& mtime), g_file_info_set_modification_date_time)
+  _WRAP_METHOD(void set_modification_time(const Glib::TimeVal& mtime), g_file_info_set_modification_time,
+    deprecated "Use set_modification_date_time() instead.")
+  _WRAP_METHOD(void set_modification_date_time(const Glib::DateTime& mtime), g_file_info_set_modification_date_time)
 
   _WRAP_METHOD(void set_symlink_target(const std::string& symlink_target), g_file_info_set_symlink_target)
   _WRAP_METHOD(void set_sort_order(gint32 sort_order), g_file_info_set_sort_order)

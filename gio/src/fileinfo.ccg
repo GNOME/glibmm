@@ -27,6 +27,7 @@ FileAttributeMatcher::create(const std::string& attributes)
   return Glib::wrap(g_file_attribute_matcher_new(attributes.c_str()));
 }
 
+_DEPRECATE_IFDEF_START
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 Glib::TimeVal
 FileInfo::modification_time() const
@@ -35,11 +36,7 @@ FileInfo::modification_time() const
   g_file_info_get_modification_time(const_cast<GFileInfo*>(gobj()), (GTimeVal*)(&result));
   return result;
 }
-
-void FileInfo::set_modification_time(const Glib::TimeVal& mtime)
-{
-  g_file_info_set_modification_time(gobj(), const_cast<GTimeVal*>(static_cast<const GTimeVal*>(&mtime)));
-}
 G_GNUC_END_IGNORE_DEPRECATIONS
+_DEPRECATE_IFDEF_END
 
 } // namespace Gio

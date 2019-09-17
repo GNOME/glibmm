@@ -74,21 +74,25 @@ public:
   _WRAP_METHOD(static DateTime create_now_local(gint64 t), g_date_time_new_from_unix_local)
   _WRAP_METHOD(static DateTime create_now_utc(gint64 t), g_date_time_new_from_unix_utc)
 
-  _WRAP_METHOD_DOCS_ONLY(g_date_time_new_from_timeval_local)
-  static DateTime create_now_local(const TimeVal& tv);
-//TODO: Deprecate in the next minor stable release (glibmm 2.62.0?).
-//  _WRAP_METHOD(static DateTime create_now_local(const TimeVal& tv), g_date_time_new_from_timeval_local,
-//    deprecated "Use create_now_local(gint64 t) instead.")
+  _WRAP_METHOD(static DateTime create_now_local(const TimeVal& tv), g_date_time_new_from_timeval_local,
+    deprecated "Use create_now_local(gint64 t) instead.")
 
-  _WRAP_METHOD_DOCS_ONLY(g_date_time_new_from_timeval_utc)
-  static DateTime create_now_utc(const TimeVal& tv);
-//TODO: Deprecate in the next minor stable release (glibmm 2.62.0?).
-//  _WRAP_METHOD(static DateTime create_now_utc(const TimeVal& tv), g_date_time_new_from_timeval_utc,
-//    deprecated "Use create_now_utc(gint64 t) instead.")
+  _WRAP_METHOD(static DateTime create_now_utc(const TimeVal& tv), g_date_time_new_from_timeval_utc,
+    deprecated "Use create_now_utc(gint64 t) instead.")
 
+  _WRAP_METHOD(static DateTime create_from_iso8601(const Glib::ustring& text, const TimeZone& default_tz{?}),
+    g_date_time_new_from_iso8601, newin "2,62")
   _WRAP_METHOD(static DateTime create(const TimeZone& tz, int year, int month, int day, int hour, int minute, double seconds), g_date_time_new)
   _WRAP_METHOD(static DateTime create_local(int year, int month, int day, int hour, int minute, double seconds), g_date_time_new_local)
   _WRAP_METHOD(static DateTime create_utc(int year, int month, int day, int hour, int minute, double seconds), g_date_time_new_utc)
+
+  /** Returns true if the %DateTime object is valid.
+   * This will return false, for instance, if the @a text in create_from_iso8601()
+   * is not a valid ISO 8601 formatted string.
+   *
+   * @newin{2,62}
+   */
+  explicit operator bool() const;
 
   _WRAP_METHOD(DateTime add(TimeSpan timespan) const, g_date_time_add)
   _WRAP_METHOD(DateTime add_years(int years) const, g_date_time_add_years)
@@ -152,11 +156,8 @@ public:
   _WRAP_METHOD(double get_seconds() const, g_date_time_get_seconds)
   _WRAP_METHOD(gint64 to_unix() const, g_date_time_to_unix)
 
-  _WRAP_METHOD_DOCS_ONLY(g_date_time_to_timeval)
-  bool to_timeval(TimeVal& tv) const;
-//TODO: Deprecate in the next minor stable release (glibmm 2.62.0?).
-//  _WRAP_METHOD(bool to_timeval(TimeVal& tv) const, g_date_time_to_timeval,
-//    deprecated "Use to_unix() instead.")
+  _WRAP_METHOD(bool to_timeval(TimeVal& tv) const, g_date_time_to_timeval,
+    deprecated "Use to_unix() instead.")
 
   _WRAP_METHOD(TimeSpan get_utc_offset() const, g_date_time_get_utc_offset)
 #m4 _CONVERSION(`GTimeZone*',`TimeZone',`Glib::wrap($3, true)')
@@ -167,6 +168,7 @@ public:
   _WRAP_METHOD(DateTime to_local() const, g_date_time_to_local)
   _WRAP_METHOD(DateTime to_utc() const, g_date_time_to_utc)
   _WRAP_METHOD(Glib::ustring format(const Glib::ustring& format_str) const, g_date_time_format)
+  _WRAP_METHOD(Glib::ustring format_iso8601() const, g_date_time_format_iso8601)
 };
 
 } // namespace Glib
