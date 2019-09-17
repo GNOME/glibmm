@@ -20,14 +20,13 @@ _DEFS(glibmm,glib)
 #include <glibmm/refptr.h>
 #include <glibmm/timezone.h>
 #include <glibmm/ustring.h>
+#include <glibmm/value.h>
 #include <glib.h>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct _GDateTime GDateTime;
 #endif
 
-//TODO: When we can add API, add a Glib::Value specialization, similar to the one in
-// https://mail.gnome.org/archives/gtkmm-list/2019-April/msg00012.html
 //TODO: When we can change API, make DateTime a _CLASS_BOXEDTYPE.
 
 namespace Glib
@@ -170,5 +169,21 @@ public:
   _WRAP_METHOD(Glib::ustring format(const Glib::ustring& format_str) const, g_date_time_format)
   _WRAP_METHOD(Glib::ustring format_iso8601() const, g_date_time_format_iso8601)
 };
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+// This is needed so Glib::DateTime can be used with Glib::Value and _WRAP_PROPERTY.
+template <>
+class Value<Glib::DateTime> : public ValueBase_Boxed
+{
+public:
+  using CppType = Glib::DateTime;
+  using CType = GDateTime*;
+
+  static GType value_type();
+
+  void set(const CppType& data);
+  CppType get() const;
+};
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } // namespace Glib

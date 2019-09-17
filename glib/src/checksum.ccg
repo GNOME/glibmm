@@ -48,4 +48,20 @@ Checksum::update(const std::string& data)
   g_checksum_update(gobj(), (const guchar*)data.c_str(), data.size());
 }
 
+// Glib::Value<Glib::Checksum>
+GType Value<Checksum>::value_type()
+{
+  return G_TYPE_CHECKSUM;
+}
+
+void Value<Checksum>::set(const CppType& data)
+{
+  set_boxed(data.gobj());
+}
+
+Value<Checksum>::CppType Value<Checksum>::get() const
+{
+  return Glib::wrap(static_cast<CType>(get_boxed()), true);
+}
+
 } // Glib namespace

@@ -26,4 +26,20 @@ DateTime::operator bool() const
   return (gobject_ != nullptr);
 }
 
+// Glib::Value<Glib::DateTime>
+GType Value<DateTime>::value_type()
+{
+  return G_TYPE_DATE_TIME;
+}
+
+void Value<DateTime>::set(const CppType& data)
+{
+  set_boxed(data.gobj());
+}
+
+Value<DateTime>::CppType Value<DateTime>::get() const
+{
+  return Glib::wrap(static_cast<CType>(get_boxed()), true);
+}
+
 } // namespace Glib

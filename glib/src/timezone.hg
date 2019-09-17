@@ -19,14 +19,13 @@ _DEFS(glibmm,glib)
 #include <glibmmconfig.h>
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
+#include <glibmm/value.h>
 #include <glib.h>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct _GTimeZone GTimeZone;
 #endif
 
-//TODO: When we can add API, add a Glib::Value specialization, similar to the one in
-// https://mail.gnome.org/archives/gtkmm-list/2019-April/msg00012.html
 //TODO: When we can change API, make TimeZone a _CLASS_BOXEDTYPE.
 
 namespace Glib
@@ -72,5 +71,21 @@ public:
   _WRAP_METHOD(bool is_dst(int interval) const, g_time_zone_is_dst)
   _WRAP_METHOD(Glib::ustring get_identifier() const, g_time_zone_get_identifier, newin "2,60")
 };
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+// This is needed so Glib::TimeZone can be used with Glib::Value and _WRAP_PROPERTY.
+template <>
+class Value<Glib::TimeZone> : public ValueBase_Boxed
+{
+public:
+  using CppType = Glib::TimeZone;
+  using CType = GTimeZone*;
+
+  static GType value_type();
+
+  void set(const CppType& data);
+  CppType get() const;
+};
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } // namespace Glib
