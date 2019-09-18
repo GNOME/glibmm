@@ -761,7 +761,7 @@ public:
    *   greeting, name, your_cows, cow_percentage, my_cows);
    *
    * std::cout << text;
-   * // Hi, Dennis! You have 2 cows. That's about 27.27% of the 11 cows I have.
+   * // Hi, Dennis! You have 3 cows. That's about 27.27% of the 11 cows I have.
    * @endcode
    *
    * @param fmt The template string, in the format used by <tt>printf()</tt> et al.
@@ -774,7 +774,7 @@ public:
   template <class... Ts>
   static inline ustring sprintf(const ustring& fmt, const Ts&... args);
 
-  /* Overload of sprintf() taking a string literal.
+  /*! Overload of sprintf() taking a string literal.
    *
    * The main benefit of this is not constructing a temporary ustring if @p fmt
    * is a string literal. A secondary effect is that it might encourage compilers
