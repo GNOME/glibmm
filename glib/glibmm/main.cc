@@ -653,6 +653,26 @@ MainContext::remove_poll(PollFD& fd)
 }
 
 void
+MainContext::push_thread_default()
+{
+  g_main_context_push_thread_default(gobj());
+}
+
+void
+MainContext::pop_thread_default()
+{
+  g_main_context_pop_thread_default(gobj());
+}
+
+// static
+Glib::RefPtr<MainContext>
+MainContext::get_thread_default()
+{
+  // g_main_context_ref_thread_default() gives us a ref.
+  return Glib::wrap(g_main_context_ref_thread_default(), false);
+}
+
+void
 MainContext::invoke(const sigc::slot<bool()>& slot, int priority)
 {
   // Make a copy of slot on the heap.
