@@ -24,6 +24,7 @@
 #include <giomm/menumodel.h>
 #include <giomm/unixfdlist.h>
 #include "slot_async.h"
+#include <mutex>
 
 namespace
 {
@@ -84,7 +85,16 @@ DBusConnection_Message_Filter_giomm_callback_destroy(void* data)
 }
 
 } // extern "C"
-}
+
+// Glib::wrap(GDBusConnection* object, bool take_copy) must be protected by a
+// mutex while a C++ wrapper is being constructed. The same GDBusConnection
+// instance can be used in more than one thread. The wrap() function can be
+// called simultaneously in different threads for the same GDBusConnection
+// instance before it has been given a C++ wrapper.
+// https://gitlab.gnome.org/GNOME/glibmm/issues/56
+std::mutex wrap_mutex;
+
+} // anonymous namespace
 
 namespace Gio
 {
@@ -722,3 +732,25 @@ Connection::register_subtree(
 } // namespace DBus
 
 } // namespace Gio
+
+namespace Glib
+{
+
+Glib::RefPtr<Gio::DBus::Connection> wrap(GDBusConnection* object, bool take_copy)
+{
+  Glib::ObjectBase* pCppObject = nullptr;
+  if (!ObjectBase::_get_current_wrapper((GObject*)object))
+  {
+    // 'object' does not yet have a C++ wrapper. Construction of the C++ wrapper
+    // must be thread-safe. See comments at the definition of wrap_mutex.
+    std::lock_guard<std::mutex> lock(wrap_mutex);
+    pCppObject = Glib::wrap_auto((GObject*)object, take_copy);
+  }
+  else
+    pCppObject = Glib::wrap_auto((GObject*)object, take_copy);
+
+  return Glib::RefPtr<Gio::DBus::Connection>(dynamic_cast<Gio::DBus::Connection*>(pCppObject));
+  //We use dynamic_cast<> in case of multiple inheritance.
+}
+
+} // namespace Glib
