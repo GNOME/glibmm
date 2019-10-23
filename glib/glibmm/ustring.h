@@ -1562,6 +1562,53 @@ operator+(char lhs, const ustring& rhs)
   return temp;
 }
 
+//************* Glib::BasicStringView ********************
+
+// It would be possible to replace StdStringView and UStringView with one
+// non-template class StringView, having 3 constructors taking a const Glib::ustring&,
+// a const std::string& and a const char*, respectively. But such a StringView
+// would give no hint to users where to use Glib::ustring, and where to use std::string.
+/** Helper class to avoid unnecessary string copying in function calls.
+ *
+ * A %BasicStringView holds a const char pointer. It can be used as an argument
+ * type in a function that passes a const char pointer to a C function.
+ * @code
+ * // Use
+ * std::string f1(Glib::StdStringView s1, Glib::StdStringView s2);
+ * Glib::ustring f2(Glib::UStringView s1, Glib::UStringView s2);
+ * // instead of
+ * std::string f1(const std::string& s1, const std::string& s2);
+ * Glib::ustring f2(const Glib::ustring& s1, const Glib::ustring& s2);
+ * @endcode
+ * to avoid string copying when the functions are called with string literals.
+ * @code
+ * auto r1 = f1("string 1", "string 2");
+ * auto r2 = f2("string 3", "string 4");
+ * @endcode
+ *
+ * @newin{2,64}
+ */
+template <typename T>
+class BasicStringView
+{
+public:
+  BasicStringView(const T& s) : pstring_(s.c_str()) {}
+  BasicStringView(const char* s) : pstring_(s) {}
+  const char* c_str() const { return pstring_; }
+private:
+  const char* pstring_;
+};
+
+/** Recommended data types: std::string, const char*
+ * @relates Glib::BasicStringView
+ */
+using StdStringView = BasicStringView<std::string>;
+
+/** Recommended data types: Glib::ustring, const char*
+ * @relates Glib::BasicStringView
+ */
+using UStringView = BasicStringView<Glib::ustring>;
+
 } // namespace Glib
 
 #endif /* _GLIBMM_USTRING_H */

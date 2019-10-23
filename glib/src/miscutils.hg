@@ -55,7 +55,7 @@ Glib::ustring get_application_name();
  *
  * @param application_name Localized name of the application.
  */
-void set_application_name(const Glib::ustring& application_name);
+void set_application_name(UStringView application_name);
 
 /** Gets the name of the program.
  *
@@ -73,7 +73,7 @@ std::string get_prgname();
 /** Sets the name of the program.
  * @param prgname The name of the program.
  */
-void set_prgname(const std::string& prgname);
+void set_prgname(StdStringView prgname);
 
 /** Returns the value of an environment variable. The name and value
  * are in the GLib file name encoding. On Unix, this means the actual
@@ -86,7 +86,7 @@ void set_prgname(const std::string& prgname);
  * @param[out] found Whether the environment variable has been found.
  * @return The value of the environment variable, or <tt>""</tt> if not found.
  */
-std::string getenv(const std::string& variable, bool& found);
+std::string getenv(StdStringView variable, bool& found);
 
 /** Returns the value of an environment variable. The name and value
  * are in the GLib file name encoding. On Unix, this means the actual
@@ -98,7 +98,7 @@ std::string getenv(const std::string& variable, bool& found);
  * @param variable The environment variable to get.
  * @return The value of the environment variable, or <tt>""</tt> if not found.
  */
-std::string getenv(const std::string& variable);
+std::string getenv(StdStringView variable);
 
 
 /** Sets an environment variable. Both the variable's name and value
@@ -114,7 +114,7 @@ std::string getenv(const std::string& variable);
  * @param overwrite Whether to change the variable if it already exists.
  * @result false if the environment variable couldn't be set.
  */
-bool setenv(const std::string& variable, const std::string& value, bool overwrite = true);
+bool setenv(StdStringView variable, StdStringView value, bool overwrite = true);
 
 /** Removes an environment variable from the environment.
  *
@@ -125,7 +125,7 @@ bool setenv(const std::string& variable, const std::string& value, bool overwrit
  *
  * @param variable: the environment variable to remove. It  must not contain '='.
  **/
-void unsetenv(const std::string& variable);
+void unsetenv(StdStringView variable);
 
 /** Gets the names of all variables set in the environment.
  *
@@ -276,7 +276,7 @@ std::string get_user_runtime_dir();
  * @param filename A file name.
  * @return Whether @a filename is an absolute path.
  */
-bool path_is_absolute(const std::string& filename);
+bool path_is_absolute(StdStringView filename);
 
 /** Returns the remaining part of @a filename after the root component,
  * i.e.\ after the <tt>"/"</tt> on UNIX or <tt>"C:\\"</tt> on Windows.
@@ -284,20 +284,20 @@ bool path_is_absolute(const std::string& filename);
  * @param filename A file name.
  * @return The file name without the root component, or <tt>""</tt>.
  */
-std::string path_skip_root(const std::string& filename);
+std::string path_skip_root(StdStringView filename);
 
 /** Gets the name of the file without any leading directory components.
  * @param filename The name of the file.
  * @return The name of the file without any leading directory components.
  */
-std::string path_get_basename(const std::string& filename);
+std::string path_get_basename(StdStringView filename);
 
 /** Gets the directory components of a file name.
  * If the file name has no directory components <tt>"."</tt> is returned.
  * @param filename The name of the file.
  * @return The directory components of the file.
  */
-std::string path_get_dirname(const std::string& filename);
+std::string path_get_dirname(StdStringView filename);
 
 /** Creates a filename from a series of elements using the correct
  * separator for filenames.
@@ -310,134 +310,19 @@ std::string path_get_dirname(const std::string& filename);
  */
 std::string build_filename(const std::vector<std::string>&  elements);
 
-/** Creates a filename from two elements using the correct separator for filenames.
+/** Creates a filename from one or more elements using the correct separator for filenames.
  * No attempt is made to force the resulting filename to be an absolute path.
  * If the first element is a relative path, the result will be a relative path.
- * @param elem1 First path element.
- * @param elem2 Second path element.
+ * @tparam Strings std::string or const char*.
+ * @param strings The path elements.
  * @return The resulting path.
  */
-std::string build_filename(const std::string& elem1, const std::string& elem2);
-
-/** Creates a filename from three elements using the correct separator for filenames.
- * No attempt is made to force the resulting filename to be an absolute path.
- * If the first element is a relative path, the result will be a relative path.
- * @param elem1 First path element.
- * @param elem2 Second path element.
- * @param elem3 Third path element.
- * @return The resulting path.
- *
- * @newin{2,28}
- */
-std::string build_filename(const std::string& elem1, const std::string& elem2,
-                           const std::string& elem3);
-
-
-/** Creates a filename from four elements using the correct separator for filenames.
- * No attempt is made to force the resulting filename to be an absolute path.
- * If the first element is a relative path, the result will be a relative path.
- * @param elem1 First path element.
- * @param elem2 Second path element.
- * @param elem3 Third path element.
- * @param elem4 Fourth path element.
- * @return The resulting path.
- *
- * @newin{2,28}
- */
-std::string build_filename(const std::string& elem1, const std::string& elem2,
-                           const std::string& elem3, const std::string& elem4);
-
-/** Creates a filename from five elements using the correct separator for filenames.
- * No attempt is made to force the resulting filename to be an absolute path.
- * If the first element is a relative path, the result will be a relative path.
- * @param elem1 First path element.
- * @param elem2 Second path element.
- * @param elem3 Third path element.
- * @param elem4 Fourth path element.
- * @param elem5 Fifth path element.
- * @return The resulting path.
- */
-std::string build_filename(const std::string& elem1, const std::string& elem2,
-                           const std::string& elem3, const std::string& elem4,
-                           const std::string& elem5);
-
-/** Creates a filename from six elements using the correct separator for filenames.
- * No attempt is made to force the resulting filename to be an absolute path.
- * If the first element is a relative path, the result will be a relative path.
- * @param elem1 First path element.
- * @param elem2 Second path element.
- * @param elem3 Third path element.
- * @param elem4 Fourth path element.
- * @param elem5 Fifth path element.
- * @param elem6 Sixth path element.
- * @return The resulting path.
- *
- * @newin{2,28}
- */
-std::string build_filename(const std::string& elem1, const std::string& elem2,
-                           const std::string& elem3, const std::string& elem4,
-                           const std::string& elem5, const std::string& elem6);
-
-/** Creates a filename from seven elements using the correct separator for filenames.
- * No attempt is made to force the resulting filename to be an absolute path.
- * If the first element is a relative path, the result will be a relative path.
- * @param elem1 First path element.
- * @param elem2 Second path element.
- * @param elem3 Third path element.
- * @param elem4 Fourth path element.
- * @param elem5 Fifth path element.
- * @param elem6 Sixth path element.
- * @param elem7 Seventh path element.
- * @return The resulting path.
- *
- * @newin{2,28}
- */
-std::string build_filename(const std::string& elem1, const std::string& elem2,
-                           const std::string& elem3, const std::string& elem4,
-                           const std::string& elem5, const std::string& elem6,
-                           const std::string& elem7);
-
-/** Creates a filename from eight elements using the correct separator for filenames.
- * No attempt is made to force the resulting filename to be an absolute path.
- * If the first element is a relative path, the result will be a relative path.
- * @param elem1 First path element.
- * @param elem2 Second path element.
- * @param elem3 Third path element.
- * @param elem4 Fourth path element.
- * @param elem5 Fifth path element.
- * @param elem6 Sixth path element.
- * @param elem7 Seventh path element.
- * @param elem8 Eighth path element.
- * @return The resulting path.
- *
- * @newin{2,28}
- */
-std::string build_filename(const std::string& elem1, const std::string& elem2,
-                           const std::string& elem3, const std::string& elem4,
-                           const std::string& elem5, const std::string& elem6,
-                           const std::string& elem7, const std::string& elem8);
-
-/** Creates a filename from nine elements using the correct separator for filenames.
- * No attempt is made to force the resulting filename to be an absolute path.
- * If the first element is a relative path, the result will be a relative path.
- * @param elem1 First path element.
- * @param elem2 Second path element.
- * @param elem3 Third path element.
- * @param elem4 Fourth path element.
- * @param elem5 Fifth path element.
- * @param elem6 Sixth path element.
- * @param elem7 Seventh path element.
- * @param elem8 Eighth path element.
- * @param elem9 Ninth path element.
- * @return The resulting path.
- *
- * @newin{2,28}
- */
-std::string build_filename(const std::string& elem1, const std::string& elem2,
-                           const std::string& elem3, const std::string& elem4,
-                           const std::string& elem5, const std::string& elem6,
-                           const std::string& elem7, const std::string& elem8,
-                           const std::string& elem9);
+template <typename... Strings>
+std::string build_filename(const Strings&... strings)
+{
+  return Glib::convert_return_gchar_ptr_to_stdstring(
+    g_build_filename(StdStringView(strings).c_str()..., nullptr));
+}
 
 /** Creates a path from a series of elements using @a separator as the
  * separator between elements.
@@ -495,7 +380,7 @@ std::string build_path(const std::string& separator,
  * @param program A program name.
  * @return An absolute path, or <tt>""</tt>.
  */
-std::string find_program_in_path(const std::string& program);
+std::string find_program_in_path(StdStringView program);
 
 /** Formats a size (for example the size of a file) into a human readable string.
  *

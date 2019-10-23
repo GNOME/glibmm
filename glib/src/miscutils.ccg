@@ -31,7 +31,7 @@ get_application_name()
 }
 
 void
-set_application_name(const Glib::ustring& application_name)
+set_application_name(UStringView application_name)
 {
   g_set_application_name(application_name.c_str());
 }
@@ -43,13 +43,13 @@ get_prgname()
 }
 
 void
-set_prgname(const std::string& prgname)
+set_prgname(StdStringView prgname)
 {
   g_set_prgname(prgname.c_str());
 }
 
 std::string
-getenv(const std::string& variable, bool& found)
+getenv(StdStringView variable, bool& found)
 {
   const char* const value = g_getenv(variable.c_str());
   found = (value != nullptr);
@@ -57,19 +57,19 @@ getenv(const std::string& variable, bool& found)
 }
 
 std::string
-getenv(const std::string& variable)
+getenv(StdStringView variable)
 {
   return convert_const_gchar_ptr_to_stdstring(g_getenv(variable.c_str()));
 }
 
 bool
-setenv(const std::string& variable, const std::string& value, bool overwrite)
+setenv(StdStringView variable, StdStringView value, bool overwrite)
 {
   return g_setenv(variable.c_str(), value.c_str(), overwrite);
 }
 
 void
-unsetenv(const std::string& variable)
+unsetenv(StdStringView variable)
 {
   g_unsetenv(variable.c_str());
 }
@@ -159,13 +159,13 @@ get_user_runtime_dir()
 }
 
 bool
-path_is_absolute(const std::string& filename)
+path_is_absolute(StdStringView filename)
 {
-  return (g_path_is_absolute(filename.c_str()) != 0);
+  return g_path_is_absolute(filename.c_str()) != 0;
 }
 
 std::string
-path_skip_root(const std::string& filename)
+path_skip_root(StdStringView filename)
 {
   // g_path_skip_root() returns a pointer _into_ the argument string,
   // or NULL if there was no root component.
@@ -173,13 +173,13 @@ path_skip_root(const std::string& filename)
 }
 
 std::string
-path_get_basename(const std::string& filename)
+path_get_basename(StdStringView filename)
 {
   return convert_return_gchar_ptr_to_stdstring(g_path_get_basename(filename.c_str()));
 }
 
 std::string
-path_get_dirname(const std::string& filename)
+path_get_dirname(StdStringView filename)
 {
   return convert_return_gchar_ptr_to_stdstring(g_path_get_dirname(filename.c_str()));
 }
@@ -192,73 +192,6 @@ build_filename(const std::vector<std::string>& elements)
 }
 
 std::string
-build_filename(const std::string& elem1, const std::string& elem2)
-{
-  return convert_return_gchar_ptr_to_stdstring(
-    g_build_filename(elem1.c_str(), elem2.c_str(), nullptr));
-}
-
-std::string
-build_filename(const std::string& elem1, const std::string& elem2, const std::string& elem3)
-{
-  return convert_return_gchar_ptr_to_stdstring(
-    g_build_filename(elem1.c_str(), elem2.c_str(), elem3.c_str(), nullptr));
-}
-
-std::string
-build_filename(const std::string& elem1, const std::string& elem2, const std::string& elem3,
-  const std::string& elem4)
-{
-  return convert_return_gchar_ptr_to_stdstring(
-    g_build_filename(elem1.c_str(), elem2.c_str(), elem3.c_str(), elem4.c_str(), nullptr));
-}
-
-std::string
-build_filename(const std::string& elem1, const std::string& elem2, const std::string& elem3,
-  const std::string& elem4, const std::string& elem5)
-{
-  return convert_return_gchar_ptr_to_stdstring(g_build_filename(
-    elem1.c_str(), elem2.c_str(), elem3.c_str(), elem4.c_str(), elem5.c_str(), nullptr));
-}
-
-std::string
-build_filename(const std::string& elem1, const std::string& elem2, const std::string& elem3,
-  const std::string& elem4, const std::string& elem5, const std::string& elem6)
-{
-  return convert_return_gchar_ptr_to_stdstring(g_build_filename(elem1.c_str(), elem2.c_str(),
-    elem3.c_str(), elem4.c_str(), elem5.c_str(), elem6.c_str(), nullptr));
-}
-
-std::string
-build_filename(const std::string& elem1, const std::string& elem2, const std::string& elem3,
-  const std::string& elem4, const std::string& elem5, const std::string& elem6,
-  const std::string& elem7)
-{
-  return convert_return_gchar_ptr_to_stdstring(g_build_filename(elem1.c_str(), elem2.c_str(),
-    elem3.c_str(), elem4.c_str(), elem5.c_str(), elem6.c_str(), elem7.c_str(), nullptr));
-}
-
-std::string
-build_filename(const std::string& elem1, const std::string& elem2, const std::string& elem3,
-  const std::string& elem4, const std::string& elem5, const std::string& elem6,
-  const std::string& elem7, const std::string& elem8)
-{
-  return convert_return_gchar_ptr_to_stdstring(
-    g_build_filename(elem1.c_str(), elem2.c_str(), elem3.c_str(), elem4.c_str(), elem5.c_str(),
-      elem6.c_str(), elem7.c_str(), elem8.c_str(), nullptr));
-}
-
-std::string
-build_filename(const std::string& elem1, const std::string& elem2, const std::string& elem3,
-  const std::string& elem4, const std::string& elem5, const std::string& elem6,
-  const std::string& elem7, const std::string& elem8, const std::string& elem9)
-{
-  return convert_return_gchar_ptr_to_stdstring(
-    g_build_filename(elem1.c_str(), elem2.c_str(), elem3.c_str(), elem4.c_str(), elem5.c_str(),
-      elem6.c_str(), elem7.c_str(), elem8.c_str(), elem9.c_str(), nullptr));
-}
-
-std::string
 build_path(const std::string& separator, const std::vector<std::string>& elements)
 {
   return convert_return_gchar_ptr_to_stdstring(
@@ -266,7 +199,7 @@ build_path(const std::string& separator, const std::vector<std::string>& element
 }
 
 std::string
-find_program_in_path(const std::string& program)
+find_program_in_path(StdStringView program)
 {
   return convert_return_gchar_ptr_to_stdstring(g_find_program_in_path(program.c_str()));
 }
