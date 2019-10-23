@@ -1562,15 +1562,11 @@ operator+(char lhs, const ustring& rhs)
   return temp;
 }
 
-//************* Glib::BasicStringView ********************
+//************* Glib::StringView ********************
 
-// It would be possible to replace StdStringView and UStringView with one
-// non-template class StringView, having 3 constructors taking a const Glib::ustring&,
-// a const std::string& and a const char*, respectively. But such a StringView
-// would give no hint to users where to use Glib::ustring, and where to use std::string.
 /** Helper class to avoid unnecessary string copying in function calls.
  *
- * A %BasicStringView holds a const char pointer. It can be used as an argument
+ * A %Glib::StringView holds a const char pointer. It can be used as an argument
  * type in a function that passes a const char pointer to a C function.
  * @code
  * // Use
@@ -1588,26 +1584,34 @@ operator+(char lhs, const ustring& rhs)
  *
  * @newin{2,64}
  */
-template <typename T>
-class BasicStringView
+class StringView
 {
 public:
-  BasicStringView(const T& s) : pstring_(s.c_str()) {}
-  BasicStringView(const char* s) : pstring_(s) {}
+  StringView(const std::string& s) : pstring_(s.c_str()) {}
+  StringView(const Glib::ustring& s) : pstring_(s.c_str()) {}
+  StringView(const char* s) : pstring_(s) {}
   const char* c_str() const { return pstring_; }
 private:
   const char* pstring_;
 };
 
-/** Recommended data types: std::string, const char*
- * @relates Glib::BasicStringView
+/** %Glib::StringView alias.
+ *
+ * The name %Glib::StdStringView signals that recommended data types are
+ * std::string and const char*, but not Glib::ustring.
+ *
+ * @relates Glib::StringView
  */
-using StdStringView = BasicStringView<std::string>;
+using StdStringView = StringView;
 
-/** Recommended data types: Glib::ustring, const char*
- * @relates Glib::BasicStringView
+/** %Glib::StringView alias.
+ *
+ * The name %Glib::UStringView signals that recommended data types are
+ * Glib::ustring and const char*, but not std::string.
+ *
+ * @relates Glib::StringView
  */
-using UStringView = BasicStringView<Glib::ustring>;
+using UStringView = StringView;
 
 } // namespace Glib
 
