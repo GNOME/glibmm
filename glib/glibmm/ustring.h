@@ -105,6 +105,7 @@ public:
 
   inline ustring_Iterator();
   inline ustring_Iterator(const ustring_Iterator<std::string::iterator>& other);
+  ustring_Iterator& operator=(const ustring_Iterator& other) = default;
 
   inline value_type operator*() const;
 
