@@ -19,6 +19,8 @@
 #include <glibmm/ustring.h>
 #include <glibmm/value.h>
 
+#include <optional>
+
 _DEFS(glibmm,glib)
 _PINCLUDE(glibmm/private/object_p.h)
 
@@ -119,13 +121,14 @@ public:
    *
    * For instance:
    * @code
-   *   bool on_transform_to(const Glib::ustring& from_string, int& to_int);
+   *   std::optional<int> on_transform_to(const Glib::ustring& from_string);
    * @endcode
    *
-   * @return <tt>true</tt> if the transformation was successful, and <tt>false</tt> otherwise.
+   * @return a value of type <tt>T_to</tt> if the transformation was successful,
+   * and an empty optional with no value (i.e. <tt>std::nullopt</tt>) otherwise.
    */
   template <typename T_from, typename T_to>
-  using SlotTypedTransform = sigc::slot<bool(const T_from&, T_to&>);
+  using SlotTypedTransform = sigc::slot<std::optional<T_to> (const T_from&)>;
 
   /** Creates a binding between @a source_property and @a target_property,
    * allowing you to set the transformation functions to be used by the binding.
@@ -413,14 +416,14 @@ private:
     {
       Glib::Value<T_from> from_glib_value;
       from_glib_value.init(from_value);
-      T_to to{};
+      const auto to = typed_transform(from_glib_value.get());
 
-      if (!typed_transform(from_glib_value.get(), to))
+      if (!to.has_value())
         return false;
 
       Glib::Value<T_to> to_glib_value;
       to_glib_value.init(to_value);
-      to_glib_value.set(to);
+      to_glib_value.set(*to);
       g_value_copy(to_glib_value.gobj(), to_value);
       return true;
     }
