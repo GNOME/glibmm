@@ -414,14 +414,16 @@ private:
     {
       Glib::Value<T_from> from_glib_value;
       from_glib_value.init(from_value);
+      T_to to{};
+
+      if (!typed_transform(from_glib_value.get(), to))
+        return false;
+
       Glib::Value<T_to> to_glib_value;
       to_glib_value.init(to_value);
-      T_to to = to_glib_value.get();
-
-      const bool result = typed_transform(from_glib_value.get(), to);
       to_glib_value.set(to);
       g_value_copy(to_glib_value.gobj(), to_value);
-      return result;
+      return true;
     }
 
   private:
