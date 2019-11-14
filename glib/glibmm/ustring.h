@@ -1223,7 +1223,8 @@ template <class In>
 void
 ustring::insert(ustring::iterator p, In pbegin, In pend)
 {
-  string_.insert(p.base(), Glib::ustring::SequenceToString<In>(pbegin, pend));
+  size_type pos = p.base() - string_.begin();
+  string_.insert(pos, Glib::ustring::SequenceToString<In>(pbegin, pend));
 }
 
 template <class In>
