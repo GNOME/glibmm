@@ -101,12 +101,30 @@ class Binding : public Glib::Object
   _CLASS_GOBJECT(Binding, GBinding, G_BINDING, Glib::Object, GObject)
 
 public:
-  /** For instance,<br>
+  /** A slot to be called to transform values in a binding created by
+   * bind_property_value().
+   *
+   * For instance:
+   * @code
    *   bool on_transform_to(const GValue* from_value, GValue* to_value);
+   * @endcode
    *
    * @return <tt>true</tt> if the transformation was successful, and <tt>false</tt> otherwise.
    */
   using SlotTransform = sigc::slot<bool, const GValue*, GValue*>;
+
+  /** A slot to be called to transform values in a binding created by
+   * bind_property().
+   *
+   * For instance:
+   * @code
+   *   bool on_transform_to(const Glib::ustring& from_string, int& to_int);
+   * @endcode
+   *
+   * @return <tt>true</tt> if the transformation was successful, and <tt>false</tt> otherwise.
+   */
+  template <typename T_from, typename T_to>
+  using SlotTypedTransform = sigc::slot<bool, const T_from&, T_to&>;
 
   /** Creates a binding between @a source_property and @a target_property,
    * allowing you to set the transformation functions to be used by the binding.
@@ -182,8 +200,7 @@ public:
    * @tparam T_target Type of the target property. Must be a type that can be
    *         stored in a Glib::Value<T_target> object.
    * @tparam T_functor_to Type of functor that translates from the source to the target.
-   *         Must be convertible to<br>
-   *         sigc::slot<bool, const T_source&, T_target&>.
+   *         Must be convertible to SlotTypedTransform<T_source, T_target>.
    *
    * @see bind_property_value()
    *
@@ -196,7 +213,7 @@ public:
     BindingFlags flags,
     const T_functor_to& transform_to)
   {
-    sigc::slot<bool, const T_source&, T_target&> slot_transform_to = transform_to;
+    SlotTypedTransform<T_source, T_target> slot_transform_to = transform_to;
 
     return bind_property_value(source_property, target_property, flags,
       slot_transform_to.empty() ? SlotTransform() : TransformProp<T_source, T_target>(slot_transform_to));
@@ -218,8 +235,7 @@ public:
    * @tparam T_target Type of the target property. Must be a type that can be
    *         stored in a Glib::Value<T_target> object.
    * @tparam T_functor_to Type of functor that translates from the source to the target.
-   *         Must be convertible to<br>
-   *         sigc::slot<bool, const T_source&, T_target&>.
+   *         Must be convertible to SlotTypedTransform<T_source, T_target>.
    *
    * @see bind_property_value()
    *
@@ -232,7 +248,7 @@ public:
     BindingFlags flags,
     const T_functor_to& transform_to)
   {
-    sigc::slot<bool, const T_source&, T_target&> slot_transform_to = transform_to;
+    SlotTypedTransform<T_source, T_target> slot_transform_to = transform_to;
 
     return bind_property_value(source_property, target_property, flags,
       slot_transform_to.empty() ? SlotTransform() : TransformProp<T_source, T_target>(slot_transform_to));
@@ -254,8 +270,7 @@ public:
    * @tparam T_target Type of the target property. Must be a type that can be
    *         stored in a Glib::Value<T_target> object.
    * @tparam T_functor_to Type of functor that translates from the source to the target.
-   *         Must be convertible to<br>
-   *         sigc::slot<bool, const T_source&, T_target&>.
+   *         Must be convertible to SlotTypedTransform<T_source, T_target>.
    *
    * @see bind_property_value()
    *
@@ -268,7 +283,7 @@ public:
     BindingFlags flags,
     const T_functor_to& transform_to)
   {
-    sigc::slot<bool, const T_source&, T_target&> slot_transform_to = transform_to;
+    SlotTypedTransform<T_source, T_target> slot_transform_to = transform_to;
 
     return bind_property_value(source_property, target_property, flags,
       slot_transform_to.empty() ? SlotTransform() : TransformProp<T_source, T_target>(slot_transform_to));
@@ -290,8 +305,7 @@ public:
    * @tparam T_target Type of the target property. Must be a type that can be
    *         stored in a Glib::Value<T_target> object.
    * @tparam T_functor_to Type of functor that translates from the source to the target.
-   *         Must be convertible to<br>
-   *         sigc::slot<bool, const T_source&, T_target&>.
+   *         Must be convertible to SlotTypedTransform<T_source, T_target>.
    *
    * @see bind_property_value()
    *
@@ -304,7 +318,7 @@ public:
     BindingFlags flags,
     const T_functor_to& transform_to)
   {
-    sigc::slot<bool, const T_source&, T_target&> slot_transform_to = transform_to;
+    SlotTypedTransform<T_source, T_target> slot_transform_to = transform_to;
 
     return bind_property_value(source_property, target_property, flags,
       slot_transform_to.empty() ? SlotTransform() : TransformProp<T_source, T_target>(slot_transform_to));
@@ -328,11 +342,9 @@ public:
    * @tparam T_target Type of the target property. Must be a type that can be
    *         stored in a Glib::Value<T_target> object.
    * @tparam T_functor_to Type of functor that translates from the source to the target.
-   *         Must be convertible to<br>
-   *         sigc::slot<bool, const T_source&, T_target&>.
+   *         Must be convertible to SlotTypedTransform<T_source, T_target>.
    * @tparam T_functor_from Type of functor that translates from the target to the source.
-   *         Must be convertible to<br>
-   *         sigc::slot<bool, const T_target&, T_source&>.
+   *         Must be convertible to SlotTypedTransform<T_target, T_source>.
    *
    * @see bind_property_value()
    *
@@ -346,8 +358,8 @@ public:
     const T_functor_to& transform_to,
     const T_functor_from& transform_from)
   {
-    sigc::slot<bool, const T_source&, T_target&> slot_transform_to = transform_to;
-    sigc::slot<bool, const T_target&, T_source&> slot_transform_from = transform_from;
+    SlotTypedTransform<T_source, T_target> slot_transform_to = transform_to;
+    SlotTypedTransform<T_target, T_source> slot_transform_from = transform_from;
 
     return bind_property_value(source_property, target_property, flags,
       slot_transform_to.empty() ? SlotTransform() : TransformProp<T_source, T_target>(slot_transform_to),
@@ -395,26 +407,27 @@ private:
   {
   public:
     using result_type = bool;
-    using SlotTypedTransform = sigc::slot<bool, const T_from&, T_to&>;
 
-    TransformProp(const SlotTypedTransform& slot) : typed_transform(slot) {}
+    TransformProp(const SlotTypedTransform<T_from, T_to>& slot) : typed_transform(slot) {}
 
     bool operator()(const GValue* from_value, GValue* to_value)
     {
       Glib::Value<T_from> from_glib_value;
       from_glib_value.init(from_value);
+      T_to to{};
+
+      if (!typed_transform(from_glib_value.get(), to))
+        return false;
+
       Glib::Value<T_to> to_glib_value;
       to_glib_value.init(to_value);
-      T_to to = to_glib_value.get();
-
-      const bool result = typed_transform(from_glib_value.get(), to);
       to_glib_value.set(to);
       g_value_copy(to_glib_value.gobj(), to_value);
-      return result;
+      return true;
     }
 
   private:
-    SlotTypedTransform typed_transform;
+    SlotTypedTransform<T_from, T_to> typed_transform;
   };
 };
 
