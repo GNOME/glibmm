@@ -126,6 +126,16 @@ public:
   template <typename T_from, typename T_to>
   using SlotTypedTransform = sigc::slot<bool, const T_from&, T_to&>;
 
+  // GValue* or Glib::ValueBase& in SlotTransform?
+  // Binding_transform_callback_common() is simpler and faster with GValue*.
+  // No need to copy between GValue and Glib::ValueBase. ValueBase would only
+  // be marginally better for users of bind_property_value(). Users would want
+  // Value<T_source> and Value<T_target>, meaning that bind_property_value()
+  // would have to be a template function. Most users would probably still
+  // prefer bind_property(). bind_property_value() is public partly because
+  // it's a good place to present documentation common to all the
+  // bind_property() overloads.
+  // See also https://gitlab.gnome.org/GNOME/glibmm/issues/61
   /** Creates a binding between @a source_property and @a target_property,
    * allowing you to set the transformation functions to be used by the binding.
    *
