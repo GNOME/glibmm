@@ -18,6 +18,9 @@ _CONFIGINCLUDE(giommconfig.h)
 
 #include <giomm/settingsschema.h>
 
+#include <glibmm/ustring.h>
+#include <vector>
+
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
 
@@ -42,7 +45,6 @@ protected:
   _IGNORE(g_settings_schema_source_ref, g_settings_schema_source_unref)
 
 public:
-
   _WRAP_METHOD(static Glib::RefPtr<SettingsSchemaSource> get_default(), g_settings_schema_source_get_default, refreturn)
 
 /* TODO:
@@ -58,7 +60,27 @@ GSettingsSchemaSource * g_settings_schema_source_new_from_directory     (const g
   _WRAP_METHOD(Glib::RefPtr<SettingsSchema> lookup(const Glib::ustring& schema_id, bool recursive), g_settings_schema_source_lookup)
   _WRAP_METHOD(Glib::RefPtr<const SettingsSchema> lookup(const Glib::ustring& schema_id, bool recursive) const, g_settings_schema_source_lookup)
 
-  //TODO:_WRAP_METHOD(void list_schemas(bool recursive,  gchar*** non_relocatable, gchar*** relocatable), g_settings_schema_source_list_schemas)
+  _IGNORE(g_settings_schema_source_list_schemas)
+  /** Lists the schemas in a given source.
+   *
+   * Do not call this function from normal programs. It is designed for use by
+   * database editors, commandline tools, etc.
+   *
+   * @newin{2,64}
+   *
+   * @param relocatable Whether you want the list of relocatable schemas
+   * (<tt>true</tt>) or the list of non-relocatable schemas (<tt>false</tt>)
+   * for this source. Non-relocatable schemas are those for which you can call
+   * Gio::Settings::create() without specifying a path. Relocatable schemas are
+   * those for which you must pass a path to Gio::Settings::create().
+   *
+   * @param recursive If <tt>true</tt>, the list will include parent sources.
+   * If <tt>false</tt>, it will only include the schemas from one source (i.e.
+   * one directory). You probably want to recurse.
+   *
+   * @return a vector of the names of the schemas matching the given parameters.
+   */
+  std::vector<Glib::ustring> list_schemas(bool relocatable, bool recursive) const;
 };
 
 } // namespace Gio

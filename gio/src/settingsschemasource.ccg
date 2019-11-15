@@ -16,7 +16,23 @@
 
 #include <gio/gio.h>
 
+#include <glibmm/vectorutils.h>
+
 namespace Gio
 {
+
+std::vector<Glib::ustring>
+SettingsSchemaSource::list_schemas(bool relocatable, bool recursive) const
+{
+  auto gobject = const_cast<GSettingsSchemaSource*>(gobj());
+  gchar** schemas{};
+
+  if (relocatable)
+    g_settings_schema_source_list_schemas(gobject, recursive, nullptr, &schemas);
+  else
+    g_settings_schema_source_list_schemas(gobject, recursive, &schemas, nullptr);
+
+  return Glib::ArrayHandler<Glib::ustring>::array_to_vector(schemas, Glib::OWNERSHIP_DEEP);
+}
 
 } // namespace Gio
