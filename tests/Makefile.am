@@ -28,6 +28,7 @@ check_PROGRAMS =				\
 	giomm_listmodel/test \
 	glibmm_btree/test			\
 	glibmm_base64/test			\
+	glibmm_binding/test                     \
 	glibmm_date/test			\
 	glibmm_buildfilename/test		\
 	glibmm_interface_implementation/test	\
@@ -92,6 +93,7 @@ giomm_listmodel_test_SOURCES                = giomm_listmodel/main.cc
 giomm_listmodel_test_LDADD                  = $(giomm_ldadd)
 
 glibmm_base64_test_SOURCES               = glibmm_base64/main.cc
+glibmm_binding_test_SOURCES              = glibmm_binding/main.cc
 glibmm_btree_test_SOURCES                = glibmm_btree/main.cc
 glibmm_buildfilename_test_SOURCES        = glibmm_buildfilename/main.cc
 glibmm_date_test_SOURCES                 = glibmm_date/main.cc
