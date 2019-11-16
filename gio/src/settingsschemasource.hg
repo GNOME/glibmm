@@ -47,13 +47,10 @@ protected:
 public:
   _WRAP_METHOD(static Glib::RefPtr<SettingsSchemaSource> get_default(), g_settings_schema_source_get_default, refreturn)
 
-/* TODO:
-GLIB_AVAILABLE_IN_2_32
-GSettingsSchemaSource * g_settings_schema_source_new_from_directory     (const gchar            *directory,
-                                                                         GSettingsSchemaSource  *parent,
-                                                                         gboolean                trusted,
-                                                                         GError                **error);
-*/
+  _WRAP_METHOD(static Glib::RefPtr<SettingsSchemaSource> create(
+    const std::string& directory, bool trusted{.},
+    const Glib::RefPtr<SettingsSchemaSource>& parent{.} = get_default()),
+    g_settings_schema_source_new_from_directory, errthrow)
 
   //Note this doesn't need refreturn because the C function returns a reference.
   //- it is documented as transfer:full

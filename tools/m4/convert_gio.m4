@@ -307,7 +307,7 @@ _CONVERSION(`GSettingsSchema*',`Glib::RefPtr<SettingsSchema>',`Glib::wrap($3)')
 _CONVERSION(`GSettingsSchema*',`Glib::RefPtr<const SettingsSchema>',`Glib::wrap($3)')
 
 _CONVERSION(`GSettingsSchemaSource*',`Glib::RefPtr<SettingsSchemaSource>',`Glib::wrap($3)')
-
+_CONVERSION(`const Glib::RefPtr<SettingsSchemaSource>&',`GSettingsSchemaSource*',__CONVERT_REFPTR_TO_P)
 
 #Socket
 _CONVERSION(`const Glib::RefPtr<Socket>&',`GSocket*',__CONVERT_CONST_REFPTR_TO_P)
