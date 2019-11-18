@@ -113,7 +113,7 @@ on_server_new_connection(const Glib::RefPtr<Gio::DBus::Connection>& connection)
 {
   auto credentials = connection->get_peer_credentials();
 
-  std::string credentials_str;
+  Glib::ustring credentials_str;
 
   if (!credentials)
     credentials_str = "(no credentials received)";
@@ -177,7 +177,7 @@ main(int, char**)
 
   Glib::RefPtr<Gio::DBus::Server> server;
 
-  const Glib::ustring address = "unix:abstract=myadd";
+  const std::string address = "unix:abstract=myadd";
   try
   {
     server = Gio::DBus::Server::create_sync(address, Gio::DBus::generate_guid());

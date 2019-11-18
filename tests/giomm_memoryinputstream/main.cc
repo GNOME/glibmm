@@ -27,7 +27,7 @@ destroy_func1(void* data)
 }
 
 void
-destroy_func2(void* data, const Glib::ustring& intro)
+destroy_func2(void* data, const std::string& intro)
 {
   char* cdata = static_cast<char*>(data);
   func2_output += intro + cdata;
