@@ -56,15 +56,20 @@ test()
   auto source = StringSource{};
   auto target = IntTarget{};
 
+  auto create_binding = [&source, &target](Glib::Binding::Flags flags)
+  {
+    return Glib::Binding::bind_property(
+      source.property_string(), target.property_int(),
+      flags, &transform_string_to_int);
+  };
+
   // We should obviously not change the target before it has been bound!
   target.property_int() = 7;
   source.property_string() = "42";
   g_assert_cmpint(target.property_int(), ==, 7);
 
   {
-    auto binding = Glib::Binding::bind_property(
-      source.property_string(), target.property_int(),
-      Glib::Binding::Flags::DEFAULT, &transform_string_to_int);
+    auto binding = create_binding(Glib::Binding::Flags::DEFAULT);
 
     // Without SYNC_CREATE, only changes after bound will be synced
     g_assert_cmpint(target.property_int(), ==, 7);
@@ -92,13 +97,29 @@ test()
   g_assert_cmpint(target.property_int(), ==, 47);
 
   {
-    auto binding = Glib::Binding::bind_property(
-      source.property_string(), target.property_int(),
-      Glib::Binding::Flags::SYNC_CREATE, &transform_string_to_int);
+    auto binding = create_binding(Glib::Binding::Flags::SYNC_CREATE);
 
     // With SYNC_CREATE, value of source must sync to target on bind
     g_assert_cmpint(target.property_int(), ==, 89);
   }
+
+  // Ensure the binding was released when its RefPtr went out of scope
+  source.property_string() = "97";
+  g_assert_cmpint(target.property_int(), ==, 89);
+
+  // Ensure that a manage()d binding...
+  {
+    auto binding = create_binding(Glib::Binding::Flags::DEFAULT);
+    Glib::manage(binding);
+
+    // (a) still syncs when the source value changes
+    source.property_string() = "1999";
+    g_assert_cmpint(target.property_int(), ==, 1999);
+  }
+
+  // and (b) still binds the properties after our RefPtr to it goes out of scope
+  source.property_string() = "2001";
+  g_assert_cmpint(target.property_int(), ==, 2001);
 }
 
 } // namespace

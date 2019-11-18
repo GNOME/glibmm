@@ -112,7 +112,8 @@ Binding::bind_property_value(const PropertyProxy_Base& source_property,
 
   // Take an extra ref. GBinding uses one ref itself, and drops it if
   // either the source object or the target object is finalized.
-  // The GBinding object must not be destroyed while there are RefPtrs around.
+  // The GBinding object must not be destroyed while there are RefPtrs around,
+  // unless set_manage() was called.
   g_object_ref(binding);
   return Glib::make_refptr_for_instance<Binding>(new Binding(binding));
 }
@@ -131,18 +132,36 @@ Binding::unbind()
 // It calls g_object_unref() itself, if either the source object or the
 // target object is finalized, almost like g_binding_unbind().
 // But the GBinding object shall be destroyed when and only when the last
-// reference from a Glib::RefPtr is dropped.
+// reference from a Glib::RefPtr is dropped, unless set_manage() was called.
 void
 Binding::unreference() const
 {
-  GBinding* const binding = const_cast<GBinding*>(gobj());
+  if (!m_manage)
+  {
+    GBinding* const binding = const_cast<GBinding*>(gobj());
 
-  // If the last Glib::RefPtr is being deleted, and the binding has not been unbound,
-  // then drop the extra reference that was added by bind_property_value().
-  if (gobject_->ref_count == 2 && g_binding_get_source(binding))
-    g_object_unref(binding);
+    // If the last Glib::RefPtr is being deleted, and the binding has not been unbound,
+    // then drop the extra reference that was added by bind_property_value().
+    if (gobject_->ref_count == 2 && g_binding_get_source(binding))
+      g_object_unref(binding);
+  }
 
   Object::unreference();
+}
+
+void
+Binding::set_manage()
+{
+  m_manage = true;
+}
+
+const Glib::RefPtr<Glib::Binding>&
+manage(const Glib::RefPtr<Glib::Binding>& binding)
+{
+  if (binding)
+    binding->set_manage();
+
+  return binding;
 }
 
 } // namespace Glib
