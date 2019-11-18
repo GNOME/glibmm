@@ -26,6 +26,7 @@
 #include <glibmmconfig.h>
 #include <new>
 #include <typeinfo>
+#include <type_traits>
 
 namespace Glib
 {
@@ -98,6 +99,15 @@ private:
 template <class T, typename Enable = void>
 class Value : public ValueBase_Boxed
 {
+  static_assert(std::is_default_constructible<T>(), "T should be default constractable");
+  static_assert(std::is_copy_constructible<T>(), "T should be copy constractable");
+  static_assert(std::is_assignable<T&, T>(), "T should be assignable");
+  static_assert(std::is_assignable<T&, T&>(), "T should be assignable");
+  static_assert(std::is_assignable<T&, const T&>(), "T should be assignable");
+  static_assert(std::is_destructible<T>(), "T should be destructable");
+  static_assert(std::is_move_assignable<T>(), "T should be move assignable");
+  static_assert(std::is_move_constructible<T>(), "T should be move constractable");
+
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Used in class Glib::Traits::ValueCompatibleWithWrapProperty.
