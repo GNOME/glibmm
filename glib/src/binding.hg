@@ -90,10 +90,13 @@ namespace Glib
  * various ways of blocking a signal emission, like Glib::SignalProxyNormal::emission_stop()
  * or g_signal_handler_block().
  *
- * A binding will be severed, and the resources it allocates freed, whenever
- * either one of the Glib::ObjectBase instances it refers to is deleted,
- * when unbind() is called, or when the Glib::Binding instance loses
- * its last reference.
+ * The binding between properties is broken, and its resources freed, when the
+ * Glib::Binding loses its last Glib::RefPtr, the source or target object is
+ * deleted, or unbind() is called. If a Glib::RefPtr to the Glib::Binding
+ * remains after the binding is broken another way, Glib::Binding::get_source()
+ * and Glib::Binding::get_target() return an empty Glib::RefPtr. So, you must
+ * keep a Glib::RefPtr to the Glib::Binding for as long as you want it to bind,
+ * but doing that does not guarantee the source/target are still alive or bound.
  *
  * @newin{2,44}
  */
@@ -147,10 +150,6 @@ public:
    * if @a target_property changes then the @a source_property
    * will be updated as well. The @a transform_from function is only used in case
    * of bidirectional bindings, otherwise it will be ignored.
-   *
-   * The binding will automatically be removed when either the source or the
-   * target instance is deleted. To remove the binding without affecting the
-   * source and the target you can call unbind() on the returned Binding instance.
    *
    * A Glib::ObjectBase instance can have multiple bindings.
    *
