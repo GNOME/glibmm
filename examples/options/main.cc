@@ -43,7 +43,7 @@ public:
   Glib::OptionGroup::vecustrings m_arg_list;
   Glib::OptionGroup::vecustrings m_remaining_list;
   Glib::ustring m_arg_x_string;
-  std::string m_arg_x_filename;
+  Glib::ustring m_arg_x_filename;
 };
 
 ExampleOptionGroup::ExampleOptionGroup()

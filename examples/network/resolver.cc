@@ -349,12 +349,12 @@ do_async_connectable(Glib::RefPtr<Gio::SocketAddressEnumerator> enumerator)
 Glib::RefPtr<Gio::SocketConnectable> global_connectable;
 
 static void
-do_connectable(const std::string& arg, gboolean synchronous)
+do_connectable(const Glib::ustring& arg, gboolean synchronous)
 {
   std::vector<Glib::ustring> parts;
   Glib::RefPtr<Gio::SocketConnectable> connectable;
 
-  if (arg.find('/') != std::string::npos)
+  if (arg.find('/') != Glib::ustring::npos)
   {
     /* service/protocol/domain */
     parts = split_service_parts(arg);
@@ -368,18 +368,16 @@ do_connectable(const std::string& arg, gboolean synchronous)
   }
   else
   {
-    std::string host, port_str;
-    guint16 port;
+    Glib::ustring host;
+    guint16 port = 0;
 
     const auto pos = arg.find(':');
-    if (pos != std::string::npos)
+    if (pos != Glib::ustring::npos)
     {
       host = arg.substr(0, pos);
-      port_str = arg.substr(pos);
-      port = std::stoul(port_str);
+      auto port_str = arg.substr(pos);
+      port = std::stoul(port_str.raw());
     }
-    else
-      port = 0;
 
     if (Gio::hostname_is_ip_address(host))
     {
@@ -387,7 +385,7 @@ do_connectable(const std::string& arg, gboolean synchronous)
       connectable = Gio::InetSocketAddress::create(addr, port);
     }
     else
-      connectable = Gio::NetworkAddress::create(arg, port);
+      connectable = Gio::NetworkAddress::create(arg.raw(), port);
   }
 
   const auto enumerator = connectable->enumerate();
