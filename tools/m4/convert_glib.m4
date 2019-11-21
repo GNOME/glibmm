@@ -99,6 +99,8 @@ _CONVERSION(`const char*',`const-gchar*',`$3')
 _CONVERSION(`const-gchar*',`const char*',`$3')
 _CONVERSION(`const char*',`const std::string&',__GCHARP_TO_STDSTRING)
 
+_CONVERSION(`Glib::UStringView',`const char*',`$3.c_str()')
+
 _CONVERSION(`return-gchar*',`Glib::ustring',`Glib::convert_return_gchar_ptr_to_ustring($3)')
 _CONVERSION(`return-gchar*',`std::string',`Glib::convert_return_gchar_ptr_to_stdstring($3)')
 _CONVERSION(`return-char*',`Glib::ustring',`Glib::convert_return_gchar_ptr_to_ustring($3)')
