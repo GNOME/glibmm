@@ -90,6 +90,18 @@ class MatchInfo;
  * The regular expressions low level functionalities are obtained through the
  * excellent PCRE library written by Philip Hazel.
  *
+ * @note When you call a match() or a match_all() method taking a MatchInfo,
+ * use a Glib::ustring that still exists when you later call MatchInfo methods.
+ * If you call match() or match_all() with a std::string or a string literal,
+ * the method will internally use a temporary copy of the string. The copy will
+ * not exist when you call MatchInfo methods.
+ * @code
+ * Glib::ustring str1 = "String to search through";
+ * regex->match(str1, match_info);
+ * // ...
+ * if (match_info.matches()) // str1 must still exist here
+ * @endcode
+ *
  * @newin{2,14}
  */
 class Regex final
