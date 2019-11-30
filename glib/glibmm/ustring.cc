@@ -33,6 +33,7 @@ namespace
 {
 
 using Glib::ustring;
+using Glib::UStringView;
 
 // Little helper to make the conversion from gunichar to UTF-8 a one-liner.
 //
@@ -737,21 +738,15 @@ ustring::erase(ustring::iterator pbegin, ustring::iterator pend)
 /**** Glib::ustring::compare() *********************************************/
 
 int
-ustring::compare(const ustring& rhs) const
+ustring::compare(UStringView rhs) const
 {
-  return g_utf8_collate(string_.c_str(), rhs.string_.c_str());
+  return g_utf8_collate(string_.c_str(), rhs.c_str());
 }
 
 int
-ustring::compare(const char* rhs) const
+ustring::compare(ustring::size_type i, ustring::size_type n, UStringView rhs) const
 {
-  return g_utf8_collate(string_.c_str(), rhs);
-}
-
-int
-ustring::compare(ustring::size_type i, ustring::size_type n, const ustring& rhs) const
-{
-  return ustring(*this, i, n).compare(rhs);
+  return ustring(*this, i, n).compare(rhs.c_str());
 }
 
 int
@@ -766,12 +761,6 @@ ustring::compare(
   ustring::size_type i, ustring::size_type n, const char* rhs, ustring::size_type n2) const
 {
   return ustring(*this, i, n).compare(ustring(rhs, n2));
-}
-
-int
-ustring::compare(ustring::size_type i, ustring::size_type n, const char* rhs) const
-{
-  return ustring(*this, i, n).compare(rhs);
 }
 
 /**** Glib::ustring -- index access ****************************************/

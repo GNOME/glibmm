@@ -27,9 +27,98 @@
 #include <iterator>
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 namespace Glib
 {
+
+class ustring;
+
+//********** Glib::StdStringView and Glib::UStringView *************
+
+// It would be possible to replace StdStringView and UStringView with a
+// template class BasicStringView + two type aliases defining StdStringView
+// and UStringView. But Doxygen don't generate links to type aliases.
+//
+// It would also be possible to replace StdStringView and UStringView with
+// a StringView class with 3 constructors, taking const std::string&,
+// const Glib::ustring& and const char*, respectively. The split into two classes
+// is by design. Using the wrong string class shall not be as easy as using
+// the right string class.
+
+/** Helper class to avoid unnecessary string copying in function calls.
+ *
+ * A %Glib::StdStringView holds a const char pointer. It can be used as an argument
+ * type in a function that passes a const char pointer to a C function.
+ *
+ * Unlike std::string_view, %Glib::StdStringView shall be used only for
+ * null-terminated strings.
+ * @code
+ * std::string f1(Glib::StdStringView s1, Glib::StdStringView s2);
+ * // can be used instead of
+ * std::string f2(const std::string& s1, const std::string& s2);
+ * @endcode
+ * The strings are not copied when f1() is called with string literals.
+ * @code
+ * auto r1 = f1("string 1", "string 2");
+ * @endcode
+ * To pass a Glib::ustring to a function taking a %Glib::StdStringView, you may have
+ * to use Glib::ustring::c_str().
+ * @code
+ * std::string str = "non-UTF8 string";
+ * Glib::ustring ustr = "UTF8 string";
+ * auto r1 = f1(str, ustr.c_str());
+ * @endcode
+ *
+ * @newin{2,64}
+ */
+class StdStringView
+{
+public:
+  StdStringView(const std::string& s) : pstring_(s.c_str()) {}
+  StdStringView(const char* s) : pstring_(s) {}
+  const char* c_str() const { return pstring_; }
+private:
+  const char* pstring_;
+};
+
+/** Helper class to avoid unnecessary string copying in function calls.
+ *
+ * A %Glib::UStringView holds a const char pointer. It can be used as an argument
+ * type in a function that passes a const char pointer to a C function.
+ *
+ * Unlike std::string_view, %Glib::UStringView shall be used only for
+ * null-terminated strings.
+ * @code
+ * Glib::ustring f1(Glib::UStringView s1, Glib::UStringView s2);
+ * // can be used instead of
+ * Glib::ustring f2(const Glib::ustring& s1, const Glib::ustring& s2);
+ * @endcode
+ * The strings are not copied when f1() is called with string literals.
+ * @code
+ * auto r1 = f1("string 1", "string 2");
+ * @endcode
+ * To pass a std::string to a function taking a %Glib::UStringView, you may have
+ * to use std::string::c_str().
+ * @code
+ * std::string str = "non-UTF8 string";
+ * Glib::ustring ustr = "UTF8 string";
+ * auto r1 = f1(str.c_str(), ustr);
+ * @endcode
+ *
+ * @newin{2,64}
+ */
+class UStringView
+{
+public:
+  inline UStringView(const Glib::ustring& s);
+  UStringView(const char* s) : pstring_(s) {}
+  const char* c_str() const { return pstring_; }
+private:
+  const char* pstring_;
+};
+
+//***************************************************
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 #ifndef GLIBMM_HAVE_STD_ITERATOR_TRAITS
@@ -428,12 +517,10 @@ public:
   //! @name Compare and collate.
   //! @{
 
-  int compare(const ustring& rhs) const;
-  int compare(const char* rhs) const;
-  int compare(size_type i, size_type n, const ustring& rhs) const;
+  int compare(UStringView rhs) const;
+  int compare(size_type i, size_type n, UStringView rhs) const;
   int compare(size_type i, size_type n, const ustring& rhs, size_type i2, size_type n2) const;
   int compare(size_type i, size_type n, const char* rhs, size_type n2) const;
-  int compare(size_type i, size_type n, const char* rhs) const;
 
   /*! Create a unique sorting key for the UTF-8 string.  If you need to
    * compare UTF-8 strings regularly, e.g. for sorted containers such as
@@ -1355,127 +1442,91 @@ swap(ustring& lhs, ustring& rhs)
 /**** Glib::ustring -- comparison operators ********************************/
 
 /** @relates Glib::ustring */
+template <typename T, typename = std::enable_if_t<!std::is_base_of_v<ustring, T>>>
 inline bool
-operator==(const ustring& lhs, const ustring& rhs)
+operator==(const ustring& lhs, const T& rhs)
 {
   return (lhs.compare(rhs) == 0);
 }
 
 /** @relates Glib::ustring */
 inline bool
-operator==(const ustring& lhs, const char* rhs)
-{
-  return (lhs.compare(rhs) == 0);
-}
-
-/** @relates Glib::ustring */
-inline bool
-operator==(const char* lhs, const ustring& rhs)
+operator==(UStringView lhs, const ustring& rhs)
 {
   return (rhs.compare(lhs) == 0);
 }
 
 /** @relates Glib::ustring */
+template <typename T, typename = std::enable_if_t<!std::is_base_of_v<ustring, T>>>
 inline bool
-operator!=(const ustring& lhs, const ustring& rhs)
+operator!=(const ustring& lhs, const T& rhs)
 {
   return (lhs.compare(rhs) != 0);
 }
 
 /** @relates Glib::ustring */
 inline bool
-operator!=(const ustring& lhs, const char* rhs)
-{
-  return (lhs.compare(rhs) != 0);
-}
-
-/** @relates Glib::ustring */
-inline bool
-operator!=(const char* lhs, const ustring& rhs)
+operator!=(UStringView lhs, const ustring& rhs)
 {
   return (rhs.compare(lhs) != 0);
 }
 
 /** @relates Glib::ustring */
+template <typename T, typename = std::enable_if_t<!std::is_base_of_v<ustring, T>>>
 inline bool
-operator<(const ustring& lhs, const ustring& rhs)
+operator<(const ustring& lhs, const T& rhs)
 {
   return (lhs.compare(rhs) < 0);
 }
 
 /** @relates Glib::ustring */
 inline bool
-operator<(const ustring& lhs, const char* rhs)
-{
-  return (lhs.compare(rhs) < 0);
-}
-
-/** @relates Glib::ustring */
-inline bool
-operator<(const char* lhs, const ustring& rhs)
+operator<(UStringView lhs, const ustring& rhs)
 {
   return (rhs.compare(lhs) > 0);
 }
 
 /** @relates Glib::ustring */
+template <typename T, typename = std::enable_if_t<!std::is_base_of_v<ustring, T>>>
 inline bool
-operator>(const ustring& lhs, const ustring& rhs)
+operator>(const ustring& lhs, const T& rhs)
 {
   return (lhs.compare(rhs) > 0);
 }
 
 /** @relates Glib::ustring */
 inline bool
-operator>(const ustring& lhs, const char* rhs)
-{
-  return (lhs.compare(rhs) > 0);
-}
-
-/** @relates Glib::ustring */
-inline bool
-operator>(const char* lhs, const ustring& rhs)
+operator>(UStringView lhs, const ustring& rhs)
 {
   return (rhs.compare(lhs) < 0);
 }
 
 /** @relates Glib::ustring */
+template <typename T, typename = std::enable_if_t<!std::is_base_of_v<ustring, T>>>
 inline bool
-operator<=(const ustring& lhs, const ustring& rhs)
+operator<=(const ustring& lhs, const T& rhs)
 {
   return (lhs.compare(rhs) <= 0);
 }
 
 /** @relates Glib::ustring */
 inline bool
-operator<=(const ustring& lhs, const char* rhs)
-{
-  return (lhs.compare(rhs) <= 0);
-}
-
-/** @relates Glib::ustring */
-inline bool
-operator<=(const char* lhs, const ustring& rhs)
+operator<=(UStringView lhs, const ustring& rhs)
 {
   return (rhs.compare(lhs) >= 0);
 }
 
 /** @relates Glib::ustring */
+template <typename T, typename = std::enable_if_t<!std::is_base_of_v<ustring, T>>>
 inline bool
-operator>=(const ustring& lhs, const ustring& rhs)
+operator>=(const ustring& lhs, const T& rhs)
 {
   return (lhs.compare(rhs) >= 0);
 }
 
 /** @relates Glib::ustring */
 inline bool
-operator>=(const ustring& lhs, const char* rhs)
-{
-  return (lhs.compare(rhs) >= 0);
-}
-
-/** @relates Glib::ustring */
-inline bool
-operator>=(const char* lhs, const ustring& rhs)
+operator>=(UStringView lhs, const ustring& rhs)
 {
   return (rhs.compare(lhs) <= 0);
 }
@@ -1566,87 +1617,7 @@ operator+(char lhs, const ustring& rhs)
 
 //********** Glib::StdStringView and Glib::UStringView *************
 
-// It would be possible to replace StdStringView and UStringView with a
-// template class BasicStringView + two type aliases defining StdStringView
-// and UStringView. But Doxygen don't generate links to type aliases.
-//
-// It would also be possible to replace StdStringView and UStringView with
-// a StringView class with 3 constructors, taking const std::string&,
-// const Glib::ustring& and const char*, respectively. The split into two classes
-// is by design. Using the wrong string class shall not be as easy as using
-// the right string class.
-
-/** Helper class to avoid unnecessary string copying in function calls.
- *
- * A %Glib::StdStringView holds a const char pointer. It can be used as an argument
- * type in a function that passes a const char pointer to a C function.
- *
- * Unlike std::string_view, %Glib::StdStringView shall be used only for
- * null-terminated strings.
- * @code
- * std::string f1(Glib::StdStringView s1, Glib::StdStringView s2);
- * // can be used instead of
- * std::string f2(const std::string& s1, const std::string& s2);
- * @endcode
- * The strings are not copied when f1() is called with string literals.
- * @code
- * auto r1 = f1("string 1", "string 2");
- * @endcode
- * To pass a Glib::ustring to a function taking a %Glib::StdStringView, you may have
- * to use Glib::ustring::c_str().
- * @code
- * std::string str = "non-UTF8 string";
- * Glib::ustring ustr = "UTF8 string";
- * auto r1 = f1(str, ustr.c_str());
- * @endcode
- *
- * @newin{2,64}
- */
-class StdStringView
-{
-public:
-  StdStringView(const std::string& s) : pstring_(s.c_str()) {}
-  StdStringView(const char* s) : pstring_(s) {}
-  const char* c_str() const { return pstring_; }
-private:
-  const char* pstring_;
-};
-
-/** Helper class to avoid unnecessary string copying in function calls.
- *
- * A %Glib::UStringView holds a const char pointer. It can be used as an argument
- * type in a function that passes a const char pointer to a C function.
- *
- * Unlike std::string_view, %Glib::UStringView shall be used only for
- * null-terminated strings.
- * @code
- * Glib::ustring f1(Glib::UStringView s1, Glib::UStringView s2);
- * // can be used instead of
- * Glib::ustring f2(const Glib::ustring& s1, const Glib::ustring& s2);
- * @endcode
- * The strings are not copied when f1() is called with string literals.
- * @code
- * auto r1 = f1("string 1", "string 2");
- * @endcode
- * To pass a std::string to a function taking a %Glib::UStringView, you may have
- * to use std::string::c_str().
- * @code
- * std::string str = "non-UTF8 string";
- * Glib::ustring ustr = "UTF8 string";
- * auto r1 = f1(str.c_str(), ustr);
- * @endcode
- *
- * @newin{2,64}
- */
-class UStringView
-{
-public:
-  UStringView(const Glib::ustring& s) : pstring_(s.c_str()) {}
-  UStringView(const char* s) : pstring_(s) {}
-  const char* c_str() const { return pstring_; }
-private:
-  const char* pstring_;
-};
+inline UStringView::UStringView(const ustring& s) : pstring_(s.c_str()) {}
 
 } // namespace Glib
 

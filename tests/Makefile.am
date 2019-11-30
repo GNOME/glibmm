@@ -40,7 +40,7 @@ check_PROGRAMS =				\
 	glibmm_objectbase/test			\
 	glibmm_objectbase_move/test			\
 	glibmm_regex/test			\
-	glibmm_ustring_compose/test		\
+	glibmm_ustring_compare/test		\
 	glibmm_ustring_format/test		\
 	glibmm_ustring_sprintf/test		\
 	glibmm_value/test			\
@@ -115,6 +115,7 @@ glibmm_objectbase_test_SOURCES           = glibmm_objectbase/main.cc \
 glibmm_objectbase_move_test_SOURCES      = glibmm_objectbase_move/main.cc \
 					   glibmm_objectbase/test_derived_objectbase.h \
 					   glibmm_object/test_derived_object.h
+glibmm_ustring_compare_test_SOURCES      = glibmm_ustring_compare/main.cc
 glibmm_ustring_compose_test_SOURCES      = glibmm_ustring_compose/main.cc
 glibmm_ustring_format_test_SOURCES       = glibmm_ustring_format/main.cc
 glibmm_ustring_sprintf_test_SOURCES      = glibmm_ustring_sprintf/main.cc
