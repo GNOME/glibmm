@@ -50,7 +50,7 @@ Error::Error(GError* gobject, bool take_copy)
 }
 
 Error::Error(const Error& other)
-: Exception(other), gobject_((other.gobject_) ? g_error_copy(other.gobject_) : nullptr)
+: std::exception(other), gobject_((other.gobject_) ? g_error_copy(other.gobject_) : nullptr)
 {
 }
 
@@ -99,8 +99,8 @@ Error::code() const
   return gobject_->code;
 }
 
-Glib::ustring
-Error::what() const
+const char*
+Error::what() const noexcept
 {
   g_return_val_if_fail(gobject_ != nullptr, "");
   g_return_val_if_fail(gobject_->message != nullptr, "");

@@ -99,7 +99,6 @@
 #include <glibmm/dispatcher.h>
 #include <glibmm/enums.h>
 #include <glibmm/error.h>
-#include <glibmm/exception.h>
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/fileutils.h>
 #include <glibmm/interface.h>

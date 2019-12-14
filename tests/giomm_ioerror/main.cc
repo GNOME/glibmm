@@ -73,9 +73,9 @@ main(int, char**)
     else
       std::cerr << "Gio::Error exception caught: " << ex.what() << std::endl;
   }
-  catch (const Glib::Exception& ex)
+  catch (const Glib::Error& ex)
   {
-    std::cerr << "Exception caught: " << ex.what() << std::endl;
+    std::cerr << "Glib::Error exception caught: " << ex.what() << std::endl;
     return EXIT_FAILURE;
   }
 

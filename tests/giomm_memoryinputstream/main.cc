@@ -77,7 +77,7 @@ main(int, char**)
       return EXIT_FAILURE;
     }
   }
-  catch (const Glib::Exception& ex)
+  catch (const Glib::Error& ex)
   {
     std::cerr << "Exception caught: " << ex.what() << std::endl;
     return EXIT_FAILURE;

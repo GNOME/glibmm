@@ -18,14 +18,14 @@
  */
 
 #include <glibmmconfig.h>
-#include <glibmm/exception.h>
 #include <glibmm/value.h>
 #include <glib.h>
+#include <exception>
 
 namespace Glib
 {
 
-class Error : public Glib::Exception
+class Error : public std::exception
 {
 public:
   Error();
@@ -45,7 +45,7 @@ public:
 
   GQuark domain() const;
   int code() const;
-  Glib::ustring what() const override;
+  const char* what() const noexcept override;
 
   bool matches(GQuark error_domain, int error_code) const;
 
