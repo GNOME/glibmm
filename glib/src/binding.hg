@@ -29,7 +29,7 @@ namespace Glib
 
 /** Bind two object properties.
  *
- * Glib::Binding is the representation of a binding between a property on a
+ * %Glib::Binding is the representation of a binding between a property on a
  * Glib::ObjectBase instance (or source) and another property on another Glib::ObjectBase
  * instance (or target). Whenever the source property changes, the same
  * value is applied to the target property; for instance, the following binding:
@@ -90,10 +90,11 @@ namespace Glib
  * various ways of blocking a signal emission, like Glib::SignalProxyNormal::emission_stop()
  * or g_signal_handler_block().
  *
- * A binding will be severed, and the resources it allocates freed, whenever
- * either one of the Glib::ObjectBase instances it refers to is deleted,
- * when unbind() is called, or when the Glib::Binding instance loses
- * its last reference.
+ * The binding between the two properties is broken whenever either one of the
+ * Glib::ObjectBase instances it refers to is deleted or when unbind() is called.
+ * If a RefPtr<Binding> remains after the binding has been broken, get_source()
+ * and get_target() return a <tt>nullptr</tt>. It's not necessary to keep a
+ * RefPtr<Binding> in order to keep the binding alive.
  *
  * @newin{2,44}
  */
@@ -406,13 +407,6 @@ public:
   _WRAP_PROPERTY("source-property", Glib::ustring, newin "2,44")
   _WRAP_PROPERTY("target", Glib::RefPtr<Glib::ObjectBase>, newin "2,44")
   _WRAP_PROPERTY("target-property", Glib::ustring, newin "2,44")
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  /** Decrement the reference count for this object.
-   * You should never need to do this manually - use the object via a RefPtr instead.
-   */
-  void unreference() const override;
-#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 private:
   // The functor TransformProp can be implicitly converted to a SlotTransform

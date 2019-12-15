@@ -80,11 +80,12 @@ test()
     // Ensure no change when invalid source results in false return
     source.property_string() = "six six six";
     g_assert_cmpint(target.property_int(), ==, 47);
-  }
 
-  // Ensure the binding was released when its RefPtr went out of scope
-  source.property_string() = "89";
-  g_assert_cmpint(target.property_int(), ==, 47);
+    // Ensure the binding is broken when unbind() is called
+    binding->unbind();
+    source.property_string() = "89";
+    g_assert_cmpint(target.property_int(), ==, 47);
+  }
 
   {
     auto binding = Glib::Binding::bind_property(
@@ -94,6 +95,10 @@ test()
     // With SYNC_CREATE, value of source must sync to target on bind
     g_assert_cmpint(target.property_int(), ==, 89);
   }
+
+  // Ensure the binding was not broken when its RefPtr went out of scope
+  source.property_string() = "90";
+  g_assert_cmpint(target.property_int(), ==, 90);
 }
 
 } // namespace

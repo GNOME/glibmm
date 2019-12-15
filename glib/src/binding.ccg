@@ -125,24 +125,4 @@ Binding::unbind()
     g_binding_unbind(gobj());
 }
 
-// Override unreference() from ObjectBase.
-//
-// Why is this necessary? Because GBinding is an unusual kind of GObject.
-// It calls g_object_unref() itself, if either the source object or the
-// target object is finalized, almost like g_binding_unbind().
-// But the GBinding object shall be destroyed when and only when the last
-// reference from a Glib::RefPtr is dropped.
-void
-Binding::unreference() const
-{
-  GBinding* const binding = const_cast<GBinding*>(gobj());
-
-  // If the last Glib::RefPtr is being deleted, and the binding has not been unbound,
-  // then drop the extra reference that was added by bind_property_value().
-  if (gobject_->ref_count == 2 && g_binding_get_source(binding))
-    g_object_unref(binding);
-
-  Object::unreference();
-}
-
 } // namespace Glib
