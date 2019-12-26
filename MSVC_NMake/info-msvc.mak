@@ -9,10 +9,10 @@ all-build-info:
 
 help:
 	@echo.
-	@echo ============================
-	@echo Building cairomm Using NMake
-	@echo ============================
-	@echo nmake /f Makefile.vc CFG=[release^|debug] ^<PREFIX=PATH^> <option1=xxx option2=xxx>
+	@echo ===========================
+	@echo Building glibmm Using NMake
+	@echo ===========================
+	@echo nmake /f Makefile.vc CFG=[release^|debug] ^<PREFIX=PATH^> ^<option1=xxx option2=xxx^>
 	@echo.
 	@echo Where:
 	@echo ------
@@ -30,6 +30,9 @@ help:
 	@echo GLIB_COMPILE_SCHEMAS: Location of the glib-compile-schemas tool,
 	@echo if it cannot be found in $(PREFIX)\bin.  This tool is needed for the
 	@echo giomm settings example program.
+	@echo.
+	@echo USE_MESON_LIBS: Use DLLs and LIBs of C++ dependencies that are built with Meson,
+	@echo as applicable.
 	@echo ======
 	@echo A 'clean' target is supported to remove all generated files, intermediate
 	@echo object files and binaries for the specified configuration.
