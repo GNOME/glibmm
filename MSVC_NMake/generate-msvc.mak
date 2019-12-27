@@ -4,22 +4,22 @@
 # one is maintaining the NMake build files.
 
 # Create the build directories
-$(CFG)\$(PLAT)\gendef	\
-$(CFG)\$(PLAT)\glibmm	\
-$(CFG)\$(PLAT)\giomm	\
-$(CFG)\$(PLAT)\glibmm-ex	\
-$(CFG)\$(PLAT)\giomm-ex	\
-$(CFG)\$(PLAT)\glibmm-tests	\
-$(CFG)\$(PLAT)\giomm-tests:
+vs$(VSVER)\$(CFG)\$(PLAT)\gendef	\
+vs$(VSVER)\$(CFG)\$(PLAT)\glibmm	\
+vs$(VSVER)\$(CFG)\$(PLAT)\giomm	\
+vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-ex	\
+vs$(VSVER)\$(CFG)\$(PLAT)\giomm-ex	\
+vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-tests	\
+vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests:
 	@-mkdir $@
 
 # Generate .def files
-$(CFG)\$(PLAT)\glibmm\glibmm.def: $(GENDEF) $(CFG)\$(PLAT)\glibmm $(glibmm_OBJS)
-	$(CFG)\$(PLAT)\gendef.exe $@ $(GLIBMM_LIBNAME) $(CFG)\$(PLAT)\glibmm\*.obj
+vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\glibmm.def: $(GENDEF) vs$(VSVER)\$(CFG)\$(PLAT)\glibmm $(glibmm_OBJS)
+	vs$(VSVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GLIBMM_LIBNAME) vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\*.obj
 
-$(CFG)\$(PLAT)\giomm\giomm.def: $(GENDEF) $(CFG)\$(PLAT)\giomm $(giomm_OBJS)
-	$(CFG)\$(PLAT)\gendef.exe $@ $(GIOMM_LIBNAME) $(CFG)\$(PLAT)\giomm\*.obj
+vs$(VSVER)\$(CFG)\$(PLAT)\giomm\giomm.def: $(GENDEF) vs$(VSVER)\$(CFG)\$(PLAT)\giomm $(giomm_OBJS)
+	vs$(VSVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GIOMM_LIBNAME) vs$(VSVER)\$(CFG)\$(PLAT)\giomm\*.obj
 
 # Compile schema for giomm settings example
-$(CFG)\$(PLAT)\gschema.compiled: ..\examples\settings\org.gtkmm.demo.gschema.xml
-	$(GLIB_COMPILE_SCHEMAS) --targetdir=$(CFG)\$(PLAT) ..\examples\settings
+vs$(VSVER)\$(CFG)\$(PLAT)\gschema.compiled: ..\examples\settings\org.gtkmm.demo.gschema.xml
+	$(GLIB_COMPILE_SCHEMAS) --targetdir=vs$(VSVER)\$(CFG)\$(PLAT) ..\examples\settings
