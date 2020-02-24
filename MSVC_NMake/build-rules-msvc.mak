@@ -23,15 +23,26 @@ $<
 $<
 <<
 
+{..\tools\extra_defs_gen\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\}.obj::
+	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ $(MAKE) /f Makefile.vc CFG=$(CFG) vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen
+	$(CXX) $(GLIBMM_BASE_CFLAGS) $(GLIBMM_EXTRA_INCLUDES) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ /c @<<
+$<
+<<
+
 {.\glibmm\}.rc{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.res:
 	rc /fo$@ $<
 
 {.\giomm\}.rc{vs$(VSVER)\$(CFG)\$(PLAT)\giomm\}.res:
 	rc /fo$@ $<
 
+vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\generate_extra_defs.obj:  ..\tools\extra_defs_gen\generate_extra_defs.cc  ..\tools\extra_defs_gen\generate_extra_defs.h
 # Rules for building .lib files
 $(GLIBMM_LIB): $(GLIBMM_DLL)
 $(GIOMM_LIB): $(GIOMM_DLL)
+
+$(GLIBMM_EXTRA_DEFS_GEN_LIB): vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\generate_extra_defs.obj
+	lib $(ARFLAGS_NOLTCG) /out:$@ $**
+
 
 # Rules for linking DLLs
 # Format is as follows (the mt command is needed for MSVC 2005/2008 builds):
@@ -192,6 +203,8 @@ clean:
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.exp
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.lib
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gschemas.compiled
+	@-del vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\*.pdb
+	@-del vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\*.obj
 	@-if exist vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests\*.obj
 	@-if exist vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests\*.pdb
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\giomm-ex\*.obj
@@ -211,6 +224,7 @@ clean:
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gendef\*.obj
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gendef\*.pdb
 	@-if exist vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests rd vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests
+	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen
 	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\giomm-ex
 	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\giomm
 	@-if exist vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-tests rd vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-tests
