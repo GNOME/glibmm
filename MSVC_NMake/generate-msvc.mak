@@ -10,7 +10,8 @@ vs$(VSVER)\$(CFG)\$(PLAT)\giomm	\
 vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-ex	\
 vs$(VSVER)\$(CFG)\$(PLAT)\giomm-ex	\
 vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-tests	\
-vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests:
+vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests	\
+vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen:
 	@-mkdir $@
 
 # Generate .def files
