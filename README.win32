@@ -65,6 +65,33 @@ A 'tests' target will build the test programs for glibmm and giomm, an
 with the public headers to appropriate subdirs of $(PREFIX).  A 'clean'
 target is also provided to remove all the built files.
 
+The NMake Makefiles now support building the glibmm libraries directly from a GIT checkout
+with a few manual steps required, namely to:
+
+-Ensure that you have a copy of Cygwin or MSYS/MSYS64 installed, including
+ m4.exe and sh.exe.  You should also have a PERL for Windows installation
+ as well, and your PATH should contain the paths to your PERL interpreter
+ and the bin\ directory of your Cygwin or MSYS/MSYS64 installation, and
+ it is recommended that these paths are towards the end of your PATH.
+
+-Make a new copy of the entire source tree to some location, where the build
+ is to be done; then:
+--Copy $(srcroot)\glib\glibmmconfig.h.in to $(srcroot)\MSVC_NMake\glibmm\glibmmconfig.h
+--Copy $(srcroot)\gio\giommconfig.h.in to $(srcroot)\MSVC_NMake\giomm\giommconfig.h
+--Copy $(srcroot)\MSVC_NMake\glibmm\glibmm.rc.in to $(srcroot)\MSVC_NMake\glibmm\glibmm.rc
+--Copy $(srcroot)\MSVC_NMake\giomm\giomm.rc.in to $(srcroot)\MSVC_NMake\giomm\giomm.rc
+--Copy $(srcroot)\tools\gmmproc.in to $(srcroot)\tools\gmmproc
+--Copy $(srcroot)\tools\generate_wrap_init.pl.in to $(srcroot)\tools\generate_wrap_init.pl
+
+After copying the above 6 files, you need to ensure that they reflect on the package version
+that best matches your checkout status and the paths in $(srcroot)\tools\gmmproc and
+$(srcroot)\tools\generate_wrap_init.pl (the items enclosed between the @...@'s) should reflect
+on where you intend for nmake /f Makefile.vc CFG=$(CFG) install to install to (i.e. $(PREFIX)).
+For giommconfig.h, it is recommended to keep GIOMM_STATIC_LIB and GIOMM_DISABLE_DEPRECATED
+undefined unless you know what you are doing (remember, the NMake Makefiles only support DLL
+builds out-of-the-box).  You may ignore the fields in glibmmconfig.h the values between
+#ifdef GLIBMM_CONFIGURE and #endif /* GLIBMM_CONFIGURE */.
+
 3. Glibmm methods and signals not available on win32
 
 All glibmm methods and signals are available on win32.
