@@ -18,12 +18,20 @@ DEBUG_SUFFIX = -d
 DEBUG_SUFFIX =
 !endif
 
+!ifndef M4
+M4 = m4
+!endif
+
 GLIBMM_BASE_CFLAGS =			\
-	/I..\glib /I.\glibmm		\
+	/Ivs$(PDBVER)\$(CFG)\$(PLAT)	\
+	/I..\glib /I..\glib\glibmm /I.\glibmm		\
 	/wd4530 /EHsc	\
 	/FImsvc_recommended_pragmas.h
 
-GIOMM_BASE_CFLAGS = /I..\gio /I.\giomm $(GLIBMM_BASE_CFLAGS)
+GIOMM_BASE_CFLAGS =	\
+	/Ivs$(PDBVER)\$(CFG)\$(PLAT)	\
+	/I..\gio /I..\gio\giomm /I.\giomm	\
+	$(GLIBMM_BASE_CFLAGS)
 
 GLIBMM_EXTRA_INCLUDES =	\
 	/I$(PREFIX)\include\gio-win32-$(GLIB_API_VERSION)	\

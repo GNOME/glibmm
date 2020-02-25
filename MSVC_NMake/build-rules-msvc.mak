@@ -18,10 +18,38 @@
 $<
 <<
 
+{vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\}.obj::
+	$(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\ /c @<<
+$<
+<<
+
+{..\glib\src\}.cc.m4{vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\}.obj:
+	@if not exist $(@D)\ $(MAKE) /f Makefile.vc CFG=$(CFG) $(@D)
+	@for %%s in ($(<D)\*.cc.m4 $(<D)\*.h.m4) do @if not exist ..\glib\glibmm\%%~ns if not exist $(@D)\%%~ns $(M4) -I$(<D:\=/) %%s $(<D:\=/)/template.macros.m4 > $(@D)\%%~ns
+	@if exist $(@D)\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B)
+	@if exist ..\glib\glibmm\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\glib\glibmm\$(<B)
+
+{..\glib\src\}.ccg{vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\}.obj:
+	@if not exist $(@D)\private\ $(MAKE) /f Makefile.vc CFG=$(CFG) $(@D)\private
+	@for %%s in ($(<D)\*.ccg) do @if not exist ..\glib\glibmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -I ../tools/pm -- ../tools/gmmproc -I ../tools/m4 --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
+	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
+	@if exist ..\glib\glibmm\$(<B).cc $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\glib\glibmm\$(<B).cc
+
 {..\gio\giomm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\}.obj::
 	$(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\giomm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\giomm\ /c @<<
 $<
 <<
+
+{vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\}.obj::
+	$(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\giomm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\giomm\ /c @<<
+$<
+<<
+
+{..\gio\src\}.ccg{vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\}.obj:
+	@if not exist $(@D)\private\ $(MAKE) /f Makefile.vc CFG=$(CFG) $(@D)\private
+	@for %%s in ($(<D)\*.ccg) do @if not exist ..\gio\giomm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -I ../tools/pm -- ../tools/gmmproc -I ../tools/m4 --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
+	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
+	@if exist ..\gio\giomm\$(<B).cc $(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
 
 {..\tools\extra_defs_gen\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\}.obj::
 	@if not exist vs$(PDBVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ $(MAKE) /f Makefile.vc CFG=$(CFG) vs$(PDBVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen
@@ -217,6 +245,9 @@ clean:
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\*.res
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\*.obj
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\*.pdb
+	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\*.cc
+	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\private\*.h
+	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\*.h
 	@-if exist vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm-tests del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm-tests\*.obj
 	@-if exist vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm-tests del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm-tests\*.pdb
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm-ex\*.obj
@@ -225,13 +256,20 @@ clean:
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\*.res
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\*.obj
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\*.pdb
+	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\*.cc
+	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\private\*.h
+	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\*.h
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\*.obj
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\*.pdb
 	@-if exist vs$(PDBVER)\$(CFG)\$(PLAT)\giomm-tests rd vs$(PDBVER)\$(CFG)\$(PLAT)\giomm-tests
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\giomm-ex
+	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\private
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\giomm
 	@-if exist vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm-tests rd vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm-tests
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm-ex
+	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\private
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gendef
+
+.SUFFIXES: .cc .h .ccg .hg .obj .cc.m4 .h.m4

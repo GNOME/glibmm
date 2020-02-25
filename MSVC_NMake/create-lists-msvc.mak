@@ -58,6 +58,15 @@ glibmm_files_extra_ph_int = $(glibmm_files_extra_ph:/=\)
 !if [call create-lists.bat footer glibmm.mak]
 !endif
 
+!if [call create-lists.bat header glibmm.mak glibmm_real_hg]
+!endif
+
+!if [for %c in ($(glibmm_files_used_hg)) do @call create-lists.bat file glibmm.mak ..\glib\src\%c]
+!endif
+
+!if [call create-lists.bat footer glibmm.mak]
+!endif
+
 # For giomm
 
 !if [call create-lists.bat header glibmm.mak giomm_OBJS]
@@ -70,6 +79,15 @@ glibmm_files_extra_ph_int = $(glibmm_files_extra_ph:/=\)
 !endif
 
 !if [@call create-lists.bat file glibmm.mak vs^$(PDBVER)\^$(CFG)\^$(PLAT)\giomm\giomm.res]
+!endif
+
+!if [call create-lists.bat footer glibmm.mak]
+!endif
+
+!if [call create-lists.bat header glibmm.mak giomm_real_hg]
+!endif
+
+!if [for %c in ($(giomm_files_any_hg)) do @call create-lists.bat file glibmm.mak ..\gio\src\%c]
 !endif
 
 !if [call create-lists.bat footer glibmm.mak]
