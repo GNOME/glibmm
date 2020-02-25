@@ -31,8 +31,6 @@ vs$(PDBVER)\$(CFG)\$(PLAT)\gschema.compiled: ..\examples\settings\org.gtkmm.demo
 
 vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\wrap_init.cc: $(glibmm_real_hg)
 	@if not exist ..\glib\glibmm\wrap_init.cc $(PERL) -- "../tools/generate_wrap_init.pl" --namespace=Glib --parent_dir=glibmm $(glibmm_real_hg:\=/)>$@
-	@if exist ..\glib\glibmm\wrap_init.cc if not exist $@ copy ..\glib\glibmm\wrap_init.cc $@
 
 vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\wrap_init.cc: $(giomm_real_hg)
 	@if not exist ..\gio\giomm\wrap_init.cc $(PERL) -- "../tools/generate_wrap_init.pl" --namespace=Gio --parent_dir=giomm $(giomm_real_hg:\=/)>$@
-	@if exist ..\gio\giomm\wrap_init.cc if not exist $@ copy ..\gio\giomm\wrap_init.cc $@

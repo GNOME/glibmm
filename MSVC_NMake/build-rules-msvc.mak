@@ -13,12 +13,12 @@
 # 	$(CC)|$(CXX) $(cflags) /Fo$(destdir) /c @<<
 # $<
 # <<
-{..\glib\glibmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\}.obj::
+{vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\}.obj::
 	$(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\ /c @<<
 $<
 <<
 
-{vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\}.obj::
+{..\glib\glibmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\}.obj::
 	$(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\ /c @<<
 $<
 <<
@@ -35,12 +35,12 @@ $<
 	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
 	@if exist ..\glib\glibmm\$(<B).cc $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\glib\glibmm\$(<B).cc
 
-{..\gio\giomm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\}.obj::
+{vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\}.obj::
 	$(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\giomm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\giomm\ /c @<<
 $<
 <<
 
-{vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\}.obj::
+{..\gio\giomm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\}.obj::
 	$(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\giomm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\giomm\ /c @<<
 $<
 <<
