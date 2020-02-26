@@ -234,6 +234,9 @@ clean:
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\*.ilk
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\*.exp
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\*.lib
+	@-del pkg-ver.mak
+	@-del ..\tools\generate_wrap_init.pl
+	@-del ..\tools\gmmproc
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gschemas.compiled
 	@-del vs$(PDBVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\*.pdb
 	@-del vs$(PDBVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\*.obj

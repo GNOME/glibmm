@@ -144,6 +144,9 @@ glibmm_files_extra_ph_int = $(glibmm_files_extra_ph:/=\)
 !if [call create-lists.bat footer glibmm.mak]
 !endif
 
+!if [for %d in ($(PREFIX)) do @echo PREFIX_REAL=%~dpnd>>glibmm.mak]
+!endif
+
 !include glibmm.mak
 
 !if [del /f /q glibmm.mak]
