@@ -6,13 +6,15 @@
 # Create the build directories
 vs$(VSVER)\$(CFG)\$(PLAT)\gendef	\
 vs$(VSVER)\$(CFG)\$(PLAT)\glibmm	\
+vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\private	\
 vs$(VSVER)\$(CFG)\$(PLAT)\giomm	\
+vs$(VSVER)\$(CFG)\$(PLAT)\giomm\private	\
 vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-ex	\
 vs$(VSVER)\$(CFG)\$(PLAT)\giomm-ex	\
 vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-tests	\
 vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests	\
 vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen:
-	@-mkdir $@
+	@-md $@
 
 # Generate .def files
 vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\glibmm.def: $(GENDEF) vs$(VSVER)\$(CFG)\$(PLAT)\glibmm $(glibmm_OBJS)
@@ -24,3 +26,10 @@ vs$(VSVER)\$(CFG)\$(PLAT)\giomm\giomm.def: $(GENDEF) vs$(VSVER)\$(CFG)\$(PLAT)\g
 # Compile schema for giomm settings example
 vs$(VSVER)\$(CFG)\$(PLAT)\gschema.compiled: ..\examples\settings\org.gtkmm.demo.gschema.xml
 	$(GLIB_COMPILE_SCHEMAS) --targetdir=vs$(VSVER)\$(CFG)\$(PLAT) ..\examples\settings
+
+# Generate wrap_init.cc files
+vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\wrap_init.cc: $(glibmm_real_hg)
+	@if not exist ..\glib\glibmm\wrap_init.cc $(PERL) -- "../tools/generate_wrap_init.pl" --namespace=Glib --parent_dir=glibmm $(glibmm_real_hg:\=/)>$@
+
+vs$(VSVER)\$(CFG)\$(PLAT)\giomm\wrap_init.cc: $(giomm_real_hg)
+	@if not exist ..\gio\giomm\wrap_init.cc $(PERL) -- "../tools/generate_wrap_init.pl" --namespace=Gio --parent_dir=giomm $(giomm_real_hg:\=/)>$@
