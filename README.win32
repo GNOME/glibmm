@@ -73,22 +73,24 @@ with a few manual steps required, namely to:
  to install the XML::Parser PERL module as well, which requires libexpat.
 
 -Make a new copy of the entire source tree to some location, where the build
- is to be done; then:
---Copy $(srcroot)\glib\glibmmconfig.h.in to $(srcroot)\MSVC_NMake\glibmm\glibmmconfig.h
---Copy $(srcroot)\gio\giommconfig.h.in to $(srcroot)\MSVC_NMake\giomm\giommconfig.h
---Copy $(srcroot)\MSVC_NMake\glibmm\glibmm.rc.in to $(srcroot)\MSVC_NMake\glibmm\glibmm.rc
---Copy $(srcroot)\MSVC_NMake\giomm\giomm.rc.in to $(srcroot)\MSVC_NMake\giomm\giomm.rc
---Copy $(srcroot)\tools\gmmproc.in to $(srcroot)\tools\gmmproc
---Copy $(srcroot)\tools\generate_wrap_init.pl.in to $(srcroot)\tools\generate_wrap_init.pl
+ is to be done; then in $(srcroot)\MSVC_NMake run
+ nmake /f Makefile.vc CFG=[release|debug] prep-git-build, which will copy and generate
+ the following files with the proper info:
+ --$(srcroot)\MSVC_NMake\glibmm\glibmmconfig.h
+ --$(srcroot)\MSVC_NMake\giomm\giommconfig.h
+ --$(srcroot)\MSVC_NMake\glibmm\glibmm.rc
+ --$(srcroot)\MSVC_NMake\giomm\giomm.rc
+ --$(srcroot)\tools\gmmproc
+ --$(srcroot)\tools\generate_wrap_init.pl
 
-After copying the above 6 files, you need to ensure that they reflect on the package version
-that best matches your checkout status and the paths in $(srcroot)\tools\gmmproc and
-$(srcroot)\tools\generate_wrap_init.pl (the items enclosed between the @...@'s) should reflect
-on where you intend for nmake /f Makefile.vc CFG=$(CFG) install to install to (i.e. $(PREFIX)).
 For giommconfig.h, it is recommended to keep GIOMM_STATIC_LIB and GIOMM_DISABLE_DEPRECATED
 undefined unless you know what you are doing (remember, the NMake Makefiles only support DLL
-builds out-of-the-box).  You may ignore the fields in glibmmconfig.h the values between
-#ifdef GLIBMM_CONFIGURE and #endif /* GLIBMM_CONFIGURE */.
+builds out-of-the-box).  For builds from the release tarballs, running
+nmake /f Makefile.vc CFG=[release|debug] gen-perl-scripts-real will also generate
+$(srcroot)\tools\gmmproc and $(srcroot)\tools\generate_wrap_init.pl for you.
+
+Note that the prep-git-build and the gen-perl-scripts-real targets will require a working PERL
+installation.
 
 3. Glibmm methods and signals not available on win32
 

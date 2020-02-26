@@ -230,6 +230,9 @@ clean:
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.ilk
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.exp
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.lib
+	@-del pkg-ver.mak
+	@-del ..\tools\generate_wrap_init.pl
+	@-del ..\tools\gmmproc
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gschemas.compiled
 	@-del vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\*.pdb
 	@-del vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\*.obj
