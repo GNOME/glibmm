@@ -86,7 +86,7 @@ giomm\giommconfig.h: pkg-ver.mak ..\gio\giommconfig.h.in
 	@$(PERL) -pi.bak -e "s/\@exec_prefix\@/$(PREFIX_REAL:\=\/)/g" $@
 	@$(PERL) -pi.bak -e "s/\@libdir\@/$(PREFIX_REAL:\=\/)\/share/g" $@
 	@$(PERL) -pi.bak -e "s/\@M4\@/$(M4:\=\/)/g" $@
-	@$(PERL) -pi.bak -e "s/\@GLIBMM_MODULE_NAME\@/giomm-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)/g" $@
+	@$(PERL) -pi.bak -e "s/\@GLIBMM_MODULE_NAME\@/glibmm-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)/g" $@
 	@$(PERL) -pi.bak -e "s/\@PACKAGE_VERSION\@/$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION).$(PKG_MICRO_VERSION)/g" $@
 	@del $@.bak
 
