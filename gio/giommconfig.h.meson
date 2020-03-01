@@ -1,0 +1,40 @@
+#ifndef _GIOMM_CONFIG_H
+#define _GIOMM_CONFIG_H
+
+#include <glibmmconfig.h>
+
+/* Define to omit deprecated API from the library. */
+#mesondefine GIOMM_DISABLE_DEPRECATED
+
+/* Major version number of giomm. */
+#mesondefine GIOMM_MAJOR_VERSION
+
+/* Minor version number of giomm. */
+#mesondefine GIOMM_MINOR_VERSION
+
+/* Micro version number of giomm. */
+#mesondefine GIOMM_MICRO_VERSION
+
+/* Define if giomm is built as a static library */
+#mesondefine GIOMM_STATIC_LIB
+
+// Enable DLL-specific stuff only when not building a static library
+#if !defined(__CYGWIN__) && defined(__MINGW32__) && !defined(GIOMM_STATIC_LIB)
+# define GIOMM_DLL 1
+#endif
+
+#ifdef GIOMM_DLL
+# if defined(GIOMM_BUILD) && defined(_WINDLL)
+   /* Do not dllexport as it is handled by gendef on MSVC */
+#  define GIOMM_API
+# elif !defined(GIOMM_BUILD)
+#  define GIOMM_API __declspec(dllimport)
+# else
+   /* Build a static library */
+#  define GIOMM_API
+# endif /* GIOMM_BUILD - _WINDLL */
+#else
+# define GIOMM_API
+#endif /* GIOMM_DLL */
+
+#endif /* _GIOMM_CONFIG_H */

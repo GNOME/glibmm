@@ -1,0 +1,125 @@
+#ifndef _GLIBMM_CONFIG_H
+#define _GLIBMM_CONFIG_H
+
+/* Define to omit deprecated API from the library. */
+#mesondefine GLIBMM_DISABLE_DEPRECATED
+
+/* Major version number of glibmm. */
+#mesondefine GLIBMM_MAJOR_VERSION
+
+/* Minor version number of glibmm. */
+#mesondefine GLIBMM_MINOR_VERSION
+
+/* Micro version number of glibmm. */
+#mesondefine GLIBMM_MICRO_VERSION
+
+/* Define if glibmm is built as a static library */
+#mesondefine GLIBMM_STATIC_LIB
+
+/* The size of wchar_t, as computed by sizeof. */
+#mesondefine GLIBMM_SIZEOF_WCHAR_T
+
+/* Defined when the -Ddebug-refcounting configure argument was given */
+#mesondefine GLIBMM_DEBUG_REFCOUNTING
+
+#ifdef _WIN32
+  /* Win32 compilers have a lot of varation */
+# if defined(_MSC_VER)
+#  define GLIBMM_MSC 1
+#  define GLIBMM_WIN32 1
+#  define GLIBMM_DLL 1
+# elif defined(__CYGWIN__)
+#  define GLIBMM_CONFIGURE 1
+# elif defined(__MINGW32__)
+#  define GLIBMM_WIN32 1
+#  define GLIBMM_CONFIGURE 1
+# else
+   /* AIX clR compiler complains about this even though it doesn't get this far */
+#  error "Unknown architecture (send me gcc --dumpspecs or equiv)"
+# endif
+#else
+# define GLIBMM_CONFIGURE 1
+#endif /* _WIN32 */
+
+#ifdef GLIBMM_CONFIGURE
+
+/* Define only on Mac OS, COCOA */
+#mesondefine GLIBMM_OS_COCOA
+
+/* Define if extern "C" and extern "C++" function pointers are compatible. */
+#mesondefine GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+
+/* Define if non-instantiated templates may dynamic_cast<> to an undefined
+   type. */
+#mesondefine GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
+
+/* Defined if a static member variable may be initialized inline to
+   std::string::npos */
+#mesondefine GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS
+
+/* Define if the compiler disambiguates template specializations for const and
+   non-const types. */
+#mesondefine GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
+
+/* Defined if std::iterator_traits<> is standard-conforming */
+#mesondefine GLIBMM_HAVE_STD_ITERATOR_TRAITS
+
+/* Defined if std::reverse_iterator is in Sun libCstd style */
+#mesondefine GLIBMM_HAVE_SUN_REVERSE_ITERATOR
+
+/* Defined if the STL containers have templated sequence ctors */
+#mesondefine GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
+
+/* Define to 1 if wide stream is available. */
+#mesondefine GLIBMM_HAVE_WIDE_STREAM
+
+#endif /* GLIBMM_CONFIGURE */
+
+#ifdef GLIBMM_MSC
+# define GLIBMM_HAVE_STD_ITERATOR_TRAITS 1
+# define GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS 1
+# define GLIBMM_HAVE_WIDE_STREAM 1
+# define GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS 1
+# define GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION 1
+# define GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS 1
+# pragma warning (disable: 4786 4355 4800 4181)
+
+#if (_MSC_VER < 1900)
+/* The C++-11 keywords noexcept and thread_local are supported on
+ * Visual Studio 2013 via Microsoft-specific extensions, but are
+ * supported directly in Visual Studio 2015
+ */
+
+#define _ALLOW_KEYWORD_MACROS 1
+
+#ifndef noexcept
+#define noexcept _NOEXCEPT
+#endif
+
+#ifndef thread_local
+#define thread_local __declspec (thread)
+#endif
+
+#endif /* _MSC_VER < 1900 */
+#endif /* GLIBMM_MSC */
+
+/* Enable DLL-specific stuff only when not building a static library */
+#if !defined(__CYGWIN__) && defined(__MINGW32__) && !defined(GLIBMM_STATIC_LIB)
+# define GLIBMM_DLL 1
+#endif
+
+#ifdef GLIBMM_DLL
+# if defined(GLIBMM_BUILD) && defined(_WINDLL)
+   /* Do not dllexport as it is handled by gendef on MSVC */
+#  define GLIBMM_API
+# elif !defined(GLIBMM_BUILD)
+#  define GLIBMM_API __declspec(dllimport)
+# else
+   /* Build a static library */
+#  define GLIBMM_API
+# endif /* GLIBMM_BUILD - _WINDLL */
+#else
+# define GLIBMM_API
+#endif /* GLIBMM_DLL */
+
+#endif /* _GLIBMM_CONFIG_H */
