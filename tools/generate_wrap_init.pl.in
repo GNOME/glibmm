@@ -151,14 +151,16 @@ while ($ARGV[0])
       my $basename = lc($ccast);
       my @names = ($cppname, $basename, @extra_namespace);
 
+      # Don't remove the space between \ and @. When glibmm is built with Meson,
+      # the \ would be removed in generate_wrap_int.pl.
       if ($type_of_class eq "_CLASS_GOBJECT" or
           $type_of_class eq "_CLASS_GTKOBJECT")
       {
-        push(@{$objects{$filename_header}}, \@names);
+        push(@{$objects{$filename_header}}, \ @names);
       }
       elsif ($type_of_class eq "_WRAP_GERROR")
       {
-        push(@{$exceptions{$filename_header}}, \@names);
+        push(@{$exceptions{$filename_header}}, \ @names);
       }
     }
     elsif (/\b_INCLUDE_IN_WRAP_INIT\((.+)\)/)

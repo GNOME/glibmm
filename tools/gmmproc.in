@@ -73,7 +73,9 @@ sub parse_command_line_args();
 #main()
 parse_command_line_args();
 
-my $objOutputter = &Output::new($main::m4path, \@main::macrodirs);
+# Don't remove the space between \ and @. When glibmm is built with Meson,
+# the \ would be removed in gmmproc.
+my $objOutputter = &Output::new($main::m4path, \ @main::macrodirs);
 my $objWrapParser = &WrapParser::new($objOutputter);
 
 $$objWrapParser{srcdir} = $main::srcdir;
