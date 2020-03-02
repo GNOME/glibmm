@@ -124,52 +124,9 @@ if not is_host_windows
   giomm_requires += ['gio-unix-2.0', glib_req]
 endif
 
-if is_msvc
-  # We must have Visual Studio 2017 15.7 or later...
-  assert(cpp_compiler.version().split('.')[0].to_int() >= 19 and \
-         cpp_compiler.version().split('.')[1].to_int() >= 15,
-         'Visual Studio 2017 15.7 or later is required')
-
-  assert(cpp_compiler.has_header('sigc++-3.0/sigc++/sigc++.h') and \
-         cpp_compiler.has_header('sigc++-3.0/include/sigc++config.h'),
-         'sigc++-3.x headers are required')
-  message('Ensure your INCLUDE and LIB contain the paths that lead to ' + \
-          'the appropriate headers and .lib for libsigc++-3.x')
-
-  # Visual Studio 2019 can consume libraries built with 2017, so check for
-  # 2017-built libraries as well if 2019-built libraries cannot be found
-  msvc_check_range = [15]
-  msvc_minor = cpp_compiler.version().split('.')[1].to_int()
-  if msvc_minor >= 20
-    msvc_check_range = [16, 15]
-  endif
-
-  debugsuffix = ''
-  if get_option('buildtype') == 'debug'
-    debugsuffix = '-d'
-  endif
-
-  # We can be looking for MSVC 2017-built libraries on 2019 builds as well,
-  # so we can't just assume that libraries exist, but check that compatible
-  # versions are really found
-  sigcxx_dep = dependency('', required: false)
-
-  foreach v : msvc_check_range
-    sigcxx_dep = sigcxx_dep.found() ? sigcxx_dep : cpp_compiler.find_library(
-      'sigc-vc@0@0@1@-3_0'.format(v.to_string(), debugsuffix), required: false)
-  endforeach
-
-  # Now make sure the appropriate -mm libraries are found
-  assert(sigcxx_dep.found(),
-    'Appropriate sigc-vcxx0@0@-3_0.lib is required'.format(debugsuffix))
-
-else # not is_msvc
-
-  sigcxx_dep = dependency('sigc++-3.0', version: sigcxx_req)
-  glibmm_requires += ['sigc++-3.0', sigcxx_req]
-  giomm_requires += ['sigc++-3.0', sigcxx_req]
-
-endif # is_msvc
+sigcxx_dep = dependency('sigc++-3.0', version: sigcxx_req)
+glibmm_requires += ['sigc++-3.0', sigcxx_req]
+giomm_requires += ['sigc++-3.0', sigcxx_req]
 
 glibmm_build_dep += [sigcxx_dep]
 giomm_build_dep += [sigcxx_dep]
