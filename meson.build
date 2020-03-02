@@ -194,7 +194,7 @@ add_project_arguments(warning_flags, language: 'cpp')
 #       that should not be overlooked stand out.
 if is_msvc
   disabled_warnings = cpp_compiler.get_supported_arguments([
-    '/FImsvc_recommended_pragmas.h', '/wd4267', '/wd4530'
+    '/FImsvc_recommended_pragmas.h', '/wd4267', '/wd4530', '/wd4589'
   ])
   add_project_arguments(disabled_warnings, language: 'cpp')
 endif
