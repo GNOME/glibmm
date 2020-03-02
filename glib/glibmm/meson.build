@@ -231,13 +231,12 @@ if maintainer_mode
   )
 
   extra_include_dirs = ['..']
-  glibmm_library = library(glibmm_pcname,
+  glib_int_lib = static_library('glibmm-int',
     glibmm_built_cc_file_targets, glibmm_extra_cc_files, built_dummy_h_file_target,
-    version: glibmm_libversion,
     include_directories: extra_include_dirs,
     cpp_args: '-DGLIBMM_BUILD=1',
     dependencies: glibmm_build_dep,
-    install: true,
+    install: false,
   )
 
   built_h_cc_dir = meson.current_build_dir()
@@ -293,43 +292,43 @@ else # not maintainer_mode
     install: false,
   )
 
-  glibmm_def = []
-  glibmm_extra_link_args = []
-  extra_glibmm_objects = []
-
-  if is_msvc
-    glibmm_def = custom_target('glibmm.def',
-      output: 'glibmm.def',
-      depends: glib_int_lib,
-      command: [ gendef,
-        '@OUTPUT@',
-        '@0@-@1@.dll'.format(glibmm_pcname, glibmm_libversion.split('.')[0]),
-        glib_int_lib.full_path(),
-      ],
-      install: false,
-    )
-    glibmm_extra_link_args = ['/def:@0@'.format(glibmm_def.full_path())]
-  endif
-
-  # Build the .rc file for Windows builds and link to it
-  if is_host_windows
-    windows = import('windows')
-    glibmm_res = windows.compile_resources(glibmm_rc)
-    extra_glibmm_objects += glibmm_res
-  endif
-
-  glibmm_library = library(glibmm_pcname, extra_glibmm_objects,
-    objects: glib_int_lib.extract_all_objects(),
-    version: glibmm_libversion,
-    dependencies: glibmm_build_dep,
-    link_depends: glibmm_def,
-    link_args: glibmm_extra_link_args,
-    install: true,
-  )
-
   built_h_cc_dir = src_untracked_glibmm
 
 endif
+
+glibmm_def = []
+glibmm_extra_link_args = []
+extra_glibmm_objects = []
+
+if is_msvc
+  glibmm_def = custom_target('glibmm.def',
+    output: 'glibmm.def',
+    depends: glib_int_lib,
+    command: [ gendef,
+      '@OUTPUT@',
+      '@0@-@1@.dll'.format(glibmm_pcname, glibmm_libversion.split('.')[0]),
+      glib_int_lib.full_path(),
+    ],
+    install: false,
+  )
+  glibmm_extra_link_args = ['/def:@0@'.format(glibmm_def.full_path())]
+endif
+
+# Build the .rc file for Windows builds and link to it
+if is_host_windows
+  windows = import('windows')
+  glibmm_res = windows.compile_resources(glibmm_rc)
+  extra_glibmm_objects += glibmm_res
+endif
+
+glibmm_library = library(glibmm_pcname, extra_glibmm_objects,
+  objects: glib_int_lib.extract_all_objects(),
+  version: glibmm_libversion,
+  dependencies: glibmm_build_dep,
+  link_depends: glibmm_def,
+  link_args: glibmm_extra_link_args,
+  install: true,
+)
 
 # Install built .h and _p.h files.
 meson.add_install_script(
