@@ -98,14 +98,15 @@ install_pkgconfigdir = install_libdir / 'pkgconfig'
 sigcxx_req = '>= 3.0.0'
 glib_req = '>= 2.63.0'
 
-# Glib supported pkg-config files on MSVC files for a good while,
-# so just use that.
+# There are pkg-config files for sigc++ and glib on MSVC, so just use that.
+sigcxx_dep = dependency('sigc++-3.0', version: sigcxx_req)
 glib_dep = dependency('glib-2.0', version: glib_req)
 gobject_dep = dependency('gobject-2.0', version: glib_req)
 gmodule_dep = dependency('gmodule-2.0', version: glib_req)
 
-glibmm_build_dep = [glib_dep, gobject_dep, gmodule_dep]
+glibmm_build_dep = [sigcxx_dep, glib_dep, gobject_dep, gmodule_dep]
 glibmm_requires = [
+  'sigc++-3.0', sigcxx_req,
   'glib-2.0', glib_req,
   'gobject-2.0', glib_req,
   'gmodule-2.0', glib_req,
@@ -120,12 +121,6 @@ if not is_host_windows
   giomm_requires += ['gio-unix-2.0', glib_req]
 endif
 
-sigcxx_dep = dependency('sigc++-3.0', version: sigcxx_req)
-glibmm_requires += ['sigc++-3.0', sigcxx_req]
-giomm_requires += ['sigc++-3.0', sigcxx_req]
-
-glibmm_build_dep += [sigcxx_dep]
-giomm_build_dep += [sigcxx_dep]
 glibmm_requires = ' '.join(glibmm_requires)
 giomm_requires = ' '.join(giomm_requires)
 
