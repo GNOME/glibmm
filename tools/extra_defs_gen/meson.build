@@ -4,40 +4,11 @@
 #        glibmm_libversion
 # Output: -
 
-glibmm_generate_extra_defs_library_int = static_library(
-  'glibmm_generate_extra_defs_int',
-  'generate_extra_defs.cc',
-  dependencies: glibmm_build_dep,
-  install: false,
-)
-
-glibmm_generate_extra_defs = []
-glibmm_generate_extra_defs_extra_link_args = []
-
-if is_msvc
-  glibmm_generate_extra_defs = custom_target(
-    'glibmm_generate_extra_defs.def',
-    output: 'glibmm_generate_extra_defs.def',
-    depends: glibmm_generate_extra_defs_library_int,
-    command: [ gendef,
-      '@OUTPUT@',
-      '@0@-@1@.dll'.format('glibmm_generate_extra_defs-' +
-	                       glibmm_api_version, glibmm_libversion.split('.')[0]),
-      glibmm_generate_extra_defs_library_int.full_path(),
-    ],
-    install: false,
-  )
-  glibmm_generate_extra_defs_extra_link_args = [
-    '/def:@0@'.format(glibmm_generate_extra_defs.full_path())
-  ]
-endif
-
 glibmm_generate_extra_defs_library = library(
   'glibmm_generate_extra_defs-' + glibmm_api_version,
-  objects: glibmm_generate_extra_defs_library_int.extract_all_objects(),
+  'generate_extra_defs.cc',
   version: glibmm_libversion,
-  link_depends: glibmm_generate_extra_defs,
-  link_args: glibmm_generate_extra_defs_extra_link_args,
+  cpp_args: '-DGLIBMM_GEN_EXTRA_DEFS_BUILD',
   dependencies: glibmm_build_dep,
   install: true,
 )
