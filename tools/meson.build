@@ -1,7 +1,8 @@
 # tools
 
 # Input: perl, m4, install_prefix, install_libdir, glibmm_pcname
-# Output: m4_files, install_m4dir, pm_files, install_pmdir
+# Output: m4_files, install_m4dir, pm_files, install_pmdir, gmmproc,
+#         generate_wrap_init_pl
 
 subdir('extra_defs_gen')
 
@@ -18,7 +19,7 @@ gmmproc_conf_data.set('GLIBMM_MODULE_NAME', glibmm_pcname)
 gmmproc_conf_data.set('M4', m4.found() ? '/'.join(m4.path().split('\\')) : '')
 gmmproc_conf_data.set('PACKAGE_VERSION', meson.project_version())
 
-configure_file(
+gmmproc = configure_file(
   input: 'gmmproc.in',
   output: '@BASENAME@',
   configuration: gmmproc_conf_data,
@@ -31,7 +32,7 @@ gen_wrap_init_conf_data.set('PERL', perl.found() ? perl.path() : '')
 gen_wrap_init_conf_data.set('configure_input',
   'tools/generate_wrap_init.pl.  Generated from generate_wrap_init.pl.in')
 
-configure_file(
+generate_wrap_init_pl = configure_file(
   input: 'generate_wrap_init.pl.in',
   output: '@BASENAME@',
   configuration: gen_wrap_init_conf_data,

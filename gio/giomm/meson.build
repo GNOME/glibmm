@@ -3,7 +3,7 @@
 # Input: giomm_build_dep, giomm_pcname, maintainer_mode, project_source_root,
 #        generate_binding_py, handle_built_files_py, m4_files, pm_files,
 #        glibmm_libversion, install_includedir, python3, giomm_rc, gmmproc_dir,
-#        is_host_windows, gendef
+#        is_host_windows, gendef, gmmproc, generate_wrap_init_pl
 # Output: giomm_hg_ccg_basenames, giomm_extra_h_files, built_files_root,
 #         giomm_built_h_file_targets, giomm_dep
 
@@ -240,6 +240,7 @@ if maintainer_mode
       'Gio', # namespace
       '@INPUT@',
     ],
+    depend_files: generate_wrap_init_pl,
     build_by_default: maintainer_mode,
     install: false,
   )
@@ -261,7 +262,7 @@ if maintainer_mode
         meson.current_source_dir() / '..' / 'src',
         project_source_root / 'tools' / 'm4',
       ],
-      depend_files: giomm_defs_files + m4_files + pm_files,
+      depend_files: giomm_defs_files + m4_files + [gmmproc] + pm_files,
       build_by_default: maintainer_mode,
       install: false,
     )

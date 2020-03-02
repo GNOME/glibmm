@@ -3,7 +3,7 @@
 # Input: glibmm_build_dep, glibmm_pcname, maintainer_mode, project_source_root,
 #        generate_binding_py, handle_built_files_py, m4_files, pm_files,
 #        glibmm_libversion, install_includedir, python3, glibmm_rc, gmmproc_dir,
-#        is_host_windows, gendef
+#        is_host_windows, gendef, gmmproc, generate_wrap_init_pl
 # Output: glibmm_hg_ccg_basenames, glibmm_extra_h_files, built_files_root,
 #         glibmm_built_h_file_targets, glibmm_dep
 
@@ -159,6 +159,7 @@ if maintainer_mode
       'Glib', # namespace
       '@INPUT@',
     ],
+    depend_files: generate_wrap_init_pl,
     build_by_default: maintainer_mode,
     install: false,
   )
@@ -180,7 +181,7 @@ if maintainer_mode
         meson.current_source_dir() / '..' / 'src',
         project_source_root / 'tools' / 'm4',
       ],
-      depend_files: glibmm_defs_files + m4_files + pm_files,
+      depend_files: glibmm_defs_files + m4_files + [gmmproc] + pm_files,
       build_by_default: maintainer_mode,
       install: false,
     )
