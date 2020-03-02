@@ -72,10 +72,6 @@ sys.exit(os.path.isdir("@0@") or os.path.isfile("@0@"))
 '''.format(project_source_root / '.git')
 is_git_build = run_command(python3, '-c', cmd_py).returncode() != 0
 
-# Unfortunately due to m4 requirements, we cannot support MSVC builds
-# directly from GIT checkouts
-assert(not is_msvc or not is_git_build, 'Direct builds from GIT is not supported for MSVC builds')
-
 # Options.
 maintainer_mode_opt = get_option('maintainer-mode')
 maintainer_mode = maintainer_mode_opt == 'true' or \
