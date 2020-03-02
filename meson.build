@@ -199,8 +199,8 @@ if is_msvc
   add_project_arguments(disabled_warnings, language: 'cpp')
 endif
 
-subdir('tools')
 subdir('MSVC_NMake/gendef')
+subdir('tools')
 subdir('glib')
 subdir('MSVC_NMake/glibmm')
 subdir('glib/glibmm')
