@@ -15,7 +15,7 @@ gmmproc_conf_data.set('prefix', install_prefix)
 gmmproc_conf_data.set('exec_prefix', '${prefix}')
 gmmproc_conf_data.set('libdir', '${exec_prefix}' / install_libdir)
 gmmproc_conf_data.set('GLIBMM_MODULE_NAME', glibmm_pcname)
-gmmproc_conf_data.set('M4', m4.found() ? m4.path() : '')
+gmmproc_conf_data.set('M4', m4.found() ? '/'.join(m4.path().split('\\')) : '')
 gmmproc_conf_data.set('PACKAGE_VERSION', meson.project_version())
 
 configure_file(
