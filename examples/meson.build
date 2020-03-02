@@ -4,12 +4,10 @@
 
 examples = [
 # [[dir-name], exe-name, [sources], giomm-example (not just glibmm-example)]
-  [['child_watch'], 'child_watch', ['main.cc'], false],
   [['compose'], 'example', ['main.cc'], false],
   [['dbus'], 'session_bus_service', ['session_bus_service.cc'], true],
   [['dbus'], 'server_without_bus', ['server_without_bus.cc'], true],
   [['dbus'], 'client_bus_listnames', ['client_bus_listnames.cc'], true],
-  [['iochannel_stream'], 'example', ['fdstream.cc', 'main.cc'], false],
   [['keyfile'], 'example', ['main.cc'], false],
   [['markup'], 'parser', ['parser.cc'], false],
   [['network'], 'resolver', ['resolver.cc'], true],
@@ -22,6 +20,14 @@ examples = [
   [['thread'], 'dispatcher', ['dispatcher.cc'], false],
   [['thread'], 'dispatcher2', ['dispatcher2.cc'], false],
 ]
+
+if not is_host_windows
+  examples += [
+    [['child_watch'], 'child_watch', ['main.cc'], false],
+    [['iochannel_stream'], 'example', ['fdstream.cc', 'main.cc'], false],
+  ]
+endif
+
 
 # import('gnome').compile_schemas() can't be use here.
 # It can only compile schemas in the current directory.
