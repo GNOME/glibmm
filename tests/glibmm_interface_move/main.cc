@@ -22,10 +22,12 @@ test_Iface_get_type(void)
 {
   // Avoid compiler warnings about unused functions.
   // TODO: With C++17, use [[maybe unused]].
+#ifndef _MSC_VER
   (void)TEST_IFACE;
   (void)TEST_IS_IFACE;
   (void)TEST_IFACE_GET_IFACE;
   (void)glib_autoptr_cleanup_TestIface;
+#endif
 
   static GType type = 0;
 
