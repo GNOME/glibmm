@@ -53,6 +53,37 @@ dist_noinst_SCRIPTS = autogen.sh
 
 DISTCLEANFILES = $(filter %mmconfig.h,$(msvc_files))
 
+# Distribute files needed when building glibmm with Meson.
+EXTRA_DIST = \
+  meson.build \
+  meson_options.txt \
+  MSVC_NMake/gendef/meson.build \
+  MSVC_NMake/giomm/meson.build \
+  MSVC_NMake/glibmm/meson.build \
+  docs/reference/meson.build \
+  examples/meson.build \
+  glib/meson.build \
+  glib/glibmmconfig.h.meson \
+  glib/glibmm/meson.build \
+  gio/meson.build \
+  gio/giommconfig.h.meson \
+  gio/giomm/meson.build \
+  tests/meson.build \
+  tools/meson.build \
+  tools/build_scripts/compile-schemas.py \
+  tools/build_scripts/dummy-header.py \
+  tools/build_scripts/handle-built-files.py \
+  tools/conf_tests/allows_static_inline_npos.cc \
+  tools/conf_tests/can_assign_non_extern_c_functions_to_extern_c_cb.cc \
+  tools/conf_tests/can_use_dynamic_cast_in_unused_template_wo_def.cc \
+  tools/conf_tests/have_disambiguous_const_template_specializations.cc \
+  tools/conf_tests/have_std_iterator_traits.cc \
+  tools/conf_tests/have_sun_reverse_iterator.cc \
+  tools/conf_tests/have_template_sequence_ctors.cc \
+  tools/conf_tests/have_wide_stream.cc \
+  tools/extra_defs_gen/meson.build \
+  untracked/README
+
 # Auto-generate the ChangeLog file from the git log on make dist
 include $(top_srcdir)/build/dist-changelog.am
 
