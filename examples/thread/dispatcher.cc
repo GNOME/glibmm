@@ -76,8 +76,10 @@ private:
 };
 
 template <class T>
-class DeletePtr : public std::unary_function<void, T>
+class DeletePtr
 {
+  typedef void argument_type;
+  typedef T result_type;
 public:
   void operator()(T ptr) const { delete ptr; }
 };
@@ -193,7 +195,7 @@ Application::launch_threads()
   std::cout << "Launching " << progress_threads_.size() << " threads:" << std::endl;
 
   std::for_each(
-    progress_threads_.begin(), progress_threads_.end(), std::mem_fun(&ThreadProgress::launch));
+    progress_threads_.begin(), progress_threads_.end(), std::mem_fn(&ThreadProgress::launch));
 }
 
 void
@@ -205,7 +207,7 @@ Application::on_progress_finished(ThreadProgress* thread_progress)
 
   // Quit if it was the last thread to be joined.
   if (std::find_if(progress_threads_.begin(), progress_threads_.end(),
-        std::mem_fun(&ThreadProgress::unfinished)) == progress_threads_.end())
+        std::mem_fn(&ThreadProgress::unfinished)) == progress_threads_.end())
   {
     main_loop_->quit();
   }
