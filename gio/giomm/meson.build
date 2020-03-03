@@ -294,7 +294,6 @@ if maintainer_mode
   extra_include_dirs = ['..', '..' / '..' / 'glib']
   gio_int_lib = static_library('giomm-int',
     giomm_used_built_cc_file_targets, giomm_extra_cc_files, built_dummy_h_file_target,
-    version: glibmm_libversion,
     include_directories: extra_include_dirs,
     cpp_args: '-DGIOMM_BUILD=1',
     dependencies: giomm_build_dep,
