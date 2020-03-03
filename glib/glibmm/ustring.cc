@@ -29,6 +29,14 @@
 #include <config.h>
 #endif
 
+// If glibmm is built with Autotools, GLIBMM_SIZEOF_WCHAR_T is not defined and
+// SIZEOF_WCHAR_T is defined in config.h.
+// If glibmm is built with Meson, config.h does not exist and
+// GLIBMM_SIZEOF_WCHAR_T is defined in glibmmconfig.h.
+#if !defined(SIZEOF_WCHAR_T) && defined(GLIBMM_SIZEOF_WCHAR_T)
+#define SIZEOF_WCHAR_T GLIBMM_SIZEOF_WCHAR_T
+#endif
+
 namespace
 {
 

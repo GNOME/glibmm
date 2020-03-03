@@ -17,9 +17,6 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _WIN32
-#include <config.h>
-#endif
 #include <giomm.h>
 #include <iostream>
 #include <mutex>
