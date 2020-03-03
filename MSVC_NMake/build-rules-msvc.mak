@@ -23,6 +23,11 @@ $<
 $<
 <<
 
+{..\untracked\glib\glibmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj::
+	$(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /c @<<
+$<
+<<
+
 {..\glib\src\}.cc.m4{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj:
 	@if not exist $(@D)\ $(MAKE) /f Makefile.vc CFG=$(CFG) $(@D)
 	@for %%s in ($(<D)\*.cc.m4 $(<D)\*.h.m4) do @if not exist ..\glib\glibmm\%%~ns if not exist $(@D)\%%~ns $(M4) -I$(<D:\=/) %%s $(<D:\=/)/template.macros.m4 > $(@D)\%%~ns
@@ -45,6 +50,11 @@ $<
 $<
 <<
 
+{..\untracked\gio\giomm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\giomm\}.obj::
+	$(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /c @<<
+$<
+<<
+
 {..\gio\src\}.ccg{vs$(VSVER)\$(CFG)\$(PLAT)\giomm\}.obj:
 	@if not exist $(@D)\private\ $(MAKE) /f Makefile.vc CFG=$(CFG) $(@D)\private
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\gio\giomm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -I ../tools/pm -- ../tools/gmmproc -I ../tools/m4 --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
@@ -53,7 +63,7 @@ $<
 
 {..\tools\extra_defs_gen\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\}.obj::
 	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ $(MAKE) /f Makefile.vc CFG=$(CFG) vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen
-	$(CXX) $(GLIBMM_BASE_CFLAGS) $(GLIBMM_EXTRA_INCLUDES) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ /c @<<
+	$(CXX) $(GLIBMM_BASE_CFLAGS) /DGLIBMM_GEN_EXTRA_DEFS_BUILD $(GLIBMM_EXTRA_INCLUDES) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ /c @<<
 $<
 <<
 
@@ -68,8 +78,12 @@ vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\generate_extra_defs.obj:  ..\tools
 $(GLIBMM_LIB): $(GLIBMM_DLL)
 $(GIOMM_LIB): $(GIOMM_DLL)
 
-$(GLIBMM_EXTRA_DEFS_GEN_LIB): vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\generate_extra_defs.obj
-	lib $(ARFLAGS_NOLTCG) /out:$@ $**
+$(GLIBMM_EXTRA_DEFS_GEN_LIB): $(GLIBMM_EXTRA_DEFS_GEN_DLL)
+$(GLIBMM_EXTRA_DEFS_GEN_DLL): vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\generate_extra_defs.obj
+	link /DLL $(LDFLAGS_NOLTCG) $(GOBJECT_LIBS) /implib:$(GLIBMM_EXTRA_DEFS_GEN_LIB) -out:$@ @<<
+$**
+<<
+	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
 
 
 # Rules for linking DLLs
@@ -230,7 +244,6 @@ clean:
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.ilk
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.exp
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.lib
-	@-del pkg-ver.mak
 	@-del ..\tools\generate_wrap_init.pl
 	@-del ..\tools\gmmproc
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gschemas.compiled

@@ -15,6 +15,9 @@ install: all
 	@copy /b vs$(VSVER)\$(CFG)\$(PLAT)\$(GIOMM_LIBNAME).dll $(PREFIX)\bin
 	@copy /b vs$(VSVER)\$(CFG)\$(PLAT)\$(GIOMM_LIBNAME).pdb $(PREFIX)\bin
 	@copy /b vs$(VSVER)\$(CFG)\$(PLAT)\$(GIOMM_LIBNAME).lib $(PREFIX)\lib
+	@copy /b vs$(VSVER)\$(CFG)\$(PLAT)\$(GLIBMM_EXTRA_DEFS_GEN_LIBNAME).dll $(PREFIX)\bin
+	@copy /b vs$(VSVER)\$(CFG)\$(PLAT)\$(GLIBMM_EXTRA_DEFS_GEN_LIBNAME).pdb $(PREFIX)\bin
+	@copy /b vs$(VSVER)\$(CFG)\$(PLAT)\$(GLIBMM_EXTRA_DEFS_GEN_LIBNAME).lib $(PREFIX)\lib
 	@copy /b $(GLIBMM_EXTRA_DEFS_GEN_LIB) $(PREFIX)\lib
 	@copy ..\glib\glibmm.h "$(PREFIX)\include\glibmm-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)\"
 	@copy ..\gio\giomm.h "$(PREFIX)\include\giomm-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)\"
