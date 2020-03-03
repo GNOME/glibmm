@@ -24,12 +24,14 @@ M4 = m4
 
 GLIBMM_BASE_CFLAGS =			\
 	/Ivs$(PDBVER)\$(CFG)\$(PLAT)	\
+	/I..\untracked\glib /I..\untracked\glib\glibmm		\
 	/I..\glib /I..\glib\glibmm /I.\glibmm		\
 	/wd4530 /EHsc	\
 	/FImsvc_recommended_pragmas.h
 
 GIOMM_BASE_CFLAGS =	\
 	/Ivs$(PDBVER)\$(CFG)\$(PLAT)	\
+	/I..\untracked\gio /I..\untracked\gio\giomm	\
 	/I..\gio /I..\gio\giomm /I.\giomm	\
 	$(GLIBMM_BASE_CFLAGS)
 
@@ -64,7 +66,9 @@ GLIBMM_LIBNAME = glibmm-vc$(PDBVER)0$(DEBUG_SUFFIX)-$(GLIBMM_MAJOR_VERSION)_$(GL
 
 GLIBMM_DLL = vs$(PDBVER)\$(CFG)\$(PLAT)\$(GLIBMM_LIBNAME).dll
 GLIBMM_LIB = vs$(PDBVER)\$(CFG)\$(PLAT)\$(GLIBMM_LIBNAME).lib
-GLIBMM_EXTRA_DEFS_GEN_LIB = vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm_generate_extra_defs-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION).lib
+GLIBMM_EXTRA_DEFS_GEN_LIBNAME = glibmm_generate_extra_defs-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)
+GLIBMM_EXTRA_DEFS_GEN_LIB = vs$(PDBVER)\$(CFG)\$(PLAT)\$(GLIBMM_EXTRA_DEFS_GEN_LIBNAME).lib
+GLIBMM_EXTRA_DEFS_GEN_DLL = vs$(PDBVER)\$(CFG)\$(PLAT)\$(GLIBMM_EXTRA_DEFS_GEN_LIBNAME).dll
 
 GIOMM_LIBNAME = giomm-vc$(PDBVER)0$(DEBUG_SUFFIX)-$(GLIBMM_MAJOR_VERSION)_$(GLIBMM_MINOR_VERSION)
 
