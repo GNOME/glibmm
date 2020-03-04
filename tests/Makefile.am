@@ -28,7 +28,7 @@ check_PROGRAMS =				\
 	giomm_listmodel/test \
 	glibmm_btree/test			\
 	glibmm_base64/test			\
-	glibmm_binding/test                     \
+	glibmm_binding/test     \
 	glibmm_date/test			\
 	glibmm_buildfilename/test		\
 	glibmm_interface_implementation/test	\
@@ -41,6 +41,7 @@ check_PROGRAMS =				\
 	glibmm_objectbase_move/test			\
 	glibmm_regex/test			\
 	glibmm_ustring_compare/test		\
+	glibmm_ustring_compose/test		\
 	glibmm_ustring_format/test		\
 	glibmm_ustring_sprintf/test		\
 	glibmm_value/test			\
