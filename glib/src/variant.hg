@@ -72,7 +72,7 @@ class Bytes;
 // Now (2014-01-30) it's also thrown by Gio::Action::parse_detailed_name().
 /** %Exception class for Variant parse errors.
  */
-_WRAP_GERROR(VariantParseError, GVariantParseError, G_VARIANT_PARSE_ERROR, NO_GTYPE)
+_WRAP_GERROR(VariantParseError, GVariantParseError, G_VARIANT_PARSE_ERROR, NO_GTYPE, decl_prefix GLIBMM_API)
 
 //TODO: Add this documentation from the API if we are confident of it for the C++ wrapper:
 // #GVariant is completely threadsafe.  A #GVariant instance can be
@@ -90,9 +90,9 @@ _WRAP_GERROR(VariantParseError, GVariantParseError, G_VARIANT_PARSE_ERROR, NO_GT
  * @newin{2,28}
  * @ingroup Variant
  */
-class VariantBase
+class GLIBMM_API VariantBase
 {
-  _CLASS_OPAQUE_COPYABLE(VariantBase, GVariant, NONE, g_variant_ref_sink, g_variant_unref)
+  _CLASS_OPAQUE_COPYABLE(VariantBase, GVariant, NONE, g_variant_ref_sink, g_variant_unref, GLIBMM_API)
   _CUSTOM_CTOR_CAST()
   _IGNORE(g_variant_ref, g_variant_ref_sink, g_variant_take_ref, g_variant_unref,
     g_variant_get, g_variant_get_va)
@@ -293,7 +293,7 @@ V_CastTo VariantBase::cast_dynamic(const VariantBase& v)
  * @newin{2,28}
  * @ingroup Variant
  */
-class VariantStringBase : public VariantBase
+class GLIBMM_API VariantStringBase : public VariantBase
 {
   // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
   _CLASS_GENERIC(VariantStringBase, GVariant)
@@ -348,7 +348,7 @@ public:
  * @newin{2,28}
  * @ingroup Variant
  */
-class VariantContainerBase : public VariantBase
+class GLIBMM_API VariantContainerBase : public VariantBase
 {
   // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
   _CLASS_GENERIC(VariantContainerBase, GVariant)
@@ -434,7 +434,7 @@ protected:
 };
 
 template<>
-VariantContainerBase VariantBase::cast_dynamic<VariantContainerBase>(const VariantBase& v);
+GLIBMM_API VariantContainerBase VariantBase::cast_dynamic<VariantContainerBase>(const VariantBase& v);
 
 /** Template class used for the specialization of the Variant<> classes.
  * @newin{2,28}
@@ -459,7 +459,7 @@ public:
  * @ingroup Variant
  */
 template<>
-class Variant<VariantBase> : public VariantContainerBase
+class GLIBMM_API Variant<VariantBase> : public VariantContainerBase
 {
   // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
   _CLASS_GENERIC(Variant<VariantBase>, GVariant)
@@ -558,7 +558,7 @@ public:
  * @ingroup Variant
  */
 template<>
-class Variant<Glib::ustring> : public VariantStringBase
+class GLIBMM_API Variant<Glib::ustring> : public VariantStringBase
 {
   // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
   _CLASS_GENERIC(Variant<Glib::ustring>, GVariant)
@@ -601,7 +601,7 @@ public:
 
 //TODO: When we can break ABI, remove this template specialization.
 template<>
-Variant<Glib::ustring> VariantBase::cast_dynamic< Variant<Glib::ustring> >(const VariantBase& v);
+GLIBMM_API Variant<Glib::ustring> VariantBase::cast_dynamic< Variant<Glib::ustring> >(const VariantBase& v);
 
 /** Specialization of Variant containing a Glib::DBusObjectPathString,
  * for variants of type object path.
@@ -609,7 +609,7 @@ Variant<Glib::ustring> VariantBase::cast_dynamic< Variant<Glib::ustring> >(const
  * @ingroup Variant
  */
 template<>
-class Variant<Glib::DBusObjectPathString> : public VariantStringBase
+class GLIBMM_API Variant<Glib::DBusObjectPathString> : public VariantStringBase
 {
   // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
   _CLASS_GENERIC(Variant<Glib::DBusObjectPathString>, GVariant)
@@ -655,7 +655,7 @@ public:
  * @ingroup Variant
  */
 template<>
-class Variant<Glib::DBusSignatureString> : public VariantStringBase
+class GLIBMM_API Variant<Glib::DBusSignatureString> : public VariantStringBase
 {
   // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
   _CLASS_GENERIC(Variant<Glib::DBusSignatureString>, GVariant)
@@ -702,7 +702,7 @@ public:
  * @ingroup Variant
  */
 template<>
-class Variant<std::string> : public VariantStringBase
+class GLIBMM_API Variant<std::string> : public VariantStringBase
 {
   // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
   _CLASS_GENERIC(Variant<std::string>, GVariant)
@@ -741,7 +741,7 @@ public:
 
 //TODO: When we can break ABI, remove this template specialization.
 template<>
-Variant<std::string> VariantBase::cast_dynamic< Variant<std::string> >(const VariantBase& v);
+GLIBMM_API Variant<std::string> VariantBase::cast_dynamic< Variant<std::string> >(const VariantBase& v);
 
 /** Specialization of Variant containing a dictionary entry.  See also
  * Variant< std::map<K, V> >.
@@ -867,7 +867,7 @@ public:
  * @ingroup Variant
  */
 template<>
-class Variant< std::vector<Glib::ustring> > : public VariantContainerBase
+class GLIBMM_API Variant< std::vector<Glib::ustring> > : public VariantContainerBase
 {
 public:
   using CppType = Glib::ustring                ;
@@ -931,7 +931,7 @@ public:
  * @ingroup Variant
  */
 template<>
-class Variant<std::vector<Glib::DBusObjectPathString>> : public VariantContainerBase
+class GLIBMM_API Variant<std::vector<Glib::DBusObjectPathString>> : public VariantContainerBase
 {
 public:
   using CppType = Glib::DBusObjectPathString;
@@ -993,7 +993,7 @@ public:
  * @ingroup Variant
  */
 template<>
-class Variant< std::vector<std::string> > : public VariantContainerBase
+class GLIBMM_API Variant< std::vector<std::string> > : public VariantContainerBase
 {
 public:
   using CppType = std::string                  ;
@@ -1673,7 +1673,7 @@ VariantIter Variant<std::tuple<Types...>>::get_iter() const
 // This is needed so Glib::VariantBase can be used with
 // Glib::Value and _WRAP_PROPERTY in Gio::Action and elsewhere.
 template <>
-class Value<Glib::VariantBase> : public ValueBase_Variant
+class GLIBMM_API Value<Glib::VariantBase> : public ValueBase_Variant
 {
 public:
   using CppType = Glib::VariantBase;
