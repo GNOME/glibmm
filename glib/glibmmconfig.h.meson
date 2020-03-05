@@ -147,16 +147,13 @@
 #endif
 
 #ifdef GLIBMM_DLL
-# if defined(GLIBMM_BUILD) && defined(_WINDLL)
-   /* Do not dllexport as it is handled by gendef on MSVC */
-#  define GLIBMM_API
-# elif !defined(GLIBMM_BUILD)
-#  define GLIBMM_API __declspec(dllimport)
+# if defined(GLIBMM_BUILD)
+#  define GLIBMM_API __declspec(dllexport)
 # else
-   /* Build a static library */
-#  define GLIBMM_API
+#  define GLIBMM_API __declspec(dllimport)
 # endif /* GLIBMM_BUILD - _WINDLL */
 #else
+/* Build a static library or a non-native-Windows library */
 # define GLIBMM_API
 #endif /* GLIBMM_DLL */
 

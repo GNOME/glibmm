@@ -145,6 +145,16 @@ install_headers(glibmm_extra_ph_files, subdir: glibmm_pcname / 'glibmm' / 'priva
 untracked_glibmm = 'untracked' / 'glib' / 'glibmm'
 src_untracked_glibmm = project_source_root / untracked_glibmm
 
+extra_glibmm_objects = []
+glibmm_cpp_args = [ '-DGLIBMM_BUILD=1' ]
+
+# Build the .rc file for Windows builds and link to it
+if is_host_windows
+  windows = import('windows')
+  glibmm_res = windows.compile_resources(glibmm_rc)
+  extra_glibmm_objects += glibmm_res
+endif
+
 if maintainer_mode
 
   # Maintainer mode. Generate .h and .cc files from .hg and .ccg files in ../src.
@@ -246,12 +256,14 @@ if maintainer_mode
   )
 
   extra_include_dirs = ['..']
-  glib_int_lib = static_library('glibmm-int',
+
+  glibmm_library = library(glibmm_pcname, extra_glibmm_objects,
     glibmm_built_cc_file_targets, glibmm_extra_cc_files, built_dummy_h_file_target,
     include_directories: extra_include_dirs,
-    cpp_args: '-DGLIBMM_BUILD=1',
+    cpp_args: glibmm_cpp_args,
+    version: glibmm_libversion,
     dependencies: glibmm_build_dep,
-    install: false,
+    install: true,
   )
 
   built_h_cc_dir = meson.current_build_dir()
@@ -297,53 +309,18 @@ else # not maintainer_mode
 
   extra_include_dirs = [ '..', '..' / '..' / 'untracked' / 'glib' ]
 
-  # We need this so that we can run gendef.exe to get the .def file
-  # needed for obtaining the .lib file for the glibmm DLL
-  glib_int_lib = static_library('glibmm-int',
+  glibmm_library = library(glibmm_pcname, extra_glibmm_objects,
     built_cc_files, glibmm_extra_cc_files,
     include_directories: extra_include_dirs,
-    cpp_args: '-DGLIBMM_BUILD=1',
+    cpp_args: glibmm_cpp_args,
+    version: glibmm_libversion,
     dependencies: glibmm_build_dep,
-    install: false,
+    install: true,
   )
 
   built_h_cc_dir = src_untracked_glibmm
 
 endif
-
-glibmm_def = []
-glibmm_extra_link_args = []
-extra_glibmm_objects = []
-
-if is_msvc
-  glibmm_def = custom_target('glibmm.def',
-    output: 'glibmm.def',
-    depends: glib_int_lib,
-    command: [ gendef,
-      '@OUTPUT@',
-      '@0@-@1@.dll'.format(glibmm_pcname, glibmm_libversion.split('.')[0]),
-      glib_int_lib.full_path(),
-    ],
-    install: false,
-  )
-  glibmm_extra_link_args = ['/def:@0@'.format(glibmm_def.full_path())]
-endif
-
-# Build the .rc file for Windows builds and link to it
-if is_host_windows
-  windows = import('windows')
-  glibmm_res = windows.compile_resources(glibmm_rc)
-  extra_glibmm_objects += glibmm_res
-endif
-
-glibmm_library = library(glibmm_pcname, extra_glibmm_objects,
-  objects: glib_int_lib.extract_all_objects(),
-  version: glibmm_libversion,
-  dependencies: glibmm_build_dep,
-  link_depends: glibmm_def,
-  link_args: glibmm_extra_link_args,
-  install: true,
-)
 
 # Install built .h and _p.h files.
 meson.add_install_script(

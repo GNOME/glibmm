@@ -17,9 +17,6 @@ vs$(PDBVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen:
 	@-md $@
 
 # Generate .def files
-vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\glibmm.def: $(GENDEF) vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm $(glibmm_OBJS)
-	vs$(PDBVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GLIBMM_LIBNAME) vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\*.obj
-
 vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\giomm.def: $(GENDEF) vs$(PDBVER)\$(CFG)\$(PLAT)\giomm $(giomm_OBJS)
 	vs$(PDBVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GIOMM_LIBNAME) vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\*.obj
 

@@ -93,8 +93,8 @@ $**
 # $(dependent_objects)
 # <<
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
-$(GLIBMM_DLL): vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\glibmm.def $(glibmm_OBJS)
-	link /DLL $(LDFLAGS_NOLTCG) $(GOBJECT_LIBS) $(LIBSIGC_LIB) /implib:$(GLIBMM_LIB) /def:vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\glibmm.def -out:$@ @<<
+$(GLIBMM_DLL): vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm $(glibmm_OBJS)
+	link /DLL $(LDFLAGS_NOLTCG) $(GOBJECT_LIBS) $(LIBSIGC_LIB) /implib:$(GLIBMM_LIB) -out:$@ @<<
 $(glibmm_OBJS)
 <<
 
