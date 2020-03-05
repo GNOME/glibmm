@@ -75,7 +75,7 @@ namespace Glib
  *
  * @newin{2,58}
  */
-class ExtraClassInit : virtual public ObjectBase
+class GLIBMM_API ExtraClassInit : virtual public ObjectBase
 {
 protected:
   /** Constructor.

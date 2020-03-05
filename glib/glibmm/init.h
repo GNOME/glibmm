@@ -17,6 +17,8 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <glibmmconfig.h>
+
 namespace Glib
 {
 
@@ -31,6 +33,7 @@ namespace Glib
  *
  * @see set_init_to_users_preferred_locale()
  */
+GLIBMM_API
 void init();
 
 /** Instruct Glib::init() which global locale to set.
@@ -57,6 +60,7 @@ void init();
  *
  * @newin{2,58}
  */
+GLIBMM_API
 void set_init_to_users_preferred_locale(bool state = true);
 
 /** Get the state, set with set_init_to_users_preferred_locale().
@@ -65,6 +69,7 @@ void set_init_to_users_preferred_locale(bool state = true);
  *
  * @newin{2,58}
  */
+GLIBMM_API
 bool get_init_to_users_preferred_locale();
 
 } // namespace Glib

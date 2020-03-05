@@ -39,8 +39,8 @@ namespace Glib
 {
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-class GSigConnectionNode;
-class Interface_Class;
+class GLIBMM_API GSigConnectionNode;
+class GLIBMM_API Interface_Class;
 #endif
 
 // This inherits virtually from sigc::trackable so that people can multiply inherit glibmm classes

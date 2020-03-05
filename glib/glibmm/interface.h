@@ -23,7 +23,7 @@ namespace Glib
 {
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-class Interface_Class;
+class GLIBMM_API Interface_Class;
 #endif
 
 // There is no base GInterface struct in Glib, though there is G_TYPE_INTERFACE enum value.

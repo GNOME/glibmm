@@ -32,8 +32,7 @@ namespace Glib
  * Manages all available sources of events.
  * @{
  */
-
-class PollFD
+class GLIBMM_API PollFD
 {
 public:
   using fd_t = decltype(GPollFD::fd);
@@ -58,7 +57,7 @@ private:
   GPollFD gobject_;
 };
 
-class SignalTimeout
+class GLIBMM_API SignalTimeout
 {
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -194,7 +193,7 @@ private:
   SignalTimeout& operator=(const SignalTimeout&);
 };
 
-class SignalIdle
+class GLIBMM_API SignalIdle
 {
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -252,7 +251,7 @@ private:
   SignalIdle& operator=(const SignalIdle&);
 };
 
-class SignalIO
+class GLIBMM_API SignalIO
 {
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -323,7 +322,7 @@ private:
   SignalIO& operator=(const SignalIO&);
 };
 
-class SignalChildWatch
+class GLIBMM_API SignalChildWatch
 {
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -357,26 +356,30 @@ private:
 /** Convenience timeout signal.
  * @return A signal proxy; you want to use SignalTimeout::connect().
  */
+GLIBMM_API
 SignalTimeout signal_timeout();
 
 /** Convenience idle signal.
  * @return A signal proxy; you want to use SignalIdle::connect().
  */
+GLIBMM_API
 SignalIdle signal_idle();
 
 /** Convenience I/O signal.
  * @return A signal proxy; you want to use SignalIO::connect().
  */
+GLIBMM_API
 SignalIO signal_io();
 
 /** Convenience child watch signal.
  * @return A signal proxy; you want to use SignalChildWatch::connect().
  */
+GLIBMM_API
 SignalChildWatch signal_child_watch();
 
 /** Main context.
  */
-class MainContext
+class GLIBMM_API MainContext
 {
 public:
   using CppObjectType = Glib::MainContext;
@@ -636,9 +639,10 @@ private:
 };
 
 /** @relates Glib::MainContext */
+GLIBMM_API
 Glib::RefPtr<MainContext> wrap(GMainContext* gobject, bool take_copy = false);
 
-class MainLoop
+class GLIBMM_API MainLoop
 {
 public:
   using CppObjectType = Glib::MainLoop;
@@ -694,9 +698,10 @@ private:
 };
 
 /** @relates Glib::MainLoop */
+GLIBMM_API
 Glib::RefPtr<MainLoop> wrap(GMainLoop* gobject, bool take_copy = false);
 
-class Source
+class GLIBMM_API Source
 {
 public:
   using CppObjectType = Glib::Source;
@@ -856,7 +861,7 @@ public:
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 };
 
-class TimeoutSource : public Glib::Source
+class GLIBMM_API TimeoutSource : public Glib::Source
 {
 public:
   using CppObjectType = Glib::TimeoutSource;
@@ -877,7 +882,7 @@ private:
   unsigned int interval_; // milliseconds
 };
 
-class IdleSource : public Glib::Source
+class GLIBMM_API IdleSource : public Glib::Source
 {
 public:
   using CppObjectType = Glib::IdleSource;
@@ -894,7 +899,7 @@ protected:
   bool dispatch(sigc::slot_base* slot_data) override;
 };
 
-class IOSource : public Glib::Source
+class GLIBMM_API IOSource : public Glib::Source
 {
 public:
   using CppObjectType = Glib::IOSource;

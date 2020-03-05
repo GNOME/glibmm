@@ -32,9 +32,11 @@ namespace Glib
 extern "C" {
 #endif // GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC
 
+GLIBMM_API
 void custom_get_property_callback(
   GObject* object, unsigned int property_id, GValue* value, GParamSpec* param_spec);
 
+GLIBMM_API
 void custom_set_property_callback(
   GObject* object, unsigned int property_id, const GValue* value, GParamSpec* param_spec);
 
@@ -49,7 +51,7 @@ void custom_set_property_callback(
  * This class manages the generic parts of the object properties.
  * Derived (templated) classes handle the specific value types.
  */
-class PropertyBase
+class GLIBMM_API PropertyBase
 {
 public:
   // noncopyable

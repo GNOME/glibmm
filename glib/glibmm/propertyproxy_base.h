@@ -26,11 +26,11 @@
 namespace Glib
 {
 
-class ObjectBase;
+class GLIBMM_API ObjectBase;
 
 /// Use the connect() method, with sigc::ptr_fun() or sigc::mem_fun() to connect signals to signal
 /// handlers.
-class SignalProxyProperty : public SignalProxyBase
+class GLIBMM_API SignalProxyProperty : public SignalProxyBase
 {
 public:
   friend class PropertyProxy_Base;
@@ -51,7 +51,7 @@ private:
   SignalProxyProperty& operator=(const SignalProxyProperty&); // not implemented
 };
 
-class PropertyProxy_Base
+class GLIBMM_API PropertyProxy_Base
 {
 public:
   PropertyProxy_Base(ObjectBase* obj, const char* property_name);
@@ -79,13 +79,13 @@ private:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-class SignalProxyProperty;
+class GLIBMM_API SignalProxyProperty;
 
 /** PropertyProxyConnectionNode is a connection node for use with SignalProxyProperty.
   * It's like SignalProxyConnectionNode, but it contains the property name too.
   * This is not public API.
   */
-class PropertyProxyConnectionNode : public SignalProxyConnectionNode
+class GLIBMM_API PropertyProxyConnectionNode : public SignalProxyConnectionNode
 {
 public:
   friend class SignalProxyProperty;
