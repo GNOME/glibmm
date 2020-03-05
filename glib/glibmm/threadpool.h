@@ -44,7 +44,7 @@ namespace Glib
  *
  * @deprecated This is deprecated in favor of the standard C++ concurrency API in C++11 and C++14.
  */
-class ThreadPool
+class GLIBMM_API ThreadPool
 {
 public:
   /** Constructs a new thread pool.

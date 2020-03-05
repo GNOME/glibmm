@@ -264,7 +264,7 @@ struct TypeTraits<Glib::RefPtr<const T>>
  * the output type cannot be 'const char*'.
  */
 template <>
-struct TypeTraits<Glib::ustring>
+struct GLIBMM_API TypeTraits<Glib::ustring>
 {
   using CppType = Glib::ustring;
   using CType = const char*;
@@ -286,7 +286,7 @@ struct TypeTraits<Glib::ustring>
  * cannot be 'const char*'.
  */
 template <>
-struct TypeTraits<std::string>
+struct GLIBMM_API TypeTraits<std::string>
 {
   using CppType = std::string;
   using CType = const char*;
@@ -305,7 +305,7 @@ struct TypeTraits<std::string>
  * @ingroup ContHelpers
  */
 template <>
-struct TypeTraits<bool>
+struct GLIBMM_API TypeTraits<bool>
 {
   using CppType = bool;
   using CType = gboolean;
@@ -321,7 +321,7 @@ struct TypeTraits<bool>
  * @ingroup ContHelpers
  */
 template <>
-struct TypeTraits<Glib::VariantBase>
+struct GLIBMM_API TypeTraits<Glib::VariantBase>
 {
   using CppType = Glib::VariantBase;
   using CType = GVariant*;
@@ -340,7 +340,7 @@ struct TypeTraits<Glib::VariantBase>
  * @ingroup ContHelpers
  */
 template <>
-struct TypeTraits<Glib::VariantContainerBase>
+struct GLIBMM_API TypeTraits<Glib::VariantContainerBase>
 {
   using CppType = Glib::VariantContainerBase;
   using CType = GVariant*;

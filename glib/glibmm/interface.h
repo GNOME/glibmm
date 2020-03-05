@@ -23,7 +23,7 @@ namespace Glib
 {
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-class Interface_Class;
+class GLIBMM_API Interface_Class;
 #endif
 
 // There is no base GInterface struct in Glib, though there is G_TYPE_INTERFACE enum value.
@@ -78,6 +78,7 @@ public:
   inline const GObject* gobj() const { return gobject_; }
 };
 
+GLIBMM_API
 RefPtr<ObjectBase> wrap_interface(GObject* object, bool take_copy = false);
 
 } // namespace Glib

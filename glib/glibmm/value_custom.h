@@ -42,6 +42,8 @@ typedef void (*ValueCopyFunc)(const GValue*, GValue*);
  * as subtype of G_TYPE_BOXED, via this function.  The type_name argument
  * should be the C++ RTTI name.
  */
+
+GLIBMM_API
 GType custom_boxed_type_register(
   const char* type_name, ValueInitFunc init_func, ValueFreeFunc free_func, ValueCopyFunc copy_func);
 
@@ -49,6 +51,7 @@ GType custom_boxed_type_register(
  * each T* or const T* will be registered as a subtype of G_TYPE_POINTER,
  * via this function.  The type_name argument should be the C++ RTTI name.
  */
+GLIBMM_API
 GType custom_pointer_type_register(const char* type_name);
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */

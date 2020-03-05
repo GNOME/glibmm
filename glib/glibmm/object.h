@@ -47,9 +47,9 @@ namespace Glib
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-class Class;
-class Object_Class;
-class GSigConnectionNode;
+class GLIBMM_API Class;
+class GLIBMM_API Object_Class;
+class GLIBMM_API GSigConnectionNode;
 
 /* ConstructParams::ConstructParams() takes a varargs list of properties
  * and values, like g_object_new() does.  This list will then be converted
@@ -65,7 +65,7 @@ class GSigConnectionNode;
  * The comments in object.cc and objectbase.cc should explain in detail
  * how this works.
  */
-class ConstructParams
+class GLIBMM_API ConstructParams
 {
 public:
   const Glib::Class& glibmm_class;

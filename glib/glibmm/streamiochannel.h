@@ -29,7 +29,7 @@ namespace Glib
 /** @deprecated This whole class was deprecated in glibmm 2.2 - See the Glib::IOChannel
  * documentation for an explanation.
  */
-class StreamIOChannel : public Glib::IOChannel
+class GLIBMM_API StreamIOChannel : public Glib::IOChannel
 {
 public:
   ~StreamIOChannel() noexcept override;

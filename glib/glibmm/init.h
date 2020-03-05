@@ -17,6 +17,8 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <glibmmconfig.h>
+
 namespace Glib
 {
 
@@ -28,6 +30,7 @@ namespace Glib
  * You do not need to call %Glib::init() if you are using Gtk::Application or
  * Gio::init(), because they call %Glib::init() for you.
  */
+GLIBMM_API
 void init();
 
 } // namespace Glib

@@ -25,7 +25,7 @@
 namespace Glib
 {
 
-class Error : public Glib::Exception
+class GLIBMM_API Error : public Glib::Exception
 {
 public:
   Error();
@@ -74,7 +74,7 @@ protected:
 // This is needed so Glib::Error can be used with
 // Glib::Value and _WRAP_PROPERTY.
 template <>
-class Value<Glib::Error> : public ValueBase_Boxed
+class GLIBMM_API Value<Glib::Error> : public ValueBase_Boxed
 {
 public:
   using CppType = Glib::Error;

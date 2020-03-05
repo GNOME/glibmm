@@ -24,6 +24,7 @@
 namespace Glib
 {
 
+GLIBMM_API
 void wrap_init();
 
 } // namespace Glib

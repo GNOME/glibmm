@@ -26,22 +26,27 @@ namespace Glib
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-class ObjectBase;
-class Object;
+class GLIBMM_API ObjectBase;
+class GLIBMM_API Object;
 
 // Type of the per-class wrap_new() functions.
 using WrapNewFunction = Glib::ObjectBase*(*)(GObject*);
 
 // Setup and free the structures used by wrap_register().
 // Both functions might be called more than once.
+GLIBMM_API
 void wrap_register_init();
+
+GLIBMM_API
 void wrap_register_cleanup();
 
 // Register a new type for auto allocation.
+GLIBMM_API
 void wrap_register(GType type, WrapNewFunction func);
 
 // Return the current C++ wrapper instance of the GObject,
 // or automatically generate a new wrapper if there's none.
+GLIBMM_API
 Glib::ObjectBase* wrap_auto(GObject* object, bool take_copy = false);
 
 /** Create a C++ instance of a known C++ type that is mostly closely associated with the GType of
@@ -50,6 +55,7 @@ Glib::ObjectBase* wrap_auto(GObject* object, bool take_copy = false);
  * @param interface_gtype The returned instance will implement this interface. Otherwise it will be
  * NULL.
  */
+GLIBMM_API
 Glib::ObjectBase* wrap_create_new_wrapper_for_interface(GObject* object, GType interface_gtype);
 
 // Return the current C++ wrapper instance of the GObject,
@@ -107,6 +113,7 @@ wrap_auto_interface(GObject* object, bool take_copy = false)
 // use take_copy = true when wrapping a struct member.
 // TODO: move to object.h ?
 /** @relates Glib::Object */
+GLIBMM_API
 Glib::RefPtr<Glib::Object> wrap(GObject* object, bool take_copy = false);
 
 /** Get the underlying C instance from the C++ instance.  This is just

@@ -33,7 +33,7 @@ namespace Glib
  * @{
  */
 
-class PatternSpec
+class GLIBMM_API PatternSpec
 {
 public:
   explicit PatternSpec(const Glib::ustring& pattern);
