@@ -26,7 +26,7 @@ GLIBMM_BASE_CFLAGS =			\
 	/Ivs$(VSVER)\$(CFG)\$(PLAT)	\
 	/I..\untracked\glib /I..\untracked\glib\glibmm		\
 	/I..\glib /I..\glib\glibmm /I.\glibmm		\
-	/wd4530 /std:c++17	\
+	/wd4530 /wd4251 /wd4275 /std:c++17	\
 	/FImsvc_recommended_pragmas.h
 
 GIOMM_BASE_CFLAGS =	\
