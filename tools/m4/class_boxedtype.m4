@@ -1,7 +1,7 @@
 dnl $Id$
 
 dnl
-dnl _CLASS_BOXEDTYPE(Region, GdkRegion, gdk_region_new, gdk_region_copy, gdk_region_destroy)
+dnl _CLASS_BOXEDTYPE(Region, GdkRegion, gdk_region_new, gdk_region_copy, gdk_region_destroy, api_decoration)
 dnl
 
 define(`_CLASS_BOXEDTYPE',`dnl
@@ -13,6 +13,7 @@ define(`__CNAME__',`$2')
 define(`__BOXEDTYPE_FUNC_NEW',`$3')
 define(`__BOXEDTYPE_FUNC_COPY',`$4')
 define(`__BOXEDTYPE_FUNC_FREE',`$5')
+define(`__BOXEDTYPE_FUNC_DECORATION',`$6')
 
 define(`_CUSTOM_DEFAULT_CTOR',`dnl
 _PUSH()
@@ -79,6 +80,7 @@ ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
  *
  * @relates __NAMESPACE__::__CPPNAME__
  */
+__BOXEDTYPE_FUNC_DECORATION
 __NAMESPACE__::__CPPNAME__ wrap(__CNAME__* object, bool take_copy = false);
 ')dnl endif __BOOL_NO_WRAP_FUNCTION__
 
