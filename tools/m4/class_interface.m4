@@ -15,6 +15,8 @@ define(`__CPARENT__',m4_ifelse($6,`',`GObject',$6)) #Optional parameter.
 define(`__PCAST__',`(__CPARENT__`'*)')
 define(`__BOOL_IS_INTERFACE__',`1')
 
+dnl $7 is for the optional api_decoration used for import/export
+define(`__FUNC_DECORATION__',`$7')
 
 dnl For classes that need custom code in their cast constructor.
 define(`_CUSTOM_CTOR_CAST',`dnl
@@ -135,6 +137,7 @@ namespace Glib
    *
    * @relates __NAMESPACE__::__CPPNAME__
    */
+  __FUNC_DECORATION__
   Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__CNAME__`'* object, bool take_copy = false);
 
 } // namespace Glib

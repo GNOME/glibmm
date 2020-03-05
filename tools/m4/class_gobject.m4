@@ -19,6 +19,8 @@ dnl the problem by supporting optional __REAL_* arguments to this macro.
 define(`__REAL_CNAME__',ifelse(`$6',,__CNAME__,`$6'))
 define(`__REAL_CPARENT__',ifelse(`$7',,__CPARENT__,`$7'))
 
+dnl $8 is for the optional api_decoration used for import/export
+define(`__FUNC_DECORATION__',`$8')
 
 _POP()
 _SECTION(SECTION_CLASS2)
@@ -141,6 +143,7 @@ namespace Glib
    *
    * @relates __NAMESPACE__::__CPPNAME__
    */
+  __FUNC_DECORATION__
   Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__REAL_CNAME__`'* object, bool take_copy = false);
 }
 ')dnl

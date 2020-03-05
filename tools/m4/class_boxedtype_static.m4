@@ -1,7 +1,7 @@
 dnl $Id$
 
 dnl
-dnl _CLASS_BOXEDTYPE_STATIC(TreeIter, GtkTreeIter)
+dnl _CLASS_BOXEDTYPE_STATIC(TreeIter, GtkTreeIter, api_decoration)
 dnl
 define(`_CLASS_BOXEDTYPE_STATIC',`dnl
 _PUSH()
@@ -9,6 +9,7 @@ dnl
 dnl Define the args for later macros
 define(`__CPPNAME__',`$1')
 define(`__CNAME__',`$2')
+define(`__FUNC_DECORATION__',`$3')
 
 define(`_CUSTOM_DEFAULT_CTOR',`dnl
 _PUSH()
@@ -53,12 +54,14 @@ ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
  * @param object The C instance
  * @result A C++ instance that wraps this C instance.
  */
+__FUNC_DECORATION__
 __NAMESPACE__::__CPPNAME__& wrap(__CNAME__* object);
 
 /** @relates __NAMESPACE__::__CPPNAME__
  * @param object The C instance
  * @result A C++ instance that wraps this C instance.
  */
+__FUNC_DECORATION__
 const __NAMESPACE__::__CPPNAME__& wrap(const __CNAME__* object);
 ')dnl endif __BOOL_NO_WRAP_FUNCTION__
 
