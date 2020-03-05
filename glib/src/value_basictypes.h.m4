@@ -29,7 +29,7 @@ LINE(]__line__[)dnl
  * @ingroup glibmmValue
  */
 template <>
-class Value<$1> : public ValueBase
+class GLIBMM_API Value<$1> : public ValueBase
 {
 public:
   using CppType = $1;

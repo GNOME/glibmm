@@ -59,7 +59,8 @@ _WRAP_GERROR(FileError, GFileError, G_FILE_ERROR, NO_GTYPE,
     s#^AGAIN$#TRYAGAIN#,
     s#^INTR$#INTERRUPTED#,
     s#^IO$#IO_ERROR#,
-    s#^PERM$#NOT_OWNER#
+    s#^PERM$#NOT_OWNER#,
+    decl_prefix GLIBMM_API
 )
 
 /** @var FileError::Code FileError::EXISTS
@@ -142,7 +143,7 @@ class Dir;
 /** The iterator type of Glib::Dir.
  * @ingroup FileUtils
  */
-class DirIterator
+class GLIBMM_API DirIterator
 {
 public:
   typedef std::input_iterator_tag   iterator_category;
@@ -186,7 +187,7 @@ private:
  * @note The encoding of the directory entries isn't necessarily UTF-8.
  * Use Glib::filename_to_utf8() if you need to display them.
  */
-class Dir
+class GLIBMM_API Dir
 {
 public:
   using iterator = DirIterator;
@@ -263,6 +264,7 @@ private:
  * @param test Bitfield of Glib::FileTest flags.
  * @return Whether a test was true.
  */
+GLIBMM_API
 bool file_test(const std::string& filename, FileTest test);
 
 /** Opens a temporary file.
@@ -278,6 +280,7 @@ bool file_test(const std::string& filename, FileTest test);
  *   is a difference. The file handle should be closed with close(). In
  *   case of errors, <tt>-1</tt> is returned.
  */
+GLIBMM_API
 int mkstemp(std::string& filename_template);
 
 /** Opens a file for writing in the preferred directory for temporary files
@@ -295,6 +298,7 @@ int mkstemp(std::string& filename_template);
  * difference. The file handle should be closed with <tt>close()</tt>.
  * @throw Glib::FileError
  */
+GLIBMM_API
 int file_open_tmp(std::string& name_used, const std::string& prefix);
 
 /** Opens a file for writing in the preferred directory for temporary files
@@ -309,6 +313,7 @@ int file_open_tmp(std::string& name_used, const std::string& prefix);
  * difference. The file handle should be closed with <tt>close()</tt>.
  * @throw Glib::FileError
  */
+GLIBMM_API
 int file_open_tmp(std::string& name_used);
 
 /** Reads an entire file into a string, with good error checking.
@@ -317,6 +322,7 @@ int file_open_tmp(std::string& name_used);
  * @return The file contents.
  * @throw Glib::FileError
  */
+GLIBMM_API
 std::string file_get_contents(const std::string& filename);
 
 /** Writes all of @a contents to a file named @a filename, with good error checking.
@@ -354,11 +360,13 @@ std::string file_get_contents(const std::string& filename);
  *
  * @newin{2,22}
  **/
+GLIBMM_API
 void file_set_contents (const std::string& filename, const gchar *contents, gssize length);
 /** A variant of file_set_contents which accepts a standard C++ string
  *
  * @newin{2,22}
  * */
+GLIBMM_API
 void file_set_contents (const std::string& filename, const std::string& contents);
 
 } // namespace Glib

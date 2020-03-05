@@ -39,7 +39,7 @@ LINE(]__line__[)dnl
  * @ingroup Variant
  */
 template <>
-class Variant<$1> : public VariantBase
+class GLIBMM_API Variant<$1> : public VariantBase
 {
 public:
   using CType = $2;
