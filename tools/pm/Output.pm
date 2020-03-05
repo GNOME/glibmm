@@ -782,12 +782,12 @@ sub output_wrap_enum_docs_only($$$$$$$$$$$$)
 
 # void output_wrap_gerror($filename, $line_num, $cpp_type, $c_type, $domain,
 #  $class_docs, $ref_subst_in, $ref_subst_out, $gtype_func,
-#  $deprecated, $deprecation_docs, $newin)
-sub output_wrap_gerror($$$$$$$$$$$$$)
+#  $deprecated, $deprecation_docs, $newin, $decl_prefix)
+sub output_wrap_gerror($$$$$$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $cpp_type, $c_type, $domain,
     $class_docs, $ref_subst_in, $ref_subst_out, $gtype_func,
-    $deprecated, $deprecation_docs, $newin) = @_;
+    $deprecated, $deprecation_docs, $newin, $decl_prefix) = @_;
 
   my $objDefsParser = $$self{objDefsParser};
 
@@ -845,7 +845,7 @@ sub output_wrap_gerror($$$$$$$$$$$$$)
   # Prevent Doxygen from auto-linking to a class called Exception.
   $class_docs =~ s/([^%])(Exception class)/$1%$2/g;
 
-  my $str = sprintf("_GERROR(%s,%s,%s,\`%s\',\`%s\',\`%s\',\`%s\',\`%s\')dnl\n",
+  my $str = sprintf("_GERROR(%s,%s,%s,\`%s\',\`%s\',\`%s\',\`%s\',\`%s\',\`%s\')dnl\n",
     $cpp_type,
     $c_type,
     $domain,
@@ -853,7 +853,8 @@ sub output_wrap_gerror($$$$$$$$$$$$$)
     $gtype_func,
     $class_docs,
     $enum_docs,
-    $deprecated
+    $deprecated,
+    $decl_prefix
   );
 
   $self->append($str);
