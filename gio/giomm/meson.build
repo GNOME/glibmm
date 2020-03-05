@@ -379,11 +379,12 @@ if is_host_windows
 endif
 
 giomm_library = library(giomm_pcname, extra_giomm_objects,
+  objects: gio_int_lib.extract_all_objects(),
   version: glibmm_libversion,
   dependencies: giomm_build_dep,
   link_depends: giomm_def,
   link_args: giomm_extra_link_args,
-  link_with: [gio_int_lib, glibmm_library],
+  link_with: glibmm_library,
   install: true,
 )
 

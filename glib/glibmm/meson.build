@@ -337,7 +337,7 @@ if is_host_windows
 endif
 
 glibmm_library = library(glibmm_pcname, extra_glibmm_objects,
-  link_with: glib_int_lib,
+  objects: glib_int_lib.extract_all_objects(),
   version: glibmm_libversion,
   dependencies: glibmm_build_dep,
   link_depends: glibmm_def,
