@@ -3,7 +3,7 @@
 # Input: giomm_build_dep, giomm_pcname, maintainer_mode, project_source_root,
 #        generate_binding_py, handle_built_files_py, m4_files, pm_files,
 #        glibmm_libversion, install_includedir, python3, giomm_rc, gmmproc_dir,
-#        is_host_windows, gendef, gmmproc, generate_wrap_init_pl
+#        is_host_windows, gmmproc, generate_wrap_init_pl
 # Output: giomm_hg_ccg_basenames, giomm_extra_h_files, built_files_root,
 #         giomm_built_h_file_targets, giomm_dep
 
@@ -210,6 +210,16 @@ install_headers(giomm_extra_h_files, subdir: giomm_pcname / 'giomm')
 untracked_giomm = 'untracked' / 'gio' / 'giomm'
 src_untracked_giomm = project_source_root / untracked_giomm
 
+extra_giomm_objects = []
+giomm_cpp_flags = [ '-DGIOMM_BUILD=1' ]
+
+# Build the .rc file for Windows builds and link to it
+if is_host_windows
+  windows = import('windows')
+  giomm_res = windows.compile_resources(giomm_rc)
+  extra_giomm_objects += giomm_res
+endif
+
 if maintainer_mode
 
   # Maintainer mode. Generate .h and .cc files from .hg and .ccg files in ../src.
@@ -291,13 +301,15 @@ if maintainer_mode
   )
 
   extra_include_dirs = ['..', '..' / '..' / 'glib']
-  gio_int_lib = static_library('giomm-int',
+
+  giomm_library = library(giomm_pcname, extra_giomm_objects,
     giomm_used_built_cc_file_targets, giomm_extra_cc_files, built_dummy_h_file_target,
+    version: glibmm_libversion,
     include_directories: extra_include_dirs,
-    cpp_args: '-DGIOMM_BUILD=1',
+    cpp_args: giomm_cpp_flags,
     dependencies: giomm_build_dep,
     link_with: glibmm_library,
-    install: false,
+    install: true,
   )
 
   built_h_cc_dir = meson.current_build_dir()
@@ -338,55 +350,19 @@ else # not maintainer_mode
          '..' / '..' / 'glib', '..' / '..' / 'untracked' / 'glib',
   ]
 
-  # We need this so that we can run gendef.exe to get the .def file
-  # needed for obtaining the .lib file for the giomm DLL
-  gio_int_lib = static_library('giomm-int',
+  giomm_library = library(giomm_pcname, extra_giomm_objects,
     built_cc_files, giomm_extra_cc_files,
+    version: glibmm_libversion,
     include_directories: extra_include_dirs,
-    cpp_args: '-DGIOMM_BUILD=1',
+    cpp_args: giomm_cpp_flags,
     dependencies: giomm_build_dep,
     link_with: glibmm_library,
-    install: false,
+    install: true,
   )
 
   built_h_cc_dir = src_untracked_giomm
 
 endif
-
-giomm_def = []
-giomm_extra_link_args = []
-extra_giomm_objects = []
-
-if is_msvc
-  giomm_def = custom_target('giomm.def',
-    output: 'giomm.def',
-    depends: gio_int_lib,
-    command: [ gendef,
-      '@OUTPUT@',
-      '@0@-@1@.dll'.format(giomm_pcname, glibmm_libversion.split('.')[0]),
-      gio_int_lib.full_path(),
-    ],
-    install: false,
-  )
-  giomm_extra_link_args = ['/def:@0@'.format(giomm_def.full_path())]
-endif
-
-# Build the .rc file for Windows builds and link to it
-if is_host_windows
-  windows = import('windows')
-  giomm_res = windows.compile_resources(giomm_rc)
-  extra_giomm_objects += giomm_res
-endif
-
-giomm_library = library(giomm_pcname, extra_giomm_objects,
-  objects: gio_int_lib.extract_all_objects(),
-  version: glibmm_libversion,
-  dependencies: giomm_build_dep,
-  link_depends: giomm_def,
-  link_args: giomm_extra_link_args,
-  link_with: glibmm_library,
-  install: true,
-)
 
 # Install built .h and _p.h files.
 meson.add_install_script(

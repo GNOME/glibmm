@@ -97,10 +97,10 @@ $(GLIBMM_DLL): vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm $(glibmm_OBJS)
 	link /DLL $(LDFLAGS_NOLTCG) $(GOBJECT_LIBS) $(LIBSIGC_LIB) /implib:$(GLIBMM_LIB) -out:$@ @<<
 $(glibmm_OBJS)
 <<
-
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
-$(GIOMM_DLL): $(GLIBMM_LIB) vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\giomm.def $(giomm_OBJS)
-	link /DLL $(LDFLAGS_NOLTCG) $(GLIBMM_LIB) $(GIO_LIBS) $(LIBSIGC_LIB) /implib:$(GIOMM_LIB) /def:vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\giomm.def -out:$@ @<<
+
+$(GIOMM_DLL): vs$(PDBVER)\$(CFG)\$(PLAT)\giomm $(GLIBMM_LIB) $(giomm_OBJS)
+	link /DLL $(LDFLAGS_NOLTCG) $(GLIBMM_LIB) $(GIO_LIBS) $(LIBSIGC_LIB) /implib:$(GIOMM_LIB) -out:$@ @<<
 $(giomm_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
@@ -112,11 +112,6 @@ $(giomm_OBJS)
 # $(dependent_objects)
 # <<
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
-
-# For the gendef tool
-{.\gendef\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\}.exe:
-	@if not exist vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\ $(MAKE) -f Makefile.vc CFG=$(CFG) vs$(PDBVER)\$(CFG)\$(PLAT)\gendef
-	$(CXX) $(GLIBMM_BASE_CFLAGS) $(CFLAGS) /Fo$(@D)\gendef\ /Fd$(@D)\gendef\ $< /link $(LDFLAGS) /out:$@
 
 # For the buildable glibmm examples
 vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm-ex-compose.exe: ..\examples\compose\main.cc $(GLIBMM_LIB)
@@ -256,6 +251,7 @@ clean:
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.lib
 	@-del ..\tools\generate_wrap_init.pl
 	@-del ..\tools\gmmproc
+<<<<<<< HEAD
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gschemas.compiled
 	@-del vs$(PDBVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\*.pdb
 	@-del vs$(PDBVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\*.obj
@@ -281,8 +277,6 @@ clean:
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\*.cc
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\private\*.h
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\*.h
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\*.obj
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\*.pdb
 	@-if exist vs$(PDBVER)\$(CFG)\$(PLAT)\giomm-tests rd vs$(PDBVER)\$(CFG)\$(PLAT)\giomm-tests
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\giomm-ex
@@ -292,6 +286,5 @@ clean:
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm-ex
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\private
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm
-	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gendef
 
 .SUFFIXES: .cc .h .ccg .hg .obj .cc.m4 .h.m4

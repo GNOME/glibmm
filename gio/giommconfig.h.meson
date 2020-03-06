@@ -19,20 +19,17 @@
 #mesondefine GIOMM_STATIC_LIB
 
 // Enable DLL-specific stuff only when not building a static library
-#if !defined(__CYGWIN__) && defined(__MINGW32__) && !defined(GIOMM_STATIC_LIB)
+#if !defined(__CYGWIN__) && (defined(__MINGW32__) || defined(_MSC_VER)) && !defined(GIOMM_STATIC_LIB)
 # define GIOMM_DLL 1
 #endif
 
 #ifdef GIOMM_DLL
-# if defined(GIOMM_BUILD) && defined(_WINDLL)
-   /* Do not dllexport as it is handled by gendef on MSVC */
-#  define GIOMM_API
-# elif !defined(GIOMM_BUILD)
-#  define GIOMM_API __declspec(dllimport)
+# if defined(GIOMM_BUILD)
+#  define GIOMM_API __declspec(dllexport)
 # else
-   /* Build a static library */
-#  define GIOMM_API
-# endif /* GIOMM_BUILD - _WINDLL */
+#  define GIOMM_API __declspec(dllimport)
+# endif
+/* Build a static library or non-native-Windows library */
 #else
 # define GIOMM_API
 #endif /* GIOMM_DLL */
