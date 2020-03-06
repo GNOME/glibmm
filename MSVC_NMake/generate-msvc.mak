@@ -4,7 +4,6 @@
 # one is maintaining the NMake build files.
 
 # Create the build directories
-vs$(VSVER)\$(CFG)\$(PLAT)\gendef	\
 vs$(VSVER)\$(CFG)\$(PLAT)\glibmm	\
 vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\private	\
 vs$(VSVER)\$(CFG)\$(PLAT)\giomm	\
@@ -15,10 +14,6 @@ vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-tests	\
 vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests	\
 vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen:
 	@-md $@
-
-# Generate .def files
-vs$(VSVER)\$(CFG)\$(PLAT)\giomm\giomm.def: $(GENDEF) vs$(VSVER)\$(CFG)\$(PLAT)\giomm $(giomm_OBJS)
-	vs$(VSVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GIOMM_LIBNAME) vs$(VSVER)\$(CFG)\$(PLAT)\giomm\*.obj
 
 # Compile schema for giomm settings example
 vs$(VSVER)\$(CFG)\$(PLAT)\gschema.compiled: ..\examples\settings\org.gtkmm.demo.gschema.xml

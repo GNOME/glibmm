@@ -75,7 +75,6 @@ GIOMM_LIBNAME = giomm-vc$(VSVER)0$(DEBUG_SUFFIX)-$(GLIBMM_MAJOR_VERSION)_$(GLIBM
 GIOMM_DLL = vs$(VSVER)\$(CFG)\$(PLAT)\$(GIOMM_LIBNAME).dll
 GIOMM_LIB = vs$(VSVER)\$(CFG)\$(PLAT)\$(GIOMM_LIBNAME).lib
 
-GENDEF = vs$(VSVER)\$(CFG)\$(PLAT)\gendef.exe
 GOBJECT_LIBS = gobject-2.0.lib gmodule-2.0.lib glib-2.0.lib
 GIO_LIBS = gio-2.0.lib $(GOBJECT_LIBS)
 
