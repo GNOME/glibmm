@@ -35,6 +35,7 @@ namespace Gio
  *
  * @see Glib::set_init_to_users_preferred_locale()
  */
+GIOMM_API
 void init();
 
 } // end namespace Gio

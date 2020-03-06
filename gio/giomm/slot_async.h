@@ -32,6 +32,7 @@ namespace Gio
  *   slot_name slot, slot_callback SignalProxy_async_callback)
  * @endcode
  */
+GIOMM_API
 void SignalProxy_async_callback(GObject*, GAsyncResult* res, void* data);
 
 } // namespace Gio
