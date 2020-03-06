@@ -1,6 +1,47 @@
 #ifndef _GLIBMM_CONFIG_H
 #define _GLIBMM_CONFIG_H
 
+/* Define to omit deprecated API from the library. */
+#mesondefine GLIBMM_DISABLE_DEPRECATED
+
+/* Major version number of glibmm. */
+#mesondefine GLIBMM_MAJOR_VERSION
+
+/* Minor version number of glibmm. */
+#mesondefine GLIBMM_MINOR_VERSION
+
+/* Micro version number of glibmm. */
+#mesondefine GLIBMM_MICRO_VERSION
+
+/* Define if glibmm is built as a static library */
+#mesondefine GLIBMM_STATIC_LIB
+
+/* The size of wchar_t, as computed by sizeof. */
+#mesondefine GLIBMM_SIZEOF_WCHAR_T
+
+/* Defined when the -Ddebug-refcounting configure argument was given */
+#mesondefine GLIBMM_DEBUG_REFCOUNTING
+
+/* This is always set. This is only for backwards compatibility. */
+#define GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED 1
+
+/* This is always set. This is only for backwards compatibility. */
+#define GLIBMM_EXCEPTIONS_ENABLED 1
+
+/* This is always set. This is only for backwards compatibility. */
+#define GLIBMM_VFUNCS_ENABLED 1
+
+/* This is always set. This is only for backwards compatibility. */
+#define GLIBMM_PROPERTIES_ENABLED 1
+
+/* This is always set. This is only for backwards compatibility.
+ * All acceptable C++ compilers have namespace std. */
+#define GLIBMM_HAVE_NAMESPACE_STD 1
+
+/* Dummy macro definition for compatibility with old code that expects
+ * it to be defined. */
+#define GLIBMM_USING_STD(Symbol)
+
 #ifdef _WIN32
   /* Win32 compilers have a lot of varation */
 # if defined(_MSC_VER)
@@ -23,98 +64,62 @@
 #ifdef GLIBMM_CONFIGURE
 
 /* Define only on Mac OS, COCOA */
-#undef GLIBMM_OS_COCOA
+#mesondefine GLIBMM_OS_COCOA
 
 /* Define if extern "C" and extern "C++" function pointers are compatible. */
-#undef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+#mesondefine GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
 
 /* Define if non-instantiated templates may dynamic_cast<> to an undefined
    type. */
-#undef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
+#mesondefine GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 
 /* Define if the compiler honors namespaces inside extern "C" blocks. */
-#undef GLIBMM_CAN_USE_NAMESPACES_INSIDE_EXTERNC
+#mesondefine GLIBMM_CAN_USE_NAMESPACES_INSIDE_EXTERNC
 
 /* Defined when the SUN Forte C++ compiler is being used. */
-#undef GLIBMM_COMPILER_SUN_FORTE
-
-/* Defined when the --enable-debug-refcounting configure argument was given */
-#undef GLIBMM_DEBUG_REFCOUNTING
-
-/* This is always set. This is only for backwards compatibility. */
-#undef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
-
-/* Define to omit deprecated API from the library. */
-#undef GLIBMM_DISABLE_DEPRECATED
-
-/* This is always set. This is only for backwards compatibility. */
-#undef GLIBMM_EXCEPTIONS_ENABLED
-
-/* This is always set. This is only for backwards compatibility. */
-#undef GLIBMM_VFUNCS_ENABLED
+#mesondefine GLIBMM_COMPILER_SUN_FORTE
 
 /* Defined if a static member variable may be initialized inline to
    std::string::npos */
-#undef GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS
+#mesondefine GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS
 
 /* Defined when time_t is not equivalent to gint32, meaning that it can be
    used for a method overload */
-#undef GLIBMM_HAVE_C_STD_TIME_T_IS_NOT_INT32
+#mesondefine GLIBMM_HAVE_C_STD_TIME_T_IS_NOT_INT32
 
 /* Define if the compiler disambiguates template specializations for const and
    non-const types. */
-#undef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
-
-/* Defined when the libstdc++ declares the std-namespace */
-#undef GLIBMM_HAVE_NAMESPACE_STD
+#mesondefine GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
 /* Defined if std::iterator_traits<> is standard-conforming */
-#undef GLIBMM_HAVE_STD_ITERATOR_TRAITS
+#mesondefine GLIBMM_HAVE_STD_ITERATOR_TRAITS
 
 /* Defined if std::reverse_iterator is in Sun libCstd style */
-#undef GLIBMM_HAVE_SUN_REVERSE_ITERATOR
+#mesondefine GLIBMM_HAVE_SUN_REVERSE_ITERATOR
 
 /* Defined if the STL containers have templated sequence ctors */
-#undef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
+#mesondefine GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
 
 /* Define to 1 if wide stream is available. */
-#undef GLIBMM_HAVE_WIDE_STREAM
-
-/* Major version number of glibmm. */
-#undef GLIBMM_MAJOR_VERSION
+#mesondefine GLIBMM_HAVE_WIDE_STREAM
 
 /* Define if C++ member functions may refer to member templates. */
-#undef GLIBMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES
+#mesondefine GLIBMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES
 
-/* Micro version number of glibmm. */
-#undef GLIBMM_MICRO_VERSION
-
-/* Minor version number of glibmm. */
-#undef GLIBMM_MINOR_VERSION
-
-/* This is always set. This is only for backwards compatibility. */
-#undef GLIBMM_PROPERTIES_ENABLED
-
-/* Define if glibmm is built as a static library */
-#undef GLIBMM_STATIC_LIB
-
+/* Define if the thread_local keyword is supported. */
+#mesondefine GLIBMM_CAN_USE_THREAD_LOCAL
 
 #endif /* GLIBMM_CONFIGURE */
 
 #ifdef GLIBMM_MSC
 # define GLIBMM_HAVE_STD_ITERATOR_TRAITS 1
-# define GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS 2
+# define GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS 1
 # define GLIBMM_HAVE_WIDE_STREAM 1
 # define GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS 1
 # define GLIBMM_HAVE_C_STD_TIME_T_IS_NOT_INT32 1
 # define GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION 1
 # define GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS 1
 # define GLIBMM_CAN_USE_NAMESPACES_INSIDE_EXTERNC 1
-# define GLIBMM_CAN_USE_THREAD_LOCAL 1
-# define GLIBMM_PROPERTIES_ENABLED 1
-# define GLIBMM_VFUNCS_ENABLED 1
-# define GLIBMM_EXCEPTIONS_ENABLED 1
-# define GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED 1
 # pragma warning (disable: 4786 4355 4800 4181)
 
 #if (_MSC_VER < 1900)
@@ -135,10 +140,6 @@
 
 #endif /* _MSC_VER < 1900 */
 #endif /* GLIBMM_MSC */
-
-/* Dummy macro definition for compatibility with old code that expects
- * it to be defined.  Remove after grace period. */
-#define GLIBMM_USING_STD(Symbol)
 
 /* Enable DLL-specific stuff only when not building a static library */
 #if !defined(__CYGWIN__) && defined(__MINGW32__) && !defined(GLIBMM_STATIC_LIB)

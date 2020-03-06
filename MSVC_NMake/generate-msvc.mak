@@ -37,8 +37,6 @@ vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\wrap_init.cc: $(giomm_real_hg)
 
 # Generate pre-generated resources and configuration headers (builds from GIT)
 prep-git-build: pkg-ver.mak
-	$(MAKE) /f Makefile.vc CFG=$(CFG) GENERATE_VERSIONED_FILES=1 glibmm\glibmm.rc giomm\giomm.rc giomm\giommconfig.h
-	$(MAKE) /f Makefile.vc CFG=$(CFG) gen-perl-scripts-real
 
 gen-perl-scripts-real: pkg-ver.mak
 	$(MAKE) /f Makefile.vc CFG=$(CFG) GENERATE_VERSIONED_FILES=1 ..\tools\gmmproc ..\tools\generate_wrap_init.pl
@@ -108,3 +106,5 @@ pkg-ver.mak: ..\configure.ac
 	@echo for /f "tokens=1,2,3 delims=." %%%%a IN ("%glibmm_ver%") do (echo PKG_MAJOR_VERSION=%%%%a^& echo PKG_MINOR_VERSION=%%%%b^& echo PKG_MICRO_VERSION=%%%%c)^>$@>>pkg-ver.bat
 	@pkg-ver.bat
 	@del ver.txt pkg-ver.bat
+	$(MAKE) /f Makefile.vc CFG=$(CFG) GENERATE_VERSIONED_FILES=1 glibmm\glibmm.rc giomm\giomm.rc giomm\giommconfig.h
+	$(MAKE) /f Makefile.vc CFG=$(CFG) gen-perl-scripts-real
