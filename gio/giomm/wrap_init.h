@@ -19,8 +19,11 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <giommconfig.h>
+
 namespace Gio
 {
+GIOMM_API
 void wrap_init();
 }
 

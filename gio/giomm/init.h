@@ -32,6 +32,7 @@ namespace Gio
  * You do not need to call %Gio::init() if you are using Gtk::Application,
  * because it calls %Gio::init() for you.
  */
+GIOMM_API
 void init();
 
 } // end namespace Gio

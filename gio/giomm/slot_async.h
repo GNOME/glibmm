@@ -13,11 +13,15 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include <giommconfig.h>
+
 #include <gio/gio.h>
 
 namespace Gio
 {
 
+GIOMM_API
 void SignalProxy_async_callback(GObject*, GAsyncResult* res, void* data);
 
 } // namespace Gio
