@@ -195,7 +195,6 @@ if is_msvc
 endif
 
 subdir('tools')
-subdir('MSVC_NMake/gendef')
 subdir('glib')
 subdir('MSVC_NMake/glibmm')
 subdir('glib/glibmm')
