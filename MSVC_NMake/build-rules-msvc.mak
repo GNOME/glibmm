@@ -251,7 +251,6 @@ clean:
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.lib
 	@-del ..\tools\generate_wrap_init.pl
 	@-del ..\tools\gmmproc
-<<<<<<< HEAD
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gschemas.compiled
 	@-del vs$(PDBVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\*.pdb
 	@-del vs$(PDBVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\*.obj
