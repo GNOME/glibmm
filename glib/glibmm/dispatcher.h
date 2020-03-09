@@ -24,7 +24,7 @@ namespace Glib
 {
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-class GLIBMM_API DispatchNotifier;
+class DispatchNotifier;
 #endif
 
 /** Signal class for inter-thread communication.
