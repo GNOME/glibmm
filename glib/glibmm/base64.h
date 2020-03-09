@@ -18,6 +18,8 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <glibmmconfig.h>
+
 #include <string>
 #include <glib.h>
 
@@ -40,12 +42,14 @@ namespace Base64
  * @param break_lines Enables/disables line breaking.
  * @return The string encoded in Base-64.
  */
+GLIBMM_API
 std::string encode(const std::string& source, bool break_lines = false);
 
 /** Decode the given base64 encoded string.
  * @param source A string to decode.
  * @return The resulting decode string
  */
+GLIBMM_API
 std::string decode(const std::string& source);
 }
 

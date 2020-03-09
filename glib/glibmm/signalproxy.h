@@ -33,7 +33,7 @@ namespace Glib
 {
 
 // Forward declarations
-class ObjectBase;
+class GLIBMM_API ObjectBase;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -47,7 +47,7 @@ struct SignalProxyInfo
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 // This base class is used by SignalProxyNormal, SignalProxyDetailedBase and SignalProxyProperty.
-class SignalProxyBase
+class GLIBMM_API SignalProxyBase
 {
 public:
   SignalProxyBase(Glib::ObjectBase* obj);
@@ -80,7 +80,7 @@ private:
  *
  * For signals with a detailed name (signal_name::detail_name) see SignalProxyDetailedBase.
  */
-class SignalProxyNormal : public SignalProxyBase
+class GLIBMM_API SignalProxyNormal : public SignalProxyBase
 {
 public:
   ~SignalProxyNormal() noexcept;
@@ -272,7 +272,7 @@ public:
  * the template derivatives, which serve as gatekeepers for the
  * types allowed on a particular signal.
  */
-class SignalProxyDetailedBase : public SignalProxyBase
+class GLIBMM_API SignalProxyDetailedBase : public SignalProxyBase
 {
 public:
   ~SignalProxyDetailedBase() noexcept;

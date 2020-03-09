@@ -1,6 +1,6 @@
 dnl
-dnl _GERROR(cpp_type, c_type, domain, `element_list', `gtype_func', `class_docs', `enum_docs', 'deprecated')
-dnl            $1       $2      $3         $4              $5           $6           $7            $8
+dnl _GERROR(cpp_type, c_type, domain, `element_list', `gtype_func', `class_docs', `enum_docs', 'deprecated', `decl_prefix')
+dnl            $1       $2      $3         $4              $5           $6           $7            $8              $9
 dnl
 
 m4_define(`_GERROR',`dnl
@@ -17,7 +17,7 @@ ifelse(`$6',,,`dnl
 /** $6
  */
 ')dnl
-class __CPPNAME__ : public Glib::Error
+class $9 __CPPNAME__ : public Glib::Error
 {
 public:
   /** $7
@@ -36,7 +36,7 @@ private:
 
   static void throw_func(GError* gobject);
 
-  friend void wrap_init(); // uses throw_func()
+  friend $9 void wrap_init(); // uses throw_func()
 
   _IMPORT(SECTION_H_GERROR_PRIVATE)
 #endif //DOXYGEN_SHOULD_SKIP_THIS

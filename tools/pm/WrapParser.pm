@@ -1440,6 +1440,7 @@ sub on_wrap_any_enum($$)
   my $argDeprecated = "";
   my $deprecation_docs = "";
   my $newin = "";
+  my $decl_prefix = "";
 
   # $gtype_func:
   # 1. If an empty string, the M4 macro _ENUM or _GERROR calls _GET_TYPE_FUNC()
@@ -1485,9 +1486,13 @@ sub on_wrap_any_enum($$)
     {
       $newin = string_unquote(string_trim($1));
     }
+    elsif ($arg =~ /^decl_prefix(.*)/) #If decl_prefix is at the start.
+    {
+      $decl_prefix = string_unquote(string_trim($1));
+    }
   }
   return ($cpp_type, $c_type, $domain, \@subst_in, \@subst_out, $gtype_func,
-    $conv_to_int, $argDeprecated, $deprecation_docs, $newin);
+    $conv_to_int, $argDeprecated, $deprecation_docs, $newin, $decl_prefix);
 }
 
 # void on_wrap_enum()
@@ -1564,12 +1569,12 @@ sub on_wrap_gerror($)
 
   # get the arguments
   my ($cpp_type, $c_type, $domain, $ref_subst_in, $ref_subst_out, $gtype_func, undef,
-    $argDeprecated, $deprecation_docs, $newin) = $self->on_wrap_any_enum(1);
+    $argDeprecated, $deprecation_docs, $newin, $decl_prefix) = $self->on_wrap_any_enum(1);
 
   $$self{objOutputter}->output_wrap_gerror(
     $$self{filename}, $$self{line_num}, $cpp_type, $c_type, $domain,
     $class_docs, $ref_subst_in, $ref_subst_out, $gtype_func,
-    $argDeprecated, $deprecation_docs, $newin);
+    $argDeprecated, $deprecation_docs, $newin, $decl_prefix);
 }
 
 sub on_wrap_any_property($)

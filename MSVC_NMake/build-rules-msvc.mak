@@ -93,14 +93,14 @@ $**
 # $(dependent_objects)
 # <<
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
-$(GLIBMM_DLL): vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\glibmm.def $(glibmm_OBJS)
-	link /DLL $(LDFLAGS_NOLTCG) $(GOBJECT_LIBS) $(LIBSIGC_LIB) /implib:$(GLIBMM_LIB) /def:vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\glibmm.def -out:$@ @<<
+$(GLIBMM_DLL): vs$(VSVER)\$(CFG)\$(PLAT)\glibmm $(glibmm_OBJS)
+	link /DLL $(LDFLAGS_NOLTCG) $(GOBJECT_LIBS) $(LIBSIGC_LIB) /implib:$(GLIBMM_LIB) -out:$@ @<<
 $(glibmm_OBJS)
 <<
 
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
-$(GIOMM_DLL): $(GLIBMM_LIB) vs$(VSVER)\$(CFG)\$(PLAT)\giomm\giomm.def $(giomm_OBJS)
-	link /DLL $(LDFLAGS_NOLTCG) $(GLIBMM_LIB) $(GIO_LIBS) $(LIBSIGC_LIB) /implib:$(GIOMM_LIB) /def:vs$(VSVER)\$(CFG)\$(PLAT)\giomm\giomm.def -out:$@ @<<
+$(GIOMM_DLL): vs$(VSVER)\$(CFG)\$(PLAT)\giomm $(GLIBMM_LIB) $(giomm_OBJS)
+	link /DLL $(LDFLAGS_NOLTCG) $(GLIBMM_LIB) $(GIO_LIBS) $(LIBSIGC_LIB) /implib:$(GIOMM_LIB) -out:$@ @<<
 $(giomm_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
@@ -112,11 +112,6 @@ $(giomm_OBJS)
 # $(dependent_objects)
 # <<
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
-
-# For the gendef tool
-{.\gendef\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\}.exe:
-	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gendef\ $(MAKE) -f Makefile.vc CFG=$(CFG) vs$(VSVER)\$(CFG)\$(PLAT)\gendef
-	$(CXX) $(GLIBMM_BASE_CFLAGS) $(CFLAGS) /Fo$(@D)\gendef\ /Fd$(@D)\gendef\ $< /link $(LDFLAGS) /out:$@
 
 # For the buildable glibmm examples
 vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-ex-compose.exe: ..\examples\compose\main.cc $(GLIBMM_LIB)
@@ -253,7 +248,6 @@ clean:
 	@-if exist vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests\*.pdb
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\giomm-ex\*.obj
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\giomm-ex\*.pdb
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\giomm\*.def
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\giomm\*.res
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\giomm\*.obj
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\giomm\*.pdb
@@ -264,15 +258,12 @@ clean:
 	@-if exist vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-tests del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-tests\*.pdb
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-ex\*.obj
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-ex\*.pdb
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\*.def
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\*.res
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\*.obj
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\*.pdb
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\*.cc
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\private\*.h
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\*.h
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gendef\*.obj
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gendef\*.pdb
 	@-if exist vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests rd vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests
 	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen
 	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\giomm-ex
@@ -282,6 +273,5 @@ clean:
 	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-ex
 	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\private
 	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\glibmm
-	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gendef
 
 .SUFFIXES: .cc .h .ccg .hg .obj .cc.m4 .h.m4

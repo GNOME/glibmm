@@ -32,7 +32,16 @@ pkg_conf_data.set('GLIBMM_MICRO_VERSION', glibmm_micro_version)
 pkg_conf_data.set('GIOMM_MAJOR_VERSION', glibmm_major_version)
 pkg_conf_data.set('GIOMM_MINOR_VERSION', glibmm_minor_version)
 pkg_conf_data.set('GIOMM_MICRO_VERSION', glibmm_micro_version)
-if get_option('default_library') == 'static'
+
+library_build_type = get_option('default_library')
+
+if cpp_compiler.get_argument_syntax() == 'msvc'
+  if library_build_type == 'static' or library_build_type == 'both'
+    error('Static builds are not supported by MSVC-style builds')
+  endif
+endif
+
+if library_build_type == 'static'
   pkg_conf_data.set('GLIBMM_STATIC_LIB', 1)
   pkg_conf_data.set('GIOMM_STATIC_LIB', 1)
 endif

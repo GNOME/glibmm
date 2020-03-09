@@ -29,7 +29,7 @@ namespace Glib
 /** Portable stop watch interface.
  * This resembles a convient and portable timer with microseconds resolution.
  */
-class Timer
+class GLIBMM_API Timer
 {
 public:
   /** Create a new timer.
@@ -66,6 +66,7 @@ private:
   GTimer* gobject_;
 };
 
+GLIBMM_API
 void usleep(unsigned long microseconds);
 
 } // namespace Glib

@@ -110,6 +110,7 @@ create_array(typename std::vector<typename Tr::CppType>::const_iterator pbegin, 
 /* first class function for bools, because std::vector<bool> is a specialization
  * which does not conform to being an STL container.
  */
+GLIBMM_API
 gboolean* create_bool_array(std::vector<bool>::const_iterator pbegin, std::size_t size);
 
 /* Create and fill a GList as efficient as possible.
@@ -479,7 +480,7 @@ public:
 };
 
 template <>
-class ArrayHandler<bool>
+class GLIBMM_API ArrayHandler<bool>
 {
 public:
   using CType = gboolean;

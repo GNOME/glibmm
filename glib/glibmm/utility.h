@@ -80,6 +80,7 @@ c_str_or_nullptr(const T& str)
 }
 
 // Append type_name to dest, while replacing special characters with '+'.
+GLIBMM_API
 void append_canonical_typename(std::string& dest, const char* type_name);
 
 // Delete data referred to by a void*.

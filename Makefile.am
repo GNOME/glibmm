@@ -57,7 +57,6 @@ DISTCLEANFILES = $(filter %mmconfig.h,$(msvc_files))
 EXTRA_DIST = \
   meson.build \
   meson_options.txt \
-  MSVC_NMake/gendef/meson.build \
   MSVC_NMake/giomm/meson.build \
   MSVC_NMake/glibmm/meson.build \
   docs/reference/meson.build \

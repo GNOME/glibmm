@@ -28,9 +28,9 @@
 
 namespace Glib
 {
-class Interface_Class;
+class GLIBMM_API Interface_Class;
 
-class Class
+class GLIBMM_API Class
 {
 public:
   /* No constructor/destructor:

@@ -34,6 +34,7 @@ namespace Glib
  * @param prefix The prefix to look for.
  * @return <tt>true</tt> if @a str begins with @a prefix, <tt>false</tt> otherwise.
  */
+GLIBMM_API
 bool str_has_prefix(const std::string& str, const std::string& prefix);
 
 /** Looks whether the string @a str ends with @a suffix.
@@ -42,6 +43,7 @@ bool str_has_prefix(const std::string& str, const std::string& prefix);
  * @param suffix The suffix to look for.
  * @return <tt>true</tt> if @a str ends with @a suffix, <tt>false</tt> otherwise.
  */
+GLIBMM_API
 bool str_has_suffix(const std::string& str, const std::string& suffix);
 
 namespace Ascii
@@ -65,6 +67,7 @@ namespace Ascii
  * @throw std::overflow_error  Thrown if the correct value would cause overflow.
  * @throw std::underflow_error Thrown if the correct value would cause underflow.
  */
+GLIBMM_API
 double strtod(const std::string& str);
 
 /** Converts a string to a <tt>double</tt> value.
@@ -88,6 +91,7 @@ double strtod(const std::string& str);
  * @throw std::overflow_error  Thrown if the correct value would cause overflow.
  * @throw std::underflow_error Thrown if the correct value would cause underflow.
  */
+GLIBMM_API
 double strtod(const std::string& str, std::string::size_type& end_index,
   std::string::size_type start_index = 0);
 
@@ -100,6 +104,7 @@ double strtod(const std::string& str, std::string::size_type& end_index,
  * @param d The <tt>double</tt> value to convert.
  * @return The converted string.
  */
+GLIBMM_API
 std::string dtostr(double d);
 
 } // namespace Ascii
@@ -118,6 +123,7 @@ std::string dtostr(double d);
  * @param source A string to escape.
  * @return A copy of @a source with certain characters escaped. See above.
  */
+GLIBMM_API
 std::string strescape(const std::string& source);
 
 /** Escapes all special characters in the string.
@@ -136,6 +142,7 @@ std::string strescape(const std::string& source);
  * @param exceptions A string of characters not to escape in @a source.
  * @return A copy of @a source with certain characters escaped. See above.
  */
+GLIBMM_API
 std::string strescape(const std::string& source, const std::string& exceptions);
 
 /** Replaces all escaped characters with their one byte equivalent.
@@ -145,6 +152,7 @@ std::string strescape(const std::string& source, const std::string& exceptions);
  * @param source A string to compress.
  * @return A copy of @a source with all escaped characters compressed.
  */
+GLIBMM_API
 std::string strcompress(const std::string& source);
 
 /** Returns a string corresponding to the given error code, e.g.\ <tt>"no such process"</tt>.
@@ -156,6 +164,7 @@ std::string strcompress(const std::string& source);
  * @return A string describing the error code. If the error code is unknown,
  * <tt>&quot;unknown error (<em>\<errnum\></em>)&quot;</tt> is returned.
  */
+GLIBMM_API
 Glib::ustring strerror(int errnum);
 
 /** Returns a string describing the given signal, e.g.\ <tt>"Segmentation fault"</tt>.
@@ -167,6 +176,7 @@ Glib::ustring strerror(int errnum);
  * @return A string describing the signal. If the signal is unknown,
  * <tt>&quot;unknown signal (<em>\<signum\></em>)&quot;</tt> is returned.
  */
+GLIBMM_API
 Glib::ustring strsignal(int signum);
 
 } // namespace Glib

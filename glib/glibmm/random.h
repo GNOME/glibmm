@@ -33,7 +33,7 @@ namespace Glib
  * @{
  */
 
-class Rand
+class GLIBMM_API Rand
 {
 public:
   Rand();
