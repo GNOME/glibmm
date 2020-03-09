@@ -63,7 +63,7 @@ Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__CNAME__* object, bool take_copy 
 ifdef(`__OPAQUE_FUNC_GTYPE__',`dnl
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 template <>
-class Value<Glib::RefPtr<__NAMESPACE__::__CPPNAME__>> : public Glib::Value_RefPtrBoxed<__NAMESPACE__::__CPPNAME__>
+class __OPAQUE_FUNC_DECORATION Value<Glib::RefPtr<__NAMESPACE__::__CPPNAME__>> : public Glib::Value_RefPtrBoxed<__NAMESPACE__::__CPPNAME__>
 {
 public:
   CppType get() const { return Glib::wrap(static_cast<__CNAME__*>(get_boxed()), true); }
