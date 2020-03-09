@@ -67,7 +67,7 @@ const __NAMESPACE__::__CPPNAME__& wrap(const __CNAME__* object);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 template <>
-class Value<__NAMESPACE__::__CPPNAME__> : public Glib::Value_Boxed<__NAMESPACE__::__CPPNAME__>
+class __FUNC_DECORATION__ Value<__NAMESPACE__::__CPPNAME__> : public Glib::Value_Boxed<__NAMESPACE__::__CPPNAME__>
 {};
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
