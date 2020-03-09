@@ -53,6 +53,7 @@ foreach ex : test_programs
   endforeach
 
   exe_file = executable(ex_name, ex_sources,
+    cpp_args: ['-DGLIBMM_DISABLE_DEPRECATED', '-DGIOMM_DISABLE_DEPRECATED'],
     dependencies: ex[3] ? giomm_dep : glibmm_dep,
     gui_app: false,
     build_by_default: true,
