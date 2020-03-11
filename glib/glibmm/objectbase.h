@@ -294,6 +294,7 @@ ObjectBase::get_property(const Glib::ustring& property_name) const
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
+GLIBMM_API
 bool _gobject_cppinstance_already_deleted(GObject* gobject);
 
 } // namespace Glib
