@@ -25,12 +25,12 @@
 
 namespace Gio
 {
-class Socket;
+class GIOMM_API Socket;
 
 /** @newin{2,42}
  * @ingroup NetworkIO
  */
-class SignalSocket
+class GIOMM_API SignalSocket
 {
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -88,6 +88,7 @@ private:
  * @newin{2,42}
  * @ingroup NetworkIO
  */
+GIOMM_API
 SignalSocket signal_socket(
   const Glib::RefPtr<Glib::MainContext>& context = Glib::RefPtr<Glib::MainContext>());
 
@@ -97,7 +98,7 @@ SignalSocket signal_socket(
  * @newin{2,42}
  * @ingroup NetworkIO
  */
-class SocketSource : public Glib::IOSource
+class GIOMM_API SocketSource : public Glib::IOSource
 {
 public:
   using CppObjectType = Gio::SocketSource;

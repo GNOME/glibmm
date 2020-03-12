@@ -27,8 +27,8 @@
 namespace Glib
 {
 
-class ObjectBase;
-class Object;
+class GLIBMM_API ObjectBase;
+class GLIBMM_API Object;
 
 /** @defgroup glibmmValue Generic Values
  *
@@ -49,7 +49,7 @@ class Object;
 /**
  * @ingroup glibmmValue
  */
-class ValueBase
+class GLIBMM_API ValueBase
 {
 public:
   /** Initializes the GValue, but without a type.  You have to
@@ -97,7 +97,7 @@ protected:
 /**
  * @ingroup glibmmValue
  */
-class ValueBase_Boxed : public ValueBase
+class GLIBMM_API ValueBase_Boxed : public ValueBase
 {
 public:
   static GType value_type() G_GNUC_CONST;
@@ -116,7 +116,7 @@ protected:
 /**
  * @ingroup glibmmValue
  */
-class ValueBase_Object : public ValueBase
+class GLIBMM_API ValueBase_Object : public ValueBase
 {
 public:
   static GType value_type() G_GNUC_CONST;
@@ -137,7 +137,7 @@ protected:
 /**
  * @ingroup glibmmValue
  */
-class ValueBase_Enum : public ValueBase
+class GLIBMM_API ValueBase_Enum : public ValueBase
 {
 public:
   using CType = gint;
@@ -158,7 +158,7 @@ protected:
 /**
  * @ingroup glibmmValue
  */
-class ValueBase_Flags : public ValueBase
+class GLIBMM_API ValueBase_Flags : public ValueBase
 {
 public:
   using CType = guint;
@@ -179,7 +179,7 @@ protected:
 /**
  * @ingroup glibmmValue
  */
-class ValueBase_String : public ValueBase
+class GLIBMM_API ValueBase_String : public ValueBase
 {
 public:
   using CType = const gchar*;
@@ -200,7 +200,7 @@ protected:
 /**
  * @ingroup glibmmValue
  */
-class ValueBase_Variant : public ValueBase
+class GLIBMM_API ValueBase_Variant : public ValueBase
 {
 public:
   static GType value_type() G_GNUC_CONST;
@@ -320,7 +320,7 @@ namespace Glib
  * @ingroup glibmmValue
  */
 template <>
-class Value<std::string> : public ValueBase_String
+class GLIBMM_API Value<std::string> : public ValueBase_String
 {
 public:
   using CppType = std::string;
@@ -333,7 +333,7 @@ public:
  * @ingroup glibmmValue
  */
 template <>
-class Value<Glib::ustring> : public ValueBase_String
+class GLIBMM_API Value<Glib::ustring> : public ValueBase_String
 {
 public:
   using CppType = Glib::ustring;
@@ -346,7 +346,7 @@ public:
  * @ingroup glibmmValue
  */
 template <>
-class Value<std::vector<std::string>> : public ValueBase_Boxed
+class GLIBMM_API Value<std::vector<std::string>> : public ValueBase_Boxed
 {
 public:
   using CppType = std::vector<std::string>;
@@ -361,7 +361,7 @@ public:
  * @ingroup glibmmValue
  */
 template <>
-class Value<std::vector<Glib::ustring>> : public ValueBase_Boxed
+class GLIBMM_API Value<std::vector<Glib::ustring>> : public ValueBase_Boxed
 {
 public:
   using CppType = std::vector<Glib::ustring>;

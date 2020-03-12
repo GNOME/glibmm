@@ -39,7 +39,7 @@ namespace Glib
  *   void set_data (const Quark&, void * data);
  *   void* get_data (const QueryQuark&);
  */
-class QueryQuark
+class GLIBMM_API QueryQuark
 {
 public:
   QueryQuark(const GQuark& q);
@@ -56,7 +56,7 @@ private:
   GQuark quark_;
 };
 
-class Quark : public QueryQuark
+class GLIBMM_API Quark : public QueryQuark
 {
 public:
   Quark(const ustring& s);

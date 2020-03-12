@@ -19,6 +19,8 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <glibmmconfig.h>
+
 #include <sigc++/sigc++.h>
 #include <glib.h>
 
@@ -36,7 +38,7 @@ namespace Glib
   * It lives between the layer of Gtk+ and libsigc++.
   * It is very much an internal class.
   */
-class SignalProxyConnectionNode
+class GLIBMM_API SignalProxyConnectionNode
 {
 public:
   /** @param slot The signal handler for the glib signal.

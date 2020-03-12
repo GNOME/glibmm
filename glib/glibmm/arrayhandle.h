@@ -281,7 +281,7 @@ private:
 };
 
 template <>
-class ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>
+class GLIBMM_API ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>
 {
 public:
   using Me = ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>;

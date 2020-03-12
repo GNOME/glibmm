@@ -66,7 +66,7 @@ class DispatchNotifier;
  * likely minor and the notification still happens asynchronously.  Apart
  * from the additional lock the behavior matches the Unix implementation.
  */
-class Dispatcher
+class GLIBMM_API Dispatcher
 {
 public:
   /** Create new Dispatcher instance using the default main context.

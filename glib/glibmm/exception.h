@@ -24,7 +24,7 @@
 namespace Glib
 {
 
-class Exception
+class GLIBMM_API Exception
 {
 public:
   virtual ~Exception() noexcept = 0;

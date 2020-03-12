@@ -26,7 +26,7 @@ GLIBMM_BASE_CFLAGS =			\
 	/Ivs$(PDBVER)\$(CFG)\$(PLAT)	\
 	/I..\untracked\glib /I..\untracked\glib\glibmm		\
 	/I..\glib /I..\glib\glibmm /I.\glibmm		\
-	/wd4530 /EHsc	\
+	/wd4530 /wd4251 /wd4275 /EHsc	\
 	/FImsvc_recommended_pragmas.h
 
 GIOMM_BASE_CFLAGS =	\
@@ -75,7 +75,6 @@ GIOMM_LIBNAME = giomm-vc$(PDBVER)0$(DEBUG_SUFFIX)-$(GLIBMM_MAJOR_VERSION)_$(GLIB
 GIOMM_DLL = vs$(PDBVER)\$(CFG)\$(PLAT)\$(GIOMM_LIBNAME).dll
 GIOMM_LIB = vs$(PDBVER)\$(CFG)\$(PLAT)\$(GIOMM_LIBNAME).lib
 
-GENDEF = vs$(PDBVER)\$(CFG)\$(PLAT)\gendef.exe
 GOBJECT_LIBS = gobject-2.0.lib gmodule-2.0.lib glib-2.0.lib
 GIO_LIBS = gio-2.0.lib $(GOBJECT_LIBS)
 

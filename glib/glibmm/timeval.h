@@ -38,7 +38,7 @@ G_GNUC_BEGIN_IGNORE_DEPRECATIONS
  *
  * @deprecated Use Glib::DateTime instead.
  */
-struct TimeVal : public GTimeVal
+struct GLIBMM_API TimeVal : public GTimeVal
 {
   inline TimeVal();
   inline TimeVal(long seconds, long microseconds);

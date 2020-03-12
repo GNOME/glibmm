@@ -42,6 +42,7 @@ namespace Gio
  *
  * @return true if the two strings are identical or equivalent, false otherwise.
  */
+GIOMM_API
 bool content_type_equals(const Glib::ustring& type1, const Glib::ustring& type2);
 
 /**
@@ -52,6 +53,7 @@ bool content_type_equals(const Glib::ustring& type1, const Glib::ustring& type2)
  *
  * @return true if @a type is a kind of @a supertype, false otherwise.
  */
+GIOMM_API
 bool content_type_is_a(const Glib::ustring& type, const Glib::ustring& supertype);
 
 /**
@@ -63,6 +65,7 @@ bool content_type_is_a(const Glib::ustring& type, const Glib::ustring& supertype
  *
  * @return true if the type is the unknown type.
  */
+GIOMM_API
 bool content_type_is_unknown(const Glib::ustring& type);
 
 /**
@@ -72,6 +75,7 @@ bool content_type_is_unknown(const Glib::ustring& type);
  *
  * @return a short description of the content type @a type.
  */
+GIOMM_API
 Glib::ustring content_type_get_description(const Glib::ustring& type);
 
 /**
@@ -81,6 +85,7 @@ Glib::ustring content_type_get_description(const Glib::ustring& type);
  *
  * @return the registered mime-type for the given @a type, or an empty string if unknown.
  */
+GIOMM_API
 Glib::ustring content_type_get_mime_type(const Glib::ustring& type);
 
 /**
@@ -90,6 +95,7 @@ Glib::ustring content_type_get_mime_type(const Glib::ustring& type);
  *
  * @return Icon corresponding to the content type.
  */
+GIOMM_API
 Glib::RefPtr<Icon> content_type_get_icon(const Glib::ustring& type);
 
 #ifdef G_OS_UNIX
@@ -101,6 +107,7 @@ Glib::RefPtr<Icon> content_type_get_icon(const Glib::ustring& type);
  *
  * @newin{2,34}
  */
+GIOMM_API
 Glib::RefPtr<Icon> content_type_get_symbolic_icon(const Glib::ustring& type);
 #endif
 
@@ -113,6 +120,7 @@ Glib::RefPtr<Icon> content_type_get_symbolic_icon(const Glib::ustring& type);
  * @return true if the file type corresponds to a type that can be executable,
  * false otherwise.
  */
+GIOMM_API
 bool content_type_can_be_executable(const Glib::ustring& type);
 
 /** Tries to find a content type based on the mime type name.
@@ -122,6 +130,7 @@ bool content_type_can_be_executable(const Glib::ustring& type);
  *
  * @newin{2,20}
  */
+GIOMM_API
 Glib::ustring content_type_from_mime_type(const Glib::ustring& mime_type);
 
 /**
@@ -137,6 +146,7 @@ Glib::ustring content_type_from_mime_type(const Glib::ustring& mime_type);
  * @return A string indicating a guessed content type for the
  * given data.
  */
+GIOMM_API
 Glib::ustring content_type_guess(
   const std::string& filename, const guchar* data, gsize data_size, bool& result_uncertain);
 
@@ -151,6 +161,7 @@ Glib::ustring content_type_guess(
  * @return A string indicating a guessed content type for the
  * given data.
  */
+GIOMM_API
 Glib::ustring content_type_guess(
   const std::string& filename, const std::string& data, bool& result_uncertain);
 
@@ -169,6 +180,7 @@ Glib::ustring content_type_guess(
  *
  * @newin{2,18}
  */
+GIOMM_API
 Glib::StringArrayHandle content_type_guess_for_tree(const Glib::RefPtr<const File>& root);
 
 /**
@@ -177,6 +189,7 @@ Glib::StringArrayHandle content_type_guess_for_tree(const Glib::RefPtr<const Fil
  *
  * @return List of the registered content types.
  */
+GIOMM_API
 Glib::ListHandle<Glib::ustring> content_types_get_registered();
 
 /** @} group giommContentType */

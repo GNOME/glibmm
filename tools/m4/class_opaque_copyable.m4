@@ -1,7 +1,7 @@
 dnl $Id$
 
 dnl
-dnl _CLASS_OPAQUE_COPYABLE(Region, GdkRegion, gdk_region_new, gdk_region_copy, gdk_region_destroy)
+dnl _CLASS_OPAQUE_COPYABLE(Region, GdkRegion, gdk_region_new, gdk_region_copy, gdk_region_destroy, api_decoration)
 dnl
 
 define(`_CLASS_OPAQUE_COPYABLE',`dnl
@@ -13,6 +13,7 @@ define(`__CNAME__',`$2')
 define(`__OPAQUE_FUNC_NEW',`$3')
 define(`__OPAQUE_FUNC_COPY',`$4')
 define(`__OPAQUE_FUNC_FREE',`$5')
+define(`__OPAQUE_FUNC_DECORATION',`$6')
 
 define(`_CUSTOM_DEFAULT_CTOR',`dnl
 _PUSH()
@@ -65,7 +66,8 @@ namespace Glib
    *
    * @relates __NAMESPACE__::__CPPNAME__
    */
-__NAMESPACE__::__CPPNAME__ wrap(__CNAME__* object, bool take_copy = false);
+  __OPAQUE_FUNC_DECORATION
+  __NAMESPACE__::__CPPNAME__ wrap(__CNAME__* object, bool take_copy = false);
 
 } // namespace Glib
 ')dnl endif __BOOL_NO_WRAP_FUNCTION__

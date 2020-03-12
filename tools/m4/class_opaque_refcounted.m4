@@ -1,5 +1,5 @@
 dnl
-dnl _CLASS_OPAQUE_REFCOUNTED(Coverage, PangoCoverage, pango_coverage_new, pango_coverage_ref, pango_coverage_unref)
+dnl _CLASS_OPAQUE_REFCOUNTED(Coverage, PangoCoverage, pango_coverage_new, pango_coverage_ref, pango_coverage_unref, api_decoration)
 dnl
 
 define(`_CLASS_OPAQUE_REFCOUNTED',`dnl
@@ -11,6 +11,7 @@ define(`__CNAME__',`$2')
 define(`__OPAQUE_FUNC_NEW',`$3')
 define(`__OPAQUE_FUNC_REF',`$4')
 define(`__OPAQUE_FUNC_UNREF',`$5')
+define(`__OPAQUE_FUNC_DECORATION',`$6')
 undefine(`__OPAQUE_FUNC_GTYPE__')
 
 _POP()
@@ -56,12 +57,13 @@ namespace Glib
  *
  * @relates __NAMESPACE__::__CPPNAME__
  */
+__OPAQUE_FUNC_DECORATION
 Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__CNAME__* object, bool take_copy = false);
 
 ifdef(`__OPAQUE_FUNC_GTYPE__',`dnl
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 template <>
-class Value<Glib::RefPtr<__NAMESPACE__::__CPPNAME__>> : public Glib::Value_RefPtrBoxed<__NAMESPACE__::__CPPNAME__>
+class __OPAQUE_FUNC_DECORATION Value<Glib::RefPtr<__NAMESPACE__::__CPPNAME__>> : public Glib::Value_RefPtrBoxed<__NAMESPACE__::__CPPNAME__>
 {
 public:
   CppType get() const { return Glib::wrap(static_cast<__CNAME__*>(get_boxed()), true); }

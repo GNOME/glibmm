@@ -29,6 +29,11 @@
 #include <cstddef> /* for std::ptrdiff_t */
 #endif
 
+/* work around linker error on Visual Studio if we don't have GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS */
+#if (_MSC_VER >= 1600) && !defined (GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS)
+const std::basic_string<char>::size_type std::basic_string<char>::npos = (std::basic_string<char>::size_type) -1;
+#endif
+
 namespace Glib
 {
 
@@ -132,6 +137,7 @@ private:
  * but it might be useful as utility function if you prefer using
  * std::string even for UTF-8 encoding.
  */
+GLIBMM_API
 gunichar get_unichar_from_std_iterator(std::string::const_iterator pos) G_GNUC_PURE;
 
 /** %Glib::ustring has much the same interface as std::string, but contains
@@ -221,7 +227,7 @@ gunichar get_unichar_from_std_iterator(std::string::const_iterator pos) G_GNUC_P
  * reimplement the interface so that all operations are based on characters
  * instead of bytes.
  */
-class ustring
+class GLIBMM_API ustring
 {
 public:
   using size_type = std::string::size_type;
@@ -252,11 +258,11 @@ public:
 #endif /* GLIBMM_HAVE_SUN_REVERSE_ITERATOR */
 
 #ifdef GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS
-  static GLIBMM_API const size_type npos = std::string::npos;
+  static const size_type npos = std::string::npos;
 #else
   // The IRIX MipsPro compiler says "The indicated constant value is not known",
   // so we need to initalize the static member data elsewhere.
-  static GLIBMM_API const size_type npos;
+  static const size_type npos;
 #endif
 
   /*! Default constructor, which creates an empty string.
@@ -966,18 +972,19 @@ struct ustring::SequenceToString<In, gunichar> : public std::string
 };
 
 template <>
-struct ustring::SequenceToString<Glib::ustring::iterator, gunichar> : public std::string
+struct GLIBMM_API ustring::SequenceToString<Glib::ustring::iterator, gunichar> : public std::string
 {
   SequenceToString(Glib::ustring::iterator pbegin, Glib::ustring::iterator pend);
 };
 
 template <>
-struct ustring::SequenceToString<Glib::ustring::const_iterator, gunichar> : public std::string
+struct GLIBMM_API ustring::SequenceToString<Glib::ustring::const_iterator, gunichar> : public std::string
 {
   SequenceToString(Glib::ustring::const_iterator pbegin, Glib::ustring::const_iterator pend);
 };
 
-class ustring::FormatStream
+
+class GLIBMM_API ustring::FormatStream
 {
 public:
   // noncopyable
@@ -1013,12 +1020,14 @@ public:
  * @relates Glib::ustring
  * @throw Glib::ConvertError
  */
+GLIBMM_API
 std::istream& operator>>(std::istream& is, Glib::ustring& utf8_string);
 
 /** Stream output operator.
  * @relates Glib::ustring
  * @throw Glib::ConvertError
  */
+GLIBMM_API
 std::ostream& operator<<(std::ostream& os, const Glib::ustring& utf8_string);
 
 #ifdef GLIBMM_HAVE_WIDE_STREAM
@@ -1027,12 +1036,14 @@ std::ostream& operator<<(std::ostream& os, const Glib::ustring& utf8_string);
  * @relates Glib::ustring
  * @throw Glib::ConvertError
  */
+GLIBMM_API
 std::wistream& operator>>(std::wistream& is, ustring& utf8_string);
 
 /** Wide stream output operator.
  * @relates Glib::ustring
  * @throw Glib::ConvertError
  */
+GLIBMM_API
 std::wostream& operator<<(std::wostream& os, const ustring& utf8_string);
 
 #endif /* GLIBMM_HAVE_WIDE_STREAM */
@@ -1389,7 +1400,7 @@ public:
 
 /// A template specialization for Stringify<ustring>:
 template <>
-class ustring::Stringify<ustring>
+class GLIBMM_API ustring::Stringify<ustring>
 {
 private:
   const ustring& string_;
@@ -1408,7 +1419,7 @@ public:
  * because the regular template has ambiguous constructor overloads for char*.
  */
 template <>
-class ustring::Stringify<const char*>
+class GLIBMM_API ustring::Stringify<const char*>
 {
 private:
   const ustring string_;
