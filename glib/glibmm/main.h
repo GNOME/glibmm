@@ -415,10 +415,13 @@ public:
    * @return The new MainContext.
    */
   static Glib::RefPtr<MainContext> create();
-  /** Returns the default main context.
-   * This is the main context used for main loop functions when a main loop is not explicitly
-   * specified.
-   * @return The new MainContext.
+
+  /** Returns the global default main context.
+   * This is the main context used for main loop functions when a main loop
+   * is not explicitly specified, and corresponds to the "main" main loop.
+   *
+   * @return The global default main context.
+   * @see get_thread_default()
    */
   static Glib::RefPtr<MainContext> get_default();
 
@@ -554,6 +557,72 @@ public:
    * @param fd A PollFD structure holding information about a file descriptor.
    */
   void remove_poll(PollFD& fd);
+
+  /** Acquires the context and sets it as the thread-default context for the current thread.
+   *
+   * This will cause certain asynchronous operations (such as most gio-based I/O)
+   * which are started in this thread to run under this context and deliver their
+   * results to its main loop, rather than running under the global
+   * default context in the main thread. Note that calling this function
+   * changes the context returned by get_thread_default(),
+   * not the one returned by get_default(), so it does not affect
+   * the context used by functions like g_idle_add().
+   *
+   * Normally you would call this function shortly after creating a new
+   * thread, passing it a Glib::MainContext which will be run by a
+   * Glib::MainLoop in that thread, to set a new default context for all
+   * async operations in that thread. In this case you may not need to
+   * ever call pop_thread_default(), assuming you want the
+   * new Glib::MainContext to be the default for the whole lifecycle of the
+   * thread.
+   *
+   * If you don't have control over how the new thread was created (e.g.
+   * if the new thread isn't newly created, or if the thread life
+   * cycle is managed by a GThreadPool), it is always suggested to wrap
+   * the logic that needs to use the new Glib::MainContext inside a
+   * push_thread_default() / pop_thread_default()
+   * pair, otherwise threads that are re-used will end up never explicitly
+   * releasing the Glib::MainContext reference they hold.
+   *
+   * In some cases you may want to schedule a single operation in a
+   * non-default context, or temporarily use a non-default context in
+   * the main thread. In that case, you can wrap the call to the
+   * asynchronous operation inside a push_thread_default() / pop_thread_default()
+   * pair, but it is up to you to ensure that no other asynchronous operations
+   * accidentally get started while the non-default context is active.
+   *
+   * Beware that libraries that predate this function may not correctly
+   * handle being used from a thread with a thread-default context. Eg,
+   * see Gio::File::supports_thread_contexts().
+   *
+   * @newin{2,64}
+   */
+  void push_thread_default();
+
+  /** Pops the context off the thread-default context stack (verifying that
+   * it was on the top of the stack).
+   *
+   * @newin{2,64}
+   */
+  void pop_thread_default();
+
+  /** Gets the thread-default MainContext for this thread.
+   * Asynchronous operations that want to be able to be run in contexts
+   * other than the default one should call this method to get a MainContext
+   * to add their Glib::Sources to. (Note that even in single-threaded
+   * programs applications may sometimes want to temporarily push a
+   * non-default context, so it is not safe to assume that this will
+   * always return the global default context if you are running in
+   * the default thread.)
+   *
+   * This method wraps g_main_context_ref_thread_default(),
+   * and not g_main_context_get_thread_default().
+   *
+   * @return The thread-default MainContext.
+   *
+   * @newin{2,64}
+   */
+  static Glib::RefPtr<MainContext> get_thread_default();
 
   /** Invokes a function in such a way that this MainContext is owned during
    * the invocation of @a slot.
