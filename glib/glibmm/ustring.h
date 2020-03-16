@@ -37,6 +37,94 @@ const std::basic_string<char>::size_type std::basic_string<char>::npos = (std::b
 namespace Glib
 {
 
+class GLIBMM_API ustring;
+
+//********** Glib::StdStringView and Glib::UStringView *************
+
+// It would be possible to replace StdStringView and UStringView with a
+// template class BasicStringView + two type aliases defining StdStringView
+// and UStringView. But Doxygen don't generate links to type aliases.
+//
+// It would also be possible to replace StdStringView and UStringView with
+// a StringView class with 3 constructors, taking const std::string&,
+// const Glib::ustring& and const char*, respectively. The split into two classes
+// is by design. Using the wrong string class shall not be as easy as using
+// the right string class.
+
+/** Helper class to avoid unnecessary string copying in function calls.
+ *
+ * A %Glib::StdStringView holds a const char pointer. It can be used as an argument
+ * type in a function that passes a const char pointer to a C function.
+ *
+ * Unlike std::string_view, %Glib::StdStringView shall be used only for
+ * null-terminated strings.
+ * @code
+ * std::string f1(Glib::StdStringView s1, Glib::StdStringView s2);
+ * // can be used instead of
+ * std::string f2(const std::string& s1, const std::string& s2);
+ * @endcode
+ * The strings are not copied when f1() is called with string literals.
+ * @code
+ * auto r1 = f1("string 1", "string 2");
+ * @endcode
+ * To pass a Glib::ustring to a function taking a %Glib::StdStringView, you may have
+ * to use Glib::ustring::c_str().
+ * @code
+ * std::string str = "non-UTF8 string";
+ * Glib::ustring ustr = "UTF8 string";
+ * auto r1 = f1(str, ustr.c_str());
+ * @endcode
+ *
+ * @newin{2,64}
+ */
+class GLIBMM_API StdStringView
+{
+public:
+  StdStringView(const std::string& s) : pstring_(s.c_str()) {}
+  StdStringView(const char* s) : pstring_(s) {}
+  const char* c_str() const { return pstring_; }
+private:
+  const char* pstring_;
+};
+
+/** Helper class to avoid unnecessary string copying in function calls.
+ *
+ * A %Glib::UStringView holds a const char pointer. It can be used as an argument
+ * type in a function that passes a const char pointer to a C function.
+ *
+ * Unlike std::string_view, %Glib::UStringView shall be used only for
+ * null-terminated strings.
+ * @code
+ * Glib::ustring f1(Glib::UStringView s1, Glib::UStringView s2);
+ * // can be used instead of
+ * Glib::ustring f2(const Glib::ustring& s1, const Glib::ustring& s2);
+ * @endcode
+ * The strings are not copied when f1() is called with string literals.
+ * @code
+ * auto r1 = f1("string 1", "string 2");
+ * @endcode
+ * To pass a std::string to a function taking a %Glib::UStringView, you may have
+ * to use std::string::c_str().
+ * @code
+ * std::string str = "non-UTF8 string";
+ * Glib::ustring ustr = "UTF8 string";
+ * auto r1 = f1(str.c_str(), ustr);
+ * @endcode
+ *
+ * @newin{2,64}
+ */
+class GLIBMM_API UStringView
+{
+public:
+  inline UStringView(const Glib::ustring& s);
+  UStringView(const char* s) : pstring_(s) {}
+  const char* c_str() const { return pstring_; }
+private:
+  const char* pstring_;
+};
+
+//***************************************************
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 #ifndef GLIBMM_HAVE_STD_ITERATOR_TRAITS
 
@@ -1905,6 +1993,10 @@ operator+(char lhs, const ustring& rhs)
   temp += rhs;
   return temp;
 }
+
+//********** Glib::StdStringView and Glib::UStringView *************
+
+inline UStringView::UStringView(const ustring& s) : pstring_(s.c_str()) {}
 
 } // namespace Glib
 
