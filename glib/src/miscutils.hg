@@ -362,6 +362,26 @@ std::string path_get_dirname(const std::string& filename);
 GLIBMM_API
 std::string build_filename(const Glib::ArrayHandle<std::string>& elements);
 
+/** Creates a filename from one or more elements using the correct separator for filenames.
+ * No attempt is made to force the resulting filename to be an absolute path.
+ * If the first element is a relative path, the result will be a relative path.
+ * @tparam Strings std::string or const char*.
+ * @param strings The path elements.
+ * @return The resulting path.
+ *
+ * @newin{2,64}
+ */
+template <typename... Strings>
+std::string build_filename(const Strings&... strings)
+{
+  return Glib::convert_return_gchar_ptr_to_stdstring(
+    g_build_filename(StdStringView(strings).c_str()..., nullptr));
+}
+
+// When the templated build_filename() overload was added, the following
+// build_filename() overloads became unnecessary.
+//TODO: They can be removed when we can break ABI.
+
 /** Creates a filename from two elements using the correct separator for filenames.
  * No attempt is made to force the resulting filename to be an absolute path.
  * If the first element is a relative path, the result will be a relative path.
