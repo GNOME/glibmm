@@ -1781,6 +1781,17 @@
   )
 )
 
+(define-enum MonitorWarningLevel
+  (in-module "GMemory")
+  (c-name "GMemoryMonitorWarningLevel")
+  (gtype-id "G_TYPE_MEMORY_MONITOR_WARNING_LEVEL")
+  (values
+    '("low" "G_MEMORY_MONITOR_WARNING_LEVEL_LOW")
+    '("medium" "G_MEMORY_MONITOR_WARNING_LEVEL_MEDIUM")
+    '("critical" "G_MEMORY_MONITOR_WARNING_LEVEL_CRITICAL")
+  )
+)
+
 (define-flags NameLookupFlags
   (in-module "GResolver")
   (c-name "GResolverNameLookupFlags")
@@ -11527,6 +11538,27 @@
   )
 )
 
+(define-method find
+  (of-object "GListStore")
+  (c-name "g_list_store_find")
+  (return-type "gboolean")
+  (parameters
+    '("gpointer" "item")
+    '("guint*" "position")
+  )
+)
+
+(define-method find_with_equal_func
+  (of-object "GListStore")
+  (c-name "g_list_store_find_with_equal_func")
+  (return-type "gboolean")
+  (parameters
+    '("gpointer" "item")
+    '("GEqualFunc" "equal_func")
+    '("guint*" "position")
+  )
+)
+
 
 
 ;; From gloadableicon.h
@@ -11637,6 +11669,7 @@
     '("GFileMonitorFlags" "flags")
     '("GFileMonitorCallback" "callback")
     '("gpointer" "user_data")
+    '("GClosureNotify" "destroy_user_data")
     '("GError**" "error")
   )
 )
@@ -11718,6 +11751,23 @@
     '("GBytes*" "bytes")
   )
 )
+
+
+
+;; From gmemorymonitordbus.h
+
+
+
+;; From gmemorymonitor.h
+
+(define-function g_memory_monitor_dup_default
+  (c-name "g_memory_monitor_dup_default")
+  (return-type "GMemoryMonitor*")
+)
+
+
+
+;; From gmemorymonitorportal.h
 
 
 
@@ -17995,6 +18045,15 @@
   (varargs #t)
 )
 
+(define-method return_value
+  (of-object "GTask")
+  (c-name "g_task_return_value")
+  (return-type "none")
+  (parameters
+    '("GValue*" "result")
+  )
+)
+
 (define-method return_error_if_cancelled
   (of-object "GTask")
   (c-name "g_task_return_error_if_cancelled")
@@ -18024,6 +18083,16 @@
   (c-name "g_task_propagate_int")
   (return-type "gssize")
   (parameters
+    '("GError**" "error")
+  )
+)
+
+(define-method propagate_value
+  (of-object "GTask")
+  (c-name "g_task_propagate_value")
+  (return-type "gboolean")
+  (parameters
+    '("GValue*" "value")
     '("GError**" "error")
   )
 )
@@ -20934,6 +21003,11 @@
 
 (define-function g_pollable_return_get_type
   (c-name "g_pollable_return_get_type")
+  (return-type "GType")
+)
+
+(define-function g_memory_monitor_warning_level_get_type
+  (c-name "g_memory_monitor_warning_level_get_type")
   (return-type "GType")
 )
 

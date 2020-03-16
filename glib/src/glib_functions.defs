@@ -1079,6 +1079,7 @@
     '("unknown-keyword" "G_VARIANT_PARSE_ERROR_UNKNOWN_KEYWORD")
     '("unterminated-string-constant" "G_VARIANT_PARSE_ERROR_UNTERMINATED_STRING_CONSTANT")
     '("value-expected" "G_VARIANT_PARSE_ERROR_VALUE_EXPECTED")
+    '("recursion" "G_VARIANT_PARSE_ERROR_RECURSION")
   )
 )
 
@@ -1116,6 +1117,15 @@
     '("gboolean" "zero_terminated")
     '("gboolean" "clear_")
     '("guint" "element_size")
+  )
+)
+
+(define-method steal
+  (of-object "GArray")
+  (c-name "g_array_steal")
+  (return-type "gpointer")
+  (parameters
+    '("gsize*" "len")
   )
 )
 
@@ -1282,6 +1292,15 @@
   (return-type "GPtrArray*")
   (parameters
     '("GDestroyNotify" "element_free_func")
+  )
+)
+
+(define-method steal
+  (of-object "GPtrArray")
+  (c-name "g_ptr_array_steal")
+  (return-type "gpointer*")
+  (parameters
+    '("gsize*" "len")
   )
 )
 
@@ -1517,6 +1536,15 @@
   (parameters
     '("guint8*" "data")
     '("gsize" "len")
+  )
+)
+
+(define-method steal
+  (of-object "GByteArray")
+  (c-name "g_byte_array_steal")
+  (return-type "guint8*")
+  (parameters
+    '("gsize*" "len")
   )
 )
 
@@ -6674,6 +6702,15 @@
   )
 )
 
+(define-function g_clear_list
+  (c-name "g_clear_list")
+  (return-type "none")
+  (parameters
+    '("GList**" "list_ptr")
+    '("GDestroyNotify" "destroy")
+  )
+)
+
 
 
 ;; From gmacros.h
@@ -6886,6 +6923,18 @@
   (return-type "GMainContext*")
 )
 
+(define-method pusher_new
+  (of-object "GMainContext")
+  (c-name "g_main_context_pusher_new")
+  (return-type "GMainContextPusher*")
+)
+
+(define-method free
+  (of-object "GMainContextPusher")
+  (c-name "g_main_context_pusher_free")
+  (return-type "none")
+)
+
 (define-function g_main_loop_new
   (c-name "g_main_loop_new")
   (is-constructor-of "GMainLoop")
@@ -6939,6 +6988,15 @@
   (parameters
     '("GSourceFuncs*" "source_funcs")
     '("guint" "struct_size")
+  )
+)
+
+(define-method set_dispose_function
+  (of-object "GSource")
+  (c-name "g_source_set_dispose_function")
+  (return-type "none")
+  (parameters
+    '("GSourceDisposeFunc" "dispose")
   )
 )
 
@@ -10747,6 +10805,15 @@
   )
 )
 
+(define-function g_clear_slist
+  (c-name "g_clear_slist")
+  (return-type "none")
+  (parameters
+    '("GSList**" "slist_ptr")
+    '("GDestroyNotify" "destroy")
+  )
+)
+
 
 
 ;; From gspawn.h
@@ -10992,6 +11059,14 @@
     '("const-gchar*" "filename")
     '("const-gchar*" "mode")
     '("FILE*" "stream")
+  )
+)
+
+(define-function g_fsync
+  (c-name "g_fsync")
+  (return-type "gint")
+  (parameters
+    '("gint" "fd")
   )
 )
 
@@ -13860,6 +13935,14 @@
   (return-type "none")
   (parameters
     '("const-gchar*" "application_name")
+  )
+)
+
+(define-function g_get_os_info
+  (c-name "g_get_os_info")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "key_name")
   )
 )
 

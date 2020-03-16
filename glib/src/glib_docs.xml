@@ -20,7 +20,10 @@ Since: 2.26
 <property name="GBinding:source-property">
 <description>
 The name of the property of #GBinding:source that should be used
-as the source of the binding
+as the source of the binding.
+
+This should be in [canonical form][canonical-parameter-names] to get the
+best performance.
 
 Since: 2.26
 
@@ -39,7 +42,10 @@ Since: 2.26
 <property name="GBinding:target-property">
 <description>
 The name of the property of #GBinding:target that should be used
-as the target of the binding
+as the target of the binding.
+
+This should be in [canonical form][canonical-parameter-names] to get the
+best performance.
 
 Since: 2.26
 
@@ -2115,7 +2121,7 @@ match signals by.
 </parameter_description>
 </parameter>
 <parameter name="G_SIGNAL_MATCH_DETAIL">
-<parameter_description> The signal detail be equal.
+<parameter_description> The signal detail must be equal.
 </parameter_description>
 </parameter>
 <parameter name="G_SIGNAL_MATCH_CLOSURE">
@@ -2131,7 +2137,7 @@ match signals by.
 </parameter_description>
 </parameter>
 <parameter name="G_SIGNAL_MATCH_UNBLOCKED">
-<parameter_description> Only unblocked signals may matched.
+<parameter_description> Only unblocked signals may be matched.
 </parameter_description>
 </parameter>
 </parameters>
@@ -3903,6 +3909,10 @@ Error codes returned by parsing text-format GVariants.
 <parameter_description> no value given
 </parameter_description>
 </parameter>
+<parameter name="G_VARIANT_PARSE_ERROR_RECURSION">
+<parameter_description> variant was too deeply nested; #GVariant is only guaranteed to handle nesting up to 64 levels (Since: 2.64)
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -4605,6 +4615,47 @@ This did not actually work, so any such code should be removed.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_array_steal">
+<description>
+Frees the data in the array and resets the size to zero, while
+the underlying array is preserved for use elsewhere and returned
+to the caller.
+
+If the array was created with the @zero_terminate property
+set to %TRUE, the returned data is zero terminated too.
+
+If array elements contain dynamically-allocated memory,
+the array elements should also be freed by the caller.
+
+A short example of use:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+...
+gpointer data;
+gsize data_len;
+data = g_array_steal (some_array, &amp;data_len);
+...
+]|
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="array">
+<parameter_description> a #GArray.
+</parameter_description>
+</parameter>
+<parameter name="len">
+<parameter_description> pointer to retrieve the number of
+elements of the original array
+</parameter_description>
+</parameter>
+</parameters>
+<return> the element data, which should be
+freed using g_free().
+
+</return>
 </function>
 
 <function name="g_array_unref">
@@ -5548,6 +5599,8 @@ The effect of `g_assert_cmpmem (m1, l1, m2, l2)` is
 the same as `g_assert_true (l1 == l2 &amp;&amp; memcmp (m1, m2, l1) == 0)`.
 The advantage of this macro is that it can produce a message that
 includes the actual values of @l1 and @l2.
+
+@m1 may be %NULL if (and only if) @l1 is zero; similarly for @m2 and @l2.
 
 |[&lt;!-- language=&quot;C&quot; --&gt;
 g_assert_cmpmem (buf-&gt;data, buf-&gt;len, expected, sizeof (expected));
@@ -7781,10 +7834,10 @@ The output buffer must be large enough to fit all the data that will
 be written to it. Due to the way base64 encodes you will need
 at least: (@len / 3 + 1) * 4 + 4 bytes (+ 4 may be needed in case of
 non-zero state). If you enable line-breaking you will need at least:
-((@len / 3 + 1) * 4 + 4) / 72 + 1 bytes of extra space.
+((@len / 3 + 1) * 4 + 4) / 76 + 1 bytes of extra space.
 
 @break_lines is typically used when putting base64-encoded data in emails.
-It breaks the lines at 72 columns instead of putting all of the text on
+It breaks the lines at 76 columns instead of putting all of the text on
 the same line. This avoids problems with long lines in the email system.
 Note however that it breaks the lines with `LF` characters, not
 `CR LF` sequences, so the result cannot be passed directly to SMTP
@@ -9890,6 +9943,32 @@ user data argument.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_byte_array_steal">
+<description>
+Frees the data in the array and resets the size to zero, while
+the underlying array is preserved for use elsewhere and returned
+to the caller.
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="array">
+<parameter_description> a #GByteArray.
+</parameter_description>
+</parameter>
+<parameter name="len">
+<parameter_description> pointer to retrieve the number of
+elements of the original array
+</parameter_description>
+</parameter>
+</parameters>
+<return> the element data, which should be
+freed using g_free().
+
+</return>
 </function>
 
 <function name="g_byte_array_unref">
@@ -12966,6 +13045,28 @@ Since: 2.56
 <return></return>
 </function>
 
+<function name="g_clear_list">
+<description>
+Clears a pointer to a #GList, freeing it and, optionally, freeing its elements using @destroy.
+
+@list_ptr must be a valid pointer. If @list_ptr points to a null #GList, this does nothing.
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="list_ptr">
+<parameter_description> a #GList return location
+</parameter_description>
+</parameter>
+<parameter name="destroy">
+<parameter_description> the function to pass to g_list_free_full() or %NULL to not free elements
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_clear_object">
 <description>
 Clears a reference to a #GObject.
@@ -13046,6 +13147,28 @@ Since: 2.62
 </parameter>
 <parameter name="instance">
 <parameter_description> The instance to remove the signal handler from.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_clear_slist">
+<description>
+Clears a pointer to a #GSList, freeing it and, optionally, freeing its elements using @destroy.
+
+@slist_ptr must be a valid pointer. If @slist_ptr points to a null #GSList, this does nothing.
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="slist_ptr">
+<parameter_description> a #GSList return location
+</parameter_description>
+</parameter>
+<parameter name="destroy">
+<parameter_description> the function to pass to g_slist_free_full() or %NULL to not free elements
 </parameter_description>
 </parameter>
 </parameters>
@@ -16988,9 +17111,17 @@ Since: 2.26
 <description>
 Creates a #GDateTime corresponding to the given
 [ISO 8601 formatted string](https://en.wikipedia.org/wiki/ISO_8601)
-@text. ISO 8601 strings of the form &lt;date&gt;&lt;sep&gt;&lt;time&gt;&lt;tz&gt; are supported.
+@text. ISO 8601 strings of the form &lt;date&gt;&lt;sep&gt;&lt;time&gt;&lt;tz&gt; are supported, with
+some extensions from [RFC 3339](https://tools.ietf.org/html/rfc3339) as
+mentioned below.
 
-&lt;sep&gt; is the separator and can be either 'T', 't' or ' '.
+Note that as #GDateTime &quot;is oblivious to leap seconds&quot;, leap seconds information
+in an ISO-8601 string will be ignored, so a `23:59:60` time would be parsed as
+`23:59:59`.
+
+&lt;sep&gt; is the separator and can be either 'T', 't' or ' '. The latter two
+separators are an extension from
+[RFC 3339](https://tools.ietf.org/html/rfc3339#section-5.6).
 
 &lt;date&gt; is in the form:
 
@@ -19041,8 +19172,8 @@ including the type suffix.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string with the absolute path,
-or %NULL
+<return> a newly-allocated
+string with the absolute path, or %NULL
 </return>
 </function>
 
@@ -19189,17 +19320,22 @@ Since: 2.54
 
 <function name="g_fopen">
 <description>
-A wrapper for the stdio fopen() function. The fopen() function
+A wrapper for the stdio `fopen()` function. The `fopen()` function
 opens a file and associates a new stream with it.
 
 Because file descriptors are specific to the C library on Windows,
-and a file descriptor is part of the FILE struct, the FILE* returned
+and a file descriptor is part of the `FILE` struct, the `FILE*` returned
 by this function makes sense only to functions in the same C library.
 Thus if the GLib-using code uses a different C library than GLib does,
 the FILE* returned by this function cannot be passed to C library
-functions like fprintf() or fread().
+functions like `fprintf()` or `fread()`.
 
-See your C library manual for more details about fopen().
+See your C library manual for more details about `fopen()`.
+
+As `close()` and `fclose()` are part of the C library, this implies that it is
+currently impossible to close a file if the application C library and the C library
+used by GLib are different. Convenience functions like g_file_set_contents()
+avoid this problem.
 
 Since: 2.6
 
@@ -19215,7 +19351,7 @@ Since: 2.6
 </parameter_description>
 </parameter>
 </parameters>
-<return> A FILE* if the file was successfully opened, or %NULL if
+<return> A `FILE*` if the file was successfully opened, or %NULL if
 an error occurred
 
 </return>
@@ -19246,8 +19382,8 @@ Since: 2.30
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated formatted string containing a human readable
-file size
+<return> a newly-allocated formatted string containing
+a human readable file size
 
 </return>
 </function>
@@ -19276,8 +19412,8 @@ suffixes to denote IEC units. Use g_format_size() instead.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated formatted string containing a human
-readable file size
+<return> a newly-allocated formatted string
+containing a human readable file size
 
 </return>
 </function>
@@ -19302,8 +19438,8 @@ Since: 2.30
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated formatted string containing a human
-readable file size
+<return> a newly-allocated formatted string
+containing a human readable file size
 
 </return>
 </function>
@@ -19386,6 +19522,29 @@ an error occurred.
 </return>
 </function>
 
+<function name="g_fsync">
+<description>
+A wrapper for the POSIX fsync() function (_commit() on Windows).
+The fsync() function is used to synchronize a file's in-core
+state with that of the disk.
+
+See the C library manual for more details about fsync().
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="fd">
+<parameter_description> a file descriptor
+</parameter_description>
+</parameter>
+</parameters>
+<return> 0 on success, or -1 if an error occurred.
+The return value can be used exactly like the return value from fsync().
+
+</return>
+</function>
+
 <function name="g_get_application_name">
 <description>
 Gets a human-readable name for the application, as set by
@@ -19401,7 +19560,8 @@ Since: 2.2
 </description>
 <parameters>
 </parameters>
-<return> human-readable application name. may return %NULL
+<return> human-readable application
+name. May return %NULL
 
 </return>
 </function>
@@ -19713,10 +19873,15 @@ It must not be modified or freed. It must be copied if planned to be used in ano
 Returns a list of derived variants of @locale, which can be used to
 e.g. construct locale-dependent filenames or search paths. The returned
 list is sorted from most desirable to least desirable.
-This function handles territory, charset and extra locale modifiers.
+This function handles territory, charset and extra locale modifiers. See
+[`setlocale(3)`](man:setlocale) for information about locales and their format.
 
-For example, if @locale is &quot;fr_BE&quot;, then the returned list
-is &quot;fr_BE&quot;, &quot;fr&quot;.
+@locale itself is guaranteed to be returned in the output.
+
+For example, if @locale is `fr_BE`, then the returned list
+is `fr_BE`, `fr`. If @locale is `en_GB.UTF-8@euro`, then the returned list
+is `en_GB.UTF-8@euro`, `en_GB.UTF-8`, `en_GB@euro`, `en_GB`, `en.UTF-8@euro`,
+`en.UTF-8`, `en@euro`, `en`.
 
 If you need the list of variants for the current locale,
 use g_get_language_names().
@@ -19777,6 +19942,32 @@ Since: 2.36
 </return>
 </function>
 
+<function name="g_get_os_info">
+<description>
+Get information about the operating system.
+
+On Linux this comes from the `/etc/os-release` file. On other systems, it may
+come from a variety of sources. You can either use the standard key names
+like %G_OS_INFO_KEY_NAME or pass any UTF-8 string key name. For example,
+`/etc/os-release` provides a number of other less commonly used values that may
+be useful. No key is guaranteed to be provided, so the caller should always
+check if the result is %NULL.
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="key_name">
+<parameter_description> a key for the OS info being requested, for example %G_OS_INFO_KEY_NAME.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The associated value for the requested key or %NULL if
+this information is not provided.
+
+</return>
+</function>
+
 <function name="g_get_prgname">
 <description>
 Gets the name of the program. This name should not be localized,
@@ -19792,8 +19983,8 @@ taking the last component of @argv[0].
 </description>
 <parameters>
 </parameters>
-<return> the name of the program, or %NULL if it has not been
-set yet. The returned string belongs
+<return> the name of the program,
+or %NULL if it has not been set yet. The returned string belongs
 to GLib and must not be modified or freed.
 </return>
 </function>
@@ -19960,8 +20151,8 @@ Since: 2.6
 </description>
 <parameters>
 </parameters>
-<return> a string owned by GLib that must not be modified
-or freed.
+<return> a string owned by GLib that
+must not be modified or freed.
 </return>
 </function>
 
@@ -19987,8 +20178,8 @@ Since: 2.6
 </description>
 <parameters>
 </parameters>
-<return> a string owned by GLib that must not be modified
-or freed.
+<return> a string owned by GLib that
+must not be modified or freed.
 </return>
 </function>
 
@@ -20014,8 +20205,9 @@ Since: 2.6
 </description>
 <parameters>
 </parameters>
-<return> a string owned by GLib that must not be modified
-or freed.
+<return> a string owned by GLib that must
+not be modified or freed.
+
 </return>
 </function>
 
@@ -20117,6 +20309,10 @@ or g_unsetenv().
 This is a convenience function for using a #GHashTable as a set.  It
 is equivalent to calling g_hash_table_replace() with @key as both the
 key and the value.
+
+In particular, this means that if @key already exists in the hash table, then
+the old copy of @key in the hash table is freed and @key replaces it in the
+table.
 
 When a hash table only ever contains keys that have themselves as the
 corresponding value it is able to be stored more efficiently.  See
@@ -20233,6 +20429,9 @@ pair, and the given @user_data parameter.  The hash table may not
 be modified while iterating over it (you can't add/remove
 items). To remove all items matching a predicate, use
 g_hash_table_foreach_remove().
+
+The order in which g_hash_table_foreach() iterates over the keys/values in
+the hash table is not defined.
 
 See g_hash_table_find() for performance caveats for linear
 order searches in contrast to g_hash_table_lookup().
@@ -20480,6 +20679,10 @@ Since: 2.16
 Initializes a key/value pair iterator and associates it with
 @hash_table. Modifying the hash table after calling this function
 invalidates the returned iterator.
+
+The iteration order of a #GHashTableIter over the keys/values in a hash
+table is not defined.
+
 |[&lt;!-- language=&quot;C&quot; --&gt;
 GHashTableIter iter;
 gpointer key, value;
@@ -23271,6 +23474,9 @@ Creates a #GSource that's dispatched when @condition is met for the
 given @channel. For example, if condition is #G_IO_IN, the source will 
 be dispatched when there's data available for reading.
 
+The callback function invoked by the #GSource should be added with
+g_source_set_callback(), but it has type #GIOFunc (not #GSourceFunc).
+
 g_io_add_watch() is a simpler interface to this same functionality, for 
 the case where you want to add the source to the default main loop context 
 at the default priority.
@@ -25195,6 +25401,13 @@ The freed elements are returned to the slice allocator.
 If list elements contain dynamically-allocated memory, you should
 either use g_list_free_full() or free them manually first.
 
+It can be combined with g_steal_pointer() to ensure the list head pointer
+is not left dangling:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+GList *list_of_borrowed_things = …;  /&lt;!-- --&gt;* (transfer container) *&lt;!-- --&gt;/
+g_list_free (g_steal_pointer (&amp;list_of_borrowed_things));
+]|
+
 </description>
 <parameters>
 <parameter name="list">
@@ -25240,6 +25453,15 @@ and calls @free_func on every element's data.
 
 @free_func must not modify the list (eg, by removing the freed
 element from it).
+
+It can be combined with g_steal_pointer() to ensure the list head pointer
+is not left dangling ­— this also has the nice property that the head pointer
+is cleared before any of the list elements are freed, to prevent double frees
+from @free_func:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+GList *list_of_owned_things = …;  /&lt;!-- --&gt;* (transfer full) (element-type GObject) *&lt;!-- --&gt;/
+g_list_free_full (g_steal_pointer (&amp;list_of_owned_things), g_object_unref);
+]|
 
 Since: 2.28
 
@@ -27200,6 +27422,79 @@ Since: 2.22
 <return></return>
 </function>
 
+<function name="g_main_context_pusher_free">
+<description>
+Pop @pusher’s main context as the thread default main context.
+See g_main_context_pusher_new() for details.
+
+This will pop the #GMainContext as the current thread-default main context,
+but will not call g_main_context_unref() on it.
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="pusher">
+<parameter_description> a #GMainContextPusher
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_main_context_pusher_new">
+<description>
+Push @main_context as the new thread-default main context for the current
+thread, using g_main_context_push_thread_default(), and return a new
+#GMainContextPusher. Pop with g_main_context_pusher_free(). Using
+g_main_context_pop_thread_default() on @main_context while a
+#GMainContextPusher exists for it can lead to undefined behaviour.
+
+Using two #GMainContextPushers in the same scope is not allowed, as it leads
+to an undefined pop order.
+
+This is intended to be used with g_autoptr().  Note that g_autoptr()
+is only available when using GCC or clang, so the following example
+will only work with those compilers:
+|[
+typedef struct
+{
+...
+GMainContext *context;
+...
+} MyObject;
+
+static void
+my_object_do_stuff (MyObject *self)
+{
+g_autoptr(GMainContextPusher) pusher = g_main_context_pusher_new (self-&gt;context);
+
+// Code with main context as the thread default here
+
+if (cond)
+// No need to pop
+return;
+
+// Optionally early pop
+g_clear_pointer (&amp;pusher, g_main_context_pusher_free);
+
+// Code with main context no longer the thread default here
+}
+]|
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="main_context">
+<parameter_description> a main context to push
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GMainContextPusher
+</return>
+</function>
+
 <function name="g_main_context_query">
 <description>
 Determines information necessary to poll this main loop.
@@ -29124,7 +29419,7 @@ includes the key `gc-friendly`.
 <description>
 Checks whether the allocator used by g_malloc() is the system's
 malloc implementation. If it returns %TRUE memory allocated with
-malloc() can be used interchangeable with memory allocated using g_malloc().
+malloc() can be used interchangeably with memory allocated using g_malloc().
 This function is useful for avoiding an extra copy of allocated memory returned
 by a non-GLib-based API.
 
@@ -29542,7 +29837,7 @@ If that fails and @file_name has the &quot;.la&quot;-suffix (and is a libtool
 archive) it tries to open the corresponding module. If that fails
 and it doesn't have the proper module suffix for the platform
 (#G_MODULE_SUFFIX), this suffix will be appended and the corresponding
-module will be opended. If that fails and @file_name doesn't have the
+module will be opened. If that fails and @file_name doesn't have the
 &quot;.la&quot;-suffix, this suffix is appended and g_module_open() tries to open
 the corresponding module. If eventually that fails as well, %NULL is
 returned.
@@ -29708,6 +30003,8 @@ already been locked by the same thread results in undefined behaviour
 <description>
 Unlock @locker's mutex. See g_mutex_locker_new() for details.
 
+No memory is freed, it is equivalent to a g_mutex_unlock() call.
+
 Since: 2.44
 
 </description>
@@ -29725,6 +30022,8 @@ Since: 2.44
 Lock @mutex and return a new #GMutexLocker. Unlock with
 g_mutex_locker_free(). Using g_mutex_unlock() on @mutex
 while a #GMutexLocker exists can lead to undefined behaviour.
+
+No allocation is performed, it is equivalent to a g_mutex_lock() call.
 
 This is intended to be used with g_autoptr().  Note that g_autoptr()
 is only available when using GCC or clang, so the following example
@@ -31373,16 +31672,18 @@ Here is an example of using g_object_get() to get the contents
 of three properties: an integer, a string and an object:
 |[&lt;!-- language=&quot;C&quot; --&gt; 
 gint intval;
+guint64 uint64val;
 gchar *strval;
 GObject *objval;
 
 g_object_get (my_object,
 &quot;int-property&quot;, &amp;intval,
+&quot;uint64-property&quot;, &amp;uint64val,
 &quot;str-property&quot;, &amp;strval,
 &quot;obj-property&quot;, &amp;objval,
 NULL);
 
-// Do something with intval, strval, objval
+// Do something with intval, uint64val, strval, objval
 
 g_free (strval);
 g_object_unref (objval);
@@ -31666,6 +31967,20 @@ Creates a new instance of a #GObject subtype and sets its properties.
 
 Construction parameters (see #G_PARAM_CONSTRUCT, #G_PARAM_CONSTRUCT_ONLY)
 which are not explicitly specified are set to their default values.
+
+Note that in C, small integer types in variable argument lists are promoted
+up to #gint or #guint as appropriate, and read back accordingly. #gint is 32
+bits on every platform on which GLib is currently supported. This means that
+you can use C expressions of type #gint with g_object_new() and properties of
+type #gint or #guint or smaller. Specifically, you can use integer literals
+with these property types.
+
+When using property types of #gint64 or #guint64, you must ensure that the
+value that you provide is 64 bit. This means that you should use a cast or
+make use of the %G_GINT64_CONSTANT or %G_GUINT64_CONSTANT macros.
+
+Similarly, #gfloat is promoted to #gdouble, so you must ensure that the value
+you provide is a #gdouble, even for a property of type #gfloat.
 
 
 </description>
@@ -32090,6 +32405,11 @@ This function should only be called from object system implementations.
 <function name="g_object_set">
 <description>
 Sets properties on an object.
+
+The same caveats about passing integer literals as varargs apply as with
+g_object_new(). In particular, any integer literals set as the values for
+properties of type #gint64 or #guint64 must be 64 bits wide, using the
+%G_GINT64_CONSTANT or %G_GUINT64_CONSTANT macros.
 
 Note that the &quot;notify&quot; signals are queued and only emitted (in
 reverse order) after all properties have been set. See
@@ -34094,15 +34414,9 @@ See g_param_spec_internal() for details on property names.
 <description>
 Creates a new #GParamSpec instance.
 
-A property name consists of segments consisting of ASCII letters and
-digits, separated by either the '-' or '_' character. The first
-character of a property name must be a letter. Names which violate these
-rules lead to undefined behaviour.
-
-When creating and looking up a #GParamSpec, either separator can be
-used, but they cannot be mixed. Using '-' is considerably more
-efficient and in fact required when using property names as detail
-strings for signals.
+See [canonical parameter names][canonical-parameter-names] for details of
+the rules for @name. Names which violate these rules lead to undefined
+behaviour.
 
 Beyond the name, #GParamSpecs have two more descriptive
 strings associated with them, the @nick, which should be suitable
@@ -35005,7 +35319,8 @@ Sets @value to its default value as specified in @pspec.
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> a #GValue of correct type for @pspec
+<parameter_description> a #GValue of correct type for @pspec; since 2.64, you
+can also pass an empty #GValue, initialized with %G_VALUE_INIT
 </parameter_description>
 </parameter>
 </parameters>
@@ -36339,7 +36654,32 @@ greater than second arg).
 
 Note that the comparison function for g_ptr_array_sort() doesn't
 take the pointers from the array as arguments, it takes pointers to
-the pointers in the array.
+the pointers in the array. Here is a full example of usage:
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
+typedef struct
+{
+gchar *name;
+gint size;
+} FileListEntry;
+
+static gint
+sort_filelist (gconstpointer a, gconstpointer b)
+{
+const FileListEntry *entry1 = *((FileListEntry **) a);
+const FileListEntry *entry2 = *((FileListEntry **) b);
+
+return g_ascii_strcasecmp (entry1-&gt;name, entry2-&gt;name);
+}
+
+…
+g_autoptr (GPtrArray) file_list = NULL;
+
+// initialize file_list array and load with many FileListEntry entries
+...
+// now sort it with
+g_ptr_array_sort (file_list, sort_filelist);
+]|
 
 This is guaranteed to be a stable sort since version 2.32.
 
@@ -36364,7 +36704,52 @@ user data argument.
 
 Note that the comparison function for g_ptr_array_sort_with_data()
 doesn't take the pointers from the array as arguments, it takes
-pointers to the pointers in the array.
+pointers to the pointers in the array. Here is a full example of use:
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
+typedef enum { SORT_NAME, SORT_SIZE } SortMode;
+
+typedef struct
+{
+gchar *name;
+gint size;
+} FileListEntry;
+
+static gint
+sort_filelist (gconstpointer a, gconstpointer b, gpointer user_data)
+{
+gint order;
+const SortMode sort_mode = GPOINTER_TO_INT (user_data);
+const FileListEntry *entry1 = *((FileListEntry **) a);
+const FileListEntry *entry2 = *((FileListEntry **) b);
+
+switch (sort_mode)
+{
+case SORT_NAME:
+order = g_ascii_strcasecmp (entry1-&gt;name, entry2-&gt;name);
+break;
+case SORT_SIZE:
+order = entry1-&gt;size - entry2-&gt;size;
+break;
+default:
+order = 0;
+break;
+}
+return order;
+}
+
+...
+g_autoptr (GPtrArray) file_list = NULL;
+SortMode sort_mode;
+
+// initialize file_list array and load with many FileListEntry entries
+...
+// now sort it with
+sort_mode = SORT_NAME;
+g_ptr_array_sort_with_data (file_list,
+sort_filelist,
+GINT_TO_POINTER (sort_mode));
+]|
 
 This is guaranteed to be a stable sort since version 2.32.
 
@@ -36384,6 +36769,69 @@ This is guaranteed to be a stable sort since version 2.32.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_ptr_array_steal">
+<description>
+Frees the data in the array and resets the size to zero, while
+the underlying array is preserved for use elsewhere and returned
+to the caller.
+
+Even if set, the #GDestroyNotify function will never be called
+on the current contents of the array and the caller is
+responsible for freeing the array elements.
+
+An example of use:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+g_autoptr(GPtrArray) chunk_buffer = g_ptr_array_new_with_free_func (g_bytes_unref);
+
+// Some part of your application appends a number of chunks to the pointer array.
+g_ptr_array_add (chunk_buffer, g_bytes_new_static (&quot;hello&quot;, 5));
+g_ptr_array_add (chunk_buffer, g_bytes_new_static (&quot;world&quot;, 5));
+
+…
+
+// Periodically, the chunks need to be sent as an array-and-length to some
+// other part of the program.
+GBytes **chunks;
+gsize n_chunks;
+
+chunks = g_ptr_array_steal (chunk_buffer, &amp;n_chunks);
+for (gsize i = 0; i &lt; n_chunks; i++)
+{
+// Do something with each chunk here, and then free them, since
+// g_ptr_array_steal() transfers ownership of all the elements and the
+// array to the caller.
+…
+
+g_bytes_unref (chunks[i]);
+}
+
+g_free (chunks);
+
+// After calling g_ptr_array_steal(), the pointer array can be reused for the
+// next set of chunks.
+g_assert (chunk_buffer-&gt;len == 0);
+]|
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="array">
+<parameter_description> a #GPtrArray.
+</parameter_description>
+</parameter>
+<parameter name="len">
+<parameter_description> pointer to retrieve the number of
+elements of the original array
+</parameter_description>
+</parameter>
+</parameters>
+<return> the element data, which should be
+freed using g_free().
+
+</return>
 </function>
 
 <function name="g_ptr_array_steal_index">
@@ -38175,6 +38623,8 @@ Since: 2.32
 <description>
 Unlock @locker's recursive mutex. See g_rec_mutex_locker_new() for details.
 
+No memory is freed, it is equivalent to a g_rec_mutex_unlock() call.
+
 Since: 2.60
 
 </description>
@@ -38192,6 +38642,8 @@ Since: 2.60
 Lock @rec_mutex and return a new #GRecMutexLocker. Unlock with
 g_rec_mutex_locker_free(). Using g_rec_mutex_unlock() on @rec_mutex
 while a #GRecMutexLocker exists can lead to undefined behaviour.
+
+No allocation is performed, it is equivalent to a g_rec_mutex_lock() call.
 
 This is intended to be used with g_autoptr().  Note that g_autoptr()
 is only available when using GCC or clang, so the following example
@@ -40042,6 +40494,8 @@ Since: 2.32
 Release a read lock on @locker's read-write lock. See
 g_rw_lock_reader_locker_new() for details.
 
+No memory is freed, it is equivalent to a g_rw_lock_reader_unlock() call.
+
 Since: 2.62
 
 </description>
@@ -40060,6 +40514,8 @@ Obtain a read lock on @rw_lock and return a new #GRWLockReaderLocker.
 Unlock with g_rw_lock_reader_locker_free(). Using g_rw_lock_reader_unlock()
 on @rw_lock while a #GRWLockReaderLocker exists can lead to undefined
 behaviour.
+
+No allocation is performed, it is equivalent to a g_rw_lock_reader_lock() call.
 
 This is intended to be used with g_autoptr(). For a code sample, see
 g_rw_lock_writer_locker_new().
@@ -40139,6 +40595,8 @@ Since: 2.32
 Release a write lock on @locker's read-write lock. See
 g_rw_lock_writer_locker_new() for details.
 
+No memory is freed, it is equivalent to a g_rw_lock_writer_unlock() call.
+
 Since: 2.62
 
 </description>
@@ -40157,6 +40615,8 @@ Obtain a write lock on @rw_lock and return a new #GRWLockWriterLocker.
 Unlock with g_rw_lock_writer_locker_free(). Using g_rw_lock_writer_unlock()
 on @rw_lock while a #GRWLockWriterLocker exists can lead to undefined
 behaviour.
+
+No allocation is performed, it is equivalent to a g_rw_lock_writer_lock() call.
 
 This is intended to be used with g_autoptr().  Note that g_autoptr()
 is only available when using GCC or clang, so the following example
@@ -43243,6 +43703,10 @@ somewhat faster than using the name each time.
 
 Also tries the ancestors of the given type.
 
+The type class passed as @itype must already have been instantiated (for
+example, using g_type_class_ref()) for this function to work, as signals are
+always installed during class initialization.
+
 See g_signal_new() for details on allowed signal names.
 
 
@@ -43284,12 +43748,14 @@ Two different signals may have the same name, if they have differing types.
 Creates a new signal. (This is usually done in the class initializer.)
 
 A signal name consists of segments consisting of ASCII letters and
-digits, separated by either the '-' or '_' character. The first
+digits, separated by either the `-` or `_` character. The first
 character of a signal name must be a letter. Names which violate these
-rules lead to undefined behaviour of the GSignal system.
+rules lead to undefined behaviour. These are the same rules as for property
+naming (see g_param_spec_internal()).
 
 When registering a signal and looking up a signal, either separator can
-be used, but they cannot be mixed.
+be used, but they cannot be mixed. Using `-` is considerably more efficient.
+Using `_` is discouraged.
 
 If 0 is used for @class_offset subclasses cannot override the class handler
 in their class_init method by doing super_class-&gt;signal_handler = my_signal_handler.
@@ -44406,6 +44872,13 @@ If list elements contain dynamically-allocated memory,
 you should either use g_slist_free_full() or free them manually
 first.
 
+It can be combined with g_steal_pointer() to ensure the list head pointer
+is not left dangling:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+GSList *list_of_borrowed_things = …;  /&lt;!-- --&gt;* (transfer container) *&lt;!-- --&gt;/
+g_slist_free (g_steal_pointer (&amp;list_of_borrowed_things));
+]|
+
 </description>
 <parameters>
 <parameter name="list">
@@ -44450,6 +44923,15 @@ calls the specified destroy function on every element's data.
 
 @free_func must not modify the list (eg, by removing the freed
 element from it).
+
+It can be combined with g_steal_pointer() to ensure the list head pointer
+is not left dangling ­— this also has the nice property that the head pointer
+is cleared before any of the list elements are freed, to prevent double frees
+from @free_func:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+GSList *list_of_owned_things = …;  /&lt;!-- --&gt;* (transfer full) (element-type GObject) *&lt;!-- --&gt;/
+g_slist_free_full (g_steal_pointer (&amp;list_of_owned_things), g_object_unref);
+]|
 
 Since: 2.28
 
@@ -45046,6 +45528,9 @@ Since: 2.36
 Adds a #GSource to a @context so that it will be executed within
 that context. Remove it by calling g_source_destroy().
 
+This function is safe to call from any thread, regardless of which thread
+the @context is running in.
+
 
 </description>
 <parameters>
@@ -45072,6 +45557,9 @@ removed from their context.
 
 This does not unref the #GSource: if you still hold a reference, use
 g_source_unref() to drop it.
+
+This function is safe to call from any thread, regardless of which thread
+the #GMainContext is running in.
 
 </description>
 <parameters>
@@ -45701,6 +46189,41 @@ filled in with pointers to appropriate functions.
 </parameter>
 <parameter name="closure">
 <parameter_description> a #GClosure
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_source_set_dispose_function">
+<description>
+Set @dispose as dispose function on @source. @dispose will be called once
+the reference count of @source reaches 0 but before any of the state of the
+source is freed, especially before the finalize function is called.
+
+This means that at this point @source is still a valid #GSource and it is
+allow for the reference count to increase again until @dispose returns.
+
+The dispose function can be used to clear any &quot;weak&quot; references to the
+@source in other data structures in a thread-safe way where it is possible
+for another thread to increase the reference count of @source again while
+it is being freed.
+
+The finalize function can not be used for this purpose as at that point
+@source is already partially freed and not valid anymore.
+
+This should only ever be called from #GSource implementations.
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> A #GSource to set the dispose function on
+</parameter_description>
+</parameter>
+<parameter name="dispose">
+<parameter_description> #GSourceDisposeFunc to set on the source
 </parameter_description>
 </parameter>
 </parameters>
@@ -47706,6 +48229,10 @@ calculates the maximum space required and allocates memory to hold
 the result. The returned string should be freed with g_free() when no
 longer needed.
 
+The returned string is guaranteed to be non-NULL, unless @format
+contains `%lc` or `%ls` conversions, which can fail if no multibyte
+representation is available for the given character.
+
 
 </description>
 <parameters>
@@ -47748,6 +48275,10 @@ Similar to the standard C vsprintf() function but safer, since it
 calculates the maximum space required and allocates memory to hold
 the result. The returned string should be freed with g_free() when
 no longer needed.
+
+The returned string is guaranteed to be non-NULL, unless @format
+contains `%lc` or `%ls` conversions, which can fail if no multibyte
+representation is available for the given character.
 
 See also g_vasprintf(), which offers the same functionality, but
 additionally returns the length of the allocated string.
@@ -51297,6 +51828,14 @@ multiple #GThreads.
 To free the struct returned by this function, use g_thread_unref().
 Note that g_thread_join() implicitly unrefs the #GThread as well.
 
+New threads by default inherit their scheduler policy (POSIX) or thread
+priority (Windows) of the thread creating the new thread.
+
+This behaviour changed in GLib 2.64: before threads on Windows were not
+inheriting the thread priority but were spawned with the default priority.
+Starting with GLib 2.64 the behaviour is now consistent between Windows and
+POSIX and all threads inherit their parent thread's priority.
+
 Since: 2.32
 
 </description>
@@ -52165,7 +52704,8 @@ time values to be added to Coordinated Universal Time (UTC) to get
 the local time.
 
 In UNIX, the `TZ` environment variable typically corresponds
-to the name of a file in the zoneinfo database, or string in
+to the name of a file in the zoneinfo database, an absolute path to a file
+somewhere else, or a string in
 &quot;std offset [dst [offset],start[/time],end[/time]]&quot; (POSIX) format.
 There  are  no spaces in the specification. The name of standard
 and daylight savings time zone must be three or more alphabetic
@@ -52352,6 +52892,8 @@ the callback will be invoked in whichever thread is running that main
 context. You can do these steps manually if you need greater control or to
 use a custom main context.
 
+It is safe to call this function from any thread.
+
 The interval given is in terms of monotonic time, not wall clock
 time.  See g_get_monotonic_time().
 
@@ -52445,6 +52987,8 @@ g_timeout_source_new_seconds() and attaches it to the main loop context
 using g_source_attach(). You can do these steps manually if you need
 greater control. Also see g_timeout_add_seconds_full().
 
+It is safe to call this function from any thread.
+
 Note that the first call of the timer may not be precise for timeouts
 of one second. If you need finer precision and have such a timeout,
 you may want to use g_timeout_add() instead.
@@ -52512,6 +53056,8 @@ This internally creates a main loop source using
 g_timeout_source_new_seconds() and attaches it to the main loop context 
 using g_source_attach(). You can do these steps manually if you need 
 greater control.
+
+It is safe to call this function from any thread.
 
 The interval given is in terms of monotonic time, not wall clock
 time.  See g_get_monotonic_time().
@@ -53580,7 +54126,7 @@ is initialized
 
 <function name="g_type_add_interface_dynamic">
 <description>
-Adds the dynamic @interface_type to @instantiable_type. The information
+Adds @interface_type to the dynamic @instantiable_type. The information
 contained in the #GTypePlugin structure pointed to by @plugin
 is used to manage the relationship.
 
@@ -53604,7 +54150,7 @@ is used to manage the relationship.
 
 <function name="g_type_add_interface_static">
 <description>
-Adds the static @interface_type to @instantiable_type.
+Adds @interface_type to the static @instantiable_type.
 The information contained in the #GInterfaceInfo structure
 pointed to by @info is used to manage the relationship.
 
@@ -56154,6 +56700,38 @@ Since: 2.36
 </return>
 </function>
 
+<function name="g_unix_get_passwd_entry">
+<description>
+Get the `passwd` file entry for the given @user_name using `getpwnam_r()`.
+This can fail if the given @user_name doesn’t exist.
+
+The returned `struct passwd` has been allocated using g_malloc() and should
+be freed using g_free(). The strings referenced by the returned struct are
+included in the same allocation, so are valid until the `struct passwd` is
+freed.
+
+This function is safe to call from multiple threads concurrently.
+
+You will need to include `pwd.h` to get the definition of `struct passwd`.
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="user_name">
+<parameter_description> the username to get the passwd file entry for
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> passwd entry, or %NULL on error; free the returned
+value with g_free()
+</return>
+</function>
+
 <function name="g_unix_open_pipe">
 <description>
 Similar to the UNIX pipe() call, but on modern systems like Linux
@@ -57504,7 +58082,9 @@ Since: 2.52
 
 <function name="g_uuid_string_random">
 <description>
-Generates a random UUID (RFC 4122 version 4) as a string.
+Generates a random UUID (RFC 4122 version 4) as a string. It has the same
+randomness guarantees as #GRand, so must not be used for cryptographic
+purposes such as key generation, nonces, salts or one-time pads.
 
 Since: 2.52
 
@@ -62429,6 +63009,10 @@ then it will be set to reflect the error that occurred.
 Officially, the language understood by the parser is &quot;any string
 produced by g_variant_print()&quot;.
 
+There may be implementation specific restrictions on deeply nested values,
+which would result in a %G_VARIANT_PARSE_ERROR_RECURSION error. #GVariant is
+guaranteed to handle nesting up to at least 64 levels.
+
 
 </description>
 <parameters>
@@ -63428,6 +64012,10 @@ This function is similar to g_vsprintf(), except that it allocates a
 string to hold the output, instead of putting the output in a buffer 
 you allocate in advance.
 
+The returned value in @string is guaranteed to be non-NULL, unless
+@format contains `%lc` or `%ls` conversions, which can fail if no
+multibyte representation is available for the given character.
+
 `glib/gprintf.h` must be explicitly included in order to use this function.
 
 Since: 2.4
@@ -63782,6 +64370,29 @@ need not be entered manually.
 If structured logging is enabled, this will use g_log_structured();
 otherwise it will use g_log(). See
 [Using Structured Logging][using-structured-logging].
+
+</description>
+<parameters>
+<parameter name="Varargs">
+<parameter_description> format string, followed by parameters to insert
+into the format string (as with printf())
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_warning_once">
+<description>
+Logs a warning only once.
+
+g_warning_once() calls g_warning() with the passed message the first time
+the statement is executed; subsequent times it is a no-op.
+
+Note! On platforms where the compiler doesn't support variadic macros, the
+warning is printed each time instead of only once.
+
+Since: 2.64
 
 </description>
 <parameters>
