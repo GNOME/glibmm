@@ -221,6 +221,13 @@ path_get_dirname(const std::string& filename)
 }
 
 std::string
+canonicalize_filename(StdStringView filename, StdStringView relative_to)
+{
+  return convert_return_gchar_ptr_to_stdstring(g_canonicalize_filename(
+    filename.c_str(), relative_to.c_str()));
+}
+
+std::string
 build_filename(const Glib::ArrayHandle<std::string>& elements)
 {
   return convert_return_gchar_ptr_to_stdstring(

@@ -349,6 +349,32 @@ std::string path_get_basename(const std::string& filename);
 GLIBMM_API
 std::string path_get_dirname(const std::string& filename);
 
+/** Gets the canonical file name from @a filename.
+ *
+ * All triple slashes are turned into single slashes, and all `..` and `.`s
+ * resolved against @a relative_to.
+ *
+ * Symlinks are not followed, and the returned path is guaranteed to be absolute.
+ *
+ * If @a filename is an absolute path, @a relative_to is ignored. Otherwise,
+ * @a relative_to will be prepended to @a filename to make it absolute. @a relative_to
+ * must be an absolute path, or <tt>nullptr</tt>. If @a relative_to is <tt>nullptr</tt>,
+ * it'll fallback to get_current_dir().
+ *
+ * This function never fails, and will canonicalize file paths even if they don't exist.
+ *
+ * No file system I/O is done.
+ *
+ * @param filename The name of the file.
+ * @param relative_to The relative directory, or <tt>nullptr</tt> to use the
+ *                    current working directory.
+ * @return The canonical file path.
+ *
+ * @newin{2,64}
+ */
+GLIBMM_API
+std::string canonicalize_filename(StdStringView filename, StdStringView relative_to = nullptr);
+
 /** Creates a filename from a series of elements using the correct
  * separator for filenames.
  * This function behaves identically to Glib::build_path(G_DIR_SEPARATOR_S,
