@@ -23,12 +23,15 @@ main(int, char**)
 {
   Glib::init();
 
+  Glib::ustring u_abcd = "abcd";
+  Glib::ustring u_1234 = "1234";
+
   /* Reusing one regex pattern: */
   const auto regex = Glib::Regex::create("(a)?(b)");
   std::cout << "Pattern=" << regex->get_pattern() << ", with string=abcd, result=" << std::boolalpha
-            << regex->match("abcd") << std::endl;
+            << regex->match(u_abcd) << std::endl;
   std::cout << "Pattern=" << regex->get_pattern() << ", with string=1234, result=" << std::boolalpha
-            << regex->match("1234") << std::endl;
+            << regex->match(u_1234) << std::endl;
   std::cout << std::endl;
 
   /* Using the static function without a regex instance: */
