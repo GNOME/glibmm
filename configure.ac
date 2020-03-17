@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([glibmm], [2.63.1],
+AC_INIT([glibmm], [2.65.1],
         [https://gitlab.gnome.org/GNOME/glibmm/issues],
         [glibmm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -31,8 +31,8 @@ AM_MAINTAINER_MODE
 AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
 MM_PREREQ([0.9.12])
-MM_INIT_MODULE([glibmm-2.64])
-MM_INIT_MODULE([giomm-2.64])
+MM_INIT_MODULE([glibmm-2.66])
+MM_INIT_MODULE([giomm-2.66])
 
 # Copy the mm-common .pl scripts into docs/,
 # and use them from there,
