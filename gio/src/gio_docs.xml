@@ -2784,9 +2784,7 @@ g_dtls_connection_set_rehandshake_mode().
 
 Since: 2.48
 
-Deprecated: 2.60. Changing the rehandshake mode is no longer
-required for compatibility. Also, rehandshaking has been removed
-from the TLS protocol in TLS 1.3.
+Deprecated: 2.60: The rehandshake mode is ignored.
 
 </description>
 </property>
@@ -3758,6 +3756,65 @@ Since: 2.44
 
 </description>
 </property>
+
+<signal name="GMemoryMonitor::low-memory-warning">
+<description>
+Emitted when the system is running low on free memory. The signal
+handler should then take the appropriate action depending on the
+warning level. See the #GMemoryMonitorWarningLevel documentation for
+details.
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="monitor">
+<parameter_description> a #GMemoryMonitor
+</parameter_description>
+</parameter>
+<parameter name="level">
+<parameter_description> the #GMemoryMonitorWarningLevel warning level
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<enum name="GMemoryMonitorWarningLevel">
+<description>
+Memory availability warning levels.
+
+Note that because new values might be added, it is recommended that applications check
+#GMemoryMonitorWarningLevel as ranges, for example:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+if (warning_level &gt; G_MEMORY_MONITOR_WARNING_LEVEL_LOW)
+drop_caches ();
+]|
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="G_MEMORY_MONITOR_WARNING_LEVEL_LOW">
+<parameter_description> Memory on the device is low, processes
+should free up unneeded resources (for example, in-memory caches) so they can
+be used elsewhere.
+</parameter_description>
+</parameter>
+<parameter name="G_MEMORY_MONITOR_WARNING_LEVEL_MEDIUM">
+<parameter_description> Same as @G_MEMORY_MONITOR_WARNING_LEVEL_LOW
+but the device has even less free memory, so processes should try harder to free
+up unneeded resources. If your process does not need to stay running, it is a
+good time for it to quit.
+</parameter_description>
+</parameter>
+<parameter name="G_MEMORY_MONITOR_WARNING_LEVEL_CRITICAL">
+<parameter_description> The system will soon start terminating
+processes to reclaim memory, including background processes.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <property name="GMemoryOutputStream:data">
 <description>
@@ -6002,14 +6059,12 @@ Since: 2.28
 
 <property name="GTlsClientConnection:use-ssl3">
 <description>
-If %TRUE, forces the connection to use a fallback version of TLS
-or SSL, rather than trying to negotiate the best version of TLS
-to use. See g_tls_client_connection_set_use_ssl3().
+SSL 3.0 is no longer supported. See
+g_tls_client_connection_set_use_ssl3() for details.
 
 Since: 2.28
 
-Deprecated: 2.56: SSL 3.0 is insecure, and this property does not
-generally enable or disable it, despite its name.
+Deprecated: 2.56: SSL 3.0 is insecure.
 
 </description>
 </property>
@@ -6188,6 +6243,8 @@ The rehandshaking mode. See
 g_tls_connection_set_rehandshake_mode().
 
 Since: 2.28
+
+Deprecated: 2.60: The rehandshake mode is ignored.
 
 </description>
 </property>
@@ -7739,7 +7796,7 @@ Since: 2.38
 </description>
 <parameters>
 <parameter name="action_name">
-<parameter_description> an potential action name
+<parameter_description> a potential action name
 </parameter_description>
 </parameter>
 </parameters>
@@ -8765,7 +8822,7 @@ Initiates startup notification for the application and returns the
 `DESKTOP_STARTUP_ID` for the launched operation, if supported.
 
 Startup notification IDs are defined in the 
-[FreeDesktop.Org Startup Notifications standard](http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt&quot;).
+[FreeDesktop.Org Startup Notifications standard](http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt).
 
 
 </description>
@@ -8989,14 +9046,14 @@ consumed, they will no longer be visible to the default handling
 
 It is important to use the proper GVariant format when retrieving
 the options with g_variant_dict_lookup():
-- for %G_OPTION_ARG_NONE, use b
-- for %G_OPTION_ARG_STRING, use &amp;s
-- for %G_OPTION_ARG_INT, use i
-- for %G_OPTION_ARG_INT64, use x
-- for %G_OPTION_ARG_DOUBLE, use d
-- for %G_OPTION_ARG_FILENAME, use ^ay
-- for %G_OPTION_ARG_STRING_ARRAY, use &amp;as
-- for %G_OPTION_ARG_FILENAME_ARRAY, use ^aay
+- for %G_OPTION_ARG_NONE, use `b`
+- for %G_OPTION_ARG_STRING, use `&amp;s`
+- for %G_OPTION_ARG_INT, use `i`
+- for %G_OPTION_ARG_INT64, use `x`
+- for %G_OPTION_ARG_DOUBLE, use `d`
+- for %G_OPTION_ARG_FILENAME, use `^&amp;ay`
+- for %G_OPTION_ARG_STRING_ARRAY, use `^a&amp;s`
+- for %G_OPTION_ARG_FILENAME_ARRAY, use `^a&amp;ay`
 
 Since: 2.40
 
@@ -11389,7 +11446,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> an identifier (never 0) that an be used with
+<return> an identifier (never 0) that can be used with
 g_bus_unown_name() to stop owning the name.
 
 </return>
@@ -11433,7 +11490,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> an identifier (never 0) that an be used with
+<return> an identifier (never 0) that can be used with
 g_bus_unown_name() to stop owning the name
 
 </return>
@@ -11471,7 +11528,7 @@ or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> an identifier (never 0) that an be used with
+<return> an identifier (never 0) that can be used with
 g_bus_unown_name() to stop owning the name.
 
 </return>
@@ -11514,7 +11571,7 @@ acquired or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> an identifier (never 0) that an be used with
+<return> an identifier (never 0) that can be used with
 g_bus_unown_name() to stop owning the name.
 
 </return>
@@ -11523,6 +11580,13 @@ g_bus_unown_name() to stop owning the name.
 <function name="g_bus_unown_name">
 <description>
 Stops owning a name.
+
+Note that there may still be D-Bus traffic to process (relating to owning
+and unowning the name) in the current thread-default #GMainContext after
+this function has returned. You should continue to iterate the #GMainContext
+until the #GDestroyNotify function passed to g_bus_own_name() is called, in
+order to avoid memory leaks through callbacks queued on the #GMainContext
+after it’s stopped being iterated.
 
 Since: 2.26
 
@@ -11540,6 +11604,13 @@ Since: 2.26
 <description>
 Stops watching a name.
 
+Note that there may still be D-Bus traffic to process (relating to watching
+and unwatching the name) in the current thread-default #GMainContext after
+this function has returned. You should continue to iterate the #GMainContext
+until the #GDestroyNotify function passed to g_bus_watch_name() is called, in
+order to avoid memory leaks through callbacks queued on the #GMainContext
+after it’s stopped being iterated.
+
 Since: 2.26
 
 </description>
@@ -11556,7 +11627,7 @@ Since: 2.26
 <description>
 Starts watching @name on the bus specified by @bus_type and calls
 @name_appeared_handler and @name_vanished_handler when the name is
-known to have a owner respectively known to lose its
+known to have an owner respectively known to lose its
 owner. Callbacks will be invoked in the
 [thread-default main context][g-main-context-push-thread-default]
 of the thread you are calling this function from.
@@ -11617,7 +11688,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> An identifier (never 0) that an be used with
+<return> An identifier (never 0) that can be used with
 g_bus_unwatch_name() to stop watching the name.
 
 </return>
@@ -11661,7 +11732,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> An identifier (never 0) that an be used with
+<return> An identifier (never 0) that can be used with
 g_bus_unwatch_name() to stop watching the name.
 
 </return>
@@ -11699,7 +11770,7 @@ to not exist or %NULL.
 </parameter_description>
 </parameter>
 </parameters>
-<return> An identifier (never 0) that an be used with
+<return> An identifier (never 0) that can be used with
 g_bus_unwatch_name() to stop watching the name.
 
 </return>
@@ -11737,7 +11808,7 @@ to not exist or %NULL.
 </parameter_description>
 </parameter>
 </parameters>
-<return> An identifier (never 0) that an be used with
+<return> An identifier (never 0) that can be used with
 g_bus_unwatch_name() to stop watching the name.
 
 </return>
@@ -12802,7 +12873,7 @@ Since: 2.24
 Gets a pointer to native credentials of type @native_type from
 @credentials.
 
-It is a programming error (which will cause an warning to be
+It is a programming error (which will cause a warning to be
 logged) to use this method if there is no #GCredentials support for
 the OS or if @native_type isn't supported by the OS.
 
@@ -12931,7 +13002,7 @@ Since: 2.26
 Copies the native credentials of type @native_type from @native
 into @credentials.
 
-It is a programming error (which will cause an warning to be
+It is a programming error (which will cause a warning to be
 logged) to use this method if there is no #GCredentials support for
 the OS or if @native_type isn't supported by the OS.
 
@@ -15763,7 +15834,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="guid">
-<parameter_description> the GUID to use if a authenticating as a server or %NULL
+<parameter_description> the GUID to use if authenticating as a server or %NULL
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -15971,7 +16042,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="guid">
-<parameter_description> the GUID to use if a authenticating as a server or %NULL
+<parameter_description> the GUID to use if authenticating as a server or %NULL
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -16518,6 +16589,24 @@ needed. (It is not guaranteed to be called synchronously when the
 signal is unsubscribed from, and may be called after @connection
 has been destroyed.)
 
+As @callback is potentially invoked in a different thread from where it’s
+emitted, it’s possible for this to happen after
+g_dbus_connection_signal_unsubscribe() has been called in another thread.
+Due to this, @user_data should have a strong reference which is freed with
+@user_data_free_func, rather than pointing to data whose lifecycle is tied
+to the signal subscription. For example, if a #GObject is used to store the
+subscription ID from g_dbus_connection_signal_subscribe(), a strong reference
+to that #GObject must be passed to @user_data, and g_object_unref() passed to
+@user_data_free_func. You are responsible for breaking the resulting
+reference count cycle by explicitly unsubscribing from the signal when
+dropping the last external reference to the #GObject. Alternatively, a weak
+reference may be used.
+
+It is guaranteed that if you unsubscribe from a signal using
+g_dbus_connection_signal_unsubscribe() from the same thread which made the
+corresponding g_dbus_connection_signal_subscribe() call, @callback will not
+be invoked after g_dbus_connection_signal_unsubscribe() returns.
+
 The returned subscription identifier is an opaque value which is guaranteed
 to never be zero.
 
@@ -16583,6 +16672,14 @@ subscription is removed or %NULL
 <function name="g_dbus_connection_signal_unsubscribe">
 <description>
 Unsubscribes from signals.
+
+Note that there may still be D-Bus traffic to process (relating to this
+signal subscription) in the current thread-default #GMainContext after this
+function has returned. You should continue to iterate the #GMainContext
+until the #GDestroyNotify function passed to
+g_dbus_connection_signal_subscribe() is called, in order to avoid memory
+leaks through callbacks queued on the #GMainContext after it’s stopped being
+iterated.
 
 Since: 2.26
 
@@ -16848,7 +16945,7 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="error_domain">
-<parameter_description> A #GQuark for a error domain.
+<parameter_description> A #GQuark for an error domain.
 </parameter_description>
 </parameter>
 <parameter name="error_code">
@@ -16992,7 +17089,7 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="error_domain">
-<parameter_description> A #GQuark for a error domain.
+<parameter_description> A #GQuark for an error domain.
 </parameter_description>
 </parameter>
 <parameter name="error_code">
@@ -23294,6 +23391,10 @@ g_dtls_connection_set_rehandshake_mode() for details.
 
 Since: 2.48
 
+Deprecated: 2.64. Changing the rehandshake mode is no longer
+required for compatibility. Also, rehandshaking has been removed
+from the TLS protocol in TLS 1.3.
+
 </description>
 <parameters>
 <parameter name="conn">
@@ -23301,7 +23402,7 @@ Since: 2.48
 </parameter_description>
 </parameter>
 </parameters>
-<return> @conn's rehandshaking mode
+<return> %G_TLS_REHANDSHAKE_SAFELY
 
 </return>
 </function>
@@ -23332,28 +23433,25 @@ Attempts a TLS handshake on @conn.
 
 On the client side, it is never necessary to call this method;
 although the connection needs to perform a handshake after
-connecting (or after sending a &quot;STARTTLS&quot;-type command) and may
-need to rehandshake later if the server requests it,
-#GDtlsConnection will handle this for you automatically when you try
-to send or receive data on the connection. However, you can call
-g_dtls_connection_handshake() manually if you want to know for sure
-whether the initial handshake succeeded or failed (as opposed to
-just immediately trying to write to @conn, in which
-case if it fails, it may not be possible to tell if it failed
-before or after completing the handshake).
+connecting, #GDtlsConnection will handle this for you automatically
+when you try to send or receive data on the connection. You can call
+g_dtls_connection_handshake() manually if you want to know whether
+the initial handshake succeeded or failed (as opposed to just
+immediately trying to use @conn to read or write, in which case,
+if it fails, it may not be possible to tell if it failed before
+or after completing the handshake), but beware that servers may reject
+client authentication after the handshake has completed, so a
+successful handshake does not indicate the connection will be usable.
 
 Likewise, on the server side, although a handshake is necessary at
 the beginning of the communication, you do not need to call this
 function explicitly unless you want clearer error reporting.
 
-If TLS 1.2 or older is in use, you may call
-g_dtls_connection_handshake() after the initial handshake to
-rehandshake; however, this usage is deprecated because rehandshaking
-is no longer part of the TLS protocol in TLS 1.3. Accordingly, the
-behavior of calling this function after the initial handshake is now
-undefined, except it is guaranteed to be reasonable and
-nondestructive so as to preserve compatibility with code written for
-older versions of GLib.
+Previously, calling g_dtls_connection_handshake() after the initial
+handshake would trigger a rehandshake; however, this usage was
+deprecated in GLib 2.60 because rehandshaking was removed from the
+TLS protocol in TLS 1.3. Since GLib 2.64, calling this function after
+the initial handshake will no longer do anything.
 
 #GDtlsConnection::accept_certificate may be emitted during the
 handshake.
@@ -23562,26 +23660,10 @@ Since: 2.48
 
 <function name="g_dtls_connection_set_rehandshake_mode">
 <description>
-Sets how @conn behaves with respect to rehandshaking requests.
-
-%G_TLS_REHANDSHAKE_NEVER means that it will never agree to
-rehandshake after the initial handshake is complete. (For a client,
-this means it will refuse rehandshake requests from the server, and
-for a server, this means it will close the connection with an error
-if the client attempts to rehandshake.)
-
-%G_TLS_REHANDSHAKE_SAFELY means that the connection will allow a
-rehandshake only if the other end of the connection supports the
-TLS `renegotiation_info` extension. This is the default behavior,
-but means that rehandshaking will not work against older
-implementations that do not support that extension.
-
-%G_TLS_REHANDSHAKE_UNSAFELY means that the connection will allow
-rehandshaking even without the `renegotiation_info` extension. On
-the server side in particular, this is not recommended, since it
-leaves the server open to certain attacks. However, this mode is
-necessary if you need to allow renegotiation with older client
-software.
+Since GLib 2.64, changing the rehandshake mode is no longer supported
+and will have no effect. With TLS 1.3, rehandshaking has been removed from
+the TLS protocol, replaced by separate post-handshake authentication and
+rekey operations.
 
 Since: 2.48
 
@@ -24281,7 +24363,7 @@ counted structures, and are created with a reference count of 1. If
 the number of references falls to 0, the #GFileAttributeMatcher is
 automatically destroyed.
 
-The @attribute string should be formatted with specific keys separated
+The @attributes string should be formatted with specific keys separated
 from namespaces with a double colon. Several &quot;namespace::key&quot; strings may be
 concatenated with a single comma (e.g. &quot;standard::type,standard::is-hidden&quot;).
 The wildcard &quot;*&quot; may be used to match all keys and namespaces, or
@@ -26088,7 +26170,7 @@ Virtual: prefix_matches
 </parameter_description>
 </parameter>
 </parameters>
-<return>  %TRUE if the @files's parent, grandparent, etc is @prefix,
+<return>  %TRUE if the @file's parent, grandparent, etc is @prefix,
 %FALSE otherwise.
 </return>
 </function>
@@ -26347,7 +26429,7 @@ attribute does not contain a signed 32-bit integer, or is invalid,
 <function name="g_file_info_get_attribute_int64">
 <description>
 Gets a signed 64-bit integer contained within the attribute. If the
-attribute does not contain an signed 64-bit integer, or is invalid,
+attribute does not contain a signed 64-bit integer, or is invalid,
 0 will be returned.
 
 
@@ -26692,6 +26774,10 @@ Checks if a file is a symlink.
 Gets the modification time of the current @info and returns it as a
 #GDateTime.
 
+This requires the %G_FILE_ATTRIBUTE_TIME_MODIFIED attribute. If
+%G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC is provided, the resulting #GDateTime
+will have microsecond precision.
+
 Since: 2.62
 
 </description>
@@ -26826,7 +26912,7 @@ Checks if a file info structure has an attribute named @attribute.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @Ginfo has an attribute named @attribute,
+<return> %TRUE if @info has an attribute named @attribute,
 %FALSE otherwise.
 </return>
 </function>
@@ -26849,7 +26935,7 @@ Since: 2.22
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @Ginfo has an attribute in @name_space,
+<return> %TRUE if @info has an attribute in @name_space,
 %FALSE otherwise.
 
 </return>
@@ -27330,8 +27416,9 @@ See %G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK.
 
 <function name="g_file_info_set_modification_date_time">
 <description>
-Sets the %G_FILE_ATTRIBUTE_TIME_MODIFIED attribute in the file
-info to the given date/time value.
+Sets the %G_FILE_ATTRIBUTE_TIME_MODIFIED and
+%G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC attributes in the file info to the
+given date/time value.
 
 Since: 2.62
 
@@ -27351,8 +27438,9 @@ Since: 2.62
 
 <function name="g_file_info_set_modification_time">
 <description>
-Sets the %G_FILE_ATTRIBUTE_TIME_MODIFIED attribute in the file
-info to the given time value.
+Sets the %G_FILE_ATTRIBUTE_TIME_MODIFIED and
+%G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC attributes in the file info to the
+given time value.
 
 Deprecated: 2.62: Use g_file_info_set_modification_date_time() instead, as
 #GTimeVal is deprecated due to the year 2038 problem.
@@ -27868,7 +27956,7 @@ entity tag for the file, or %NULL if the entity tag is not needed
 <description>
 Loads the content of the file into memory. The data is always
 zero-terminated, but this is not included in the resultant @length.
-The returned @content should be freed with g_free() when no longer
+The returned @contents should be freed with g_free() when no longer
 needed.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
@@ -27952,7 +28040,7 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 <description>
 Finishes an asynchronous load of the @file's contents.
 The contents are placed in @contents, and @length is set to the
-size of the @contents string. The @content should be freed with
+size of the @contents string. The @contents should be freed with
 g_free() when no longer needed. If @etag_out is present, it will be
 set to the new entity tag for the @file.
 
@@ -28039,7 +28127,7 @@ when the request is satisfied
 Finishes an asynchronous partial load operation that was started
 with g_file_load_partial_contents_async(). The data is always
 zero-terminated, but this is not included in the resultant @length.
-The returned @content should be freed with g_free() when no longer
+The returned @contents should be freed with g_free() when no longer
 needed.
 
 
@@ -28774,10 +28862,6 @@ inside the same filesystem), but the fallback code does not.
 
 If the flag #G_FILE_COPY_OVERWRITE is specified an already
 existing @destination file is overwritten.
-
-If the flag #G_FILE_COPY_NOFOLLOW_SYMLINKS is specified then symlinks
-will be copied as symlinks, otherwise the target of the
-@source symlink will be copied.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
@@ -30164,7 +30248,7 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 If @make_backup is %TRUE, this function will attempt to
 make a backup of @file.
 
-Note that no copy of @content will be made, so it must stay valid
+Note that no copy of @contents will be made, so it must stay valid
 until @callback is called. See g_file_replace_contents_bytes_async()
 for a #GBytes version that will automatically hold a reference to the
 contents (without copying) for the duration of the call.
@@ -30480,7 +30564,7 @@ Free the returned object with g_object_unref().
 
 <function name="g_file_set_attribute">
 <description>
-Sets an attribute in the file with attribute name @attribute to @value.
+Sets an attribute in the file with attribute name @attribute to @value_p.
 
 Some attributes can be unset by setting @type to
 %G_FILE_ATTRIBUTE_TYPE_INVALID and @value_p to %NULL.
@@ -31141,7 +31225,7 @@ when the request is satisfied, or %NULL
 
 <function name="g_file_stop_mountable_finish">
 <description>
-Finishes an stop operation, see g_file_stop_mountable() for details.
+Finishes a stop operation, see g_file_stop_mountable() for details.
 
 Finish an asynchronous stop operation that was started
 with g_file_stop_mountable().
@@ -34558,6 +34642,72 @@ Since: 2.44
 <return></return>
 </function>
 
+<function name="g_list_store_find">
+<description>
+Looks up the given @item in the list store by looping over the items until
+the first occurrence of @item. If @item was not found, then @position will
+not be set, and this method will return %FALSE.
+
+If you need to compare the two items with a custom comparison function, use
+g_list_store_find_with_equal_func() with a custom #GEqualFunc instead.
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="store">
+<parameter_description> a #GListStore
+</parameter_description>
+</parameter>
+<parameter name="item">
+<parameter_description> an item
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> the first position of @item, if it was found.
+</parameter_description>
+</parameter>
+</parameters>
+<return> Whether @store contains @item. If it was found, @position will be
+set to the position where @item occurred for the first time.
+
+</return>
+</function>
+
+<function name="g_list_store_find_with_equal_func">
+<description>
+Looks up the given @item in the list store by looping over the items and
+comparing them with @compare_func until the first occurrence of @item which
+matches. If @item was not found, then @position will not be set, and this
+method will return %FALSE.
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="store">
+<parameter_description> a #GListStore
+</parameter_description>
+</parameter>
+<parameter name="item">
+<parameter_description> an item
+</parameter_description>
+</parameter>
+<parameter name="equal_func">
+<parameter_description> A custom equality check function
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> the first position of @item, if it was found.
+</parameter_description>
+</parameter>
+</parameters>
+<return> Whether @store contains @item. If it was found, @position will be
+set to the position where @item occurred for the first time.
+
+</return>
+</function>
+
 <function name="g_list_store_insert">
 <description>
 Inserts @item into @store at @position. @item must be of type
@@ -34960,6 +35110,20 @@ Creates a new #GMemoryInputStream with data in memory of a given size.
 </parameter>
 </parameters>
 <return> new #GInputStream read from @data of @len bytes.
+</return>
+</function>
+
+<function name="g_memory_monitor_dup_default">
+<description>
+Gets a reference to the default #GMemoryMonitor for the system.
+
+Since: 2.64
+
+</description>
+<parameters>
+</parameters>
+<return> a new reference to the default #GMemoryMonitor
+
 </return>
 </function>
 
@@ -37087,7 +37251,7 @@ memory cards. See the
 [shared-mime-info](http://www.freedesktop.org/wiki/Specifications/shared-mime-info-spec)
 specification for more on x-content types.
 
-This is an synchronous operation and as such may block doing IO;
+This is a synchronous operation and as such may block doing IO;
 see g_mount_guess_content_type() for the asynchronous version.
 
 Since: 2.18
@@ -43293,7 +43457,7 @@ Gets the value that is stored in @settings for @key and converts it
 to the flags value that it represents.
 
 In order to use this function the type of the value must be an array
-of strings and it must be marked in the schema file as an flags type.
+of strings and it must be marked in the schema file as a flags type.
 
 It is a programmer error to give a @key that isn't contained in the
 schema for @settings or is not marked as a flags type.
@@ -43704,7 +43868,7 @@ function is intended for introspection reasons.
 You should free the return value with g_strfreev() when you are done
 with it.
 
-Deprecated: 2.46: Use g_settings_schema_list_keys instead().
+Deprecated: 2.46: Use g_settings_schema_list_keys() instead.
 
 </description>
 <parameters>
@@ -44042,7 +44206,7 @@ schemas correspond to exactly one set of keys in the backend
 database: those located at the path returned by this function.
 
 Relocatable schemas can be referenced by other schemas and can
-threfore describe multiple sets of keys at different locations.  For
+therefore describe multiple sets of keys at different locations.  For
 relocatable schemas, this function will return %NULL.
 
 Since: 2.32
@@ -51138,7 +51302,7 @@ Since: 2.40
 </description>
 <parameters>
 <parameter name="self">
-<parameter_description> a #GSubprocess
+<parameter_description> a #GSubprocessLauncher
 </parameter_description>
 </parameter>
 <parameter name="variable">
@@ -51225,7 +51389,7 @@ Since: 2.40
 </description>
 <parameters>
 <parameter name="self">
-<parameter_description> a #GSubprocess
+<parameter_description> a #GSubprocessLauncher
 </parameter_description>
 </parameter>
 <parameter name="cwd">
@@ -51263,7 +51427,7 @@ Since: 2.40
 </description>
 <parameters>
 <parameter name="self">
-<parameter_description> a #GSubprocess
+<parameter_description> a #GSubprocessLauncher
 </parameter_description>
 </parameter>
 <parameter name="env">
@@ -51412,7 +51576,7 @@ Since: 2.40
 </description>
 <parameters>
 <parameter name="self">
-<parameter_description> a #GSubprocess
+<parameter_description> a #GSubprocessLauncher
 </parameter_description>
 </parameter>
 <parameter name="variable">
@@ -51640,7 +51804,7 @@ Since: 2.40
 </description>
 <parameters>
 <parameter name="self">
-<parameter_description> a #GSubprocess
+<parameter_description> a #GSubprocessLauncher
 </parameter_description>
 </parameter>
 <parameter name="variable">
@@ -52314,6 +52478,41 @@ Since: 2.36
 </return>
 </function>
 
+<function name="g_task_propagate_value">
+<description>
+Gets the result of @task as a #GValue, and transfers ownership of
+that value to the caller. As with g_task_return_value(), this is
+a generic low-level method; g_task_propagate_pointer() and the like
+will usually be more useful for C code.
+
+If the task resulted in an error, or was cancelled, then this will
+instead set @error and return %FALSE.
+
+Since this method transfers ownership of the return value (or
+error) to the caller, you may only call it once.
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="task">
+<parameter_description> a #GTask
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> return location for the #GValue
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @task succeeded, %FALSE on error.
+
+</return>
+</function>
+
 <function name="g_task_report_error">
 <description>
 Creates a #GTask and then immediately calls g_task_return_error()
@@ -52575,6 +52774,34 @@ function
 </parameter>
 <parameter name="result_destroy">
 <parameter_description> a #GDestroyNotify function.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_task_return_value">
+<description>
+Sets @task's result to @result (by copying it) and completes the task.
+
+If @result is %NULL then a #GValue of type #G_TYPE_POINTER
+with a value of %NULL will be used for the result.
+
+This is a very generic low-level method intended primarily for use
+by language bindings; for C code, g_task_return_pointer() and the
+like will normally be much easier to use.
+
+Since: 2.64
+
+</description>
+<parameters>
+<parameter name="task">
+<parameter_description> a #GTask
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> the #GValue result of
+a task function
 </parameter_description>
 </parameter>
 </parameters>
@@ -53689,12 +53916,34 @@ Since: 2.28
 
 <function name="g_tls_client_connection_copy_session_state">
 <description>
-Copies session state from one connection to another. This is
-not normally needed, but may be used when the same session
-needs to be used between different endpoints as is required
-by some protocols such as FTP over TLS. @source should have
-already completed a handshake, and @conn should not have
-completed a handshake.
+Possibly copies session state from one connection to another, for use
+in TLS session resumption. This is not normally needed, but may be
+used when the same session needs to be used between different
+endpoints, as is required by some protocols, such as FTP over TLS.
+@source should have already completed a handshake and, since TLS 1.3,
+it should have been used to read data at least once. @conn should not
+have completed a handshake.
+
+It is not possible to know whether a call to this function will
+actually do anything. Because session resumption is normally used
+only for performance benefit, the TLS backend might not implement
+this function. Even if implemented, it may not actually succeed in
+allowing @conn to resume @source's TLS session, because the server
+may not have sent a session resumption token to @source, or it may
+refuse to accept the token from @conn. There is no way to know
+whether a call to this function is actually successful.
+
+Using this function is not required to benefit from session
+resumption. If the TLS backend supports session resumption, the
+session will be resumed automatically if it is possible to do so
+without weakening the privacy guarantees normally provided by TLS,
+without need to call this function. For example, with TLS 1.3,
+a session ticket will be automatically copied from any
+#GTlsClientConnection that has previously received session tickets
+from the server, provided a ticket is available that has not
+previously been used for session resumption, since session ticket
+reuse would be a privacy weakness. Using this function causes the
+ticket to be copied without regard for privacy considerations.
 
 Since: 2.46
 
@@ -53760,14 +54009,12 @@ known.
 
 <function name="g_tls_client_connection_get_use_ssl3">
 <description>
-Gets whether @conn will force the lowest-supported TLS protocol
-version rather than attempt to negotiate the highest mutually-
-supported version of TLS; see g_tls_client_connection_set_use_ssl3().
+SSL 3.0 is no longer supported. See
+g_tls_client_connection_set_use_ssl3() for details.
 
 Since: 2.28
 
-Deprecated: 2.56: SSL 3.0 is insecure, and this function does not
-actually indicate whether it is enabled.
+Deprecated: 2.56: SSL 3.0 is insecure.
 
 </description>
 <parameters>
@@ -53776,7 +54023,7 @@ actually indicate whether it is enabled.
 </parameter_description>
 </parameter>
 </parameters>
-<return> whether @conn will use the lowest-supported TLS protocol version
+<return> %FALSE
 
 </return>
 </function>
@@ -53857,24 +54104,20 @@ Since: 2.28
 
 <function name="g_tls_client_connection_set_use_ssl3">
 <description>
-Since 2.42.1, if @use_ssl3 is %TRUE, this forces @conn to use the
-lowest-supported TLS protocol version rather than trying to properly
-negotiate the highest mutually-supported protocol version with the
-peer. Be aware that SSL 3.0 is generally disabled by the
-#GTlsBackend, so the lowest-supported protocol version is probably
-not SSL 3.0.
+Since GLib 2.42.1, SSL 3.0 is no longer supported.
 
-Since 2.58, this may additionally cause an RFC 7507 fallback SCSV to
-be sent to the server, causing modern TLS servers to immediately
-terminate the connection. You should generally only use this function
-if you need to connect to broken servers that exhibit TLS protocol
-version intolerance, and when an initial attempt to connect to a
-server normally has already failed.
+From GLib 2.42.1 through GLib 2.62, this function could be used to
+force use of TLS 1.0, the lowest-supported TLS protocol version at
+the time. In the past, this was needed to connect to broken TLS
+servers that exhibited protocol version intolerance. Such servers
+are no longer common, and using TLS 1.0 is no longer considered
+acceptable.
+
+Since GLib 2.64, this function does nothing.
 
 Since: 2.28
 
-Deprecated: 2.56: SSL 3.0 is insecure, and this function does not
-generally enable or disable it, despite its name.
+Deprecated: 2.56: SSL 3.0 is insecure.
 
 </description>
 <parameters>
@@ -53883,7 +54126,7 @@ generally enable or disable it, despite its name.
 </parameter_description>
 </parameter>
 <parameter name="use_ssl3">
-<parameter_description> whether to use the lowest-supported protocol version
+<parameter_description> a #gboolean, ignored
 </parameter_description>
 </parameter>
 </parameters>
@@ -54080,7 +54323,7 @@ from the TLS protocol in TLS 1.3.
 </parameter_description>
 </parameter>
 </parameters>
-<return> @conn's rehandshaking mode
+<return> %G_TLS_REHANDSHAKE_SAFELY
 
 </return>
 </function>
@@ -54131,28 +54374,30 @@ Attempts a TLS handshake on @conn.
 
 On the client side, it is never necessary to call this method;
 although the connection needs to perform a handshake after
-connecting (or after sending a &quot;STARTTLS&quot;-type command) and may
-need to rehandshake later if the server requests it,
+connecting (or after sending a &quot;STARTTLS&quot;-type command),
 #GTlsConnection will handle this for you automatically when you try
-to send or receive data on the connection. However, you can call
-g_tls_connection_handshake() manually if you want to know for sure
-whether the initial handshake succeeded or failed (as opposed to
-just immediately trying to write to @conn's output stream, in which
-case if it fails, it may not be possible to tell if it failed
-before or after completing the handshake).
+to send or receive data on the connection. You can call
+g_tls_connection_handshake() manually if you want to know whether
+the initial handshake succeeded or failed (as opposed to just
+immediately trying to use @conn to read or write, in which case,
+if it fails, it may not be possible to tell if it failed before or
+after completing the handshake), but beware that servers may reject
+client authentication after the handshake has completed, so a
+successful handshake does not indicate the connection will be usable.
 
 Likewise, on the server side, although a handshake is necessary at
 the beginning of the communication, you do not need to call this
 function explicitly unless you want clearer error reporting.
 
-If TLS 1.2 or older is in use, you may call
-g_tls_connection_handshake() after the initial handshake to
-rehandshake; however, this usage is deprecated because rehandshaking
-is no longer part of the TLS protocol in TLS 1.3. Accordingly, the
-behavior of calling this function after the initial handshake is now
-undefined, except it is guaranteed to be reasonable and
-nondestructive so as to preserve compatibility with code written for
-older versions of GLib.
+Previously, calling g_tls_connection_handshake() after the initial
+handshake would trigger a rehandshake; however, this usage was
+deprecated in GLib 2.60 because rehandshaking was removed from the
+TLS protocol in TLS 1.3. Since GLib 2.64, calling this function after
+the initial handshake will no longer do anything.
+
+When using a #GTlsConnection created by #GSocketClient, the
+#GSocketClient performs the initial handshake, so calling this
+function manually is not recommended.
 
 #GTlsConnection::accept_certificate may be emitted during the
 handshake.
@@ -54361,27 +54606,10 @@ Since: 2.30
 
 <function name="g_tls_connection_set_rehandshake_mode">
 <description>
-Sets how @conn behaves with respect to rehandshaking requests, when
-TLS 1.2 or older is in use.
-
-%G_TLS_REHANDSHAKE_NEVER means that it will never agree to
-rehandshake after the initial handshake is complete. (For a client,
-this means it will refuse rehandshake requests from the server, and
-for a server, this means it will close the connection with an error
-if the client attempts to rehandshake.)
-
-%G_TLS_REHANDSHAKE_SAFELY means that the connection will allow a
-rehandshake only if the other end of the connection supports the
-TLS `renegotiation_info` extension. This is the default behavior,
-but means that rehandshaking will not work against older
-implementations that do not support that extension.
-
-%G_TLS_REHANDSHAKE_UNSAFELY means that the connection will allow
-rehandshaking even without the `renegotiation_info` extension. On
-the server side in particular, this is not recommended, since it
-leaves the server open to certain attacks. However, this mode is
-necessary if you need to allow renegotiation with older client
-software.
+Since GLib 2.64, changing the rehandshake mode is no longer supported
+and will have no effect. With TLS 1.3, rehandshaking has been removed from
+the TLS protocol, replaced by separate post-handshake authentication and
+rekey operations.
 
 Since: 2.28
 
@@ -55380,7 +55608,7 @@ Since: 2.40
 
 <function name="g_tls_interaction_request_certificate_finish">
 <description>
-Complete an request certificate user interaction request. This should be once
+Complete a request certificate user interaction request. This should be once
 the g_tls_interaction_request_certificate_async() completion callback is called.
 
 If %G_TLS_INTERACTION_HANDLED is returned, then the #GTlsConnection
