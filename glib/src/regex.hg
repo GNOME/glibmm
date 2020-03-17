@@ -94,7 +94,8 @@ class GLIBMM_API MatchInfo;
  * use a Glib::ustring that still exists when you later call MatchInfo methods.
  * If you call match() or match_all() with a std::string or a string literal,
  * the method will internally use a temporary copy of the string. The copy will
- * not exist when you call MatchInfo methods.
+ * not exist when you call MatchInfo methods. The use of temporary string values
+ * is deprecated in all match() and match_all() methods since glibmm 2.64.
  * @code
  * Glib::ustring str1 = "String to search through";
  * regex->match(str1, match_info);
@@ -166,7 +167,10 @@ public:
   bool match(const Glib::ustring& string, gssize string_len, int start_position, RegexMatchFlags match_options);
 
 #if defined(GLIBMM_DISABLE_DEPRECATED) || defined(DOXYGEN_SHOULD_SKIP_THIS)
-  /// @deprecated Disallow rvalue references, such as temporary values.
+  /** Rvalue references, such as temporary values, are deprecated.
+   * This declaration is enabled if the preprocessor constant
+   * GLIBMM_DISABLE_DEPRECATED is defined.
+   */
   bool match(Glib::ustring&& string, ...) = delete;
 #endif // GLIBMM_DISABLE_DEPRECATED || DOXYGEN_SHOULD_SKIP_THIS
 
@@ -211,7 +215,10 @@ public:
   bool match_all(const Glib::ustring& string, gssize string_len, int start_position, RegexMatchFlags match_options);
 
 #if defined(GLIBMM_DISABLE_DEPRECATED) || defined(DOXYGEN_SHOULD_SKIP_THIS)
-  /// @deprecated Disallow rvalue references, such as temporary values.
+  /** Rvalue references, such as temporary values, are deprecated.
+   * This declaration is enabled if the preprocessor constant
+   * GLIBMM_DISABLE_DEPRECATED is defined.
+   */
   bool match_all(Glib::ustring&& string, ...) = delete;
 #endif // GLIBMM_DISABLE_DEPRECATED || DOXYGEN_SHOULD_SKIP_THIS
 
