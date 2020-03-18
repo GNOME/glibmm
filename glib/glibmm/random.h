@@ -19,6 +19,7 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <glibmmconfig.h>
 #include <glib.h>
 
 extern "C" {
