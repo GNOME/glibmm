@@ -1,8 +1,7 @@
 # tools
 
 # Input: perl, m4, install_prefix, install_libdir, glibmm_pcname
-# Output: m4_files, install_m4dir, pm_files, install_pmdir, gmmproc,
-#         generate_wrap_init_pl
+# Output: install_procdir, m4_files, pm_files, gmmproc, generate_wrap_init_pl
 
 subdir('extra_defs_gen')
 
@@ -76,8 +75,7 @@ foreach file : m4_basefiles
   m4_files += 'm4' / file
 endforeach
 m4_files = files(m4_files)
-install_m4dir = install_procdir / 'm4'
-install_data(m4_files, install_dir: install_m4dir)
+install_data(m4_files, install_dir: install_procdir / 'm4')
 
 # Install pm files for reuse by other *mm projects, when building from git.
 pm_basefiles = [
@@ -97,5 +95,4 @@ foreach file : pm_basefiles
   pm_files += 'pm' / file
 endforeach
 pm_files = files(pm_files)
-install_pmdir = install_procdir / 'pm'
-install_data(pm_files, install_dir: install_pmdir)
+install_data(pm_files, install_dir: install_procdir / 'pm')

@@ -250,7 +250,7 @@ summary = [
   '                  libdir: @0@'.format(install_prefix / install_libdir),
   '         glibmmconfigdir: @0@'.format(install_prefix / install_glibmmconfigdir),
   '          giommconfigdir: @0@'.format(install_prefix / install_giommconfigdir),
-  '                   m4dir: @0@'.format(install_prefix / install_m4dir),
+  '              gmmprocdir: @0@'.format(install_prefix / install_procdir),
   '            pkgconfigdir: @0@'.format(install_prefix / install_pkgconfigdir),
   '                 datadir: @0@'.format(install_prefix / install_datadir),
   '                  docdir: @0@'.format(install_prefix / install_docdir),
