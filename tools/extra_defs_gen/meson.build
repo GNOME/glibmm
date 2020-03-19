@@ -1,7 +1,7 @@
 # tools/extra_defs_gen
 
-# Input: is_msvc, glibmm_build_dep, giomm_build_dep, glibmm_api_version,
-#        glibmm_libversion
+# Input: glibmm_build_dep, giomm_build_dep, glibmm_api_version,
+#        glibmm_libversion, glibmm_pcname
 # Output: -
 
 glibmm_generate_extra_defs_library = library(
@@ -12,6 +12,8 @@ glibmm_generate_extra_defs_library = library(
   dependencies: glibmm_build_dep,
   install: true,
 )
+
+install_headers('generate_extra_defs.h', subdir: glibmm_pcname / 'glibmm_generate_extra_defs')
 
 executable('generate_defs_glib', 'generate_defs_glib.cc',
   dependencies: glibmm_build_dep,
