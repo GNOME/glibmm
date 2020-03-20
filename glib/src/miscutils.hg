@@ -389,20 +389,25 @@ std::string canonicalize_filename(StdStringView filename, StdStringView relative
 GLIBMM_API
 std::string build_filename(const Glib::ArrayHandle<std::string>& elements);
 
-/** Creates a filename from one or more elements using the correct separator for filenames.
+/** Creates a filename from two or more elements using the correct separator for filenames.
  * No attempt is made to force the resulting filename to be an absolute path.
  * If the first element is a relative path, the result will be a relative path.
+ * @tparam String1 std::string or const char*.
+ * @tparam String2 std::string or const char*.
  * @tparam Strings std::string or const char*.
- * @param strings The path elements.
+ * @param elem1 First path element.
+ * @param elem2 Second path element.
+ * @param strings The following path elements, if any.
  * @return The resulting path.
  *
  * @newin{2,64}
  */
-template <typename... Strings>
-std::string build_filename(const Strings&... strings)
+template <typename String1, typename String2, typename... Strings>
+std::string build_filename(const String1& elem1, const String2& elem2, const Strings&... strings)
 {
   return Glib::convert_return_gchar_ptr_to_stdstring(
-    g_build_filename(StdStringView(strings).c_str()..., nullptr));
+    g_build_filename(StdStringView(elem1).c_str(), StdStringView(elem2).c_str(),
+      StdStringView(strings).c_str()..., nullptr));
 }
 
 // When the templated build_filename() overload was added, the following

@@ -1,6 +1,7 @@
 #include <glibmm.h>
 #include <iostream>
 #include <string.h>
+#include <vector>
 
 // Use this line if you want debug output:
 // std::ostream& ostr = std::cout;
@@ -38,6 +39,30 @@ main(int, char**)
 
   path = Glib::build_filename(dir_1, dir_2, dir_1, dir_3, dir_2, dir_3, dir_1, dir_2, file_2);
   ostr << "Path 5: " << path << std::endl;
+
+  path = Glib::build_filename(dir_2, file_2);
+  ostr << "Path 6: " << path << std::endl;
+
+  path = Glib::build_filename(dir_2, file_3);
+  ostr << "Path 7: " << path << std::endl;
+
+  path = Glib::build_filename(dir_3, file_3);
+  ostr << "Path 8: " << path << std::endl;
+
+//  path = Glib::build_filename(dir_1);
+//  ostr << "Path 9: " << path << std::endl;
+
+//  path = Glib::build_filename(nullptr);
+//  ostr << "Path 10: " << path << std::endl;
+
+  std::vector<std::string> pathv;
+  pathv.push_back("vdir1");
+  path = Glib::build_filename(pathv);
+  ostr << "Path v1: " << path << std::endl;
+
+  pathv.push_back("vdir2");
+  path = Glib::build_filename(pathv);
+  ostr << "Path v2: " << path << std::endl;
 
   return EXIT_SUCCESS;
 }
