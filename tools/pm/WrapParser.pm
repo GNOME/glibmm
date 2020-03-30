@@ -1505,12 +1505,12 @@ sub on_wrap_enum($)
 
   # get the arguments
   my ($cpp_type, $c_type, undef, $ref_subst_in, $ref_subst_out, $gtype_func,
-    $argDeprecated, $deprecation_docs, $newin) = $self->on_wrap_any_enum(0);
+    $argDeprecated, $deprecation_docs, $newin, $decl_prefix) = $self->on_wrap_any_enum(0);
 
   $$self{objOutputter}->output_wrap_enum(
     $$self{filename}, $$self{line_num}, $cpp_type, $c_type,
     $comment, $ref_subst_in, $ref_subst_out, $gtype_func,
-    $argDeprecated, $deprecation_docs, $newin);
+    $argDeprecated, $deprecation_docs, $newin, $decl_prefix);
 }
 
 sub on_wrap_enum_docs_only($)
