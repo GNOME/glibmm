@@ -52,7 +52,7 @@ namespace Glib
 
 ifelse(`$8',,,`_DEPRECATE_IFDEF_START')`'dnl
 template <>
-class Value<__NAMESPACE__::__CPPNAME__::Code> : public __VALUE_BASE__
+class $9 Value<__NAMESPACE__::__CPPNAME__::Code> : public __VALUE_BASE__
 {
 public:
   static GType value_type() G_GNUC_CONST;

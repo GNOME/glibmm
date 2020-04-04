@@ -1,8 +1,8 @@
 dnl
 dnl _ENUM(cpp_type, c_type, value_suffix, `element_list', `gtype_func', `conv_to_int',
 dnl          $1       $2         $3             $4             $5            $6
-dnl in_class, `optional_refdoc_comment', 'deprecated')
-dnl   $7                $8                    $9
+dnl in_class, `optional_refdoc_comment', 'deprecated', 'decl_prefix')
+dnl   $7                $8                    $9            $10
 dnl
 m4_define(`_ENUM',`dnl
 _PUSH()
@@ -13,6 +13,7 @@ m4_define(`__ENUM_CLASS_CPPNAME__',m4_ifelse($7,0,,`__CPPNAME__::')`__ENUM_CPPNA
 m4_define(`__ENUM_INDENT1__',m4_ifelse($7,0,,`  '))
 m4_define(`__ENUM_INDENT2__',__ENUM_INDENT1__`'m4_ifelse($6,,,`  '))
 m4_define(`__ENUM_VALUE_BASE__',`Glib::Value_$3<__NAMESPACE__::__ENUM_CLASS_CPPNAME__>')
+m4_define(`__ENUM_DECL_PREFIX__', $10)
 
 _POP()
 dnl
@@ -121,7 +122,7 @@ namespace Glib
 
 ifelse(`$9',,,`_DEPRECATE_IFDEF_START')`'dnl
 template <>
-class Value<__NAMESPACE__::__ENUM_CLASS_CPPNAME__> : public __ENUM_VALUE_BASE__
+class __ENUM_DECL_PREFIX__ Value<__NAMESPACE__::__ENUM_CLASS_CPPNAME__> : public __ENUM_VALUE_BASE__
 {
 public:
   static GType value_type() G_GNUC_CONST;
