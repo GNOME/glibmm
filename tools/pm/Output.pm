@@ -685,12 +685,12 @@ sub output_wrap_sig_decl($$$$$$$$$$$$$$)
 
 # void output_wrap_enum($filename, $line_num, $cpp_type, $c_type,
 #   $comment, $ref_subst_in, $ref_subst_out, $gtype_func,
-#   $deprecated, $deprecation_docs, $newin)
-sub output_wrap_enum($$$$$$$$$$$$)
+#   $deprecated, $deprecation_docs, $newin, $decl_prefix)
+sub output_wrap_enum($$$$$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $cpp_type, $c_type,
     $comment, $ref_subst_in, $ref_subst_out, $gtype_func,
-    $deprecated, $deprecation_docs, $newin) = @_;
+    $deprecated, $deprecation_docs, $newin, $decl_prefix) = @_;
 
   my $objEnum = GtkDefs::lookup_enum($c_type);
   if(!$objEnum)
@@ -720,14 +720,15 @@ sub output_wrap_enum($$$$$$$$$$$$)
   # Merge the passed in comment to the existing enum documentation.
   $comment .= "\n * " . $enum_docs if $enum_docs ne "";
 
-  my $str = sprintf("_ENUM(%s,%s,%s,\`%s\',\`%s\',\`%s\',\`%s\')dnl\n",
+  my $str = sprintf("_ENUM(%s,%s,%s,\`%s\',\`%s\',\`%s\',\`%s\',\`%s\')dnl\n",
     $cpp_type,
     $c_type,
     $value_suffix,
     $elements,
     $gtype_func,
     $comment,
-    $deprecated
+    $deprecated,
+    $decl_prefix
   );
 
   $self->append($str);
@@ -736,7 +737,7 @@ sub output_wrap_enum($$$$$$$$$$$$)
 sub output_wrap_enum_docs_only($$$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $module_canonical, $cpp_type, $c_type,
-    $comment, $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin) = @_;
+    $comment, $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin, $decl_prefix) = @_;
 
   # Get the existing enum description from the parsed docs.
   my $enum_docs = DocsParser::lookup_enum_documentation("$c_type", "$cpp_type",
