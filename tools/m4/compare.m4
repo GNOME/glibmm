@@ -6,6 +6,7 @@ define(`__OPERATOR_DECL',`dnl
  * @param rhs The right-hand side
  * @result The result
  */
+$2
 bool operator`'$1`'(const __CPPNAME__& lhs, const __CPPNAME__& rhs);
 ')
 
@@ -27,12 +28,13 @@ dnl
 define(`_WRAP_EQUAL',`dnl
 pushdef(`__FUNC_EQUAL__',$1)dnl
 pushdef(`__UNCONST__',$2)dnl
+pushdef(`__FUNC_DECORATOR__',$3)dnl
 _PUSH(SECTION_HEADER3)
 
 __NAMESPACE_BEGIN__
 
-__OPERATOR_DECL(`==')
-__OPERATOR_DECL(`!=')
+__OPERATOR_DECL(`==', __FUNC_DECORATOR__)
+__OPERATOR_DECL(`!=', __FUNC_DECORATOR__)
 
 __NAMESPACE_END__
 
@@ -42,6 +44,7 @@ __OPERATOR_IMPL(`==', __FUNC_EQUAL__, `!= 0')
 __OPERATOR_IMPL(`!=', __FUNC_EQUAL__, `== 0')
 
 _POP()
+popdef(`__FUNC_DECORATOR__')dnl
 popdef(`__UNCONST__')dnl
 popdef(`__FUNC_EQUAL__')dnl
 ')dnl enddef _WRAP_EQUAL
@@ -53,16 +56,17 @@ dnl
 define(`_WRAP_COMPARE',`dnl
 pushdef(`__FUNC_COMPARE__',$1)dnl
 pushdef(`__UNCONST__',$2)dnl
+pushdef(`__FUNC_DECORATOR__',$3)dnl
 _PUSH(SECTION_HEADER3)
 
 __NAMESPACE_BEGIN__
 
-__OPERATOR_DECL(`==')
-__OPERATOR_DECL(`!=')
-__OPERATOR_DECL(`<')
-__OPERATOR_DECL(`>')
-__OPERATOR_DECL(`<=')
-__OPERATOR_DECL(`>=')
+__OPERATOR_DECL(`==', __FUNC_DECORATOR__)
+__OPERATOR_DECL(`!=', __FUNC_DECORATOR__)
+__OPERATOR_DECL(`<', __FUNC_DECORATOR__)
+__OPERATOR_DECL(`>', __FUNC_DECORATOR__)
+__OPERATOR_DECL(`<=', __FUNC_DECORATOR__)
+__OPERATOR_DECL(`>=', __FUNC_DECORATOR__)
 
 __NAMESPACE_END__
 
@@ -76,6 +80,7 @@ __OPERATOR_IMPL(`<=', __FUNC_COMPARE__, `<= 0')
 __OPERATOR_IMPL(`>=', __FUNC_COMPARE__, `>= 0')
 
 _POP()
+popdef(`__FUNC_DECORATOR__')dnl
 popdef(`__UNCONST__')dnl
 popdef(`__FUNC_COMPARE__')dnl
 ')dnl enddef _WRAP_COMPARE
@@ -88,16 +93,17 @@ define(`_WRAP_EQUAL_AND_COMPARE',`dnl
 pushdef(`__FUNC_EQUAL__',$1)dnl
 pushdef(`__FUNC_COMPARE__',$2)dnl
 pushdef(`__UNCONST__',$3)dnl
+pushdef(`__FUNC_DECORATOR__',$4)dnl
 _PUSH(SECTION_HEADER3)
 
 __NAMESPACE_BEGIN__
 
-__OPERATOR_DECL(`==')
-__OPERATOR_DECL(`!=')
-__OPERATOR_DECL(`<')
-__OPERATOR_DECL(`>')
-__OPERATOR_DECL(`<=')
-__OPERATOR_DECL(`>=')
+__OPERATOR_DECL(`==', __FUNC_DECORATOR__)
+__OPERATOR_DECL(`!=', __FUNC_DECORATOR__)
+__OPERATOR_DECL(`<', __FUNC_DECORATOR__)
+__OPERATOR_DECL(`>', __FUNC_DECORATOR__)
+__OPERATOR_DECL(`<=', __FUNC_DECORATOR__)
+__OPERATOR_DECL(`>=', __FUNC_DECORATOR__)
 
 __NAMESPACE_END__
 
@@ -111,6 +117,7 @@ __OPERATOR_IMPL(`<=', __FUNC_COMPARE__, `<= 0')
 __OPERATOR_IMPL(`>=', __FUNC_COMPARE__, `>= 0')
 
 _POP()
+popdef(`__FUNC_DECORATOR__')dnl
 popdef(`__UNCONST__')dnl
 popdef(`__FUNC_COMPARE__')dnl
 popdef(`__FUNC_EQUAL__')dnl
