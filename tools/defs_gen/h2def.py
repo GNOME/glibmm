@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- Mode: Python; py-indent-offset: 4 -*-
 # GPL'ed
 # Toby D. Reeves <toby@max.rl.plh.af.mil>
@@ -72,8 +72,6 @@ import string
 import sys
 
 import defsparser
-
-from sets import Set
 
 # ------------------ Create typecodes from typenames ---------
 
@@ -507,7 +505,7 @@ class DefsWriter:
     def _define_func(self, buf):
         buf = clean_func(buf)
         buf = buf.split('\n')
-        all_functions = Set()
+        all_functions = set()
         filter = self._functions
         for p in buf:
             if not p:
