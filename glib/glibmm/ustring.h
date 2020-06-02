@@ -30,7 +30,7 @@
 #include <type_traits>
 
 /* work around linker error on Visual Studio if we don't have GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS */
-#if (_MSC_VER >= 1600) && !defined (GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS)
+#if defined(MSC_VER) && MSC_VER >= 1600 && !defined(GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS)
 const std::basic_string<char>::size_type std::basic_string<char>::npos = (std::basic_string<char>::size_type) -1;
 #endif
 
