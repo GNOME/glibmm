@@ -39,12 +39,21 @@ PropertyProxyConnectionNode::PropertyProxyConnectionNode(sigc::slot_base&& slot,
 {
 }
 
+static Glib::ustring
+get_detailed_signal_name(const Glib::ustring& signal_name, const Glib::ustring& detail)
+{
+  if (detail.empty())
+    return signal_name;
+
+  return signal_name + "::" + detail;
+}
+
 sigc::connection
 PropertyProxyConnectionNode::connect_changed(const Glib::ustring& property_name)
 {
   // connect it to glib
   // 'this' will be passed as the data argument to the callback.
-  const Glib::ustring notify_signal_name = "notify::" + property_name;
+  const Glib::ustring notify_signal_name = get_detailed_signal_name("notify", property_name);
   connection_id_ = g_signal_connect_data(object_, notify_signal_name.c_str(),
     (GCallback)(&PropertyProxyConnectionNode::callback), this,
     &PropertyProxyConnectionNode::destroy_notify_handler, G_CONNECT_AFTER);
