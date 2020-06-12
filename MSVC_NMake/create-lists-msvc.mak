@@ -46,13 +46,13 @@ glibmm_files_extra_ph_int = $(glibmm_files_extra_ph:/=\)
 !if [call create-lists.bat header glibmm.mak glibmm_OBJS]
 !endif
 
-!if [for %c in ($(glibmm_files_built_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file glibmm.mak vs^$(PDBVER)\^$(CFG)\^$(PLAT)\glibmm\%~nc.obj]
+!if [for %c in ($(glibmm_files_built_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm\%~nc.obj]
 !endif
 
-!if [for %c in ($(glibmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file glibmm.mak vs^$(PDBVER)\^$(CFG)\^$(PLAT)\glibmm\%~nc.obj]
+!if [for %c in ($(glibmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm\%~nc.obj]
 !endif
 
-!if [@call create-lists.bat file glibmm.mak vs^$(PDBVER)\^$(CFG)\^$(PLAT)\glibmm\glibmm.res]
+!if [@call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm\glibmm.res]
 !endif
 
 !if [call create-lists.bat footer glibmm.mak]
@@ -72,13 +72,13 @@ glibmm_files_extra_ph_int = $(glibmm_files_extra_ph:/=\)
 !if [call create-lists.bat header glibmm.mak giomm_OBJS]
 !endif
 
-!if [for %c in ($(giomm_generated_sources)) do @if "%~xc" == ".cc" @call create-lists.bat file glibmm.mak vs^$(PDBVER)\^$(CFG)\^$(PLAT)\giomm\%~nc.obj]
+!if [for %c in ($(giomm_generated_sources)) do @if "%~xc" == ".cc" @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\giomm\%~nc.obj]
 !endif
 
-!if [for %c in ($(giomm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file glibmm.mak vs^$(PDBVER)\^$(CFG)\^$(PLAT)\giomm\%~nc.obj]
+!if [for %c in ($(giomm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\giomm\%~nc.obj]
 !endif
 
-!if [@call create-lists.bat file glibmm.mak vs^$(PDBVER)\^$(CFG)\^$(PLAT)\giomm\giomm.res]
+!if [@call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\giomm\giomm.res]
 !endif
 
 !if [call create-lists.bat footer glibmm.mak]
@@ -99,7 +99,7 @@ glibmm_files_extra_ph_int = $(glibmm_files_extra_ph:/=\)
 # We skip building the following examples:
 # child_watch, iochannel_stream: Builds on *NIX only
 # thread\dispatcher.cc: Not C++-17 compliant
-!if [for %e in (compose dispatcher2 keyfile markup options properties regex) do @call create-lists.bat file glibmm.mak vs^$(PDBVER)\^$(CFG)\^$(PLAT)\glibmm-ex-%e.exe]
+!if [for %e in (compose dispatcher2 keyfile markup options properties regex) do @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm-ex-%e.exe]
 !endif
 
 !if [call create-lists.bat footer glibmm.mak]
@@ -108,13 +108,13 @@ glibmm_files_extra_ph_int = $(glibmm_files_extra_ph:/=\)
 !if [call create-lists.bat header glibmm.mak giomm_ex]
 !endif
 
-!if [for %e in (resolver socket-client socket-server) do @call create-lists.bat file glibmm.mak vs^$(PDBVER)\^$(CFG)\^$(PLAT)\giomm-ex-network-%e.exe]
+!if [for %e in (resolver socket-client socket-server) do @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\giomm-ex-network-%e.exe]
 !endif
 
-!if [for %e in (settings) do @call create-lists.bat file glibmm.mak vs^$(PDBVER)\^$(CFG)\^$(PLAT)\giomm-ex-%e.exe]
+!if [for %e in (settings) do @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\giomm-ex-%e.exe]
 !endif
 
-!if [for %e in (client_bus_listnames session_bus_service server_without_bus) do @call create-lists.bat file glibmm.mak vs^$(PDBVER)\^$(CFG)\^$(PLAT)\giomm-ex-dbus-%e.exe]
+!if [for %e in (client_bus_listnames session_bus_service server_without_bus) do @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\giomm-ex-dbus-%e.exe]
 !endif
 
 !if [call create-lists.bat footer glibmm.mak]
@@ -126,7 +126,7 @@ glibmm_files_extra_ph_int = $(glibmm_files_extra_ph:/=\)
 # Skip the following:
 # glibmm_interface_implementation, glibmm_null_vectorutils, glibmm_vector: Are actually using giomm
 # glibmm_interface_move: Relies on g_autoptr_*()
-!if [for /f %d in ('dir /ad /b ..\tests\glibmm_*') do @if not "%d" == "glibmm_interface_implementation" if not "%d" == "glibmm_interface_move" if not "%d" == "glibmm_null_vectorutils" if not "%d" == "glibmm_vector" @call create-lists.bat file glibmm.mak vs^$(PDBVER)\^$(CFG)\^$(PLAT)\test-%d.exe]
+!if [for /f %d in ('dir /ad /b ..\tests\glibmm_*') do @if not "%d" == "glibmm_interface_implementation" if not "%d" == "glibmm_interface_move" if not "%d" == "glibmm_null_vectorutils" if not "%d" == "glibmm_vector" @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\test-%d.exe]
 !endif
 
 !if [call create-lists.bat footer glibmm.mak]
@@ -135,10 +135,10 @@ glibmm_files_extra_ph_int = $(glibmm_files_extra_ph:/=\)
 !if [call create-lists.bat header glibmm.mak giomm_tests]
 !endif
 
-!if [for /f %d in ('dir /ad /b ..\tests\giomm_*') do @call create-lists.bat file glibmm.mak vs^$(PDBVER)\^$(CFG)\^$(PLAT)\test-%d.exe]
+!if [for /f %d in ('dir /ad /b ..\tests\giomm_*') do @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\test-%d.exe]
 !endif
 
-!if [for %d in (interface_implementation null_vectorutils vector) do @call create-lists.bat file glibmm.mak vs^$(PDBVER)\^$(CFG)\^$(PLAT)\test-glibmm_%d.exe]
+!if [for %d in (interface_implementation null_vectorutils vector) do @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\test-glibmm_%d.exe]
 !endif
 
 !if [call create-lists.bat footer glibmm.mak]

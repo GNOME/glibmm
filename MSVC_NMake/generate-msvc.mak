@@ -4,27 +4,27 @@
 # one is maintaining the NMake build files.
 
 # Create the build directories
-vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\private	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\giomm	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\private	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm-ex	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\giomm-ex	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm-tests	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\giomm-tests	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen:
+vs$(VSVER)\$(CFG)\$(PLAT)\glibmm	\
+vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\private	\
+vs$(VSVER)\$(CFG)\$(PLAT)\giomm	\
+vs$(VSVER)\$(CFG)\$(PLAT)\giomm\private	\
+vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-ex	\
+vs$(VSVER)\$(CFG)\$(PLAT)\giomm-ex	\
+vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-tests	\
+vs$(VSVER)\$(CFG)\$(PLAT)\giomm-tests	\
+vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen:
 	@-md $@
 
 # Compile schema for giomm settings example
-vs$(PDBVER)\$(CFG)\$(PLAT)\gschema.compiled: ..\examples\settings\org.gtkmm.demo.gschema.xml
-	$(GLIB_COMPILE_SCHEMAS) --targetdir=vs$(PDBVER)\$(CFG)\$(PLAT) ..\examples\settings
+vs$(VSVER)\$(CFG)\$(PLAT)\gschema.compiled: ..\examples\settings\org.gtkmm.demo.gschema.xml
+	$(GLIB_COMPILE_SCHEMAS) --targetdir=vs$(VSVER)\$(CFG)\$(PLAT) ..\examples\settings
 
 # Generate wrap_init.cc files
 
-vs$(PDBVER)\$(CFG)\$(PLAT)\glibmm\wrap_init.cc: $(glibmm_real_hg)
+vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\wrap_init.cc: $(glibmm_real_hg)
 	@if not exist ..\glib\glibmm\wrap_init.cc $(PERL) -- "../tools/generate_wrap_init.pl" --namespace=Glib --parent_dir=glibmm $(glibmm_real_hg:\=/)>$@
 
-vs$(PDBVER)\$(CFG)\$(PLAT)\giomm\wrap_init.cc: $(giomm_real_hg)
+vs$(VSVER)\$(CFG)\$(PLAT)\giomm\wrap_init.cc: $(giomm_real_hg)
 	@if not exist ..\gio\giomm\wrap_init.cc $(PERL) -- "../tools/generate_wrap_init.pl" --namespace=Gio --parent_dir=giomm $(giomm_real_hg:\=/)>$@
 
 # Generate pre-generated resources and configuration headers (builds from GIT)
