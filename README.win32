@@ -45,7 +45,7 @@ make
 make check
 make install
 
-2. MS Visual Studio 2015
+2. MS Visual Studio 2015~2019
 
 In a Visual Studio command prompt, navigate to the MSVC_NMake directory.
 Run 'nmake /f Makefile.vc CFG=[release|debug]' to build the glibmm and
@@ -58,7 +58,18 @@ C++ dependencies that are built with Meson, specify USE_MESON_LIBS=1 in
 your NMake command line.
 
 Note that $(VSVER) refers to 14 for Visual Studio 2015 and 15 for Visual
-Studio 2017.
+Studio 2017 and 16 for Visual Studio 2019.  Note that it is recommended
+and possibly required to build glibmm and anything that depends on glibmm
+with the same Visual Studio version, even for Visual Studio 2015, 2017 and
+2019 which Microsoft tried very hard to make the binaries API and ABI
+compatible between these versions, so now the build creates different
+DLL and .lib filenames to make this distinction clear.  If you have
+previously built glibmm with Visual Studio 2017 or 2019 and had DLL and
+.lib filenames in the form of xxx-vc140(-d)-y_z, you may choose to pass
+`USE_COMPAT_LIBS=1` in your NMake build commandline to continue to build
+with the resulting DLL and .lib names be in the former form, but please
+note that this is not recommended unless rebuilding dependent code is
+not convenient.
 
 A 'tests' target will build the test programs for glibmm and giomm, an
 'install' target is provided to copy the built DLLs and LIBs, along with
