@@ -57,6 +57,19 @@ it must be specified via passing in GLIB_COMPILE_SCHEMAS.  If using C++
 dependencies that are built with Meson, specify USE_MESON_LIBS=1 in your
 NMake command line.
 
+Note that $(VSVER) refers to 15 for Visual Studio 2017 and 16 for Visual
+Studio 2019.  Note that it is recommended and possibly required to build
+glibmm and anything that depends on glibmm with the same Visual Studio
+version, even for Visual Studio 2017 and 2019 which Microsoft tried
+very hard to make the binaries API and ABI compatible between these versions.
+
+The build now creates DLLs and .lib's based on the toolset version (i.e.
+'vc141' for Visual Studio 2017 builds and 'vc142' for Visual Studio 2019
+builds instead of vc$(VSVER)0 as before, to be consistent across the board).
+Since it might be desired to use the old naming scheme, a 'USE_COMPAT_LIBS=1'
+may be used for such situations, such as when re-building dependent code is
+inconvenient.
+
 A 'tests' target will build the test programs for glibmm and giomm, an
 'install' target is provided to copy the built DLLs and LIBs, along with
 with the public headers to appropriate subdirs of $(PREFIX).  A 'clean'
