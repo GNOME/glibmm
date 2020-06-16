@@ -29,17 +29,22 @@ VALID_MSC = TRUE
 
 !if "$(VALID_MSC)" == "TRUE"
 
-# Include the Makefile portion to convert the source and header lists
-# into the lists we need for compilation and introspection
-!include create-lists-msvc.mak
 
 !ifdef GENERATE_VERSIONED_FILES
 !include pkg-ver.mak
 !endif
 
-all: $(GIOMM_LIB) $(GLIBMM_EXTRA_DEFS_GEN_LIB) $(glibmm_ex) $(giomm_ex) all-build-info
+all: $(GIOMM_LIB) $(GLIBMM_EXTRA_DEFS_GEN_LIB) examples all-build-info
 
-tests: $(glibmm_tests) $(giomm_tests) all-build-info
+# Include the Makefile portion to convert the source and header lists
+# into the lists we need for compilation and introspection
+!include create-lists-msvc.mak
+
+examples: $(glibmm_examples) vs$(VSVER)\$(CFG)\$(PLAT)\gschema.compiled
+
+tests: $(glibmm_tests) all-build-info
+	@echo To run the tests, note the test program executables correspond to the
+	@echo various directories in ^$(srcroot)/tests in vs$(VSVER)\$(CFG)\$(PLAT).
 
 # Include the build rules for sources, DLLs and executables
 !include generate-msvc.mak
