@@ -17,7 +17,7 @@ vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen:
 
 # Compile schema for giomm settings example
 vs$(VSVER)\$(CFG)\$(PLAT)\gschema.compiled: ..\examples\settings\org.gtkmm.demo.gschema.xml
-	$(GLIB_COMPILE_SCHEMAS) --targetdir=vs$(VSVER)\$(CFG)\$(PLAT) ..\examples\settings
+	$(GLIB_COMPILE_SCHEMAS) --targetdir=$(@D) $(**D)
 
 # Generate wrap_init.cc files
 vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\wrap_init.cc: $(glibmm_real_hg)

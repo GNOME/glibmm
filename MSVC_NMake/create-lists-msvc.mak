@@ -93,58 +93,36 @@ glibmm_files_extra_ph_int = $(glibmm_files_extra_ph:/=\)
 !if [call create-lists.bat footer glibmm.mak]
 !endif
 
-!if [call create-lists.bat header glibmm.mak glibmm_ex]
-!endif
-
-# We skip building the following examples:
-# child_watch, iochannel_stream: Builds on *NIX only
-# thread\dispatcher.cc: Not C++-17 compliant
-!if [for %e in (compose dispatcher2 keyfile markup options properties regex) do @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm-ex-%e.exe]
-!endif
-
-!if [call create-lists.bat footer glibmm.mak]
-!endif
-
-!if [call create-lists.bat header glibmm.mak giomm_ex]
-!endif
-
-!if [for %e in (resolver socket-client socket-server) do @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\giomm-ex-network-%e.exe]
-!endif
-
-!if [for %e in (settings) do @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\giomm-ex-%e.exe]
-!endif
-
-!if [for %e in (client_bus_listnames session_bus_service server_without_bus) do @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\giomm-ex-dbus-%e.exe]
-!endif
-
-!if [call create-lists.bat footer glibmm.mak]
-!endif
-
-!if [call create-lists.bat header glibmm.mak glibmm_tests]
-!endif
-
-# Skip the following:
-# glibmm_interface_implementation, glibmm_null_vectorutils, glibmm_vector: Are actually using giomm
-# glibmm_interface_move: Relies on g_autoptr_*()
-!if [for /f %d in ('dir /ad /b ..\tests\glibmm_*') do @if not "%d" == "glibmm_interface_implementation" if not "%d" == "glibmm_interface_move" if not "%d" == "glibmm_null_vectorutils" if not "%d" == "glibmm_vector" @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\test-%d.exe]
-!endif
-
-!if [call create-lists.bat footer glibmm.mak]
-!endif
-
-!if [call create-lists.bat header glibmm.mak giomm_tests]
-!endif
-
-!if [for /f %d in ('dir /ad /b ..\tests\giomm_*') do @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\test-%d.exe]
-!endif
-
-!if [for %d in (interface_implementation null_vectorutils vector) do @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\test-glibmm_%d.exe]
-!endif
-
-!if [call create-lists.bat footer glibmm.mak]
-!endif
-
 !if [for %d in ($(PREFIX)) do @echo PREFIX_REAL=%~dpnd>>glibmm.mak]
+!endif
+
+!if [echo.>>glibmm.mak]
+!endif
+
+# We skip building the following examples/tests:
+# child_watch, iochannel_stream: Builds on *NIX only
+!if [for %d in (examples tests) do @call create-lists.bat header glibmm.mak glibmm_%d & @(for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" call create-lists.bat file glibmm.mak vs$(VSVER)\$(CFG)\$(PLAT)\%t.exe) & @call create-lists.bat footer glibmm.mak]
+!endif
+
+!if [for %t in (dbus network thread) do @for %s in (..\examples\%t\*.cc) do @echo glibmm_examples = ^$(glibmm_examples) vs^$(VSVER)\^$(CFG)\^$(PLAT)\%~ns.exe>>glibmm.mak]
+!endif
+
+!if [echo.>>glibmm.mak]
+!endif
+
+!if [for %d in (examples tests) do @for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" for %s in (..\%d\%t\*.cc) do @echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm-%d\%t-%~ns.obj: %s>>glibmm.mak & @echo. if not exist ^$(@D)\ md ^$(@D)>>glibmm.mak & @echo.	^$(CXX) ^$(GIOMM_EX_CFLAGS) ^$(CFLAGS) /Fo^$(@D)\%t-%~ns.obj /Fd^$(@D)\ ^$** /c>>glibmm.mak & @echo.>>glibmm.mak]
+!endif
+
+!if [for %t in (dbus network thread) do @for %s in (..\examples\%t\*.cc) do @echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm-examples\%t-%~ns.obj: %s>>glibmm.mak & @echo. if not exist ^$(@D)\ md ^$(@D)>>glibmm.mak & @echo.	^$(CXX) ^$(GIOMM_EX_CFLAGS) ^$(CFLAGS) /Fo^$(@D)\%t-%~ns.obj /Fd^$(@D)\ ^$** /c>>glibmm.mak & @echo.>>glibmm.mak]
+!endif
+
+!if [for %d in (examples tests) do @for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" call create-lists.bat header glibmm.mak %t_OBJS & @(for %s in (..\%d\%t\*.cc) do @call create-lists.bat file glibmm.mak vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-%d\%t-%~ns.obj) & @call create-lists.bat footer glibmm.mak]
+!endif
+
+!if [for %d in (examples tests) do @for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\%t.exe: ^$(GIOMM_LIB) ^$(GLIBMM_LIB) ^$(%t_OBJS)>>glibmm.mak & @echo.	link ^$(LDFLAGS) ^$** ^$(GIO_LIBS) ^$(LIBSIGC_LIB) /out:^$@>>glibmm.mak & @echo.>>glibmm.mak]
+!endif
+
+!if [for %t in (dbus network thread) do @for %s in (..\examples\%t\*.cc) do @echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\%~ns.exe: ^$(GIOMM_LIB) ^$(GLIBMM_LIB) vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm-examples\%t-%~ns.obj>>glibmm.mak & @echo.	link ^$(LDFLAGS) ^$** ^$(GIO_LIBS) ^$(LIBSIGC_LIB) /out:^$@>>glibmm.mak & @echo.>>glibmm.mak]
 !endif
 
 !include glibmm.mak
