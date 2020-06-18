@@ -3,7 +3,7 @@
 # Input: glibmm_build_dep, glibmm_pcname, maintainer_mode, project_source_root,
 #        generate_binding_py, handle_built_files_py, m4_files, pm_files,
 #        glibmm_libversion, install_includedir, python3, glibmm_rc, gmmproc_dir,
-#        is_host_windows, gmmproc, generate_wrap_init_pl
+#        is_host_windows, gmmproc, generate_wrap_init_pl, glibmm_libname
 # Output: glibmm_hg_ccg_basenames, glibmm_extra_h_files, built_files_root,
 #         glibmm_built_h_file_targets, glibmm_dep
 
@@ -257,7 +257,7 @@ if maintainer_mode
 
   extra_include_dirs = ['..']
 
-  glibmm_library = library(glibmm_pcname, extra_glibmm_objects,
+  glibmm_library = library(glibmm_libname, extra_glibmm_objects,
     glibmm_built_cc_file_targets, glibmm_extra_cc_files, built_dummy_h_file_target,
     include_directories: extra_include_dirs,
     cpp_args: glibmm_cpp_args,
@@ -309,7 +309,7 @@ else # not maintainer_mode
 
   extra_include_dirs = [ '..', '..' / '..' / 'untracked' / 'glib' ]
 
-  glibmm_library = library(glibmm_pcname, extra_glibmm_objects,
+  glibmm_library = library(glibmm_libname, extra_glibmm_objects,
     built_cc_files, glibmm_extra_cc_files,
     include_directories: extra_include_dirs,
     cpp_args: glibmm_cpp_args,
