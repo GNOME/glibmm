@@ -1,11 +1,11 @@
 # tools/extra_defs_gen
 
 # Input: glibmm_build_dep, giomm_build_dep, glibmm_api_version,
-#        glibmm_libversion, glibmm_pcname
+#        glibmm_libversion, glibmm_pcname, msvc14x_toolset_ver
 # Output: -
 
 glibmm_generate_extra_defs_library = library(
-  'glibmm_generate_extra_defs-' + glibmm_api_version,
+  'glibmm_generate_extra_defs' + msvc14x_toolset_ver + '-' + glibmm_api_version,
   'generate_extra_defs.cc',
   version: glibmm_libversion,
   cpp_args: '-DGLIBMM_GEN_EXTRA_DEFS_BUILD',
