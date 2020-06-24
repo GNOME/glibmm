@@ -4,7 +4,7 @@
 #        glibmm_pcname, giomm_pcname, glibmm_api_version, glibmm_requires,
 #        giomm_requires, build_deprecated_api, install_pkgconfigdir,
 #        is_os_cocoa, cpp_compiler, glibmm_major_version, glibmm_minor_version,
-#        glibmm_micro_version
+#        glibmm_micro_version, msvc14x_toolset_ver
 # Output: pkg_conf_data, install_glibmmconfigdir, glibmmconfig_h
 
 pkg_conf_data = configuration_data()
@@ -32,6 +32,7 @@ pkg_conf_data.set('GLIBMM_MICRO_VERSION', glibmm_micro_version)
 pkg_conf_data.set('GIOMM_MAJOR_VERSION', glibmm_major_version)
 pkg_conf_data.set('GIOMM_MINOR_VERSION', glibmm_minor_version)
 pkg_conf_data.set('GIOMM_MICRO_VERSION', glibmm_micro_version)
+pkg_conf_data.set('MSVC_TOOLSET_VER', msvc14x_toolset_ver)
 
 library_build_type = get_option('default_library')
 
