@@ -155,7 +155,7 @@ __CPPNAME__::__CPPNAME__`'(__CPPNAME__&& other) noexcept
 
 __CPPNAME__& __CPPNAME__::operator=(__CPPNAME__`'&& other) noexcept
 {
-  __CPPNAME__ temp (other);
+  __CPPNAME__ temp (std::move(other));
   swap(temp);
   return *this;
 }
