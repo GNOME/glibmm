@@ -18,26 +18,29 @@
 #include <giomm/menuattributeiter.h>
 #include <giomm/menulinkiter.h>
 
+using Attribute = Gio::MenuModel::Attribute;
+using Link = Gio::MenuModel::Link;
+
 namespace Gio
 {
 
-// Make sure the order here is the same order as in Gio::MenuAttribute.
+// Make sure the order here is the same order as in Gio::MenuModel::Attribute.
 static const char* const _attribute_strings[] = { G_MENU_ATTRIBUTE_ACTION, G_MENU_ATTRIBUTE_LABEL,
-  G_MENU_ATTRIBUTE_TARGET };
+  G_MENU_ATTRIBUTE_TARGET, G_MENU_ATTRIBUTE_ACTION_NAMESPACE, G_MENU_ATTRIBUTE_ICON };
 
 const char*
-giomm_get_menu_attribute(MenuAttribute attribute)
+giomm_get_menu_attribute(MenuModel::Attribute attribute)
 {
-  return _attribute_strings[attribute];
+  return _attribute_strings[static_cast<int>(attribute)];
 }
 
-// Make sure the order here is the same order as in Gio::MenuLink.
+// Make sure the order here is the same order as in Gio::MenuModel::Link.
 static const char* const _link_strings[] = { G_MENU_LINK_SECTION, G_MENU_LINK_SUBMENU };
 
 const char*
-giomm_get_menu_link(MenuLink link)
+giomm_get_menu_link(MenuModel::Link link)
 {
-  return _link_strings[link];
+  return _link_strings[static_cast<int>(link)];
 }
 
 } // namespace Gio
