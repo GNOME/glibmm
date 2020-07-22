@@ -36,7 +36,8 @@ $<
 	@if exist ..\glib\glibmm\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\glib\glibmm\$(<B)
 
 {..\glib\src\}.ccg{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj:
-	@if not exist $(@D)\private\ $(MAKE) /f Makefile.vc CFG=$(CFG) $(@D)\private
+	@if not exist $(@D)\private\ md $(@D)\private
+	@if not exist ..\tools\gmmproc $(MAKE) /f Makefile.vc CFG=$(CFG) ..\tools\gmmproc
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\glib\glibmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -I ../tools/pm -- ../tools/gmmproc -I ../tools/m4 --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
 	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
 	@if exist ..\glib\glibmm\$(<B).cc $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\glib\glibmm\$(<B).cc
@@ -57,7 +58,8 @@ $<
 <<
 
 {..\gio\src\}.ccg{vs$(VSVER)\$(CFG)\$(PLAT)\giomm\}.obj:
-	@if not exist $(@D)\private\ $(MAKE) /f Makefile.vc CFG=$(CFG) $(@D)\private
+	@if not exist $(@D)\private\ md $(@D)\private
+	@if not exist ..\tools\gmmproc $(MAKE) /f Makefile.vc CFG=$(CFG) ..\tools\gmmproc
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\gio\giomm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -I ../tools/pm -- ../tools/gmmproc -I ../tools/m4 --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
 	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
 	@if exist ..\gio\giomm\$(<B).cc $(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc

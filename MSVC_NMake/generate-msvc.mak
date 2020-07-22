@@ -20,70 +20,83 @@ vs$(VSVER)\$(CFG)\$(PLAT)\gschema.compiled: ..\examples\settings\org.gtkmm.demo.
 	$(GLIB_COMPILE_SCHEMAS) --targetdir=$(@D) $(**D)
 
 # Generate wrap_init.cc files
-vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\wrap_init.cc: $(glibmm_real_hg)
+vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\wrap_init.cc: $(glibmm_real_hg) ..\tools\generate_wrap_init.pl
 	@if not exist ..\glib\glibmm\wrap_init.cc $(PERL) -- "../tools/generate_wrap_init.pl" --namespace=Glib --parent_dir=glibmm $(glibmm_real_hg:\=/)>$@
 
-vs$(VSVER)\$(CFG)\$(PLAT)\giomm\wrap_init.cc: $(giomm_real_hg)
+vs$(VSVER)\$(CFG)\$(PLAT)\giomm\wrap_init.cc: $(giomm_real_hg) ..\tools\generate_wrap_init.pl
 	@if not exist ..\gio\giomm\wrap_init.cc $(PERL) -- "../tools/generate_wrap_init.pl" --namespace=Gio --parent_dir=giomm $(giomm_real_hg:\=/)>$@
 
 # Generate pre-generated resources and configuration headers (builds from GIT)
 prep-git-build: pkg-ver.mak
+	$(MAKE) /f Makefile.vc CFG=$(CFG) GENERATE_VERSIONED_FILES=1 glibmm\glibmm.rc giomm\giomm.rc giomm\giommconfig.h
 
 gen-perl-scripts-real: pkg-ver.mak
 	$(MAKE) /f Makefile.vc CFG=$(CFG) GENERATE_VERSIONED_FILES=1 ..\tools\gmmproc ..\tools\generate_wrap_init.pl
 
-glibmm\glibmm.rc: pkg-ver.mak glibmm\glibmm.rc.in glibmm\glibmmconfig.h
-	@echo Generating $@...
-	@copy $@.in $@
-	@$(PERL) -pi.bak -e "s/\@GLIBMM_MAJOR_VERSION\@/$(PKG_MAJOR_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\@GLIBMM_MINOR_VERSION\@/$(PKG_MINOR_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\@GLIBMM_MICRO_VERSION\@/$(PKG_MICRO_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\@PACKAGE_VERSION\@/$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION).$(PKG_MICRO_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\@GLIBMM_MODULE_NAME\@/glibmm-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)/g" $@
-	@del $@.bak
+glibmm\glibmm.rc: ..\configure.ac glibmm\glibmm.rc.in glibmm\glibmmconfig.h
+	@if not "$(DO_REAL_GEN)" == "1" if exist pkg-ver.mak del pkg-ver.mak
+	@if not exist pkg-ver.mak $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
+	@if "$(DO_REAL_GEN)" == "1" echo Generating $@...
+	@if "$(DO_REAL_GEN)" == "1" copy $@.in $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GLIBMM_MAJOR_VERSION\@/$(PKG_MAJOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GLIBMM_MINOR_VERSION\@/$(PKG_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GLIBMM_MICRO_VERSION\@/$(PKG_MICRO_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@PACKAGE_VERSION\@/$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION).$(PKG_MICRO_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GLIBMM_MODULE_NAME\@/glibmm-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" del $@.bak
 
-glibmm\glibmmconfig.h: ..\glib\glibmmconfig.h.in
-	@echo Copying $@ from $**...
-	@copy $** $@
+glibmm\glibmmconfig.h: ..\configure.ac ..\glib\glibmmconfig.h.in
+	@if not "$(DO_REAL_GEN)" == "1" if exist pkg-ver.mak del pkg-ver.mak
+	@if not exist pkg-ver.mak $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
+	@if "$(DO_REAL_GEN)" == "1" echo Copying $@ from ..\glib\glibmmconfig.h.in...
+	@if "$(DO_REAL_GEN)" == "1" copy ..\glib\glibmmconfig.h.in $@
 
-giomm\giomm.rc: pkg-ver.mak
-	@echo Generating $@...
-	@copy $@.in $@
-	@$(PERL) -pi.bak -e "s/\@GIOMM_MAJOR_VERSION\@/$(PKG_MAJOR_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\@GIOMM_MINOR_VERSION\@/$(PKG_MINOR_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\@GIOMM_MICRO_VERSION\@/$(PKG_MICRO_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\@PACKAGE_VERSION\@/$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION).$(PKG_MICRO_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\@GIOMM_MODULE_NAME\@/giomm-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)/g" $@
-	@del $@.bak
+giomm\giomm.rc: ..\configure.ac
+	@if not "$(DO_REAL_GEN)" == "1" if exist pkg-ver.mak del pkg-ver.mak
+	@if not exist pkg-ver.mak $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
+	@if "$(DO_REAL_GEN)" == "1" echo Generating $@...
+	@if "$(DO_REAL_GEN)" == "1" copy $@.in $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GIOMM_MAJOR_VERSION\@/$(PKG_MAJOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GIOMM_MINOR_VERSION\@/$(PKG_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GIOMM_MICRO_VERSION\@/$(PKG_MICRO_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@PACKAGE_VERSION\@/$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION).$(PKG_MICRO_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GIOMM_MODULE_NAME\@/giomm-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" del $@.bak
 
 # You may change GIOMM_DISABLE_DEPRECATED and GIOMM_STATIC_LIB if you know what you are doing
-giomm\giommconfig.h: pkg-ver.mak ..\gio\giommconfig.h.in
-	@echo Generating $@...
-	@copy ..\gio\$(@F).in $@
-	@$(PERL) -pi.bak -e "s/\#undef GIOMM_DISABLE_DEPRECATED/\/\* \#undef GIOMM_DISABLE_DEPRECATED \*\//g" $@
-	@$(PERL) -pi.bak -e "s/\#undef GIOMM_STATIC_LIB/\/\* \#undef GIOMM_STATIC_LIB \*\//g" $@
-	@$(PERL) -pi.bak -e "s/\#undef GIOMM_MAJOR_VERSION/\#define GIOMM_MAJOR_VERSION $(PKG_MAJOR_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\#undef GIOMM_MINOR_VERSION/\#define GIOMM_MINOR_VERSION $(PKG_MINOR_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\#undef GIOMM_MICRO_VERSION/\#define GIOMM_MICRO_VERSION $(PKG_MICRO_VERSION)/g" $@
-	@del $@.bak
+giomm\giommconfig.h: ..\configure.ac ..\gio\giommconfig.h.in
+	@if not "$(DO_REAL_GEN)" == "1" if exist pkg-ver.mak del pkg-ver.mak
+	@if not exist pkg-ver.mak $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
+	@if "$(DO_REAL_GEN)" == "1" echo Generating $@...
+	@if "$(DO_REAL_GEN)" == "1" copy ..\gio\$(@F).in $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GIOMM_DISABLE_DEPRECATED/\/\* \#undef GIOMM_DISABLE_DEPRECATED \*\//g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GIOMM_STATIC_LIB/\/\* \#undef GIOMM_STATIC_LIB \*\//g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GIOMM_MAJOR_VERSION/\#define GIOMM_MAJOR_VERSION $(PKG_MAJOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GIOMM_MINOR_VERSION/\#define GIOMM_MINOR_VERSION $(PKG_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GIOMM_MICRO_VERSION/\#define GIOMM_MICRO_VERSION $(PKG_MICRO_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" del $@.bak
 
-..\tools\gmmproc: ..\tools\gmmproc.in
-	@echo Generating $@...
-	@copy $** $@
-	@$(PERL) -pi.bak -e "s/\@PERL\@/$(PERL:\=\/)/g" $@
-	@$(PERL) -pi.bak -e "s/\@prefix\@/$(PREFIX_REAL:\=\/)/g" $@
-	@$(PERL) -pi.bak -e "s/\@exec_prefix\@/$(PREFIX_REAL:\=\/)/g" $@
-	@$(PERL) -pi.bak -e "s/\@libdir\@/$(PREFIX_REAL:\=\/)\/share/g" $@
-	@$(PERL) -pi.bak -e "s/\@M4\@/$(M4:\=\/)/g" $@
-	@$(PERL) -pi.bak -e "s/\@GLIBMM_MODULE_NAME\@/glibmm-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\@PACKAGE_VERSION\@/$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION).$(PKG_MICRO_VERSION)/g" $@
-	@del $@.bak
+..\tools\gmmproc: ..\configure.ac ..\tools\gmmproc.in
+	@if not "$(DO_REAL_GEN)" == "1" if exist pkg-ver.mak del pkg-ver.mak
+	@if not exist pkg-ver.mak $(MAKE) /f Makefile.vc CFG=$(CFG) gen-perl-scripts-real
+	@if "$(DO_REAL_GEN)" == "1" echo Generating $@...
+	@if "$(DO_REAL_GEN)" == "1" copy ..\tools\gmmproc.in $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@PERL\@/$(PERL:\=\/)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@prefix\@/$(PREFIX_REAL:\=\/)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@exec_prefix\@/$(PREFIX_REAL:\=\/)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@libdir\@/$(PREFIX_REAL:\=\/)\/share/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@M4\@/$(M4:\=\/)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GLIBMM_MODULE_NAME\@/glibmm-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@PACKAGE_VERSION\@/$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION).$(PKG_MICRO_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" del $@.bak
 
-..\tools\generate_wrap_init.pl: ..\tools\generate_wrap_init.pl.in
-	@echo Generating $@...
-	@copy $** $@
-	@$(PERL) -pi.bak -e "s/\@PERL\@/$(PERL:\=\/)/g" $@
-	@del $@.bak
+..\tools\generate_wrap_init.pl: ..\configure.ac ..\tools\generate_wrap_init.pl.in
+	@if not "$(DO_REAL_GEN)" == "1" if exist pkg-ver.mak del pkg-ver.mak
+	@if not exist pkg-ver.mak $(MAKE) /f Makefile.vc CFG=$(CFG) gen-perl-scripts-real
+	@if "$(DO_REAL_GEN)" == "1" echo Generating $@...
+	@if "$(DO_REAL_GEN)" == "1" copy ..\tools\generate_wrap_init.pl.in $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@PERL\@/$(PERL:\=\/)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" del $@.bak
 
 pkg-ver.mak: ..\configure.ac
 	@echo Generating version info Makefile Snippet...
@@ -97,5 +110,3 @@ pkg-ver.mak: ..\configure.ac
 	@echo for /f "tokens=1,2,3 delims=." %%%%a IN ("%glibmm_ver%") do (echo PKG_MAJOR_VERSION=%%%%a^& echo PKG_MINOR_VERSION=%%%%b^& echo PKG_MICRO_VERSION=%%%%c)^>$@>>pkg-ver.bat
 	@pkg-ver.bat
 	@del ver.txt pkg-ver.bat
-	$(MAKE) /f Makefile.vc CFG=$(CFG) GENERATE_VERSIONED_FILES=1 glibmm\glibmm.rc giomm\giomm.rc giomm\giommconfig.h
-	$(MAKE) /f Makefile.vc CFG=$(CFG) gen-perl-scripts-real
