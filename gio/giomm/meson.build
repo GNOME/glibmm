@@ -192,6 +192,8 @@ giomm_extra_h_cc_basenames = [
   'init',
   'slot_async',
   'socketsource',
+  'tlsclientconnectionimpl',
+  'tlsserverconnectionimpl',
 ]
 
 giomm_extra_h_files = [
