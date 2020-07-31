@@ -15,8 +15,27 @@
  */
 
 #include <gio/gio.h>
+#include <giomm/tlsclientconnectionimpl.h>
 #include <giomm/asyncresult.h>
 #include "slot_async.h"
+
+namespace
+{
+// Wrap the GIOStream* connection in the 'event' signal.
+// The GIOStream pointer, if not a nullptr, can point to either a GSocketConnection
+// or to a subclass of GTlsConnection that implements the GTlsClientConnection interface.
+Glib::RefPtr<Gio::IOStream> SocketClient_signal_event_wrap_connection(GIOStream* object, bool take_copy)
+{
+  if (!Glib::ObjectBase::_get_current_wrapper((GObject*)object) &&
+      G_IS_TLS_CLIENT_CONNECTION(object))
+    // An instance of a class that implements GTlsClientConnection.
+    // It doesn't have a wrapper. Wrap it in a Gio::TlsClientConnectionImpl.
+    return Glib::wrap_tls_client_connection_impl(G_TLS_CONNECTION(object), take_copy);
+
+  return Glib::wrap(object, take_copy);
+}
+
+} // anonymous namespace
 
 namespace Gio
 {
