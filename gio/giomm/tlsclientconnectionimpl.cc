@@ -31,14 +31,17 @@ Glib::RefPtr<Gio::TlsClientConnectionImpl> wrap_tls_client_connection_impl(
 {
   using IfaceImpl = Gio::TlsClientConnectionImpl;
 
-  ObjectBase* pCppObject = ObjectBase::_get_current_wrapper((GObject*)object);
+  ObjectBase* pCppObject = nullptr;
+  if (object)
+  {
+    pCppObject = ObjectBase::_get_current_wrapper((GObject*)object);
 
-  if (!pCppObject)
-    pCppObject = new IfaceImpl(object);
+    if (!pCppObject)
+      pCppObject = new IfaceImpl(object);
 
-  if (take_copy)
-    pCppObject->reference();
-
+    if (take_copy)
+      pCppObject->reference();
+  }
   return Glib::make_refptr_for_instance<IfaceImpl>(dynamic_cast<IfaceImpl*>(pCppObject));
 }
 
