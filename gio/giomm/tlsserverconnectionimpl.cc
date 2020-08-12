@@ -15,34 +15,27 @@
  */
 
 #include <giomm/tlsserverconnectionimpl.h>
+#include <utility> // std::move()
 
 namespace Gio
 {
 TlsServerConnectionImpl::TlsServerConnectionImpl(GTlsConnection* castitem)
 : Glib::ObjectBase(nullptr), TlsConnection(castitem)
 {}
-} /* namespace Gio */
 
-namespace Glib
+TlsServerConnectionImpl::TlsServerConnectionImpl(TlsServerConnectionImpl&& src) noexcept
+: TlsServerConnection(std::move(src)),
+  TlsConnection(std::move(src))
+{}
+
+TlsServerConnectionImpl& TlsServerConnectionImpl::operator=(TlsServerConnectionImpl&& src) noexcept
 {
-
-Glib::RefPtr<Gio::TlsServerConnectionImpl> wrap_tls_server_connection_impl(
-  GTlsConnection* object, bool take_copy)
-{
-  using IfaceImpl = Gio::TlsServerConnectionImpl;
-
-  ObjectBase* pCppObject = nullptr;
-  if (object)
-  {
-    pCppObject = ObjectBase::_get_current_wrapper((GObject*)object);
-
-    if (!pCppObject)
-      pCppObject = new IfaceImpl(object);
-
-    if (take_copy)
-      pCppObject->reference();
-  }
-  return Glib::make_refptr_for_instance<IfaceImpl>(dynamic_cast<IfaceImpl*>(pCppObject));
+  TlsServerConnection::operator=(std::move(src));
+  TlsConnection::operator=(std::move(src));
+  return *this;
 }
 
-} /* namespace Glib */
+TlsServerConnectionImpl::~TlsServerConnectionImpl() noexcept
+{}
+
+} // namespace Gio

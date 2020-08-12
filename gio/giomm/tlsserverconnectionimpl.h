@@ -24,7 +24,8 @@
 namespace Gio
 {
 
-/** %Gio::TlsServerConnectionImpl implements the Gio::TlsServerConnection interface.
+/** %Gio::TlsServerConnectionImpl is a Gio::TlsConnection that implements
+ * the Gio::TlsServerConnection interface.
  *
  * The GTlsServerConnection interface can be implemented by C classes that
  * derive from GTlsConnection. No public GLib class implements GTlsServerConnection.
@@ -40,30 +41,23 @@ namespace Gio
  */
 class GIOMM_API TlsServerConnectionImpl : public TlsServerConnection, public TlsConnection
 {
-public:
+private:
+  // noncopyable
+  TlsServerConnectionImpl(const TlsServerConnectionImpl&) = delete;
+  TlsServerConnectionImpl& operator=(const TlsServerConnectionImpl&) = delete;
+
+  friend class TlsConnection_Class;
+
+protected:
   explicit TlsServerConnectionImpl(GTlsConnection* castitem);
+
+public:
+  TlsServerConnectionImpl(TlsServerConnectionImpl&& src) noexcept;
+  TlsServerConnectionImpl& operator=(TlsServerConnectionImpl&& src) noexcept;
+
+  ~TlsServerConnectionImpl() noexcept override;
 };
 
 } // namespace Gio
-
-namespace Glib
-{
-  /** A %Glib::wrap() method for this object.
-   *
-   * It's not called %wrap() because it wraps a C object which is derived from
-   * GTlsConnection and implements the GTlsServerConnection interface.
-   *
-   * @param object The C instance.
-   * @param take_copy False if the result should take ownership of the C instance.
-   *                  True if it should take a new ref.
-   * @result A C++ instance that wraps this C instance.
-   *
-   * @relates Gio::TlsServerConnectionImpl
-   */
-  GIOMM_API
-  Glib::RefPtr<Gio::TlsServerConnectionImpl> wrap_tls_server_connection_impl(
-    GTlsConnection* object, bool take_copy = false);
-
-} // namespace Glib
 
 #endif /* _GIOMM_TLSSERVERCONNECTIONIMPL_H */

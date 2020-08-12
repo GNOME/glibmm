@@ -18,4 +18,23 @@
 #include <giomm/cancellable.h>
 #include <giomm/tlsdatabase.h>
 #include <giomm/tlsinteraction.h>
+#include <giomm/tlsclientconnectionimpl.h>
+#include <giomm/tlsserverconnectionimpl.h>
 #include "slot_async.h"
+
+namespace Gio
+{
+
+// Custom wrap_new() because we want to create
+// a TlsClientConnectionImpl if the underlying C class implements the GTlsClientConnection interface,
+// a TlsServerConnectionImpl if the underlying C class implements the GTlsServerConnection interface.
+Glib::ObjectBase* TlsConnection_Class::wrap_new(GObject* object)
+{
+  if (G_IS_TLS_CLIENT_CONNECTION(object))
+     return new TlsClientConnectionImpl((GTlsConnection*)object);
+  if (G_IS_TLS_SERVER_CONNECTION(object))
+     return new TlsServerConnectionImpl((GTlsConnection*)object);
+  return new TlsConnection((GTlsConnection*)object);
+}
+
+} // namespace Gio
