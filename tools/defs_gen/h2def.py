@@ -316,8 +316,12 @@ def clean_func(buf):
     pat = re.compile(r"""([A-Z]+_){1,2}?AVAILABLE_IN_[A-Z_0-9]+""", re.MULTILINE)
     buf = pat.sub('', buf)
 
-    #strip G_DECLARE_FINAL_TYPE (*) and G_DECLARE_INTERFACE (*)
-    pat = re.compile(r"""G_DECLARE_(FINAL_TYPE|INTERFACE)\s*\(.*?\)""", re.MULTILINE)
+    #strip G_DECLARE_FINAL_TYPE (*), G_DECLARE_DERIVABLE_TYPE (*) and G_DECLARE_INTERFACE (*)
+    pat = re.compile(r"""G_DECLARE_(FINAL_TYPE|DERIVABLE_TYPE|INTERFACE)\s*\(.*?\)""", re.MULTILINE)
+    buf = pat.sub('', buf)
+
+    #strip GDK_DECLARE_INTERNAL_TYPE (*)
+    pat = re.compile(r"""GDK_DECLARE_INTERNAL_TYPE\s*\(.*?\)""", re.MULTILINE)
     buf = pat.sub('', buf)
 
     #we are not stripping G_GNUC_INTERNAL
