@@ -101,7 +101,7 @@ dnl
 dnl
 dnl
 define(`_PH_CLASS_DECLARATION',`dnl
-class __CPPNAME__`'_Class : public Glib::Class
+class __FUNC_DECORATION__ __CPPNAME__`'_Class : public Glib::Class
 {
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
