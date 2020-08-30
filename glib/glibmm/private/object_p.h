@@ -8,7 +8,7 @@
 namespace Glib
 {
 
-class Object_Class : public Glib::Class
+class GLIBMM_API Object_Class : public Glib::Class
 {
 public:
   using CppObjectType = Object;
