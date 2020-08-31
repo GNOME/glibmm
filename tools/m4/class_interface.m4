@@ -44,7 +44,7 @@ dnl
 dnl
 dnl
 define(`_PH_CLASS_DECLARATION_INTERFACE',`dnl
-class __CPPNAME__`'_Class : public __CPPPARENT__`'_Class
+class __FUNC_DECORATION__ __CPPNAME__`'_Class : public __CPPPARENT__`'_Class
 {
 public:
   using CppObjectType = __CPPNAME__;
