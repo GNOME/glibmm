@@ -15,7 +15,6 @@ test_programs = [
   [['glibmm_base64'], 'test', ['main.cc'], false],
   [['glibmm_binding'], 'test', ['main.cc'], false],
   [['glibmm_bool_vector'], 'test', ['main.cc'], false],
-  [['glibmm_btree'], 'test', ['main.cc'], false],
   [['glibmm_buildfilename'], 'test', ['main.cc'], false],
   [['glibmm_bytearray'], 'test', ['main.cc'], false],
   [['glibmm_date'], 'test', ['main.cc'], false],

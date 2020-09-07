@@ -28,7 +28,6 @@ endforeach
 
 # Generated from pairs of .hg and .ccg files.
 glibmm_hg_ccg_basenames = [
-  'balancedtree',
   'binding',
   'bytes',
   'bytearray',
