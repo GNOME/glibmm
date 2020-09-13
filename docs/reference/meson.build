@@ -3,7 +3,8 @@
 # Input: built_files_root, project_source_root, glibmm_pcname, giomm_pcname,
 #        glibmm_hg_ccg_basenames, giomm_hg_ccg_basenames, build_documentation,
 #        glibmm_extra_h_files, giomm_extra_h_files, glibmm_built_h_file_targets,
-#        giomm_built_h_file_targets, install_datadir,python3, doc_reference_py
+#        giomm_built_h_file_targets, glibmm_h_m4_files, install_datadir,
+#        python3, doc_reference_py
 # Output: install_docdir, install_devhelpdir
 
 tag_file_modules = [
@@ -70,6 +71,9 @@ endif
 built_h_files = []
 foreach file : glibmm_hg_ccg_basenames
   built_h_files += built_files_root / 'glib' / 'glibmm' / file + '.h'
+endforeach
+foreach file : glibmm_h_m4_files
+  built_h_files += built_files_root / 'glib' / 'glibmm' / file
 endforeach
 foreach file : giomm_hg_ccg_basenames
   built_h_files += built_files_root / 'gio' / 'giomm' / file + '.h'
