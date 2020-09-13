@@ -5,7 +5,7 @@
 #        glibmm_libversion, install_includedir, python3, glibmm_rc, gmmproc_dir,
 #        is_host_windows, gmmproc, generate_wrap_init_pl, glibmm_libname
 # Output: glibmm_hg_ccg_basenames, glibmm_extra_h_files, built_files_root,
-#         glibmm_built_h_file_targets, glibmm_dep
+#         glibmm_built_h_file_targets, glibmm_h_m4_files, glibmm_dep
 
 glibmm_defs_basefiles = [
   'glib.defs',
