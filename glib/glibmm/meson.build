@@ -3,7 +3,8 @@
 # Input: glibmm_build_dep, glibmm_pcname, maintainer_mode, project_source_root,
 #        generate_binding_py, handle_built_files_py, m4_files, pm_files,
 #        glibmm_libversion, install_includedir, python3, glibmm_rc, gmmproc_dir,
-#        is_host_windows, gmmproc, generate_wrap_init_pl, glibmm_libname
+#        is_host_windows, gmmproc, generate_wrap_init_pl, glibmm_libname,
+#        macos_darwin_versions
 # Output: glibmm_hg_ccg_basenames, glibmm_extra_h_files, built_files_root,
 #         glibmm_built_h_file_targets, glibmm_h_m4_files, glibmm_dep
 
@@ -247,6 +248,7 @@ if maintainer_mode
     include_directories: extra_include_dirs,
     cpp_args: glibmm_cpp_args,
     version: glibmm_libversion,
+    darwin_versions: macos_darwin_versions,
     dependencies: glibmm_build_dep,
     install: true,
   )
@@ -299,6 +301,7 @@ else # not maintainer_mode
     include_directories: extra_include_dirs,
     cpp_args: glibmm_cpp_args,
     version: glibmm_libversion,
+    darwin_versions: macos_darwin_versions,
     dependencies: glibmm_build_dep,
     install: true,
   )
