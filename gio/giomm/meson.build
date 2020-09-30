@@ -3,7 +3,8 @@
 # Input: giomm_build_dep, giomm_pcname, maintainer_mode, project_source_root,
 #        generate_binding_py, handle_built_files_py, m4_files, pm_files,
 #        glibmm_libversion, install_includedir, python3, giomm_rc, gmmproc_dir,
-#        is_host_windows, gmmproc, generate_wrap_init_pl, giomm_libname
+#        is_host_windows, gmmproc, generate_wrap_init_pl, giomm_libname,
+#        macos_darwin_versions
 # Output: giomm_hg_ccg_basenames, giomm_extra_h_files, built_files_root,
 #         giomm_built_h_file_targets, giomm_dep
 
@@ -305,6 +306,7 @@ if maintainer_mode
   giomm_library = library(giomm_libname, extra_giomm_objects,
     giomm_used_built_cc_file_targets, giomm_extra_cc_files, built_dummy_h_file_target,
     version: glibmm_libversion,
+    darwin_versions: macos_darwin_versions,
     include_directories: extra_include_dirs,
     cpp_args: giomm_cpp_flags,
     dependencies: giomm_build_dep,
@@ -353,6 +355,7 @@ else # not maintainer_mode
   giomm_library = library(giomm_libname, extra_giomm_objects,
     built_cc_files, giomm_extra_cc_files,
     version: glibmm_libversion,
+    darwin_versions: macos_darwin_versions,
     include_directories: extra_include_dirs,
     cpp_args: giomm_cpp_flags,
     dependencies: giomm_build_dep,
