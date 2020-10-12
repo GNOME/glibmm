@@ -26,14 +26,14 @@
  * glibmm is the official C++ interface for the popular cross-platform library %Glib.
  * It provides non-UI API that is not available in standard C++ and makes it
  * possible for gtkmm to wrap GObject-based APIs.
- * See also the <a href="http://library.gnome.org/devel/gtkmm-tutorial/stable/">
+ * See also the <a href="https://library.gnome.org/devel/gtkmm-tutorial/stable/">
  * Programming with gtkmm</a> book for a tutorial on programming with gtkmm and
  * glibmm.
  *
  * @section features Features
  *
- * - Glib::ustring: A UTF-8 string class that can be used interchangably with std::string. Plus @ref
- * StringUtils
+ * - Glib::ustring: A UTF-8 string class that can be used interchangably with std::string.
+ *   Plus @ref StringUtils
  * - Glib::RefPtr: A reference-counting smartpointer, for use with Glib::ObjectBase or similar
  * - @ref CharsetConv
  * - Glib::Regex: Regular expression string matching.
@@ -64,6 +64,21 @@
  * If your  source file is @c program.cc, you can compile it with:
  * @code
  * g++ program.cc -o program  `pkg-config --cflags --libs glibmm-2.66 giomm-2.66`
+ * @endcode
+ * If your version of g++ is not C++17-compliant by default,
+ * add the @c -std=c++17 option.
+ *
+ * If you use <a href="https://mesonbuild.com/">Meson</a>, include the following
+ * in @c meson.build:
+ * @code
+ * glibmm_dep = dependency('glibmm-2.66')
+ * giomm_dep = dependency('giomm-2.66')
+ * program_name = 'program'
+ * cpp_sources = [ 'program.cc' ]
+ * executable(program_name,
+ *   cpp_sources,
+ *   dependencies: [ glibmm_dep, giomm_dep ]
+ * )
  * @endcode
  *
  * Alternatively, if using autoconf, use the following in @c configure.ac:
