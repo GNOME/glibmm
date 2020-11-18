@@ -207,12 +207,6 @@ print << "EOF";
 
 #define GLIBMM_INCLUDED_FROM_WRAP_INIT_CC
 #include <glibmm.h>
-
-// Disable the 'const' function attribute of the get_type() functions.
-// GCC would optimize them out because we don't use the return value.
-#undef  G_GNUC_CONST
-#define G_GNUC_CONST /* empty */
-
 #include <${parent_dir}/wrap_init.h>
 #include <glibmm/error.h>
 #include <glibmm/object.h>
@@ -437,7 +431,7 @@ foreach my $filename_header (sort keys %objects)
   {
     my ($cppname, $basename, @extra_namespace) = @{$i};
     my $qualified_cppname = join("::", (@extra_namespace, $cppname));
-    $message .= "  ${qualified_cppname}::get_type();\n"
+    $message .= "  g_type_ensure(${qualified_cppname}::get_type());\n"
   }
   print_with_guards($filename_header, $message);
 }
