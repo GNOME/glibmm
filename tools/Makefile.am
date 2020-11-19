@@ -30,7 +30,6 @@ gmmproc_bin_SCRIPTS  = gmmproc generate_wrap_init.pl
 dist_gmmproc_m4_DATA = $(files_codegen_m4:%=m4/%)
 dist_gmmproc_pm_DATA = $(files_codegen_pm:%=pm/%)
 
-dist_noinst_DATA    = README TODO
 dist_noinst_SCRIPTS = enum.pl
 
 noinst_PROGRAMS = extra_defs_gen/generate_defs_glib extra_defs_gen/generate_defs_gio
