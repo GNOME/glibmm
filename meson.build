@@ -45,21 +45,7 @@ project_build_root = meson.current_build_dir()
 cpp_compiler = meson.get_compiler('cpp')
 is_msvc = cpp_compiler.get_id() == 'msvc'
 is_host_windows = host_machine.system() == 'windows'
-
-is_os_cocoa = false
-if not is_host_windows
-  # This test for Mac OS is copied from glib. If the result of glib's test
-  # is ever made available outside glib, use glib's result instead of this test.
-  # glib: https://bugzilla.gnome.org/show_bug.cgi?id=780309
-  # glibmm: https://bugzilla.gnome.org/show_bug.cgi?id=781947
-  is_os_cocoa = cpp_compiler.compiles(
-    '''#include <Cocoa/Cocoa.h>
-    #ifdef GNUSTEP_BASE_VERSION
-    #error "Detected GNUstep, not Cocoa"
-    #endif''',
-    name: 'Mac OS X Cocoa support'
-  )
-endif
+is_os_cocoa = host_machine.system() == 'darwin'
 
 python3 = import('python').find_installation()
 python_version = python3.language_version()
