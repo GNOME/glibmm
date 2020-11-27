@@ -101,7 +101,12 @@ dnl
 dnl
 dnl
 define(`_PH_CLASS_DECLARATION',`dnl
+ifdef(`__FUNC_DECORATION__',`dnl
 class __FUNC_DECORATION__ __CPPNAME__`'_Class : public Glib::Class
+',`dnl
+dnl Old versions of class_gtkobject.m4 do not define __FUNC_DECORATION__.
+class __CPPNAME__`'_Class : public Glib::Class
+')dnl
 {
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
