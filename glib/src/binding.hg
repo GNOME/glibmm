@@ -417,6 +417,15 @@ private:
   public:
     explicit TransformProp(const SlotTypedTransform<T_from, T_to>& slot) : typed_transform(slot) {}
 
+    // g++-10 with optimization level -O1 or higher warns about possible use of
+    // an uninitialized variable when tests/glibmm_binding/main.cc is compiled.
+    // I don't understand why. Don't optimize this function. /Kjell 2020-12-08
+    //   sigc++-3.0/sigc++/functors/slot.h:226:21: warning: ‘<anonymous>’ may be
+    //   used uninitialized in this function [-Wmaybe-uninitialized]
+    //   226 |     return T_return();
+#if __GNUC__ >= 10
+  __attribute__ ((optimize(0)))
+#endif
     bool operator()(const GValue* from_value, GValue* to_value)
     {
       Glib::Value<T_from> from_glib_value;
