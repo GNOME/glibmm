@@ -6,9 +6,11 @@ image: ubuntu:devel
 
 stages:
   - build
+  - deploy
 
 variables:
   DEPENDENCIES: g++
+                g++-9
                 gettext
                 git
                 yelp-tools
@@ -20,22 +22,90 @@ variables:
                 libglib2.0-dev
                 mm-common
                 libxml-libxml-perl
-
+                meson
+                ninja-build
+                glib-networking
+  GIO_EXTRA_MODULES: "/usr/lib/x86_64-linux-gnu/gio/modules"
   GIT_SUBMODULE_STRATEGY: normal
 
 before_script:
   - export DEBIAN_FRONTEND=noninteractive
   - apt update && apt -y upgrade && apt -y install $DEPENDENCIES
-  - git clone --branch 3.0.0 https://github.com/libsigcplusplus/libsigcplusplus libsigc
+  - git clone --branch 3.0.6 https://github.com/libsigcplusplus/libsigcplusplus libsigc
   - cd libsigc
-  - ./autogen.sh --prefix=/usr
-  - make
-  - make install && cd ..
+  - mkdir _build && cd _build
+  - meson --prefix=/usr --libdir=lib -Dwarnings=fatal -Dbuildtype=release
+  - meson compile
+  - meson install
+  - cd ../..
 
-library_build:
+autotools_build:
   stage: build
   script:
-  - ./autogen.sh --prefix=/usr
+  - ./autogen.sh --enable-warnings=fatal --prefix=/usr
   - make
+  - make check
   - make install
+  allow_failure: true
 
+debug_build:
+  stage: build
+  script:
+  - mkdir _build && cd _build
+# -Ddebug=true + -Doptimization=0 correspond to -Dbuildtype=debug
+  - meson --prefix=/usr --libdir=lib -Ddebug=true -Doptimization=0 -Dwarnings=fatal
+  - meson compile
+  - meson test
+  - meson install
+  artifacts:
+    when: on_failure
+    paths:
+    - _build/meson-logs/testlog.txt
+    - _build/meson-logs/meson-log.txt
+    expire_in: 1 week
+
+release_gcc_9_build:
+  stage: build
+  script:
+  - mkdir _build && cd _build
+# -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
+  - CC=gcc-9 CXX=g++-9 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
+  - meson compile
+  - meson test
+  - meson install
+  artifacts:
+    when: on_failure
+    paths:
+    - _build/meson-logs/testlog.txt
+    - _build/meson-logs/meson-log.txt
+    expire_in: 1 week
+
+release_gcc_10_build:
+  stage: build
+  script:
+  - mkdir _build && cd _build
+# -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
+  - CC=gcc-10 CXX=g++-10 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
+  - meson compile
+  - meson test
+  - meson install
+  allow_failure: true
+  artifacts:
+    when: on_failure
+    paths:
+    - _build/meson-logs/testlog.txt
+    - _build/meson-logs/meson-log.txt
+    expire_in: 1 week
+
+pages:
+  stage: deploy
+  script:
+  - CC=gcc-9 CXX=g++-9 meson _build --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal -Dmaintainer-mode=true
+  - cd _build
+  - ninja
+  - CC=gcc-9 CXX=g++-9 meson dist
+  - mkdir -p ../public/glibmm
+  - cp docs/reference/html/* ../public/glibmm
+  artifacts:
+    paths:
+    - public
