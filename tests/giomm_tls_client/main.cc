@@ -76,19 +76,31 @@ main(int, char**)
   std::cout << "First address of test host is " << first_inet_address->to_string() << "."
             << std::endl;
 
-  auto socket = Gio::Socket::create(
-    first_inet_address->get_family(), Gio::Socket::Type::STREAM, Gio::Socket::Protocol::TCP);
-
-  auto address = Gio::InetSocketAddress::create(first_inet_address, 443);
-
+  Glib::RefPtr<Gio::Socket> socket;
   try
   {
+    socket = Gio::Socket::create(
+      first_inet_address->get_family(), Gio::Socket::Type::STREAM, Gio::Socket::Protocol::TCP);
+  }
+  catch (const Gio::Error& ex)
+  {
+    std::cout << "Could not create socket. Exception: " << ex.what() << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  Glib::RefPtr<Gio::InetSocketAddress> address;
+  try
+  {
+    address = Gio::InetSocketAddress::create(first_inet_address, 443);
     socket->connect(address);
   }
   catch (const Gio::Error& ex)
   {
-    std::cout << "Could not connect socket to " << address->get_address()->to_string() << ":"
-              << address->get_port() << ". Exception: " << ex.what() << std::endl;
+    if (!address)
+      std::cout << "Could not create socket address. Exception: " << ex.what() << std::endl;
+    else
+      std::cout << "Could not connect socket to " << address->get_address()->to_string() << ":"
+                << address->get_port() << ". Exception: " << ex.what() << std::endl;
     return EXIT_FAILURE;
   }
 
