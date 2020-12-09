@@ -25,6 +25,7 @@ variables:
                 meson
                 ninja-build
                 glib-networking
+                clang
   GIO_EXTRA_MODULES: "/usr/lib/x86_64-linux-gnu/gio/modules"
   GIT_SUBMODULE_STRATEGY: normal
 
@@ -86,6 +87,23 @@ release_gcc_10_build:
   - mkdir _build && cd _build
 # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
   - CC=gcc-10 CXX=g++-10 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
+  - meson compile
+  - meson test
+  - meson install
+  allow_failure: true
+  artifacts:
+    when: on_failure
+    paths:
+    - _build/meson-logs/testlog.txt
+    - _build/meson-logs/meson-log.txt
+    expire_in: 1 week
+
+release_clang_build:
+  stage: build
+  script:
+  - mkdir _build && cd _build
+# -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
+  - CC=clang CXX=clang++ meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
   - meson compile
   - meson test
   - meson install
