@@ -5,9 +5,9 @@
 # files that it depends on.
 
 # Example: In glibmm, go to directory glibmm, and run
-#   tools/test_scripts/testheaders.sh -I glib giomm-2.66 gio # compile glibmm/gio/giomm/*.h
-#   tools/test_scripts/testheaders.sh giomm-2.66 glib gio    # compile glibmm/glib/glibmm/*.h and glibmm/gio/giomm/*.h
-#   tools/test_scripts/testheaders.sh -I glib glibmm-2.66 glib/glibmm/ustring.h # compile glibmm/glib/glibmm/ustring.h
+#   tools/test_scripts/testheaders.sh -I glib giomm-2.68 gio # compile glibmm/gio/giomm/*.h
+#   tools/test_scripts/testheaders.sh giomm-2.68 glib gio    # compile glibmm/glib/glibmm/*.h and glibmm/gio/giomm/*.h
+#   tools/test_scripts/testheaders.sh -I glib glibmm-2.68 glib/glibmm/ustring.h # compile glibmm/glib/glibmm/ustring.h
 
 # Usage: testheaders.sh [-I<dir>]... <pkg> [<dir> | <file>]...
 # -I<dir> is added to the g++ command.

@@ -1,7 +1,7 @@
 # This file is part of glibmm.
 
 project('glibmm', 'cpp',
-  version: '2.65.3',
+  version: '2.67.1',
   license: 'LGPLv2.1+',
   default_options: [
     'cpp_std=c++17'
@@ -9,7 +9,7 @@ project('glibmm', 'cpp',
   meson_version: '>= 0.50.0', # required for python3.path()
 )
 
-glibmm_api_version = '2.66'
+glibmm_api_version = '2.68'
 glibmm_pcname = meson.project_name() + '-' + glibmm_api_version
 giomm_pcname = 'giomm-' + glibmm_api_version
 

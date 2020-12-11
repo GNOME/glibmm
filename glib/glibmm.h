@@ -63,7 +63,7 @@
  *
  * If your  source file is @c program.cc, you can compile it with:
  * @code
- * g++ program.cc -o program  `pkg-config --cflags --libs glibmm-2.66 giomm-2.66`
+ * g++ program.cc -o program  `pkg-config --cflags --libs glibmm-2.68 giomm-2.68`
  * @endcode
  * If your version of g++ is not C++17-compliant by default,
  * add the @c -std=c++17 option.
@@ -71,8 +71,8 @@
  * If you use <a href="https://mesonbuild.com/">Meson</a>, include the following
  * in @c meson.build:
  * @code
- * glibmm_dep = dependency('glibmm-2.66')
- * giomm_dep = dependency('giomm-2.66')
+ * glibmm_dep = dependency('glibmm-2.68')
+ * giomm_dep = dependency('giomm-2.68')
  * program_name = 'program'
  * cpp_sources = [ 'program.cc' ]
  * executable(program_name,
@@ -83,7 +83,7 @@
  *
  * Alternatively, if using autoconf, use the following in @c configure.ac:
  * @code
- * PKG_CHECK_MODULES([GLIBMM], [glibmm-2.66 giomm-2.66])
+ * PKG_CHECK_MODULES([GLIBMM], [glibmm-2.68 giomm-2.68])
  * @endcode
  * Then use the generated @c GLIBMM_CFLAGS and @c GLIBMM_LIBS variables in the
  * project Makefile.am files. For example:
