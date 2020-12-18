@@ -746,23 +746,27 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="G_CREDENTIALS_TYPE_LINUX_UCRED">
-<parameter_description> The native credentials type is a struct ucred.
+<parameter_description> The native credentials type is a `struct ucred`.
 </parameter_description>
 </parameter>
 <parameter name="G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED">
-<parameter_description> The native credentials type is a struct cmsgcred.
+<parameter_description> The native credentials type is a `struct cmsgcred`.
 </parameter_description>
 </parameter>
 <parameter name="G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED">
-<parameter_description> The native credentials type is a struct sockpeercred. Added in 2.30.
+<parameter_description> The native credentials type is a `struct sockpeercred`. Added in 2.30.
 </parameter_description>
 </parameter>
 <parameter name="G_CREDENTIALS_TYPE_SOLARIS_UCRED">
-<parameter_description> The native credentials type is a ucred_t. Added in 2.40.
+<parameter_description> The native credentials type is a `ucred_t`. Added in 2.40.
 </parameter_description>
 </parameter>
 <parameter name="G_CREDENTIALS_TYPE_NETBSD_UNPCBID">
-<parameter_description> The native credentials type is a struct unpcbid.
+<parameter_description> The native credentials type is a `struct unpcbid`. Added in 2.42.
+</parameter_description>
+</parameter>
+<parameter name="G_CREDENTIALS_TYPE_APPLE_XUCRED">
+<parameter_description> The native credentials type is a `struct xucred`. Added in 2.66.
 </parameter_description>
 </parameter>
 </parameters>
@@ -2615,7 +2619,7 @@ Since: 2.48
 <property name="GDtlsClientConnection:validation-flags">
 <description>
 What steps to perform when validating a certificate received from
-a server. Server certificates that fail to validate in all of the
+a server. Server certificates that fail to validate in any of the
 ways indicated here will be rejected unless the application
 overrides the default via #GDtlsConnection::accept-certificate.
 
@@ -2751,9 +2755,8 @@ Since: 2.60
 <property name="GDtlsConnection:peer-certificate">
 <description>
 The connection's peer's certificate, after the TLS handshake has
-completed and the certificate has been accepted. Note in
-particular that this is not yet set during the emission of
-#GDtlsConnection::accept-certificate.
+completed or failed. Note in particular that this is not yet set
+during the emission of #GDtlsConnection::accept-certificate.
 
 (You can watch for a #GObject::notify signal on this property to
 detect when a handshake has occurred.)
@@ -2765,7 +2768,7 @@ Since: 2.48
 
 <property name="GDtlsConnection:peer-certificate-errors">
 <description>
-The errors noticed-and-ignored while verifying
+The errors noticed while verifying
 #GDtlsConnection:peer-certificate. Normally this should be 0, but
 it may not be if #GDtlsClientConnection:validation-flags is not
 %G_TLS_CERTIFICATE_VALIDATE_ALL, or if
@@ -2887,7 +2890,7 @@ The data types for file attributes.
 </description>
 <parameters>
 <parameter name="G_FILE_ATTRIBUTE_TYPE_INVALID">
-<parameter_description> indicates an invalid or uninitalized type.
+<parameter_description> indicates an invalid or uninitialized type.
 </parameter_description>
 </parameter>
 <parameter name="G_FILE_ATTRIBUTE_TYPE_STRING">
@@ -2989,7 +2992,9 @@ is generally useful if you're doing a &quot;copy over&quot;
 rather than a &quot;save new version of&quot; replace operation.
 You can think of it as &quot;unlink destination&quot; before
 writing to it, although the implementation may not
-be exactly like that. Since 2.20
+be exactly like that. This flag can only be used with
+g_file_replace() and its variants, including g_file_replace_contents().
+Since 2.20
 </parameter_description>
 </parameter>
 </parameters>
@@ -3863,7 +3868,7 @@ Since: 2.24
 
 <signal name="GMenuModel::items-changed">
 <description>
-Emitted when a change has occured to the menu.
+Emitted when a change has occurred to the menu.
 
 The only changes that can occur to a menu is that items are removed
 or added.  Items may not change (except by being removed and added
@@ -4133,7 +4138,7 @@ Since: 2.34
 </parameter_description>
 </parameter>
 <parameter name="message">
-<parameter_description> string containing a mesage to display to the user
+<parameter_description> string containing a message to display to the user
 </parameter_description>
 </parameter>
 <parameter name="time_left">
@@ -6020,6 +6025,75 @@ Since: 2.40
 </parameters>
 </enum>
 
+<enum name="GTlsChannelBindingError">
+<description>
+An error code used with %G_TLS_CHANNEL_BINDING_ERROR in a #GError to
+indicate a TLS channel binding retrieval error.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="G_TLS_CHANNEL_BINDING_ERROR_NOT_IMPLEMENTED">
+<parameter_description> Either entire binding
+retrieval facility or specific binding type is not implemented in the
+TLS backend.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_CHANNEL_BINDING_ERROR_INVALID_STATE">
+<parameter_description> The handshake is not yet
+complete on the connection which is a strong requirement for any existing
+binding type.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_CHANNEL_BINDING_ERROR_NOT_AVAILABLE">
+<parameter_description> Handshake is complete but
+binding data is not available. That normally indicates the TLS
+implementation failed to provide the binding data. For example, some
+implementations do not provide a peer certificate for resumed connections.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_CHANNEL_BINDING_ERROR_NOT_SUPPORTED">
+<parameter_description> Binding type is not supported
+on the current connection. This error could be triggered when requesting
+`tls-server-end-point` binding data for a certificate which has no hash
+function or uses multiple hash functions.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_CHANNEL_BINDING_ERROR_GENERAL_ERROR">
+<parameter_description> Any other backend error
+preventing binding data retrieval.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GTlsChannelBindingType">
+<description>
+The type of TLS channel binding data to retrieve from #GTlsConnection
+or #GDtlsConnection, as documented by RFC 5929. The
+[`tls-unique-for-telnet`](https://tools.ietf.org/html/rfc5929#section-5)
+binding type is not currently implemented.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="G_TLS_CHANNEL_BINDING_TLS_UNIQUE">
+<parameter_description>
+[`tls-unique`](https://tools.ietf.org/html/rfc5929#section-3) binding
+type
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_CHANNEL_BINDING_TLS_SERVER_END_POINT">
+<parameter_description>
+[`tls-server-end-point`](https://tools.ietf.org/html/rfc5929#section-4)
+binding type
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <property name="GTlsClientConnection:accepted-cas">
 <description>
 A list of the distinguished names of the Certificate Authorities
@@ -6072,7 +6146,7 @@ Deprecated: 2.56: SSL 3.0 is insecure.
 <property name="GTlsClientConnection:validation-flags">
 <description>
 What steps to perform when validating a certificate received from
-a server. Server certificates that fail to validate in all of the
+a server. Server certificates that fail to validate in any of the
 ways indicated here will be rejected unless the application
 overrides the default via #GTlsConnection::accept-certificate.
 
@@ -6211,9 +6285,8 @@ Since: 2.60
 <property name="GTlsConnection:peer-certificate">
 <description>
 The connection's peer's certificate, after the TLS handshake has
-completed and the certificate has been accepted. Note in
-particular that this is not yet set during the emission of
-#GTlsConnection::accept-certificate.
+completed or failed. Note in particular that this is not yet set
+during the emission of #GTlsConnection::accept-certificate.
 
 (You can watch for a #GObject::notify signal on this property to
 detect when a handshake has occurred.)
@@ -6225,7 +6298,7 @@ Since: 2.28
 
 <property name="GTlsConnection:peer-certificate-errors">
 <description>
-The errors noticed-and-ignored while verifying
+The errors noticed while verifying
 #GTlsConnection:peer-certificate. Normally this should be 0, but
 it may not be if #GTlsClientConnection:validation-flags is not
 %G_TLS_CERTIFICATE_VALIDATE_ALL, or if
@@ -8143,7 +8216,8 @@ of the URI, up to but not including the ':', e.g. &quot;http&quot;,
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GAppInfo for given @uri_scheme or %NULL on error.
+<return> #GAppInfo for given @uri_scheme or
+%NULL on error.
 </return>
 </function>
 
@@ -9662,7 +9736,7 @@ Since: 2.44
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @application is currenty marked as busy
+<return> %TRUE if @application is currently marked as busy
 
 </return>
 </function>
@@ -12905,7 +12979,8 @@ method is only available on UNIX platforms.
 
 This operation can fail if #GCredentials is not supported on the
 OS or if the native credentials type does not contain information
-about the UNIX process ID.
+about the UNIX process ID (for example this is the case for
+%G_CREDENTIALS_TYPE_APPLE_XUCRED).
 
 Since: 2.36
 
@@ -22231,7 +22306,8 @@ unused by GIO.
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GAppInfo for given @uri_scheme or %NULL on error.
+<return> #GAppInfo for given @uri_scheme or
+%NULL on error.
 
 </return>
 </function>
@@ -22308,6 +22384,13 @@ outer list is sorted by score so that the first strv contains the
 best-matching applications, and so on.
 The algorithm for determining matches is undefined and may change at
 any time.
+
+None of the search results are subjected to the normal validation
+checks performed by g_desktop_app_info_new() (for example, checking that
+the executable referenced by a result exists), and so it is possible for
+g_desktop_app_info_new() to return %NULL when passed an app ID returned by
+this function. It is expected that calling code will do this when
+subsequently creating a #GDesktopAppInfo for each result.
 
 
 </description>
@@ -22751,7 +22834,7 @@ Check if @drive has any mountable volumes.
 
 <function name="g_drive_is_media_check_automatic">
 <description>
-Checks if @drive is capabable of automatically detecting media changes.
+Checks if @drive is capable of automatically detecting media changes.
 
 
 </description>
@@ -22761,7 +22844,7 @@ Checks if @drive is capabable of automatically detecting media changes.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the @drive is capabable of automatically detecting 
+<return> %TRUE if the @drive is capable of automatically detecting
 media changes, %FALSE otherwise.
 </return>
 </function>
@@ -23281,6 +23364,49 @@ Since: 2.48
 </return>
 </function>
 
+<function name="g_dtls_connection_get_channel_binding_data">
+<description>
+Query the TLS backend for TLS channel binding data of @type for @conn.
+
+This call retrieves TLS channel binding data as specified in RFC
+[5056](https://tools.ietf.org/html/rfc5056), RFC
+[5929](https://tools.ietf.org/html/rfc5929), and related RFCs.  The
+binding data is returned in @data.  The @data is resized by the callee
+using #GByteArray buffer management and will be freed when the @data
+is destroyed by g_byte_array_unref(). If @data is %NULL, it will only
+check whether TLS backend is able to fetch the data (e.g. whether @type
+is supported by the TLS backend). It does not guarantee that the data
+will be available though.  That could happen if TLS connection does not
+support @type or the binding data is not available yet due to additional
+negotiation or input required.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> #GTlsChannelBindingType type of data to fetch
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> #GByteArray is
+filled with the binding data, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError pointer, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE otherwise
+
+</return>
+</function>
+
 <function name="g_dtls_connection_get_database">
 <description>
 Gets the certificate database that @conn uses to verify
@@ -23346,8 +23472,8 @@ Since: 2.60
 
 <function name="g_dtls_connection_get_peer_certificate">
 <description>
-Gets @conn's peer's certificate after the handshake has completed.
-(It is not set during the emission of
+Gets @conn's peer's certificate after the handshake has completed
+or failed. (It is not set during the emission of
 #GDtlsConnection::accept-certificate.)
 
 Since: 2.48
@@ -23367,8 +23493,8 @@ Since: 2.48
 <function name="g_dtls_connection_get_peer_certificate_errors">
 <description>
 Gets the errors associated with validating @conn's peer's
-certificate, after the handshake has completed. (It is not set
-during the emission of #GDtlsConnection::accept-certificate.)
+certificate, after the handshake has completed or failed. (It is
+not set during the emission of #GDtlsConnection::accept-certificate.)
 
 Since: 2.48
 
@@ -24307,7 +24433,7 @@ Gets the next matched attribute from a #GFileAttributeMatcher.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the next attribute or %NULL if
+<return> a string containing the next attribute or, %NULL if
 no more attribute exist.
 </return>
 </function>
@@ -24960,6 +25086,21 @@ Free the returned object with g_object_unref().
 <description>
 Deletes a file. If the @file is a directory, it will only be
 deleted if it is empty. This has the same semantics as g_unlink().
+
+If @file doesn’t exist, %G_IO_ERROR_NOT_FOUND will be returned. This allows
+for deletion to be implemented avoiding
+[time-of-check to time-of-use races](https://en.wikipedia.org/wiki/Time-of-check_to_time-of-use):
+|[
+g_autoptr(GError) local_error = NULL;
+if (!g_file_delete (my_file, my_cancellable, &amp;local_error) &amp;&amp;
+!g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+{
+// deletion failed for some reason other than the file not existing:
+// so report the error
+g_warning (&quot;Failed to delete %s: %s&quot;,
+g_file_peek_path (my_file), local_error-&gt;message);
+}
+]|
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
@@ -26305,7 +26446,7 @@ Duplicates a file info structure.
 
 <function name="g_file_info_get_attribute_as_string">
 <description>
-Gets the value of a attribute, formated as a string.
+Gets the value of a attribute, formatted as a string.
 This escapes things as needed to make the string valid
 UTF-8.
 
@@ -26465,8 +26606,8 @@ not contain a #GObject, %NULL will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GObject associated with the given @attribute, or
-%NULL otherwise.
+<return> a #GObject associated with the given @attribute,
+or %NULL otherwise.
 </return>
 </function>
 
@@ -26509,8 +26650,8 @@ not contain a string, %NULL will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the contents of the @attribute value as a UTF-8 string, or
-%NULL otherwise.
+<return> the contents of the @attribute value as a UTF-8 string,
+or %NULL otherwise.
 </return>
 </function>
 
@@ -26532,8 +26673,8 @@ Since: 2.22
 </parameter_description>
 </parameter>
 </parameters>
-<return> the contents of the @attribute value as a stringv, or
-%NULL otherwise. Do not free. These returned strings are UTF-8.
+<return> the contents of the @attribute value as a stringv,
+or %NULL otherwise. Do not free. These returned strings are UTF-8.
 
 </return>
 </function>
@@ -26615,7 +26756,8 @@ Gets the file's content type.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the file's content type.
+<return> a string containing the file's content type,
+or %NULL if unknown.
 </return>
 </function>
 
@@ -26641,7 +26783,7 @@ Since: 2.36
 
 <function name="g_file_info_get_display_name">
 <description>
-Gets a display name for a file.
+Gets a display name for a file. This is guaranteed to always be set.
 
 
 </description>
@@ -26815,7 +26957,7 @@ Deprecated: 2.62: Use g_file_info_get_modification_date_time() instead, as
 
 <function name="g_file_info_get_name">
 <description>
-Gets the name for a file.
+Gets the name for a file. This is guaranteed to always be set.
 
 
 </description>
@@ -31279,7 +31421,9 @@ Since: 2.22
 Sends @file to the &quot;Trashcan&quot;, if possible. This is similar to
 deleting it, but the user can recover it before emptying the trashcan.
 Not all file systems support trashing, so this call can return the
-%G_IO_ERROR_NOT_SUPPORTED error.
+%G_IO_ERROR_NOT_SUPPORTED error. Since GLib 2.66, the `x-gvfs-notrash` unix
+mount option can be used to disable g_file_trash() support for certain
+mounts, the %G_IO_ERROR_NOT_SUPPORTED error will be returned in that case.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
@@ -31797,7 +31941,7 @@ Since: 2.38
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GVariant, or %NULL when serialization fails.
+<return> a #GVariant, or %NULL when serialization fails. The #GVariant will not be floating.
 
 </return>
 </function>
@@ -32310,8 +32454,8 @@ Since: 2.22
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GInetAddress corresponding to @string, or %NULL if
-@string could not be parsed.
+<return> a new #GInetAddress corresponding
+to @string, or %NULL if @string could not be parsed.
 Free the returned object with g_object_unref().
 
 </return>
@@ -32493,8 +32637,8 @@ Since: 2.40
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GInetSocketAddress, or %NULL if @address cannot be
-parsed.
+<return> a new #GInetSocketAddress,
+or %NULL if @address cannot be parsed.
 
 </return>
 </function>
@@ -33912,7 +34056,7 @@ any extension point implemented by a module is registered.
 
 This may not actually load and initialize all the types in each
 module, some modules may be lazily loaded and initialized when
-an extension point it implementes is used with e.g.
+an extension point it implements is used with e.g.
 g_io_extension_point_get_extensions() or
 g_io_extension_point_get_extension_by_name().
 
@@ -33939,7 +34083,7 @@ any extension point implemented by a module is registered.
 
 This may not actually load and initialize all the types in each
 module, some modules may be lazily loaded and initialized when
-an extension point it implementes is used with e.g.
+an extension point it implements is used with e.g.
 g_io_extension_point_get_extensions() or
 g_io_extension_point_get_extension_by_name().
 
@@ -34333,7 +34477,7 @@ ignore
 
 <function name="g_io_stream_splice_async">
 <description>
-Asyncronously splice the output stream of @stream1 to the input stream of
+Asynchronously splice the output stream of @stream1 to the input stream of
 @stream2, and splice the output stream of @stream2 to the input stream of
 @stream1.
 
@@ -38429,7 +38573,7 @@ Since: 2.22
 
 <function name="g_network_service_get_scheme">
 <description>
-Get's the URI scheme used to resolve proxies. By default, the service name
+Gets the URI scheme used to resolve proxies. By default, the service name
 is used as scheme.
 
 Since: 2.26
@@ -42733,7 +42877,7 @@ Tells the current position within the stream.
 <description>
 Sets the length of the stream to @offset. If the stream was previously
 larger than @offset, the extra data is discarded. If the stream was
-previouly shorter than @offset, it is extended with NUL ('\0') bytes.
+previously shorter than @offset, it is extended with NUL ('\0') bytes.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
@@ -43925,6 +44069,12 @@ modified or freed.
 <description>
 Creates a new #GSettings object with the schema specified by
 @schema_id.
+
+It is an error for the schema to not exist: schemas are an
+essential part of a program, as they provide type information.
+If schemas need to be dynamically loaded (for example, from an
+optional runtime dependency), g_settings_schema_source_lookup()
+can be used to test for their existence before loading them.
 
 Signals on the newly created #GSettings object will be dispatched
 via the thread-default #GMainContext in effect at the time of the
@@ -48340,6 +48490,7 @@ This method can be expected to be available on the following platforms:
 - OpenBSD since GLib 2.30
 - Solaris, Illumos and OpenSolaris since GLib 2.40
 - NetBSD since GLib 2.42
+- macOS, tvOS, iOS since GLib 2.66
 
 Other ways to obtain credentials from a foreign peer includes the
 #GUnixCredentialsMessage type and
@@ -49464,8 +49615,8 @@ Since: 2.22
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description> a buffer to
-read data into (which should be at least @size bytes long).
+<parameter_description>
+a buffer to read data into (which should be at least @size bytes long).
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -49511,8 +49662,8 @@ pointer, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description> a buffer to
-read data into (which should be at least @size bytes long).
+<parameter_description>
+a buffer to read data into (which should be at least @size bytes long).
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -49754,8 +49905,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description> a buffer to
-read data into (which should be at least @size bytes long).
+<parameter_description>
+a buffer to read data into (which should be at least @size bytes long).
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -52974,7 +53125,7 @@ task's #GTaskThreadFunc had called
 g_task_return_error_if_cancelled() and then returned.
 
 This allows you to create a cancellable wrapper around an
-uninterruptable function. The #GTaskThreadFunc just needs to be
+uninterruptible function. The #GTaskThreadFunc just needs to be
 careful that it does not modify any externally-visible state after
 it has been cancelled. To do that, the thread should call
 g_task_set_return_on_cancel() again to (atomically) set
@@ -53112,7 +53263,7 @@ Since: 2.22
 
 <function name="g_tcp_wrapper_connection_get_base_io_stream">
 <description>
-Get's @conn's base #GIOStream
+Gets @conn's base #GIOStream
 
 
 </description>
@@ -53914,6 +54065,20 @@ Since: 2.28
 </return>
 </function>
 
+<function name="g_tls_channel_binding_error_quark">
+<description>
+Gets the TLS channel binding error quark.
+
+Since: 2.66
+
+</description>
+<parameters>
+</parameters>
+<return> a #GQuark.
+
+</return>
+</function>
+
 <function name="g_tls_client_connection_copy_session_state">
 <description>
 Possibly copies session state from one connection to another, for use
@@ -54202,6 +54367,49 @@ Since: 2.28
 </return>
 </function>
 
+<function name="g_tls_connection_get_channel_binding_data">
+<description>
+Query the TLS backend for TLS channel binding data of @type for @conn.
+
+This call retrieves TLS channel binding data as specified in RFC
+[5056](https://tools.ietf.org/html/rfc5056), RFC
+[5929](https://tools.ietf.org/html/rfc5929), and related RFCs.  The
+binding data is returned in @data.  The @data is resized by the callee
+using #GByteArray buffer management and will be freed when the @data
+is destroyed by g_byte_array_unref(). If @data is %NULL, it will only
+check whether TLS backend is able to fetch the data (e.g. whether @type
+is supported by the TLS backend). It does not guarantee that the data
+will be available though.  That could happen if TLS connection does not
+support @type or the binding data is not available yet due to additional
+negotiation or input required.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GTlsConnection
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> #GTlsChannelBindingType type of data to fetch
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> #GByteArray is
+filled with the binding data, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError pointer, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE otherwise
+
+</return>
+</function>
+
 <function name="g_tls_connection_get_database">
 <description>
 Gets the certificate database that @conn uses to verify
@@ -54267,8 +54475,8 @@ Since: 2.60
 
 <function name="g_tls_connection_get_peer_certificate">
 <description>
-Gets @conn's peer's certificate after the handshake has completed.
-(It is not set during the emission of
+Gets @conn's peer's certificate after the handshake has completed
+or failed. (It is not set during the emission of
 #GTlsConnection::accept-certificate.)
 
 Since: 2.28
@@ -54288,8 +54496,8 @@ Since: 2.28
 <function name="g_tls_connection_get_peer_certificate_errors">
 <description>
 Gets the errors associated with validating @conn's peer's
-certificate, after the handshake has completed. (It is not set
-during the emission of #GTlsConnection::accept-certificate.)
+certificate, after the handshake has completed or failed. (It is
+not set during the emission of #GTlsConnection::accept-certificate.)
 
 Since: 2.28
 
@@ -55102,9 +55310,13 @@ is being used. Typically @purpose will be set to #G_TLS_DATABASE_PURPOSE_AUTHENT
 which means that the certificate is being used to authenticate a server
 (and we are acting as the client).
 
-The @identity is used to check for pinned certificates (trust exceptions)
-in the database. These will override the normal verification process on a
-host by host basis.
+The @identity is used to ensure the server certificate is valid for
+the expected peer identity. If the identity does not match the
+certificate, %G_TLS_CERTIFICATE_BAD_IDENTITY will be set in the
+return value. If @identity is %NULL, that bit will never be set in
+the return value. The peer identity may also be used to check for
+pinned certificates (trust exceptions) in the database. These may
+override the normal verification process on a host-by-host basis.
 
 Currently there are no @flags, and %G_TLS_DATABASE_VERIFY_NONE should be
 used.
@@ -57140,6 +57352,34 @@ poll for changes.
 <return></return>
 </function>
 
+<function name="g_unix_mount_point_at">
+<description>
+Gets a #GUnixMountPoint for a given mount path. If @time_read is set, it
+will be filled with a unix timestamp for checking if the mount points have
+changed since with g_unix_mount_points_changed_since().
+
+If more mount points have the same mount path, the last matching mount point
+is returned.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="mount_path">
+<parameter_description> path for a possible unix mount point.
+</parameter_description>
+</parameter>
+<parameter name="time_read">
+<parameter_description> guint64 to contain a timestamp.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GUnixMountPoint, or %NULL if no match
+is found.
+
+</return>
+</function>
+
 <function name="g_unix_mount_point_compare">
 <description>
 Compares two unix mount points.
@@ -58753,6 +58993,36 @@ Since: 2.26
 <return></return>
 </function>
 
+<function name="g_win32_registry_get_os_dirs">
+<description>
+Returns a list of directories for DLL lookups.
+Can be used with g_win32_registry_key_get_value().
+
+Since: 2.66
+
+</description>
+<parameters>
+</parameters>
+<return> a %NULL-terminated array of UTF-8 strings.
+
+</return>
+</function>
+
+<function name="g_win32_registry_get_os_dirs_w">
+<description>
+Returns a list of directories for DLL lookups.
+Can be used with g_win32_registry_key_get_value_w().
+
+Since: 2.66
+
+</description>
+<parameters>
+</parameters>
+<return> a %NULL-terminated array of UTF-16 strings.
+
+</return>
+</function>
+
 <function name="g_win32_registry_key_erase_change_indicator">
 <description>
 Erases change indicator of the @key.
@@ -58865,12 +59135,38 @@ Since: 2.46
 Get data from a value of a key. String data is guaranteed to be
 appropriately terminated and will be in UTF-8.
 
-Since: 2.46
+When not %NULL, @mui_dll_dirs indicates that `RegLoadMUIStringW()` API
+should be used instead of the usual `RegQueryValueExW()`. This implies
+that the value being queried is of type `REG_SZ` or `REG_EXPAND_SZ` (if it is not, the function
+falls back to `RegQueryValueExW()`), and that this string must undergo special processing
+(see [`SHLoadIndirectString()` documentation](https://docs.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shloadindirectstring) for an explanation on what
+kinds of strings are processed) to get the result.
+
+If no specific MUI DLL directories need to be used, pass
+the return value of g_win32_registry_get_os_dirs() as @mui_dll_dirs
+(as an bonus, the value from g_win32_registry_get_os_dirs()
+does not add any extra UTF8-&gt;UTF16 conversion overhead).
+
+@auto_expand works with @mui_dll_dirs, but only affects the processed
+string, making it somewhat useless. The unprocessed string is always expanded
+internally, if its type is `REG_EXPAND_SZ` - there is no need to enable
+@auto_expand for this to work.
+
+The API for this function changed in GLib 2.66 to add the @mui_dll_dirs argument.
+
+Since: 2.66
 
 </description>
 <parameters>
 <parameter name="key">
 <parameter_description> a #GWin32RegistryKey
+</parameter_description>
+</parameter>
+<parameter name="mui_dll_dirs">
+<parameter_description> a %NULL-terminated
+array of directory names where the OS
+should look for a DLL indicated in a MUI string, if the
+DLL path in the string is not absolute
 </parameter_description>
 </parameter>
 <parameter name="auto_expand">
@@ -58908,23 +59204,45 @@ by @value_data.
 
 <function name="g_win32_registry_key_get_value_w">
 <description>
-Get data from a value of a key.
-
 Get data from a value of a key. String data is guaranteed to be
 appropriately terminated and will be in UTF-16.
 
 When calling with value_data == NULL (to get data size without getting
 the data itself) remember that returned size corresponds to possibly
 unterminated string data (if value is some kind of string), because
-termination cannot be checked and fixed unless the data is retreived
+termination cannot be checked and fixed unless the data is retrieved
 too.
 
-Since: 2.46
+When not %NULL, @mui_dll_dirs indicates that `RegLoadMUIStringW()` API
+should be used instead of the usual `RegQueryValueExW()`. This implies
+that the value being queried is of type `REG_SZ` or `REG_EXPAND_SZ` (if it is not, the function
+falls back to `RegQueryValueExW()`), and that this string must undergo special processing
+(see [`SHLoadIndirectString()` documentation](https://docs.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shloadindirectstring) for an explanation on what
+kinds of strings are processed) to get the result.
+
+If no specific MUI DLL directories need to be used, pass
+the return value of g_win32_registry_get_os_dirs_w() as @mui_dll_dirs.
+
+@auto_expand works with @mui_dll_dirs, but only affects the processed
+string, making it somewhat useless. The unprocessed string is always expanded
+internally, if its type is `REG_EXPAND_SZ` - there is no need to enable
+@auto_expand for this to work.
+
+The API for this function changed in GLib 2.66 to add the @mui_dll_dirs argument.
+
+Since: 2.66
 
 </description>
 <parameters>
 <parameter name="key">
 <parameter_description> a #GWin32RegistryKey
+</parameter_description>
+</parameter>
+<parameter name="mui_dll_dirs">
+<parameter_description> a %NULL-terminated
+array of directory names where the OS
+should look for a DLL indicated in a MUI string, if the
+DLL path in the string is not absolute
 </parameter_description>
 </parameter>
 <parameter name="auto_expand">

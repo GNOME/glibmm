@@ -151,6 +151,18 @@
   )
 )
 
+(define-flags SetContentsFlags
+  (in-module "GFile")
+  (c-name "GFileSetContentsFlags")
+  (gtype-id "G_TYPE_FILE_SET_CONTENTS_FLAGS")
+  (values
+    '("none" "G_FILE_SET_CONTENTS_NONE")
+    '("consistent" "G_FILE_SET_CONTENTS_CONSISTENT")
+    '("durable" "G_FILE_SET_CONTENTS_DURABLE")
+    '("only-existing" "G_FILE_SET_CONTENTS_ONLY_EXISTING")
+  )
+)
+
 (define-flags FlagMask
   (in-module "GHook")
   (c-name "GHookFlagMask")
@@ -982,6 +994,10 @@
     '("nandinagari" "G_UNICODE_SCRIPT_NANDINAGARI")
     '("nyiakeng-puachue-hmong" "G_UNICODE_SCRIPT_NYIAKENG_PUACHUE_HMONG")
     '("wancho" "G_UNICODE_SCRIPT_WANCHO")
+    '("chorasmian" "G_UNICODE_SCRIPT_CHORASMIAN")
+    '("dives-akuru" "G_UNICODE_SCRIPT_DIVES_AKURU")
+    '("khitan-small-script" "G_UNICODE_SCRIPT_KHITAN_SMALL_SCRIPT")
+    '("yezidi" "G_UNICODE_SCRIPT_YEZIDI")
   )
 )
 
@@ -998,6 +1014,67 @@
     '("nfkd" "G_NORMALIZE_NFKD")
     '("all-compose" "G_NORMALIZE_ALL_COMPOSE")
     '("nfkc" "G_NORMALIZE_NFKC")
+  )
+)
+
+(define-flags Flags
+  (in-module "GUri")
+  (c-name "GUriFlags")
+  (gtype-id "G_TYPE_URI_FLAGS")
+  (values
+    '("none" "G_URI_FLAGS_NONE")
+    '("parse-relaxed" "G_URI_FLAGS_PARSE_RELAXED")
+    '("has-password" "G_URI_FLAGS_HAS_PASSWORD")
+    '("has-auth-params" "G_URI_FLAGS_HAS_AUTH_PARAMS")
+    '("encoded" "G_URI_FLAGS_ENCODED")
+    '("non-dns" "G_URI_FLAGS_NON_DNS")
+    '("encoded-query" "G_URI_FLAGS_ENCODED_QUERY")
+    '("encoded-path" "G_URI_FLAGS_ENCODED_PATH")
+    '("encoded-fragment" "G_URI_FLAGS_ENCODED_FRAGMENT")
+  )
+)
+
+(define-flags HideFlags
+  (in-module "GUri")
+  (c-name "GUriHideFlags")
+  (gtype-id "G_TYPE_URI_HIDE_FLAGS")
+  (values
+    '("none" "G_URI_HIDE_NONE")
+    '("userinfo" "G_URI_HIDE_USERINFO")
+    '("password" "G_URI_HIDE_PASSWORD")
+    '("auth-params" "G_URI_HIDE_AUTH_PARAMS")
+    '("query" "G_URI_HIDE_QUERY")
+    '("fragment" "G_URI_HIDE_FRAGMENT")
+  )
+)
+
+(define-flags ParamsFlags
+  (in-module "GUri")
+  (c-name "GUriParamsFlags")
+  (gtype-id "G_TYPE_URI_PARAMS_FLAGS")
+  (values
+    '("none" "G_URI_PARAMS_NONE")
+    '("case-insensitive" "G_URI_PARAMS_CASE_INSENSITIVE")
+    '("www-form" "G_URI_PARAMS_WWW_FORM")
+    '("parse-relaxed" "G_URI_PARAMS_PARSE_RELAXED")
+  )
+)
+
+(define-enum Error
+  (in-module "GUri")
+  (c-name "GUriError")
+  (gtype-id "G_TYPE_URI_ERROR")
+  (values
+    '("failed" "G_URI_ERROR_FAILED")
+    '("bad-scheme" "G_URI_ERROR_BAD_SCHEME")
+    '("bad-user" "G_URI_ERROR_BAD_USER")
+    '("bad-password" "G_URI_ERROR_BAD_PASSWORD")
+    '("bad-auth-params" "G_URI_ERROR_BAD_AUTH_PARAMS")
+    '("bad-host" "G_URI_ERROR_BAD_HOST")
+    '("bad-port" "G_URI_ERROR_BAD_PORT")
+    '("bad-path" "G_URI_ERROR_BAD_PATH")
+    '("bad-query" "G_URI_ERROR_BAD_QUERY")
+    '("bad-fragment" "G_URI_ERROR_BAD_FRAGMENT")
   )
 )
 
@@ -2405,6 +2482,20 @@
   )
 )
 
+(define-method set_application_info
+  (of-object "GBookmarkFile")
+  (c-name "g_bookmark_file_set_application_info")
+  (return-type "gboolean")
+  (parameters
+    '("const-char*" "uri")
+    '("const-char*" "name")
+    '("const-char*" "exec")
+    '("int" "count")
+    '("GDateTime*" "stamp")
+    '("GError**" "error")
+  )
+)
+
 (define-method get_app_info
   (of-object "GBookmarkFile")
   (c-name "g_bookmark_file_get_app_info")
@@ -2415,6 +2506,20 @@
     '("gchar**" "exec")
     '("guint*" "count")
     '("time_t*" "stamp")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_application_info
+  (of-object "GBookmarkFile")
+  (c-name "g_bookmark_file_get_application_info")
+  (return-type "gboolean")
+  (parameters
+    '("const-char*" "uri")
+    '("const-char*" "name")
+    '("char**" "exec")
+    '("unsigned-int*" "count")
+    '("GDateTime**" "stamp")
     '("GError**" "error")
   )
 )
@@ -2472,12 +2577,32 @@
   )
 )
 
+(define-method set_added_date_time
+  (of-object "GBookmarkFile")
+  (c-name "g_bookmark_file_set_added_date_time")
+  (return-type "none")
+  (parameters
+    '("const-char*" "uri")
+    '("GDateTime*" "added")
+  )
+)
+
 (define-method get_added
   (of-object "GBookmarkFile")
   (c-name "g_bookmark_file_get_added")
   (return-type "time_t")
   (parameters
     '("const-gchar*" "uri")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_added_date_time
+  (of-object "GBookmarkFile")
+  (c-name "g_bookmark_file_get_added_date_time")
+  (return-type "GDateTime*")
+  (parameters
+    '("const-char*" "uri")
     '("GError**" "error")
   )
 )
@@ -2492,12 +2617,32 @@
   )
 )
 
+(define-method set_modified_date_time
+  (of-object "GBookmarkFile")
+  (c-name "g_bookmark_file_set_modified_date_time")
+  (return-type "none")
+  (parameters
+    '("const-char*" "uri")
+    '("GDateTime*" "modified")
+  )
+)
+
 (define-method get_modified
   (of-object "GBookmarkFile")
   (c-name "g_bookmark_file_get_modified")
   (return-type "time_t")
   (parameters
     '("const-gchar*" "uri")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_modified_date_time
+  (of-object "GBookmarkFile")
+  (c-name "g_bookmark_file_get_modified_date_time")
+  (return-type "GDateTime*")
+  (parameters
+    '("const-char*" "uri")
     '("GError**" "error")
   )
 )
@@ -2512,12 +2657,32 @@
   )
 )
 
+(define-method set_visited_date_time
+  (of-object "GBookmarkFile")
+  (c-name "g_bookmark_file_set_visited_date_time")
+  (return-type "none")
+  (parameters
+    '("const-char*" "uri")
+    '("GDateTime*" "visited")
+  )
+)
+
 (define-method get_visited
   (of-object "GBookmarkFile")
   (c-name "g_bookmark_file_get_visited")
   (return-type "time_t")
   (parameters
     '("const-gchar*" "uri")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_visited_date_time
+  (of-object "GBookmarkFile")
+  (c-name "g_bookmark_file_get_visited_date_time")
+  (return-type "GDateTime*")
+  (parameters
+    '("const-char*" "uri")
     '("GError**" "error")
   )
 )
@@ -4345,6 +4510,19 @@
     '("const-gchar*" "filename")
     '("const-gchar*" "contents")
     '("gssize" "length")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_file_set_contents_full
+  (c-name "g_file_set_contents_full")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "filename")
+    '("const-gchar*" "contents")
+    '("gssize" "length")
+    '("GFileSetContentsFlags" "flags")
+    '("int" "mode")
     '("GError**" "error")
   )
 )
@@ -6923,18 +7101,6 @@
   (return-type "GMainContext*")
 )
 
-(define-method pusher_new
-  (of-object "GMainContext")
-  (c-name "g_main_context_pusher_new")
-  (return-type "GMainContextPusher*")
-)
-
-(define-method free
-  (of-object "GMainContextPusher")
-  (c-name "g_main_context_pusher_free")
-  (return-type "none")
-)
-
 (define-function g_main_loop_new
   (c-name "g_main_loop_new")
   (is-constructor-of "GMainLoop")
@@ -7766,14 +7932,6 @@
     '("gpointer" "mem")
     '("gsize" "n_blocks")
     '("gsize" "n_block_bytes")
-  )
-)
-
-(define-function g_steal_pointer
-  (c-name "g_steal_pointer")
-  (return-type "gpointer")
-  (parameters
-    '("gpointer" "pp")
   )
 )
 
@@ -12737,54 +12895,6 @@
   (return-type "guint")
 )
 
-(define-method locker_new
-  (of-object "GMutex")
-  (c-name "g_mutex_locker_new")
-  (return-type "GMutexLocker*")
-)
-
-(define-method free
-  (of-object "GMutexLocker")
-  (c-name "g_mutex_locker_free")
-  (return-type "none")
-)
-
-(define-method locker_new
-  (of-object "GRecMutex")
-  (c-name "g_rec_mutex_locker_new")
-  (return-type "GRecMutexLocker*")
-)
-
-(define-method free
-  (of-object "GRecMutexLocker")
-  (c-name "g_rec_mutex_locker_free")
-  (return-type "none")
-)
-
-(define-method writer_locker_new
-  (of-object "GRWLock")
-  (c-name "g_rw_lock_writer_locker_new")
-  (return-type "GRWLockWriterLocker*")
-)
-
-(define-method free
-  (of-object "GRWLockWriterLocker")
-  (c-name "g_rw_lock_writer_locker_free")
-  (return-type "none")
-)
-
-(define-method reader_locker_new
-  (of-object "GRWLock")
-  (c-name "g_rw_lock_reader_locker_new")
-  (return-type "GRWLockReaderLocker*")
-)
-
-(define-method free
-  (of-object "GRWLockReaderLocker")
-  (c-name "g_rw_lock_reader_locker_free")
-  (return-type "none")
-)
-
 
 
 ;; From gthreadpool.h
@@ -13844,7 +13954,260 @@
 
 
 
-;; From gurifuncs.h
+;; From guri.h
+
+(define-method ref
+  (of-object "GUri")
+  (c-name "g_uri_ref")
+  (return-type "GUri*")
+)
+
+(define-method unref
+  (of-object "GUri")
+  (c-name "g_uri_unref")
+  (return-type "none")
+)
+
+(define-function g_uri_split_with_user
+  (c-name "g_uri_split_with_user")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "uri_ref")
+    '("GUriFlags" "flags")
+    '("gchar**" "scheme")
+    '("gchar**" "user")
+    '("gchar**" "password")
+    '("gchar**" "auth_params")
+    '("gchar**" "host")
+    '("gint*" "port")
+    '("gchar**" "path")
+    '("gchar**" "query")
+    '("gchar**" "fragment")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_uri_split_network
+  (c-name "g_uri_split_network")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "uri_string")
+    '("GUriFlags" "flags")
+    '("gchar**" "scheme")
+    '("gchar**" "host")
+    '("gint*" "port")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_uri_is_valid
+  (c-name "g_uri_is_valid")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "uri_string")
+    '("GUriFlags" "flags")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_uri_join
+  (c-name "g_uri_join")
+  (return-type "gchar*")
+  (parameters
+    '("GUriFlags" "flags")
+    '("const-gchar*" "scheme")
+    '("const-gchar*" "userinfo")
+    '("const-gchar*" "host")
+    '("gint" "port")
+    '("const-gchar*" "path")
+    '("const-gchar*" "query")
+    '("const-gchar*" "fragment")
+  )
+)
+
+(define-function g_uri_join_with_user
+  (c-name "g_uri_join_with_user")
+  (return-type "gchar*")
+  (parameters
+    '("GUriFlags" "flags")
+    '("const-gchar*" "scheme")
+    '("const-gchar*" "user")
+    '("const-gchar*" "password")
+    '("const-gchar*" "auth_params")
+    '("const-gchar*" "host")
+    '("gint" "port")
+    '("const-gchar*" "path")
+    '("const-gchar*" "query")
+    '("const-gchar*" "fragment")
+  )
+)
+
+(define-function g_uri_parse
+  (c-name "g_uri_parse")
+  (return-type "GUri*")
+  (parameters
+    '("const-gchar*" "uri_string")
+    '("GUriFlags" "flags")
+    '("GError**" "error")
+  )
+)
+
+(define-method parse_relative
+  (of-object "GUri")
+  (c-name "g_uri_parse_relative")
+  (return-type "GUri*")
+  (parameters
+    '("const-gchar*" "uri_ref")
+    '("GUriFlags" "flags")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_uri_resolve_relative
+  (c-name "g_uri_resolve_relative")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "base_uri_string")
+    '("const-gchar*" "uri_ref")
+    '("GUriFlags" "flags")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_uri_build
+  (c-name "g_uri_build")
+  (return-type "GUri*")
+  (parameters
+    '("GUriFlags" "flags")
+    '("const-gchar*" "scheme")
+    '("const-gchar*" "userinfo")
+    '("const-gchar*" "host")
+    '("gint" "port")
+    '("const-gchar*" "path")
+    '("const-gchar*" "query")
+    '("const-gchar*" "fragment")
+  )
+)
+
+(define-function g_uri_build_with_user
+  (c-name "g_uri_build_with_user")
+  (return-type "GUri*")
+  (parameters
+    '("GUriFlags" "flags")
+    '("const-gchar*" "scheme")
+    '("const-gchar*" "user")
+    '("const-gchar*" "password")
+    '("const-gchar*" "auth_params")
+    '("const-gchar*" "host")
+    '("gint" "port")
+    '("const-gchar*" "path")
+    '("const-gchar*" "query")
+    '("const-gchar*" "fragment")
+  )
+)
+
+(define-method to_string_partial
+  (of-object "GUri")
+  (c-name "g_uri_to_string_partial")
+  (return-type "char*")
+  (parameters
+    '("GUriHideFlags" "flags")
+  )
+)
+
+(define-method get_scheme
+  (of-object "GUri")
+  (c-name "g_uri_get_scheme")
+  (return-type "const-gchar*")
+)
+
+(define-method get_userinfo
+  (of-object "GUri")
+  (c-name "g_uri_get_userinfo")
+  (return-type "const-gchar*")
+)
+
+(define-method get_user
+  (of-object "GUri")
+  (c-name "g_uri_get_user")
+  (return-type "const-gchar*")
+)
+
+(define-method get_password
+  (of-object "GUri")
+  (c-name "g_uri_get_password")
+  (return-type "const-gchar*")
+)
+
+(define-method get_auth_params
+  (of-object "GUri")
+  (c-name "g_uri_get_auth_params")
+  (return-type "const-gchar*")
+)
+
+(define-method get_host
+  (of-object "GUri")
+  (c-name "g_uri_get_host")
+  (return-type "const-gchar*")
+)
+
+(define-method get_port
+  (of-object "GUri")
+  (c-name "g_uri_get_port")
+  (return-type "gint")
+)
+
+(define-method get_path
+  (of-object "GUri")
+  (c-name "g_uri_get_path")
+  (return-type "const-gchar*")
+)
+
+(define-method get_query
+  (of-object "GUri")
+  (c-name "g_uri_get_query")
+  (return-type "const-gchar*")
+)
+
+(define-method get_fragment
+  (of-object "GUri")
+  (c-name "g_uri_get_fragment")
+  (return-type "const-gchar*")
+)
+
+(define-method get_flags
+  (of-object "GUri")
+  (c-name "g_uri_get_flags")
+  (return-type "GUriFlags")
+)
+
+(define-method init
+  (of-object "GUriParamsIter")
+  (c-name "g_uri_params_iter_init")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "params")
+    '("gssize" "length")
+    '("const-gchar*" "separators")
+    '("GUriParamsFlags" "flags")
+  )
+)
+
+(define-method next
+  (of-object "GUriParamsIter")
+  (c-name "g_uri_params_iter_next")
+  (return-type "gboolean")
+  (parameters
+    '("gchar**" "attribute")
+    '("gchar**" "value")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_uri_error_quark
+  (c-name "g_uri_error_quark")
+  (return-type "GQuark")
+)
 
 (define-function g_uri_unescape_string
   (c-name "g_uri_unescape_string")
@@ -13873,6 +14236,14 @@
   )
 )
 
+(define-function g_uri_peek_scheme
+  (c-name "g_uri_peek_scheme")
+  (return-type "const-char*")
+  (parameters
+    '("const-char*" "uri")
+  )
+)
+
 (define-function g_uri_escape_string
   (c-name "g_uri_escape_string")
   (return-type "char*")
@@ -13880,6 +14251,27 @@
     '("const-char*" "unescaped")
     '("const-char*" "reserved_chars_allowed")
     '("gboolean" "allow_utf8")
+  )
+)
+
+(define-function g_uri_unescape_bytes
+  (c-name "g_uri_unescape_bytes")
+  (return-type "GBytes*")
+  (parameters
+    '("const-char*" "escaped_string")
+    '("gssize" "length")
+    '("const-char*" "illegal_characters")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_uri_escape_bytes
+  (c-name "g_uri_escape_bytes")
+  (return-type "char*")
+  (parameters
+    '("const-guint8*" "unescaped")
+    '("gsize" "length")
+    '("const-char*" "reserved_chars_allowed")
   )
 )
 
@@ -14154,6 +14546,12 @@
   (of-object "GVariant")
   (c-name "g_variant_get_type_info")
   (return-type "GVariantTypeInfo*")
+)
+
+(define-method get_depth
+  (of-object "GVariant")
+  (c-name "g_variant_get_depth")
+  (return-type "gsize")
 )
 
 

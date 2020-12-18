@@ -1537,6 +1537,7 @@
     '("openbsd-sockpeercred" "G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED")
     '("solaris-ucred" "G_CREDENTIALS_TYPE_SOLARIS_UCRED")
     '("netbsd-unpcbid" "G_CREDENTIALS_TYPE_NETBSD_UNPCBID")
+    '("apple-xucred" "G_CREDENTIALS_TYPE_APPLE_XUCRED")
   )
 )
 
@@ -1608,6 +1609,29 @@
     '("none" "G_TLS_AUTHENTICATION_NONE")
     '("requested" "G_TLS_AUTHENTICATION_REQUESTED")
     '("required" "G_TLS_AUTHENTICATION_REQUIRED")
+  )
+)
+
+(define-enum ChannelBindingType
+  (in-module "GTls")
+  (c-name "GTlsChannelBindingType")
+  (gtype-id "G_TYPE_TLS_CHANNEL_BINDING_TYPE")
+  (values
+    '("unique" "G_TLS_CHANNEL_BINDING_TLS_UNIQUE")
+    '("server-end-point" "G_TLS_CHANNEL_BINDING_TLS_SERVER_END_POINT")
+  )
+)
+
+(define-enum ChannelBindingError
+  (in-module "GTls")
+  (c-name "GTlsChannelBindingError")
+  (gtype-id "G_TYPE_TLS_CHANNEL_BINDING_ERROR")
+  (values
+    '("not-implemented" "G_TLS_CHANNEL_BINDING_ERROR_NOT_IMPLEMENTED")
+    '("invalid-state" "G_TLS_CHANNEL_BINDING_ERROR_INVALID_STATE")
+    '("not-available" "G_TLS_CHANNEL_BINDING_ERROR_NOT_AVAILABLE")
+    '("not-supported" "G_TLS_CHANNEL_BINDING_ERROR_NOT_SUPPORTED")
+    '("general-error" "G_TLS_CHANNEL_BINDING_ERROR_GENERAL_ERROR")
   )
 )
 
@@ -1789,6 +1813,46 @@
     '("low" "G_MEMORY_MONITOR_WARNING_LEVEL_LOW")
     '("medium" "G_MEMORY_MONITOR_WARNING_LEVEL_MEDIUM")
     '("critical" "G_MEMORY_MONITOR_WARNING_LEVEL_CRITICAL")
+  )
+)
+
+(define-enum FileStatField
+  (in-module "GLocal")
+  (c-name "GLocalFileStatField")
+  (gtype-id "G_TYPE_LOCAL_FILE_STAT_FIELD")
+  (values
+    '("type" "G_LOCAL_FILE_STAT_FIELD_TYPE")
+    '("mode" "G_LOCAL_FILE_STAT_FIELD_MODE")
+    '("nlink" "G_LOCAL_FILE_STAT_FIELD_NLINK")
+    '("uid" "G_LOCAL_FILE_STAT_FIELD_UID")
+    '("gid" "G_LOCAL_FILE_STAT_FIELD_GID")
+    '("atime" "G_LOCAL_FILE_STAT_FIELD_ATIME")
+    '("mtime" "G_LOCAL_FILE_STAT_FIELD_MTIME")
+    '("ctime" "G_LOCAL_FILE_STAT_FIELD_CTIME")
+    '("ino" "G_LOCAL_FILE_STAT_FIELD_INO")
+    '("size" "G_LOCAL_FILE_STAT_FIELD_SIZE")
+    '("blocks" "G_LOCAL_FILE_STAT_FIELD_BLOCKS")
+    '("btime" "G_LOCAL_FILE_STAT_FIELD_BTIME")
+  )
+)
+
+(define-flags FileStatField
+  (in-module "GLocal")
+  (c-name "GLocalFileStatField")
+  (gtype-id "G_TYPE_LOCAL_FILE_STAT_FIELD")
+  (values
+    '("type" "G_LOCAL_FILE_STAT_FIELD_TYPE")
+    '("mode" "G_LOCAL_FILE_STAT_FIELD_MODE")
+    '("nlink" "G_LOCAL_FILE_STAT_FIELD_NLINK")
+    '("uid" "G_LOCAL_FILE_STAT_FIELD_UID")
+    '("gid" "G_LOCAL_FILE_STAT_FIELD_GID")
+    '("atime" "G_LOCAL_FILE_STAT_FIELD_ATIME")
+    '("mtime" "G_LOCAL_FILE_STAT_FIELD_MTIME")
+    '("ctime" "G_LOCAL_FILE_STAT_FIELD_CTIME")
+    '("ino" "G_LOCAL_FILE_STAT_FIELD_INO")
+    '("size" "G_LOCAL_FILE_STAT_FIELD_SIZE")
+    '("blocks" "G_LOCAL_FILE_STAT_FIELD_BLOCKS")
+    '("btime" "G_LOCAL_FILE_STAT_FIELD_BTIME")
   )
 )
 
@@ -7536,6 +7600,17 @@
   (return-type "const-gchar*")
 )
 
+(define-method get_channel_binding_data
+  (of-object "GDtlsConnection")
+  (c-name "g_dtls_connection_get_channel_binding_data")
+  (return-type "gboolean")
+  (parameters
+    '("GTlsChannelBindingType" "type")
+    '("GByteArray*" "data")
+    '("GError**" "error")
+  )
+)
+
 
 
 ;; From gdtlsserverconnection.h
@@ -11611,8 +11686,8 @@
 
 ;; From glocalfile.h
 
-(define-function g_local_file_is_remote
-  (c-name "g_local_file_is_remote")
+(define-function g_local_file_is_nfs_home
+  (c-name "g_local_file_is_nfs_home")
   (return-type "gboolean")
   (parameters
     '("const-gchar*" "filename")
@@ -11631,6 +11706,65 @@
 
 
 ;; From glocalfileinfo.h
+
+(define-function g_local_file_statx
+  (c-name "g_local_file_statx")
+  (return-type "int")
+  (parameters
+    '("int" "dirfd")
+    '("const-char*" "pathname")
+    '("int" "flags")
+    '("GLocalFileStatField" "mask")
+    '("GLocalFileStatField" "mask_required")
+    '("GLocalFileStat*" "stat_buf")
+  )
+)
+
+(define-function g_local_file_fstat
+  (c-name "g_local_file_fstat")
+  (return-type "int")
+  (parameters
+    '("int" "fd")
+    '("GLocalFileStatField" "mask")
+    '("GLocalFileStatField" "mask_required")
+    '("GLocalFileStat*" "stat_buf")
+  )
+)
+
+(define-function g_local_file_fstatat
+  (c-name "g_local_file_fstatat")
+  (return-type "int")
+  (parameters
+    '("int" "fd")
+    '("const-char*" "path")
+    '("int" "flags")
+    '("GLocalFileStatField" "mask")
+    '("GLocalFileStatField" "mask_required")
+    '("GLocalFileStat*" "stat_buf")
+  )
+)
+
+(define-function g_local_file_lstat
+  (c-name "g_local_file_lstat")
+  (return-type "int")
+  (parameters
+    '("const-char*" "path")
+    '("GLocalFileStatField" "mask")
+    '("GLocalFileStatField" "mask_required")
+    '("GLocalFileStat*" "stat_buf")
+  )
+)
+
+(define-function g_local_file_stat
+  (c-name "g_local_file_stat")
+  (return-type "int")
+  (parameters
+    '("const-char*" "path")
+    '("GLocalFileStatField" "mask")
+    '("GLocalFileStatField" "mask_required")
+    '("GLocalFileStat*" "stat_buf")
+  )
+)
 
 
 
@@ -18661,6 +18795,17 @@
   (return-type "const-gchar*")
 )
 
+(define-method get_channel_binding_data
+  (of-object "GTlsConnection")
+  (c-name "g_tls_connection_get_channel_binding_data")
+  (return-type "gboolean")
+  (parameters
+    '("GTlsChannelBindingType" "type")
+    '("GByteArray*" "data")
+    '("GError**" "error")
+  )
+)
+
 (define-method handshake
   (of-object "GTlsConnection")
   (c-name "g_tls_connection_handshake")
@@ -18695,6 +18840,11 @@
 
 (define-function g_tls_error_quark
   (c-name "g_tls_error_quark")
+  (return-type "GQuark")
+)
+
+(define-function g_tls_channel_binding_error_quark
+  (c-name "g_tls_channel_binding_error_quark")
   (return-type "GQuark")
 )
 
@@ -19627,6 +19777,15 @@
   )
 )
 
+(define-function g_unix_mount_point_at
+  (c-name "g_unix_mount_point_at")
+  (return-type "GUnixMountPoint*")
+  (parameters
+    '("const-char*" "mount_path")
+    '("guint64*" "time_read")
+  )
+)
+
 (define-function g_unix_mounts_get
   (c-name "g_unix_mounts_get")
   (return-type "GList*")
@@ -20185,10 +20344,6 @@
 
 
 
-;; From gwin32networking.h
-
-
-
 ;; From gwin32networkmonitor.h
 
 
@@ -20478,6 +20633,7 @@
   (c-name "g_win32_registry_key_get_value")
   (return-type "gboolean")
   (parameters
+    '("const-gchar*-const*" "mui_dll_dirs")
     '("gboolean" "auto_expand")
     '("const-gchar*" "value_name")
     '("GWin32RegistryValueType*" "value_type")
@@ -20492,6 +20648,7 @@
   (c-name "g_win32_registry_key_get_value_w")
   (return-type "gboolean")
   (parameters
+    '("const-gunichar2*-const*" "mui_dll_dirs")
     '("gboolean" "auto_expand")
     '("const-gunichar2*" "value_name")
     '("GWin32RegistryValueType*" "value_type")
@@ -20536,6 +20693,16 @@
   (of-object "GWin32RegistryKey")
   (c-name "g_win32_registry_key_erase_change_indicator")
   (return-type "none")
+)
+
+(define-function g_win32_registry_get_os_dirs_w
+  (c-name "g_win32_registry_get_os_dirs_w")
+  (return-type "const-gunichar2*-const*")
+)
+
+(define-function g_win32_registry_get_os_dirs
+  (c-name "g_win32_registry_get_os_dirs")
+  (return-type "const-gchar*-const*")
 )
 
 
@@ -20923,6 +21090,16 @@
 
 (define-function g_tls_authentication_mode_get_type
   (c-name "g_tls_authentication_mode_get_type")
+  (return-type "GType")
+)
+
+(define-function g_tls_channel_binding_type_get_type
+  (c-name "g_tls_channel_binding_type_get_type")
+  (return-type "GType")
+)
+
+(define-function g_tls_channel_binding_error_get_type
+  (c-name "g_tls_channel_binding_error_get_type")
   (return-type "GType")
 )
 

@@ -1237,7 +1237,8 @@
 ;;   G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED,
 ;;   G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED,
 ;;   G_CREDENTIALS_TYPE_SOLARIS_UCRED,
-;;   G_CREDENTIALS_TYPE_NETBSD_UNPCBID
+;;   G_CREDENTIALS_TYPE_NETBSD_UNPCBID,
+;;   G_CREDENTIALS_TYPE_APPLE_XUCRED,
 ;; } GCredentialsType;
 
 (define-enum-extended CredentialsType
@@ -1250,6 +1251,7 @@
     '("openbsd-sockpeercred" "G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED" "3")
     '("solaris-ucred" "G_CREDENTIALS_TYPE_SOLARIS_UCRED" "4")
     '("netbsd-unpcbid" "G_CREDENTIALS_TYPE_NETBSD_UNPCBID" "5")
+    '("apple-xucred" "G_CREDENTIALS_TYPE_APPLE_XUCRED" "6")
   )
 )
 
@@ -1373,6 +1375,42 @@
     '("none" "G_TLS_AUTHENTICATION_NONE" "0")
     '("requested" "G_TLS_AUTHENTICATION_REQUESTED" "1")
     '("required" "G_TLS_AUTHENTICATION_REQUIRED" "2")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_TLS_CHANNEL_BINDING_TLS_UNIQUE,
+;;   G_TLS_CHANNEL_BINDING_TLS_SERVER_END_POINT
+;; } GTlsChannelBindingType;
+
+(define-enum-extended TlsChannelBindingType
+  (in-module "G")
+  (c-name "GTlsChannelBindingType")
+  (values
+    '("unique" "G_TLS_CHANNEL_BINDING_TLS_UNIQUE" "0")
+    '("server-end-point" "G_TLS_CHANNEL_BINDING_TLS_SERVER_END_POINT" "1")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_TLS_CHANNEL_BINDING_ERROR_NOT_IMPLEMENTED,
+;;   G_TLS_CHANNEL_BINDING_ERROR_INVALID_STATE,
+;;   G_TLS_CHANNEL_BINDING_ERROR_NOT_AVAILABLE,
+;;   G_TLS_CHANNEL_BINDING_ERROR_NOT_SUPPORTED,
+;;   G_TLS_CHANNEL_BINDING_ERROR_GENERAL_ERROR
+;; } GTlsChannelBindingError;
+
+(define-enum-extended TlsChannelBindingError
+  (in-module "G")
+  (c-name "GTlsChannelBindingError")
+  (values
+    '("not-implemented" "G_TLS_CHANNEL_BINDING_ERROR_NOT_IMPLEMENTED" "0")
+    '("invalid-state" "G_TLS_CHANNEL_BINDING_ERROR_INVALID_STATE" "1")
+    '("not-available" "G_TLS_CHANNEL_BINDING_ERROR_NOT_AVAILABLE" "2")
+    '("not-supported" "G_TLS_CHANNEL_BINDING_ERROR_NOT_SUPPORTED" "3")
+    '("general-error" "G_TLS_CHANNEL_BINDING_ERROR_GENERAL_ERROR" "4")
   )
 )
 
@@ -1676,6 +1714,80 @@
     '("low" "G_MEMORY_MONITOR_WARNING_LEVEL_LOW" "50")
     '("medium" "G_MEMORY_MONITOR_WARNING_LEVEL_MEDIUM" "100")
     '("critical" "G_MEMORY_MONITOR_WARNING_LEVEL_CRITICAL" "255")
+  )
+)
+
+;; From glocalfileinfo.h
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   G_LOCAL_FILE_STAT_FIELD_TYPE = STATX_TYPE,
+;;   G_LOCAL_FILE_STAT_FIELD_MODE = STATX_MODE,
+;;   G_LOCAL_FILE_STAT_FIELD_NLINK = STATX_NLINK,
+;;   G_LOCAL_FILE_STAT_FIELD_UID = STATX_UID,
+;;   G_LOCAL_FILE_STAT_FIELD_GID = STATX_GID,
+;;   G_LOCAL_FILE_STAT_FIELD_ATIME = STATX_ATIME,
+;;   G_LOCAL_FILE_STAT_FIELD_MTIME = STATX_MTIME,
+;;   G_LOCAL_FILE_STAT_FIELD_CTIME = STATX_CTIME,
+;;   G_LOCAL_FILE_STAT_FIELD_INO = STATX_INO,
+;;   G_LOCAL_FILE_STAT_FIELD_SIZE = STATX_SIZE,
+;;   G_LOCAL_FILE_STAT_FIELD_BLOCKS = STATX_BLOCKS,
+;;   G_LOCAL_FILE_STAT_FIELD_BTIME = STATX_BTIME,
+;; } GLocalFileStatField;
+
+(define-flags-extended LocalFileStatField
+  (in-module "G")
+  (c-name "GLocalFileStatField")
+  (values
+    '("type" "G_LOCAL_FILE_STAT_FIELD_TYPE" "STATX_TYPE")
+    '("mode" "G_LOCAL_FILE_STAT_FIELD_MODE" "STATX_MODE")
+    '("nlink" "G_LOCAL_FILE_STAT_FIELD_NLINK" "STATX_NLINK")
+    '("uid" "G_LOCAL_FILE_STAT_FIELD_UID" "STATX_UID")
+    '("gid" "G_LOCAL_FILE_STAT_FIELD_GID" "STATX_GID")
+    '("atime" "G_LOCAL_FILE_STAT_FIELD_ATIME" "STATX_ATIME")
+    '("mtime" "G_LOCAL_FILE_STAT_FIELD_MTIME" "STATX_MTIME")
+    '("ctime" "G_LOCAL_FILE_STAT_FIELD_CTIME" "STATX_CTIME")
+    '("ino" "G_LOCAL_FILE_STAT_FIELD_INO" "STATX_INO")
+    '("size" "G_LOCAL_FILE_STAT_FIELD_SIZE" "STATX_SIZE")
+    '("blocks" "G_LOCAL_FILE_STAT_FIELD_BLOCKS" "STATX_BLOCKS")
+    '("btime" "G_LOCAL_FILE_STAT_FIELD_BTIME" "STATX_BTIME")
+  )
+)
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   G_LOCAL_FILE_STAT_FIELD_TYPE = (1 << 0),
+;;   G_LOCAL_FILE_STAT_FIELD_MODE = (1 << 1),
+;;   G_LOCAL_FILE_STAT_FIELD_NLINK = (1 << 2),
+;;   G_LOCAL_FILE_STAT_FIELD_UID = (1 << 3),
+;;   G_LOCAL_FILE_STAT_FIELD_GID = (1 << 4),
+;;   G_LOCAL_FILE_STAT_FIELD_ATIME = (1 << 5),
+;;   G_LOCAL_FILE_STAT_FIELD_MTIME = (1 << 6),
+;;   G_LOCAL_FILE_STAT_FIELD_CTIME = (1 << 7),
+;;   G_LOCAL_FILE_STAT_FIELD_INO = (1 << 8),
+;;   G_LOCAL_FILE_STAT_FIELD_SIZE = (1 << 9),
+;;   G_LOCAL_FILE_STAT_FIELD_BLOCKS = (1 << 10),
+;;   G_LOCAL_FILE_STAT_FIELD_BTIME = (1 << 11),
+;; } GLocalFileStatField;
+
+(define-flags-extended LocalFileStatField
+  (in-module "G")
+  (c-name "GLocalFileStatField")
+  (values
+    '("type" "G_LOCAL_FILE_STAT_FIELD_TYPE" "(1 << 0)")
+    '("mode" "G_LOCAL_FILE_STAT_FIELD_MODE" "(1 << 1)")
+    '("nlink" "G_LOCAL_FILE_STAT_FIELD_NLINK" "(1 << 2)")
+    '("uid" "G_LOCAL_FILE_STAT_FIELD_UID" "(1 << 3)")
+    '("gid" "G_LOCAL_FILE_STAT_FIELD_GID" "(1 << 4)")
+    '("atime" "G_LOCAL_FILE_STAT_FIELD_ATIME" "(1 << 5)")
+    '("mtime" "G_LOCAL_FILE_STAT_FIELD_MTIME" "(1 << 6)")
+    '("ctime" "G_LOCAL_FILE_STAT_FIELD_CTIME" "(1 << 7)")
+    '("ino" "G_LOCAL_FILE_STAT_FIELD_INO" "(1 << 8)")
+    '("size" "G_LOCAL_FILE_STAT_FIELD_SIZE" "(1 << 9)")
+    '("blocks" "G_LOCAL_FILE_STAT_FIELD_BLOCKS" "(1 << 10)")
+    '("btime" "G_LOCAL_FILE_STAT_FIELD_BTIME" "(1 << 11)")
   )
 )
 
