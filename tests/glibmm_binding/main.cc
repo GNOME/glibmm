@@ -90,6 +90,11 @@ test()
     // Ensure no change when invalid source results in false return
     source.property_string() = "six six six";
     g_assert_cmpint(target.property_int(), ==, 47);
+
+    // or when we manually unbind
+    binding->unbind();
+    source.property_string() = "666";
+    g_assert_cmpint(target.property_int(), ==, 47);
   }
 
   // Ensure the binding was released when its RefPtr went out of scope
