@@ -1,4 +1,21 @@
+// Glib::BalancedTree is deprecated, but let's keep the test.
+// The recommended replacement is std::map or std::unordered_map
+// which requires no test here.
+#undef GLIBMM_DISABLE_DEPRECATED
+
 #include <glibmm.h>
+
+#ifdef GLIBMM_DISABLE_DEPRECATED
+int
+main(int, char**)
+{
+  // If glibmm is configured with build-deprecated-api=false, GLIBMM_DISABLE_DEPRECATED
+  // is defined in glibmm.h (actually in glibmmconfig.h). The undef at the start of
+  // this file has no effect.
+  return 77; // Tell Meson's test harness to skip this test.
+}
+
+#else
 
 using type_key_value = Glib::ustring;
 using type_p_key_value = type_key_value*;
@@ -223,3 +240,4 @@ main()
 
   return EXIT_SUCCESS;
 }
+#endif // GLIBMM_DISABLE_DEPRECATED
