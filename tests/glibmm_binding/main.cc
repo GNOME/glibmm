@@ -109,6 +109,26 @@ test()
     // With SYNC_CREATE, value of source must sync to target on bind
     g_assert_cmpint(target.property_int(), ==, 89);
   }
+
+  // Ensure the binding was released when its RefPtr went out of scope
+  source.property_string() = "97";
+  g_assert_cmpint(target.property_int(), ==, 89);
+
+  // Ensure that a manage()d binding...
+  {
+    auto binding = Glib::Binding::bind_property(
+      source.property_string(), target.property_int(),
+      Glib::BINDING_DEFAULT, &transform_string_to_int);
+    Glib::manage(binding);
+
+    // (a) still syncs when the source value changes
+    source.property_string() = "1999";
+    g_assert_cmpint(target.property_int(), ==, 1999);
+  }
+
+  // and (b) still binds the properties after our RefPtr to it goes out of scope
+  source.property_string() = "2001";
+  g_assert_cmpint(target.property_int(), ==, 2001);
 }
 
 } // namespace

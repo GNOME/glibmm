@@ -90,12 +90,19 @@ _WRAP_ENUM(BindingFlags, GBindingFlags, newin "2,44", decl_prefix GLIBMM_API)
  * or g_signal_handler_block().
  *
  * The binding between properties is broken, and its resources freed, when the
- * %Glib::Binding loses its last Glib::RefPtr, the source or target object is
- * deleted, or unbind() is called. If a Glib::RefPtr to the %Glib::Binding
- * remains after the binding is broken another way, get_source()
- * and get_target() return an empty Glib::RefPtr. So, you must
- * keep a Glib::RefPtr to the %Glib::Binding for as long as you want it to bind,
- * but doing that does not guarantee the source/target are still alive or bound.
+ * %Glib::Binding loses its last Glib::RefPtr (by default), the source or target
+ * object is deleted, or unbind() is called. If a Glib::RefPtr to the
+ * %Glib::Binding remains after the binding is broken another way,
+ * get_source() and get_target() return an empty Glib::RefPtr.
+ * So, by default, you must keep a Glib::RefPtr to the
+ * %Glib::Binding for as long as you want it to bind, but doing that does not
+ * guarantee the source/target are still alive or bound.
+ *
+ * If it is not convenient to maintain a Glib::RefPtr to keep a %Glib::Binding
+ * active, you can pass the %Glib::Binding to Glib::manage() to specify that it
+ * should have its lifetime managed by the source/target objects and unbind()
+ * only. In that case, it will stay active as long as the source and target
+ * exist and unbind() is not called, even if no Glib::RefPtr to it is kept.
  *
  * @newin{2,44}
  */
@@ -466,6 +473,19 @@ public:
   _WRAP_PROPERTY("target-property", Glib::ustring, newin "2,44")
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
+  /** Sets the binding as having its lifetime managed by the lifetimes of its
+   * source and target objects, rather than requiring a Glib::RefPtr to be kept.
+   *
+   * See the class description for full information on the lifetimes of bindings.
+   *
+   * To manage the result of bind_property() or bind_property_value(), which can
+   * return an empty Glib::RefPtr on error, pass the result to Glib::manage(),
+   * as that specifically avoids calling set_manage() on an empty Glib::RefPtr.
+   *
+   * @newin{2,66}
+   */
+  void set_manage() override final;
+
   /** Decrement the reference count for this object.
    * You should never need to do this manually - use the object via a RefPtr instead.
    */
@@ -503,5 +523,30 @@ private:
     SlotTypedTransform<T_from, T_to> typed_transform;
   };
 };
+
+/** Sets a Glib::Binding as having its lifetime managed by the lifetimes of its
+ * source and target objects, rather than requiring a Glib::RefPtr to be kept.
+ *
+ * See the class description of Glib::Binding for full information on the
+ * lifetimes of bindings.
+ *
+ * For instance:
+ * @code
+ * void bind_my_properties(const Glib::RefPtr<Source>& source,
+ *                         const Glib::RefPtr<Target>& target)
+ * {
+ *   Glib::manage(Glib::Binding::bind_property(source->property_foo(),
+ *                                             target->property_bar()));
+ *   // don’t keep RefPtr to new Binding as source & target control its lifetime
+ * }
+ * @endcode
+ *
+ * @newin{2,66}
+ * @relates Glib::Binding
+ *
+ * @param binding The Glib::Binding to set as managed, or an empty Glib::RefPtr.
+ * @return The same Glib::Binding or empty Glib::RefPtr.
+ */
+const Glib::RefPtr<Glib::Binding>& manage(const Glib::RefPtr<Glib::Binding>& binding);
 
 } // namespace Glib
