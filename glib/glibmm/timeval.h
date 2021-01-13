@@ -30,6 +30,9 @@ namespace Glib
 // That's why not all of struct Glib::TimeVal is surrounded by
 // #ifndef GLIBMM_DISABLE_DEPRECATED/#endif. It would result in compilation errors,
 // if you define GLIBMM_DISABLE_DEPRECATED and include gdkmm/pixbufanimationiter.h.
+// Glib::TimeoutSource in glibmm/main.h contains a TimeVal. Several TimeVal methods
+// are used in glibmm/main.cc. These methods must be declared and defined when
+// glibmm is built, even if build-deprecated-api=false.
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 /** Glib::TimeVal is a wrapper around the glib structure GTimeVal.
  * The glib structure GTimeVal itself is equivalent to struct timeval,
@@ -63,10 +66,22 @@ struct GLIBMM_API TimeVal : public GTimeVal
   bool assign_from_iso8601(const Glib::ustring& iso_date);
 
   void add(const TimeVal& rhs);
+#endif // GLIBMM_DISABLE_DEPRECATED
+
+#if !defined(GLIBMM_DISABLE_DEPRECATED) || defined(GLIBMM_BUILD)
   void subtract(const TimeVal& rhs);
+#endif
+
+#ifndef GLIBMM_DISABLE_DEPRECATED
   void add_seconds(long seconds);
   void subtract_seconds(long seconds);
+#endif // GLIBMM_DISABLE_DEPRECATED
+
+#if !defined(GLIBMM_DISABLE_DEPRECATED) || defined(GLIBMM_BUILD)
   void add_milliseconds(long milliseconds);
+#endif
+
+#ifndef GLIBMM_DISABLE_DEPRECATED
   void subtract_milliseconds(long milliseconds);
   void add_microseconds(long microseconds);
   void subtract_microseconds(long microseconds);
@@ -89,9 +104,13 @@ struct GLIBMM_API TimeVal : public GTimeVal
    * @newin{2,22}
    */
   Glib::ustring as_iso8601() const;
+#endif // GLIBMM_DISABLE_DEPRECATED
 
+#if !defined(GLIBMM_DISABLE_DEPRECATED) || defined(GLIBMM_BUILD)
   inline bool negative() const;
+#endif
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
   /** Checks whether the stored time interval is positive.
    * Returns true if the stored time / time interval is positive.
    */
@@ -163,13 +182,17 @@ TimeVal::as_double() const
 {
   return double(tv_sec) + double(tv_usec) / double(G_USEC_PER_SEC);
 }
+#endif // GLIBMM_DISABLE_DEPRECATED
 
+#if !defined(GLIBMM_DISABLE_DEPRECATED) || defined(GLIBMM_BUILD)
 inline bool
 TimeVal::negative() const
 {
   return (tv_sec < 0);
 }
+#endif
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
 inline bool
 TimeVal::valid() const
 {
@@ -231,14 +254,18 @@ operator>(const TimeVal& lhs, const TimeVal& rhs)
 {
   return ((lhs.tv_sec > rhs.tv_sec) || (lhs.tv_sec == rhs.tv_sec && lhs.tv_usec > rhs.tv_usec));
 }
+#endif // GLIBMM_DISABLE_DEPRECATED
 
+#if !defined(GLIBMM_DISABLE_DEPRECATED) || defined(GLIBMM_BUILD)
 /** @relates Glib::TimeVal */
 inline bool
 operator<=(const TimeVal& lhs, const TimeVal& rhs)
 {
   return ((lhs.tv_sec < rhs.tv_sec) || (lhs.tv_sec == rhs.tv_sec && lhs.tv_usec <= rhs.tv_usec));
 }
+#endif
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
 /** @relates Glib::TimeVal */
 inline bool
 operator>=(const TimeVal& lhs, const TimeVal& rhs)

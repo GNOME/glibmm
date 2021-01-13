@@ -51,7 +51,9 @@ TimeVal::add(const TimeVal& rhs)
 
   tv_sec += rhs.tv_sec;
 }
+#endif // GLIBMM_DISABLE_DEPRECATED
 
+#if !defined(GLIBMM_DISABLE_DEPRECATED) || defined(GLIBMM_BUILD)
 void
 TimeVal::subtract(const TimeVal& rhs)
 {
@@ -68,7 +70,9 @@ TimeVal::subtract(const TimeVal& rhs)
 
   tv_sec -= rhs.tv_sec;
 }
+#endif
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
 void
 TimeVal::add_seconds(long seconds)
 {
@@ -84,7 +88,9 @@ TimeVal::subtract_seconds(long seconds)
 
   tv_sec -= seconds;
 }
+#endif // GLIBMM_DISABLE_DEPRECATED
 
+#if !defined(GLIBMM_DISABLE_DEPRECATED) || defined(GLIBMM_BUILD)
 void
 TimeVal::add_milliseconds(long milliseconds)
 {
@@ -105,7 +111,9 @@ TimeVal::add_milliseconds(long milliseconds)
 
   tv_sec += milliseconds / 1000;
 }
+#endif
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
 void
 TimeVal::subtract_milliseconds(long milliseconds)
 {
