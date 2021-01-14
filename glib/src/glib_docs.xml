@@ -565,6 +565,46 @@ code applies.
 </parameters>
 </enum>
 
+<enum name="GFileSetContentsFlags">
+<description>
+Flags to pass to g_file_set_contents_full() to affect its safety and
+performance.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="G_FILE_SET_CONTENTS_NONE">
+<parameter_description> No guarantees about file consistency or durability.
+The most dangerous setting, which is slightly faster than other settings.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_SET_CONTENTS_CONSISTENT">
+<parameter_description> Guarantee file consistency: after a crash,
+either the old version of the file or the new version of the file will be
+available, but not a mixture. On Unix systems this equates to an `fsync()`
+on the file and use of an atomic `rename()` of the new version of the file
+over the old.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_SET_CONTENTS_DURABLE">
+<parameter_description> Guarantee file durability: after a crash, the
+new version of the file will be available. On Unix systems this equates to
+an `fsync()` on the file (if %G_FILE_SET_CONTENTS_CONSISTENT is unset), or
+the effects of %G_FILE_SET_CONTENTS_CONSISTENT plus an `fsync()` on the
+directory containing the file after calling `rename()`.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_SET_CONTENTS_ONLY_EXISTING">
+<parameter_description> Only apply consistency and durability
+guarantees if the file already exists. This may speed up file operations
+if the file doesn’t currently exist, but may result in a corrupted version
+of the new file if the system crashes while writing it.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GFileTest">
 <description>
 A test to perform on a file using g_file_test().
@@ -815,7 +855,7 @@ with g_io_channel_set_flags()
 
 <enum name="GIOStatus">
 <description>
-Stati returned by most of the #GIOFuncs functions.
+Statuses returned by most of the #GIOFuncs functions.
 
 </description>
 <parameters>
@@ -2286,7 +2326,7 @@ as the file to execute, and passes all of `argv` to the child.
 </parameter_description>
 </parameter>
 <parameter name="G_SPAWN_SEARCH_PATH_FROM_ENVP">
-<parameter_description> if `argv[0]` is not an abolute path,
+<parameter_description> if `argv[0]` is not an absolute path,
 it will be looked for in the `PATH` from the passed child environment.
 Since: 2.34
 </parameter_description>
@@ -2610,7 +2650,7 @@ version use %G_TRAVERSE_NON_LEAFS.
 
 <enum name="GTraverseType">
 <description>
-Specifies the type of traveral performed by g_tree_traverse(),
+Specifies the type of traversal performed by g_tree_traverse(),
 g_node_traverse() and g_node_find(). The different orders are
 illustrated here:
 - In order: A, B, C, D, E, F, G, H, I
@@ -3559,6 +3599,22 @@ Old South Arabian. Since 2.26
 <parameter_description>               Wcho. Since: 2.62
 </parameter_description>
 </parameter>
+<parameter name="G_UNICODE_SCRIPT_CHORASMIAN">
+<parameter_description>           Chorasmian. Since: 2.66
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_DIVES_AKURU">
+<parameter_description>          Dives Akuru. Since: 2.66
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_KHITAN_SMALL_SCRIPT">
+<parameter_description>  Khitan small script. Since: 2.66
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_YEZIDI">
+<parameter_description>               Yezidi. Since: 2.66
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -3688,6 +3744,193 @@ See [Unicode Character Database](http://www.unicode.org/reports/tr44/#General_Ca
 </parameter>
 <parameter name="G_UNICODE_SPACE_SEPARATOR">
 <parameter_description> General category &quot;Separator, Space&quot; (Zs)
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GUriError">
+<description>
+Error codes returned by #GUri methods.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="G_URI_ERROR_FAILED">
+<parameter_description> Generic error if no more specific error is available.
+See the error message for details.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_ERROR_BAD_SCHEME">
+<parameter_description> The scheme of a URI could not be parsed.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_ERROR_BAD_USER">
+<parameter_description> The user/userinfo of a URI could not be parsed.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_ERROR_BAD_PASSWORD">
+<parameter_description> The password of a URI could not be parsed.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_ERROR_BAD_AUTH_PARAMS">
+<parameter_description> The authentication parameters of a URI could not be parsed.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_ERROR_BAD_HOST">
+<parameter_description> The host of a URI could not be parsed.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_ERROR_BAD_PORT">
+<parameter_description> The port of a URI could not be parsed.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_ERROR_BAD_PATH">
+<parameter_description> The path of a URI could not be parsed.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_ERROR_BAD_QUERY">
+<parameter_description> The query of a URI could not be parsed.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_ERROR_BAD_FRAGMENT">
+<parameter_description> The fragment of a URI could not be parsed.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GUriFlags">
+<description>
+Flags that describe a URI.
+
+When parsing a URI, if you need to choose different flags based on
+the type of URI, you can use g_uri_peek_scheme() on the URI string
+to check the scheme first, and use that to decide what flags to
+parse it with.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="G_URI_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_FLAGS_PARSE_RELAXED">
+<parameter_description> Parse the URI more relaxedly than the
+[RFC 3986](https://tools.ietf.org/html/rfc3986) grammar specifies,
+fixing up or ignoring common mistakes in URIs coming from external
+sources. This is also needed for some obscure URI schemes where `;`
+separates the host from the path. Don’t use this flag unless you need to.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_FLAGS_HAS_PASSWORD">
+<parameter_description> The userinfo field may contain a password,
+which will be separated from the username by `:`.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_FLAGS_HAS_AUTH_PARAMS">
+<parameter_description> The userinfo may contain additional
+authentication-related parameters, which will be separated from
+the username and/or password by `;`.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_FLAGS_NON_DNS">
+<parameter_description> The host component should not be assumed to be a
+DNS hostname or IP address (for example, for `smb` URIs with NetBIOS
+hostnames).
+</parameter_description>
+</parameter>
+<parameter name="G_URI_FLAGS_ENCODED">
+<parameter_description> When parsing a URI, this indicates that `%`-encoded
+characters in the userinfo, path, query, and fragment fields
+should not be decoded. (And likewise the host field if
+%G_URI_FLAGS_NON_DNS is also set.) When building a URI, it indicates
+that you have already `%`-encoded the components, and so #GUri
+should not do any encoding itself.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_FLAGS_ENCODED_QUERY">
+<parameter_description> Same as %G_URI_FLAGS_ENCODED, for the query
+field only.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_FLAGS_ENCODED_PATH">
+<parameter_description> Same as %G_URI_FLAGS_ENCODED, for the path only.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_FLAGS_ENCODED_FRAGMENT">
+<parameter_description> Same as %G_URI_FLAGS_ENCODED, for the
+fragment only.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GUriHideFlags">
+<description>
+Flags describing what parts of the URI to hide in
+g_uri_to_string_partial(). Note that %G_URI_HIDE_PASSWORD and
+%G_URI_HIDE_AUTH_PARAMS will only work if the #GUri was parsed with
+the corresponding flags.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="G_URI_HIDE_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_HIDE_USERINFO">
+<parameter_description> Hide the userinfo.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_HIDE_PASSWORD">
+<parameter_description> Hide the password.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_HIDE_AUTH_PARAMS">
+<parameter_description> Hide the auth_params.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_HIDE_QUERY">
+<parameter_description> Hide the query.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_HIDE_FRAGMENT">
+<parameter_description> Hide the fragment.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GUriParamsFlags">
+<description>
+Flags modifying the way parameters are handled by g_uri_parse_params() and
+#GUriParamsIter.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="G_URI_PARAMS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_PARAMS_CASE_INSENSITIVE">
+<parameter_description> Parameter names are case insensitive.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_PARAMS_WWW_FORM">
+<parameter_description> Replace `+` with space character. Only useful for
+URLs on the web, using the `https` or `http` schemas.
+</parameter_description>
+</parameter>
+<parameter name="G_URI_PARAMS_PARSE_RELAXED">
+<parameter_description> See %G_URI_FLAGS_PARSE_RELAXED.
 </parameter_description>
 </parameter>
 </parameters>
@@ -4212,14 +4455,29 @@ Since: 2.22
 <function name="g_array_index">
 <description>
 Returns the element of a #GArray at the given index. The return
-value is cast to the given type.
+value is cast to the given type. This is the main way to read or write an
+element in a #GArray.
 
-This example gets a pointer to an element in a #GArray:
+Writing an element is typically done by reference, as in the following
+example. This example gets a pointer to an element in a #GArray, and then
+writes to a field in it:
 |[&lt;!-- language=&quot;C&quot; --&gt;
 EDayViewEvent *event;
 // This gets a pointer to the 4th element in the array of
 // EDayViewEvent structs.
 event = &amp;g_array_index (events, EDayViewEvent, 3);
+event-&gt;start_time = g_get_current_time ();
+]|
+
+This example reads from and writes to an array of integers:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+g_autoptr(GArray) int_array = g_array_new (FALSE, FALSE, sizeof (guint));
+for (guint i = 0; i &lt; 10; i++)
+g_array_append_val (int_array, i);
+
+guint *my_int = &amp;g_array_index (int_array, guint, 1);
+g_print (&quot;Int at index 1 is %u; decrementing it\n&quot;, *my_int);
+*my_int = *my_int - 1;
 ]|
 
 
@@ -4278,6 +4536,10 @@ If @index_ is greater than the array’s current length, the array is expanded.
 The elements between the old end of the array and the newly inserted elements
 will be initialised to zero if the array was configured to clear elements;
 otherwise their values will be undefined.
+
+If @index_ is less than the array’s current length, new entries will be
+inserted into the array, and the existing entries above @index_ will be moved
+upwards.
 
 @data may be %NULL if (and only if) @len is zero. If @len is zero, this
 function is a no-op.
@@ -5430,7 +5692,7 @@ an ASCII lower case letter, @c is returned unchanged.
 
 <function name="g_ascii_xdigit_value">
 <description>
-Determines the numeric value of a character as a hexidecimal
+Determines the numeric value of a character as a hexadecimal
 digit. Differs from g_unichar_xdigit_value() because it takes
 a char, so there's no worry about sign extension if characters
 are signed.
@@ -5802,6 +6064,31 @@ Since: 2.62
 <parameters>
 <parameter name="object">
 <parameter_description> an object
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_assert_no_errno">
+<description>
+Debugging macro to check that an expression has a non-negative return value,
+as used by traditional POSIX functions (such as `rmdir()`) to indicate
+success.
+
+If the assertion fails (i.e. the @expr returns a negative value), an error
+message is logged and the testcase is marked as failed. The error message
+will contain the value of `errno` and its human-readable message from
+g_strerror().
+
+This macro will clear the value of `errno` before executing @expr.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="expr">
+<parameter_description> the expression to check
 </parameter_description>
 </parameter>
 </parameters>
@@ -7161,7 +7448,7 @@ Since: 2.58
 <function name="g_atomic_rc_box_alloc0">
 <description>
 Allocates @block_size bytes of memory, and adds atomic
-referenc counting semantics to it.
+reference counting semantics to it.
 
 The contents of the returned data is set to zero.
 
@@ -7923,6 +8210,10 @@ Since: 2.26
 <description>
 Retrieves the #GObject instance used as the source of the binding.
 
+A #GBinding can outlive the source #GObject as the binding does not hold a
+strong reference to the source. If the source is destroyed before the
+binding then this function will return %NULL.
+
 Since: 2.26
 
 </description>
@@ -7932,7 +8223,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> the source #GObject
+<return> the source #GObject, or %NULL if the
+source does not exist any more.
 
 </return>
 </function>
@@ -7960,6 +8252,10 @@ Since: 2.26
 <description>
 Retrieves the #GObject instance used as the target of the binding.
 
+A #GBinding can outlive the target #GObject as the binding does not hold a
+strong reference to the target. If the target is destroyed before the
+binding then this function will return %NULL.
+
 Since: 2.26
 
 </description>
@@ -7969,7 +8265,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> the target #GObject
+<return> the target #GObject, or %NULL if the
+target does not exist any more.
 
 </return>
 </function>
@@ -8273,6 +8570,8 @@ In the event the URI cannot be found, -1 is returned and
 @error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.12
+Deprecated: 2.66: Use g_bookmark_file_get_added_date_time() instead, as
+`time_t` is deprecated due to the year 2038 problem.
 
 </description>
 <parameters>
@@ -8294,10 +8593,39 @@ Since: 2.12
 </return>
 </function>
 
+<function name="g_bookmark_file_get_added_date_time">
+<description>
+Gets the time the bookmark for @uri was added to @bookmark
+
+In the event the URI cannot be found, %NULL is returned and
+@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="bookmark">
+<parameter_description> a #GBookmarkFile
+</parameter_description>
+</parameter>
+<parameter name="uri">
+<parameter_description> a valid URI
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GDateTime
+
+</return>
+</function>
+
 <function name="g_bookmark_file_get_app_info">
 <description>
 Gets the registration information of @app_name for the bookmark for
-@uri.  See g_bookmark_file_set_app_info() for more information about
+@uri.  See g_bookmark_file_set_application_info() for more information about
 the returned data.
 
 The string returned in @app_exec must be freed.
@@ -8311,6 +8639,62 @@ the command line fails, an error of the #G_SHELL_ERROR domain is
 set and %FALSE is returned.
 
 Since: 2.12
+Deprecated: 2.66: Use g_bookmark_file_get_application_info() instead, as
+`time_t` is deprecated due to the year 2038 problem.
+
+</description>
+<parameters>
+<parameter name="bookmark">
+<parameter_description> a #GBookmarkFile
+</parameter_description>
+</parameter>
+<parameter name="uri">
+<parameter_description> a valid URI
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> an application's name
+</parameter_description>
+</parameter>
+<parameter name="exec">
+<parameter_description> return location for the command line of the application, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> return location for the registration count, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="stamp">
+<parameter_description> return location for the last registration time, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success.
+
+</return>
+</function>
+
+<function name="g_bookmark_file_get_application_info">
+<description>
+Gets the registration information of @app_name for the bookmark for
+@uri.  See g_bookmark_file_set_application_info() for more information about
+the returned data.
+
+The string returned in @app_exec must be freed.
+
+In the event the URI cannot be found, %FALSE is returned and
+@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.  In the
+event that no application with name @app_name has registered a bookmark
+for @uri,  %FALSE is returned and error is set to
+#G_BOOKMARK_FILE_ERROR_APP_NOT_REGISTERED. In the event that unquoting
+the command line fails, an error of the #G_SHELL_ERROR domain is
+set and %FALSE is returned.
+
+Since: 2.66
 
 </description>
 <parameters>
@@ -8559,6 +8943,8 @@ In the event the URI cannot be found, -1 is returned and
 @error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.12
+Deprecated: 2.66: Use g_bookmark_file_get_modified_date_time() instead, as
+`time_t` is deprecated due to the year 2038 problem.
 
 </description>
 <parameters>
@@ -8576,6 +8962,35 @@ Since: 2.12
 </parameter>
 </parameters>
 <return> a timestamp
+
+</return>
+</function>
+
+<function name="g_bookmark_file_get_modified_date_time">
+<description>
+Gets the time when the bookmark for @uri was last modified.
+
+In the event the URI cannot be found, %NULL is returned and
+@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="bookmark">
+<parameter_description> a #GBookmarkFile
+</parameter_description>
+</parameter>
+<parameter name="uri">
+<parameter_description> a valid URI
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GDateTime
 
 </return>
 </function>
@@ -8663,6 +9078,8 @@ In the event the URI cannot be found, -1 is returned and
 @error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.12
+Deprecated: 2.66: Use g_bookmark_file_get_visited_date_time() instead, as
+`time_t` is deprecated due to the year 2038 problem.
 
 </description>
 <parameters>
@@ -8680,6 +9097,35 @@ Since: 2.12
 </parameter>
 </parameters>
 <return> a timestamp.
+
+</return>
+</function>
+
+<function name="g_bookmark_file_get_visited_date_time">
+<description>
+Gets the time the bookmark for @uri was last visited.
+
+In the event the URI cannot be found, %NULL is returned and
+@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="bookmark">
+<parameter_description> a #GBookmarkFile
+</parameter_description>
+</parameter>
+<parameter name="uri">
+<parameter_description> a valid URI
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GDateTime
 
 </return>
 </function>
@@ -9030,6 +9476,8 @@ Sets the time the bookmark for @uri was added into @bookmark.
 If no bookmark for @uri is found then it is created.
 
 Since: 2.12
+Deprecated: 2.66: Use g_bookmark_file_set_added_date_time() instead, as
+`time_t` is deprecated due to the year 2038 problem.
 
 </description>
 <parameters>
@@ -9043,6 +9491,32 @@ Since: 2.12
 </parameter>
 <parameter name="added">
 <parameter_description> a timestamp or -1 to use the current time
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_bookmark_file_set_added_date_time">
+<description>
+Sets the time the bookmark for @uri was added into @bookmark.
+
+If no bookmark for @uri is found then it is created.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="bookmark">
+<parameter_description> a #GBookmarkFile
+</parameter_description>
+</parameter>
+<parameter name="uri">
+<parameter_description> a valid URI
+</parameter_description>
+</parameter>
+<parameter name="added">
+<parameter_description> a #GDateTime
 </parameter_description>
 </parameter>
 </parameters>
@@ -9064,7 +9538,7 @@ application.
 be expanded as the local file name retrieved from the bookmark's
 URI; &quot;\%u&quot;, which will be expanded as the bookmark's URI.
 The expansion is done automatically when retrieving the stored
-command line using the g_bookmark_file_get_app_info() function.
+command line using the g_bookmark_file_get_application_info() function.
 @count is the number of times the application has registered the
 bookmark; if is &lt; 0, the current registration count will be increased
 by one, if is 0, the application with @name will be removed from
@@ -9081,6 +9555,8 @@ for @uri,  %FALSE is returned and error is set to
 for @uri is found, one is created.
 
 Since: 2.12
+Deprecated: 2.66: Use g_bookmark_file_set_application_info() instead, as
+`time_t` is deprecated due to the year 2038 problem.
 
 </description>
 <parameters>
@@ -9106,6 +9582,76 @@ Since: 2.12
 </parameter>
 <parameter name="stamp">
 <parameter_description> the time of the last registration for this application
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the application's meta-data was successfully
+changed.
+
+</return>
+</function>
+
+<function name="g_bookmark_file_set_application_info">
+<description>
+Sets the meta-data of application @name inside the list of
+applications that have registered a bookmark for @uri inside
+@bookmark.
+
+You should rarely use this function; use g_bookmark_file_add_application()
+and g_bookmark_file_remove_application() instead.
+
+@name can be any UTF-8 encoded string used to identify an
+application.
+@exec can have one of these two modifiers: &quot;\%f&quot;, which will
+be expanded as the local file name retrieved from the bookmark's
+URI; &quot;\%u&quot;, which will be expanded as the bookmark's URI.
+The expansion is done automatically when retrieving the stored
+command line using the g_bookmark_file_get_application_info() function.
+@count is the number of times the application has registered the
+bookmark; if is &lt; 0, the current registration count will be increased
+by one, if is 0, the application with @name will be removed from
+the list of registered applications.
+@stamp is the Unix time of the last registration.
+
+If you try to remove an application by setting its registration count to
+zero, and no bookmark for @uri is found, %FALSE is returned and
+@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND; similarly,
+in the event that no application @name has registered a bookmark
+for @uri,  %FALSE is returned and error is set to
+#G_BOOKMARK_FILE_ERROR_APP_NOT_REGISTERED.  Otherwise, if no bookmark
+for @uri is found, one is created.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="bookmark">
+<parameter_description> a #GBookmarkFile
+</parameter_description>
+</parameter>
+<parameter name="uri">
+<parameter_description> a valid URI
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> an application's name
+</parameter_description>
+</parameter>
+<parameter name="exec">
+<parameter_description> an application's command line
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> the number of registrations done for this application
+</parameter_description>
+</parameter>
+<parameter name="stamp">
+<parameter_description> the time of the last registration for this application,
+which may be %NULL if @count is 0
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -9272,9 +9818,11 @@ If no bookmark for @uri is found then it is created.
 The &quot;modified&quot; time should only be set when the bookmark's meta-data
 was actually changed.  Every function of #GBookmarkFile that
 modifies a bookmark also changes the modification time, except for
-g_bookmark_file_set_visited().
+g_bookmark_file_set_visited_date_time().
 
 Since: 2.12
+Deprecated: 2.66: Use g_bookmark_file_set_modified_date_time() instead, as
+`time_t` is deprecated due to the year 2038 problem.
 
 </description>
 <parameters>
@@ -9288,6 +9836,37 @@ Since: 2.12
 </parameter>
 <parameter name="modified">
 <parameter_description> a timestamp or -1 to use the current time
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_bookmark_file_set_modified_date_time">
+<description>
+Sets the last time the bookmark for @uri was last modified.
+
+If no bookmark for @uri is found then it is created.
+
+The &quot;modified&quot; time should only be set when the bookmark's meta-data
+was actually changed.  Every function of #GBookmarkFile that
+modifies a bookmark also changes the modification time, except for
+g_bookmark_file_set_visited_date_time().
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="bookmark">
+<parameter_description> a #GBookmarkFile
+</parameter_description>
+</parameter>
+<parameter name="uri">
+<parameter_description> a valid URI
+</parameter_description>
+</parameter>
+<parameter name="modified">
+<parameter_description> a #GDateTime
 </parameter_description>
 </parameter>
 </parameters>
@@ -9330,12 +9909,14 @@ Sets the time the bookmark for @uri was last visited.
 If no bookmark for @uri is found then it is created.
 
 The &quot;visited&quot; time should only be set if the bookmark was launched,
-either using the command line retrieved by g_bookmark_file_get_app_info()
+either using the command line retrieved by g_bookmark_file_get_application_info()
 or by the default application for the bookmark's MIME type, retrieved
 using g_bookmark_file_get_mime_type().  Changing the &quot;visited&quot; time
 does not affect the &quot;modified&quot; time.
 
 Since: 2.12
+Deprecated: 2.66: Use g_bookmark_file_set_visited_date_time() instead, as
+`time_t` is deprecated due to the year 2038 problem.
 
 </description>
 <parameters>
@@ -9349,6 +9930,38 @@ Since: 2.12
 </parameter>
 <parameter name="visited">
 <parameter_description> a timestamp or -1 to use the current time
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_bookmark_file_set_visited_date_time">
+<description>
+Sets the time the bookmark for @uri was last visited.
+
+If no bookmark for @uri is found then it is created.
+
+The &quot;visited&quot; time should only be set if the bookmark was launched,
+either using the command line retrieved by g_bookmark_file_get_application_info()
+or by the default application for the bookmark's MIME type, retrieved
+using g_bookmark_file_get_mime_type().  Changing the &quot;visited&quot; time
+does not affect the &quot;modified&quot; time.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="bookmark">
+<parameter_description> a #GBookmarkFile
+</parameter_description>
+</parameter>
+<parameter name="uri">
+<parameter_description> a valid URI
+</parameter_description>
+</parameter>
+<parameter name="visited">
+<parameter_description> a #GDateTime
 </parameter_description>
 </parameter>
 </parameters>
@@ -10667,35 +11280,40 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_BOOLEAN__FLAGS">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`gboolean (*callback) (gpointer instance, gint arg1, gpointer user_data)` where the #gint parameter
-denotes a flags type.
+A #GClosureMarshal function for use with signals with handlers that
+take a flags type as an argument and return a boolean.  If you have
+such a signal, you will probably also need to use an accumulator,
+such as g_signal_accumulator_true_handled().
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> a #GValue which can store the returned #gboolean
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding instance and arg1
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10824,44 +11442,78 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_BOOL__FLAGS">
 <description>
-Another name for g_cclosure_marshal_BOOLEAN__FLAGS().
+An old alias for g_cclosure_marshal_BOOLEAN__FLAGS().
 
 </description>
 <parameters>
+<parameter name="closure">
+<parameter_description> A #GClosure.
+</parameter_description>
+</parameter>
+<parameter name="return_value">
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
+</parameter_description>
+</parameter>
+<parameter name="n_param_values">
+<parameter_description> The length of the @param_values array.
+</parameter_description>
+</parameter>
+<parameter name="param_values">
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
+</parameter_description>
+</parameter>
+<parameter name="invocation_hint">
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
+</parameter_description>
+</parameter>
+<parameter name="marshal_data">
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
+</parameter_description>
+</parameter>
 </parameters>
 <return></return>
 </function>
 
 <function name="g_cclosure_marshal_STRING__OBJECT_POINTER">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`gchar* (*callback) (gpointer instance, GObject *arg1, gpointer arg2, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with handlers that
+take a #GObject and a pointer and produce a string.  It is highly
+unlikely that your signal handler fits this description.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> a #GValue, which can store the returned string
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 3
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding instance, arg1 and arg2
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10913,34 +11565,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__BOOLEAN">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gboolean arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+boolean argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gboolean parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10992,34 +11648,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__BOXED">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, GBoxed *arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+argument which is any boxed pointer type.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #GBoxed* parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -11071,34 +11731,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__CHAR">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gchar arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+character argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gchar parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -11150,34 +11814,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__DOUBLE">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gdouble arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with one
+double-precision floating point argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gdouble parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -11229,34 +11897,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__ENUM">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gint arg1, gpointer user_data)` where the #gint parameter denotes an enumeration type..
+A #GClosureMarshal function for use with signals with a single
+argument with an enumerated type.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the enumeration parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -11308,34 +11980,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__FLAGS">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gint arg1, gpointer user_data)` where the #gint parameter denotes a flags type.
+A #GClosureMarshal function for use with signals with a single
+argument with a flags types.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the flags parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -11387,34 +12063,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__FLOAT">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gfloat arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with one
+single-precision floating point argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gfloat parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -11466,34 +12146,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__INT">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gint arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+integer argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gint parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -11545,34 +12229,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__LONG">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, glong arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with with a single
+long integer argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #glong parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -11624,34 +12312,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__OBJECT">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, GObject *arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+#GObject argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #GObject* parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -11703,34 +12395,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__PARAM">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, GParamSpec *arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+argument of type #GParamSpec.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #GParamSpec* parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -11782,34 +12478,42 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__POINTER">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gpointer arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single raw
+pointer argument type.
+
+If it is possible, it is better to use one of the more specific
+functions such as g_cclosure_marshal_VOID__OBJECT() or
+g_cclosure_marshal_VOID__OBJECT().
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gpointer parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -11861,34 +12565,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__STRING">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, const gchar *arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single string
+argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gchar* parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -11940,34 +12648,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__UCHAR">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, guchar arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+unsigned character argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #guchar parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -12019,34 +12731,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__UINT">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, guint arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with with a single
+unsigned integer argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #guint parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -12055,34 +12771,38 @@ to g_closure_invoke()
 
 <function name="g_cclosure_marshal_VOID__UINT_POINTER">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, guint arg1, gpointer arg2, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with an unsigned int
+and a pointer as arguments.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 3
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding instance, arg1 and arg2
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -12177,34 +12897,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__ULONG">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gulong arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+unsigned long integer argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gulong parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -12256,36 +12980,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__VARIANT">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, GVariant *arg1, gpointer user_data)`.
-
-Since: 2.26
+A #GClosureMarshal function for use with signals with a single
+#GVariant argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #GVariant* parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -12337,34 +13063,37 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__VOID">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with no arguments.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 1
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding only the instance
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -13604,7 +14333,7 @@ initial reference count, if it is unowned, we instead can write:
 g_source_set_closure (source, g_cclosure_new (cb_func, cb_data));
 ]|
 
-Generally, this function is used together with g_closure_ref(). Ane example
+Generally, this function is used together with g_closure_ref(). An example
 of storing a closure for later notification looks like:
 |[&lt;!-- language=&quot;C&quot; --&gt; 
 static GClosure *notify_closure = NULL;
@@ -15421,7 +16150,7 @@ All non-%NULL dates must be valid.
 
 <function name="g_date_clear">
 <description>
-Initializes one or more #GDate structs to a sane but invalid
+Initializes one or more #GDate structs to a safe but invalid
 state. The cleared dates will not represent an existing date, but will
 not contain garbage. Useful to init a date declared on the stack.
 Validity can be tested with g_date_valid().
@@ -15796,7 +16525,7 @@ is also divisible by 400.
 <function name="g_date_new">
 <description>
 Allocates a #GDate and initializes
-it to a sane state. The new date will
+it to a safe state. The new date will
 be cleared (as if you'd called g_date_clear()) but invalid (it won't
 represent an existing day). Free the return value with g_date_free().
 
@@ -16200,8 +16929,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> the newly created #GDateTime which should be freed with
-g_date_time_unref().
+<return> the newly created #GDateTime which
+should be freed with g_date_time_unref(), or %NULL
 
 </return>
 </function>
@@ -16224,8 +16953,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> the newly created #GDateTime which should be freed with
-g_date_time_unref().
+<return> the newly created #GDateTime which
+should be freed with g_date_time_unref(), or %NULL
 
 </return>
 </function>
@@ -16268,8 +16997,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> the newly created #GDateTime that should be freed with
-g_date_time_unref().
+<return> the newly created #GDateTime which
+should be freed with g_date_time_unref(), or %NULL
 
 </return>
 </function>
@@ -16292,8 +17021,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> the newly created #GDateTime which should be freed with
-g_date_time_unref().
+<return> the newly created #GDateTime which
+should be freed with g_date_time_unref(), or %NULL
 
 </return>
 </function>
@@ -16316,8 +17045,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> the newly created #GDateTime which should be freed with
-g_date_time_unref().
+<return> the newly created #GDateTime which
+should be freed with g_date_time_unref(), or %NULL
 
 </return>
 </function>
@@ -16345,8 +17074,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> the newly created #GDateTime which should be freed with
-g_date_time_unref().
+<return> the newly created #GDateTime which
+should be freed with g_date_time_unref(), or %NULL
 
 </return>
 </function>
@@ -16369,8 +17098,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> the newly created #GDateTime which should be freed with
-g_date_time_unref().
+<return> the newly created #GDateTime which
+should be freed with g_date_time_unref(), or %NULL
 
 </return>
 </function>
@@ -16393,8 +17122,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> the newly created #GDateTime which should be freed with
-g_date_time_unref().
+<return> the newly created #GDateTime which
+should be freed with g_date_time_unref(), or %NULL
 
 </return>
 </function>
@@ -16420,8 +17149,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> the newly created #GDateTime which should be freed with
-g_date_time_unref().
+<return> the newly created #GDateTime which
+should be freed with g_date_time_unref(), or %NULL
 
 </return>
 </function>
@@ -16508,7 +17237,7 @@ The format strings understood by this function are a subset of the
 strftime() format language as specified by C99.  The \%D, \%U and \%W
 conversions are not supported, nor is the 'E' modifier.  The GNU
 extensions \%k, \%l, \%s and \%P are supported, however, as are the
-'0', '_' and '-' modifiers.
+'0', '_' and '-' modifiers. The Python extension \%f is also supported.
 
 In contrast to strftime(), this function always produces a UTF-8
 string, regardless of the current locale.  Note that the rendering of
@@ -16540,12 +17269,17 @@ single digits are preceded by a blank
 single digits are preceded by a blank
 - \%m: the month as a decimal number (range 01 to 12)
 - \%M: the minute as a decimal number (range 00 to 59)
+- \%f: the microsecond as a decimal number (range 000000 to 999999)
 - \%p: either &quot;AM&quot; or &quot;PM&quot; according to the given time value, or the
 corresponding  strings for the current locale.  Noon is treated as
-&quot;PM&quot; and midnight as &quot;AM&quot;.
+&quot;PM&quot; and midnight as &quot;AM&quot;. Use of this format specifier is discouraged, as
+many locales have no concept of AM/PM formatting. Use \%c or \%X instead.
 - \%P: like \%p but lowercase: &quot;am&quot; or &quot;pm&quot; or a corresponding string for
-the current locale
-- \%r: the time in a.m. or p.m. notation
+the current locale. Use of this format specifier is discouraged, as
+many locales have no concept of AM/PM formatting. Use \%c or \%X instead.
+- \%r: the time in a.m. or p.m. notation. Use of this format specifier is
+discouraged, as many locales have no concept of AM/PM formatting. Use \%c
+or \%X instead.
 - \%R: the time in 24-hour notation (\%H:\%M)
 - \%s: the number of seconds since the Epoch, that is, since 1970-01-01
 00:00:00 UTC
@@ -16611,10 +17345,10 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated string formatted to the requested format
-or %NULL in the case that there was an error (such as a format specifier
-not being supported in the current locale). The string
-should be freed with g_free().
+<return> a newly allocated string formatted to
+the requested format or %NULL in the case that there was an error (such
+as a format specifier not being supported in the current locale). The
+string should be freed with g_free().
 
 </return>
 </function>
@@ -16625,6 +17359,8 @@ Format @datetime in [ISO 8601 format](https://en.wikipedia.org/wiki/ISO_8601),
 including the date, time and time zone, and return that as a UTF-8 encoded
 string.
 
+Since GLib 2.66, this will output to sub-second precision if needed.
+
 Since: 2.62
 
 </description>
@@ -16634,9 +17370,10 @@ Since: 2.62
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated string formatted in ISO 8601 format
-or %NULL in the case that there was an error. The string
+<return> a newly allocated string formatted in
+ISO 8601 format or %NULL in the case that there was an error. The string
 should be freed with g_free().
+
 </return>
 </function>
 
@@ -17335,9 +18072,8 @@ Creates a #GDateTime corresponding to this exact instant in the given
 time zone @tz.  The time is as accurate as the system allows, to a
 maximum accuracy of 1 microsecond.
 
-This function will always succeed unless the system clock is set to
-truly insane values (or unless GLib is still being used after the
-year 9999).
+This function will always succeed unless GLib is still being used after the
+year 9999.
 
 You should release the return value by calling g_date_time_unref()
 when you are done with it.
@@ -17468,7 +18204,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> the newly created #GDateTime
+<return> the newly created #GDateTime which
+should be freed with g_date_time_unref(), or %NULL
 
 </return>
 </function>
@@ -17518,9 +18255,6 @@ This call can fail in the case that the time goes out of bounds.  For
 example, converting 0001-01-01 00:00:00 UTC to a time zone west of
 Greenwich will fail (due to the year 0 being out of range).
 
-You should release the return value by calling g_date_time_unref()
-when you are done with it.
-
 Since: 2.26
 
 </description>
@@ -17534,7 +18268,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GDateTime, or %NULL
+<return> the newly created #GDateTime which
+should be freed with g_date_time_unref(), or %NULL
 
 </return>
 </function>
@@ -17578,7 +18313,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> the newly created #GDateTime
+<return> the newly created #GDateTime which
+should be freed with g_date_time_unref(), or %NULL
 
 </return>
 </function>
@@ -17605,7 +18341,7 @@ Since: 2.26
 <function name="g_date_to_struct_tm">
 <description>
 Fills in the date-related bits of a struct tm using the @date value.
-Initializes the non-date parts with something sane but meaningless.
+Initializes the non-date parts with something safe but meaningless.
 
 </description>
 <parameters>
@@ -18785,42 +19521,10 @@ the symbolic link, or %NULL if an error occurred.
 
 <function name="g_file_set_contents">
 <description>
-Writes all of @contents to a file named @filename, with good error checking.
-If a file called @filename already exists it will be overwritten.
-
-This write is atomic in the sense that it is first written to a temporary
-file which is then renamed to the final name. Notes:
-
-- On UNIX, if @filename already exists hard links to @filename will break.
-Also since the file is recreated, existing permissions, access control
-lists, metadata etc. may be lost. If @filename is a symbolic link,
-the link itself will be replaced, not the linked file.
-
-- On UNIX, if @filename already exists and is non-empty, and if the system
-supports it (via a journalling filesystem or equivalent), the fsync()
-call (or equivalent) will be used to ensure atomic replacement: @filename
-will contain either its old contents or @contents, even in the face of
-system power loss, the disk being unsafely removed, etc.
-
-- On UNIX, if @filename does not already exist or is empty, there is a
-possibility that system power loss etc. after calling this function will
-leave @filename empty or full of NUL bytes, depending on the underlying
-filesystem.
-
-- On Windows renaming a file will not remove an existing file with the
-new name, so on Windows there is a race condition between the existing
-file being removed and the temporary file being renamed.
-
-- On Windows there is no way to remove a file that is open to some
-process, or mapped into memory. Thus, this function will fail if
-@filename already exists and is open.
-
-If the call was successful, it returns %TRUE. If the call was not successful,
-it returns %FALSE and sets @error. The error domain is #G_FILE_ERROR.
-Possible error codes are those in the #GFileError enumeration.
-
-Note that the name for the temporary file is constructed by appending up
-to 7 characters to @filename.
+Writes all of @contents to a file named @filename. This is a convenience
+wrapper around calling g_file_set_contents() with `flags` set to
+`G_FILE_SET_CONTENTS_CONSISTENT | G_FILE_SET_CONTENTS_ONLY_EXISTING` and
+`mode` set to `0666`.
 
 Since: 2.8
 
@@ -18837,6 +19541,98 @@ encoding
 </parameter>
 <parameter name="length">
 <parameter_description> length of @contents, or -1 if @contents is a nul-terminated string
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE if an error occurred
+
+</return>
+</function>
+
+<function name="g_file_set_contents_full">
+<description>
+Writes all of @contents to a file named @filename, with good error checking.
+If a file called @filename already exists it will be overwritten.
+
+@flags control the properties of the write operation: whether it’s atomic,
+and what the tradeoff is between returning quickly or being resilient to
+system crashes.
+
+As this function performs file I/O, it is recommended to not call it anywhere
+where blocking would cause problems, such as in the main loop of a graphical
+application. In particular, if @flags has any value other than
+%G_FILE_SET_CONTENTS_NONE then this function may call `fsync()`.
+
+If %G_FILE_SET_CONTENTS_CONSISTENT is set in @flags, the operation is atomic
+in the sense that it is first written to a temporary file which is then
+renamed to the final name.
+
+Notes:
+
+- On UNIX, if @filename already exists hard links to @filename will break.
+Also since the file is recreated, existing permissions, access control
+lists, metadata etc. may be lost. If @filename is a symbolic link,
+the link itself will be replaced, not the linked file.
+
+- On UNIX, if @filename already exists and is non-empty, and if the system
+supports it (via a journalling filesystem or equivalent), and if
+%G_FILE_SET_CONTENTS_CONSISTENT is set in @flags, the `fsync()` call (or
+equivalent) will be used to ensure atomic replacement: @filename
+will contain either its old contents or @contents, even in the face of
+system power loss, the disk being unsafely removed, etc.
+
+- On UNIX, if @filename does not already exist or is empty, there is a
+possibility that system power loss etc. after calling this function will
+leave @filename empty or full of NUL bytes, depending on the underlying
+filesystem, unless %G_FILE_SET_CONTENTS_DURABLE and
+%G_FILE_SET_CONTENTS_CONSISTENT are set in @flags.
+
+- On Windows renaming a file will not remove an existing file with the
+new name, so on Windows there is a race condition between the existing
+file being removed and the temporary file being renamed.
+
+- On Windows there is no way to remove a file that is open to some
+process, or mapped into memory. Thus, this function will fail if
+@filename already exists and is open.
+
+If the call was successful, it returns %TRUE. If the call was not successful,
+it returns %FALSE and sets @error. The error domain is #G_FILE_ERROR.
+Possible error codes are those in the #GFileError enumeration.
+
+Note that the name for the temporary file is constructed by appending up
+to 7 characters to @filename.
+
+If the file didn’t exist before and is created, it will be given the
+permissions from @mode. Otherwise, the permissions of the existing file may
+be changed to @mode depending on @flags, or they may remain unchanged.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="filename">
+<parameter_description> name of a file to write @contents to, in the GLib file name
+encoding
+</parameter_description>
+</parameter>
+<parameter name="contents">
+<parameter_description> string to write to the file
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> length of @contents, or -1 if @contents is a nul-terminated string
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags controlling the safety vs speed of the operation
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description> file mode, as passed to `open()`; typically this will be `0666`
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -19334,7 +20130,7 @@ See your C library manual for more details about `fopen()`.
 
 As `close()` and `fclose()` are part of the C library, this implies that it is
 currently impossible to close a file if the application C library and the C library
-used by GLib are different. Convenience functions like g_file_set_contents()
+used by GLib are different. Convenience functions like g_file_set_contents_full()
 avoid this problem.
 
 Since: 2.6
@@ -19524,9 +20320,12 @@ an error occurred.
 
 <function name="g_fsync">
 <description>
-A wrapper for the POSIX fsync() function (_commit() on Windows).
-The fsync() function is used to synchronize a file's in-core
+A wrapper for the POSIX `fsync()` function. On Windows, `_commit()` will be
+used. On macOS, `fcntl(F_FULLFSYNC)` will be used.
+The `fsync()` function is used to synchronize a file's in-core
 state with that of the disk.
+
+This wrapper will handle retrying on `EINTR`.
 
 See the C library manual for more details about fsync().
 
@@ -21929,6 +22728,8 @@ segments.
 Tests if @hostname is the string form of an IPv4 or IPv6 address.
 (Eg, &quot;192.168.0.1&quot;.)
 
+Since 2.66, IPv6 addresses with a zone-id are accepted (RFC6874).
+
 Since: 2.22
 
 </description>
@@ -22779,7 +23580,7 @@ a buffer to read data into
 </parameter>
 <parameter name="count">
 <parameter_description> the size of the buffer. Note that the buffer may not be
-complelely filled even if there is data in the buffer if the
+completely filled even if there is data in the buffer if the
 remaining data is not a complete character.
 </parameter_description>
 </parameter>
@@ -24357,7 +25158,7 @@ of the file, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if a key file could be loaded, %FALSE othewise
+<return> %TRUE if a key file could be loaded, %FALSE otherwise
 </return>
 </function>
 
@@ -24573,7 +25374,9 @@ Since: 2.6
 <function name="g_key_file_save_to_file">
 <description>
 Writes the contents of @key_file to @filename using
-g_file_set_contents().
+g_file_set_contents(). If you need stricter guarantees about durability of
+the written file than are provided by g_file_set_contents(), use
+g_file_set_contents_full() with the return value of g_key_file_to_data().
 
 This function can fail for any of the reasons that
 g_file_set_contents() may fail.
@@ -25411,7 +26214,7 @@ g_list_free (g_steal_pointer (&amp;list_of_borrowed_things));
 </description>
 <parameters>
 <parameter name="list">
-<parameter_description> a #GList
+<parameter_description> the first link of a #GList
 </parameter_description>
 </parameter>
 </parameters>
@@ -25468,7 +26271,7 @@ Since: 2.28
 </description>
 <parameters>
 <parameter name="list">
-<parameter_description> a pointer to a #GList
+<parameter_description> the first link of a #GList
 </parameter_description>
 </parameter>
 <parameter name="free_func">
@@ -26183,7 +26986,7 @@ environment variables:
 
 - `G_MESSAGES_PREFIXED`: A :-separated list of log levels for which
 messages should be prefixed by the program name and PID of the
-aplication.
+application.
 
 - `G_MESSAGES_DEBUG`: A space-separated list of log domains for
 which debug and informational messages are printed. By default
@@ -26980,7 +27783,10 @@ file descriptor is polled whenever the results may be needed.
 
 <function name="g_main_context_check">
 <description>
-Passes the results of polling back to the main loop.
+Passes the results of polling back to the main loop. You should be
+careful to pass @fds and its length @n_fds as received from
+g_main_context_query(), as this functions relies on assumptions
+on how @fds is filled.
 
 You must have successfully acquired the context with
 g_main_context_acquire() before you may call this function.
@@ -27497,7 +28303,10 @@ Since: 2.64
 
 <function name="g_main_context_query">
 <description>
-Determines information necessary to poll this main loop.
+Determines information necessary to poll this main loop. You should
+be careful to pass the resulting @fds array and its length @n_fds
+as is when calling g_main_context_check(), as this function relies
+on assumptions made when the array is filled.
 
 You must have successfully acquired the context with
 g_main_context_acquire() before you may call this function.
@@ -28041,13 +28850,13 @@ to %TRUE anyway.
 Checks if any events are pending for the default #GMainContext
 (i.e. ready to be processed).
 
+Deprecated: 2.2: Use g_main_context_pending() instead.
 
 </description>
 <parameters>
 </parameters>
 <return> %TRUE if any events are pending.
 
-Deprected: 2.2: Use g_main_context_pending() instead.
 </return>
 </function>
 
@@ -31966,7 +32775,9 @@ Since: 2.10
 Creates a new instance of a #GObject subtype and sets its properties.
 
 Construction parameters (see #G_PARAM_CONSTRUCT, #G_PARAM_CONSTRUCT_ONLY)
-which are not explicitly specified are set to their default values.
+which are not explicitly specified are set to their default values. Any
+private data for the object is guaranteed to be initialized with zeros, as
+per g_type_create_instance().
 
 Note that in C, small integer types in variable argument lists are promoted
 up to #gint or #guint as appropriate, and read back accordingly. #gint is 32
@@ -32520,7 +33331,7 @@ Sets a property on an object.
 <function name="g_object_set_qdata">
 <description>
 This sets an opaque, named pointer on an object.
-The name is specified through a #GQuark (retrived e.g. via
+The name is specified through a #GQuark (retrieved e.g. via
 g_quark_from_static_string()), and the pointer
 can be gotten back from the @object with g_object_get_qdata()
 until the @object is finalized.
@@ -32668,7 +33479,7 @@ const gchar *new_string)
 {
 // the quark, naming the object data
 GQuark quark_string_list = g_quark_from_static_string (&quot;my-string-list&quot;);
-// retrive the old string list
+// retrieve the old string list
 GList *list = g_object_steal_qdata (object, quark_string_list);
 
 // prepend new string
@@ -34452,6 +35263,28 @@ e.g. a tooltip. The @nick and @blurb should ideally be localized.
 </return>
 </function>
 
+<function name="g_param_spec_is_valid_name">
+<description>
+Validate a property name for a #GParamSpec. This can be useful for
+dynamically-generated properties which need to be validated at run-time
+before actually trying to create them.
+
+See [canonical parameter names][canonical-parameter-names] for details of
+the rules for valid names.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="name">
+<parameter_description> the canonical name of the property
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @name is a valid property name, %FALSE otherwise.
+</return>
+</function>
+
 <function name="g_param_spec_long">
 <description>
 Creates a new #GParamSpecLong instance specifying a %G_TYPE_LONG property.
@@ -35270,7 +36103,7 @@ g_param_value_validate().
 </parameter_description>
 </parameter>
 <parameter name="src_value">
-<parameter_description> souce #GValue
+<parameter_description> source #GValue
 </parameter_description>
 </parameter>
 <parameter name="dest_value">
@@ -39522,7 +40355,7 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GRegex structure or %NULL if an error occured. Call
+<return> a #GRegex structure or %NULL if an error occurred. Call
 g_regex_unref() when you are done with it
 
 </return>
@@ -39568,7 +40401,7 @@ There are also escapes that changes the case of the following text:
 If you do not need to use backreferences use g_regex_replace_literal().
 
 The @replacement string must be UTF-8 encoded even if #G_REGEX_RAW was
-passed to g_regex_new(). If you want to use not UTF-8 encoded stings
+passed to g_regex_new(). If you want to use not UTF-8 encoded strings
 you can use g_regex_replace_literal().
 
 Setting @start_position differs from just passing over a shortened
@@ -42492,7 +43325,7 @@ example.
 <description>
 Updates a pointer to weakly refer to @new_object. It assigns @new_object
 to @weak_pointer_location and ensures that @weak_pointer_location will
-automaticaly be set to %NULL if @new_object gets destroyed. The assignment
+automatically be set to %NULL if @new_object gets destroyed. The assignment
 is not atomic. The weak reference is not thread-safe, see
 g_object_add_weak_pointer() for details.
 
@@ -43237,7 +44070,7 @@ Returns the invocation hint of the innermost signal emission of instance.
 <description>
 Blocks a handler of an instance so it will not be called during any
 signal emissions unless it is unblocked again. Thus &quot;blocking&quot; a
-signal handler means to temporarily deactive it, a signal handler
+signal handler means to temporarily deactivate it, a signal handler
 has to be unblocked exactly the same amount of times it has been
 blocked before to become active again.
 
@@ -43673,6 +44506,28 @@ otherwise.
 </return>
 </function>
 
+<function name="g_signal_is_valid_name">
+<description>
+Validate a signal name. This can be useful for dynamically-generated signals
+which need to be validated at run-time before actually trying to create them.
+
+See [canonical parameter names][canonical-parameter-names] for details of
+the rules for valid names. The rules for signal names are the same as those
+for property names.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="name">
+<parameter_description> the canonical name of the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @name is a valid signal name, %FALSE otherwise.
+</return>
+</function>
+
 <function name="g_signal_list_ids">
 <description>
 Lists the signals by id that a certain instance or interface type
@@ -43833,7 +44688,7 @@ This is a variant of g_signal_new() that takes a C callback instead
 of a class offset for the signal's class handler. This function
 doesn't need a function pointer exposed in the class structure of
 an object definition, instead the function pointer is passed
-directly and can be overriden by derived classes with
+directly and can be overridden by derived classes with
 g_signal_override_class_closure() or
 g_signal_override_class_handler()and chained to with
 g_signal_chain_from_overridden() or
@@ -44882,7 +45737,7 @@ g_slist_free (g_steal_pointer (&amp;list_of_borrowed_things));
 </description>
 <parameters>
 <parameter name="list">
-<parameter_description> a #GSList
+<parameter_description> the first link of a #GSList
 </parameter_description>
 </parameter>
 </parameters>
@@ -44938,7 +45793,7 @@ Since: 2.28
 </description>
 <parameters>
 <parameter name="list">
-<parameter_description> a pointer to a #GSList
+<parameter_description> the first link of a #GSList
 </parameter_description>
 </parameter>
 <parameter name="free_func">
@@ -47534,6 +48389,7 @@ lock @lock for writing, immediately returns %FALSE. Otherwise locks
 @lock for reading and returns %TRUE. This lock has to be unlocked by
 g_static_rw_lock_reader_unlock().
 
+Deprecated: 2.32: Use g_rw_lock_reader_trylock() instead
 
 </description>
 <parameters>
@@ -47544,7 +48400,6 @@ g_static_rw_lock_reader_unlock().
 </parameters>
 <return> %TRUE, if @lock could be locked for reading
 
-Deprectated: 2.32: Use g_rw_lock_reader_trylock() instead
 </return>
 </function>
 
@@ -47554,7 +48409,7 @@ Unlocks @lock. If a thread waits to lock @lock for writing and all
 locks for reading have been unlocked, the waiting thread is woken up
 and can lock @lock for writing.
 
-Deprectated: 2.32: Use g_rw_lock_reader_unlock() instead
+Deprecated: 2.32: Use g_rw_lock_reader_unlock() instead
 
 </description>
 <parameters>
@@ -47576,7 +48431,7 @@ reading. When @lock is locked for writing, no other thread can lock
 @lock (neither for reading nor writing). This lock has to be
 unlocked by g_static_rw_lock_writer_unlock().
 
-Deprectated: 2.32: Use g_rw_lock_writer_lock() instead
+Deprecated: 2.32: Use g_rw_lock_writer_lock() instead
 
 </description>
 <parameters>
@@ -47595,6 +48450,7 @@ either reading or writing) by another thread, it immediately returns
 %FALSE. Otherwise it locks @lock for writing and returns %TRUE. This
 lock has to be unlocked by g_static_rw_lock_writer_unlock().
 
+Deprecated: 2.32: Use g_rw_lock_writer_trylock() instead
 
 </description>
 <parameters>
@@ -47605,7 +48461,6 @@ lock has to be unlocked by g_static_rw_lock_writer_unlock().
 </parameters>
 <return> %TRUE, if @lock could be locked for writing
 
-Deprectated: 2.32: Use g_rw_lock_writer_trylock() instead
 </return>
 </function>
 
@@ -47618,7 +48473,7 @@ lock @lock for writing, and some thread or threads are waiting to
 lock @lock for reading, the waiting threads are woken up and can
 lock @lock for reading.
 
-Deprectated: 2.32: Use g_rw_lock_writer_unlock() instead
+Deprecated: 2.32: Use g_rw_lock_writer_unlock() instead
 
 </description>
 <parameters>
@@ -48520,7 +49375,7 @@ to the string.
 
 <function name="g_string_append_uri_escaped">
 <description>
-Appends @unescaped to @string, escaped any characters that
+Appends @unescaped to @string, escaping any characters that
 are reserved in URIs using URI-style escape sequences.
 
 Since: 2.16
@@ -49828,7 +50683,8 @@ Since: 2.4
 </parameter>
 <parameter name="delimiters">
 <parameter_description> A nul-terminated string containing bytes that are used
-to split the string.
+to split the string (it can accept an empty string, which will result
+in no string splitting).
 </parameter_description>
 </parameter>
 <parameter name="max_tokens">
@@ -50265,8 +51121,11 @@ Since: 2.38
 
 <function name="g_test_create_case">
 <description>
-Create a new #GTestCase, named @test_name, this API is fairly
-low level, calling g_test_add() or g_test_add_func() is preferable.
+Create a new #GTestCase, named @test_name.
+
+This API is fairly low level, and calling g_test_add() or g_test_add_func()
+is preferable.
+
 When this test is executed, a fixture structure of size @data_size
 will be automatically allocated and filled with zeros. Then @data_setup is
 called to initialize the fixture. After fixture setup, the actual test
@@ -50275,10 +51134,10 @@ fixture structure is torn down by calling @data_teardown and
 after that the memory is automatically released by the test framework.
 
 Splitting up a test run into fixture setup, test function and
-fixture teardown is most useful if the same fixture is used for
+fixture teardown is most useful if the same fixture type is used for
 multiple tests. In this cases, g_test_create_case() will be
-called with the same fixture, but varying @test_name and
-@data_test arguments.
+called with the same type of fixture (the @data_size argument), but varying
+@test_name and @data_test arguments.
 
 Since: 2.16
 
@@ -51064,16 +51923,14 @@ Since: 2.16
 
 <function name="g_test_set_nonfatal_assertions">
 <description>
-Changes the behaviour of g_assert_cmpstr(), g_assert_cmpint(),
-g_assert_cmpuint(), g_assert_cmphex(), g_assert_cmpfloat(),
-g_assert_true(), g_assert_false(), g_assert_null(), g_assert_no_error(),
-g_assert_error(), g_test_assert_expected_messages() and the various
-g_test_trap_assert_*() macros to not abort to program, but instead
+Changes the behaviour of the various `g_assert_*()` macros,
+g_test_assert_expected_messages() and the various
+`g_test_trap_assert_*()` macros to not abort to program, but instead
 call g_test_fail() and continue. (This also changes the behavior of
 g_test_fail() so that it will not cause the test program to abort
 after completing the failed test.)
 
-Note that the g_assert_not_reached() and g_assert() are not
+Note that the g_assert_not_reached() and g_assert() macros are not
 affected by this.
 
 This function can only be called after g_test_init().
@@ -51868,10 +52725,10 @@ Note however, that no thread of this pool is interrupted while
 processing a task. Instead at least all still running threads
 can finish their tasks before the @pool is freed.
 
-If @wait_ is %TRUE, the functions does not return before all
+If @wait_ is %TRUE, this function does not return before all
 tasks to be processed (dependent on @immediate, whether all
 or only the currently running) are ready.
-Otherwise the function returns immediately.
+Otherwise this function returns immediately.
 
 After calling this function @pool must not be used anymore.
 
@@ -52004,6 +52861,10 @@ allows unlimited threads to be created for this thread pool. The
 newly created or reused thread now executes the function @func
 with the two arguments. The first one is the parameter to
 g_thread_pool_push() and the second one is @user_data.
+
+Pass g_get_num_processors() to @max_threads to create as many threads as
+there are logical processors on the system. This will not pin each thread to
+a specific processor.
 
 The parameter @exclusive determines whether the thread pool owns
 all threads exclusive or shares them with other thread pools.
@@ -53437,6 +54298,9 @@ key is freed using that function.
 
 The tree is automatically 'balanced' as new key/value pairs are added,
 so that the distance from the root to every leaf is as small as possible.
+The cost of maintaining a balanced tree while inserting new key/value
+result in a O(n log(n)) operation where most of the other operations
+are O(log(n)).
 
 </description>
 <parameters>
@@ -53629,6 +54493,10 @@ If the #GTree was created using g_tree_new_full(), the key and value
 are freed using the supplied destroy functions, otherwise you have to 
 make sure that any dynamically allocated values are freed yourself.
 If the key does not exist in the #GTree, the function does nothing.
+
+The cost of maintaining a balanced tree while removing a key/value
+result in a O(n log(n)) operation where most of the other operations
+are O(log(n)).
 
 
 </description>
@@ -54450,7 +55318,7 @@ can be instantiated. The type system only performs basic allocation
 and structure setups for instances: actual instance creation should
 happen through functions supplied by the type's fundamental type
 implementation.  So use of g_type_create_instance() is reserved for
-implementators of fundamental types only. E.g. instances of the
+implementers of fundamental types only. E.g. instances of the
 #GObject hierarchy should be created via g_object_new() and never
 directly through g_type_create_instance() which doesn't handle things
 like singleton objects or object construction.
@@ -54502,7 +55370,7 @@ Increments the reference count for the interface type @g_type,
 and returns the default interface vtable for the type.
 
 If the type is not currently in use, then the default vtable
-for the type will be created and initalized by calling
+for the type will be created and initialized by calling
 the base interface init and default vtable init functions for
 the type (the @base_init and @class_init members of #GTypeInfo).
 Calling g_type_default_interface_ref() is useful when you
@@ -56321,7 +57189,7 @@ Since: 2.12
 
 <function name="g_unichar_isxdigit">
 <description>
-Determines if a character is a hexidecimal digit.
+Determines if a character is a hexadecimal digit.
 
 
 </description>
@@ -56473,7 +57341,7 @@ character, though it's normally a string terminator.
 
 <function name="g_unichar_xdigit_value">
 <description>
-Determines the numeric value of a character as a hexidecimal
+Determines the numeric value of a character as a hexadecimal
 digit.
 
 
@@ -56958,16 +57826,164 @@ not contain '='
 <return></return>
 </function>
 
+<function name="g_uri_build">
+<description>
+Creates a new #GUri from the given components according to @flags.
+
+See also g_uri_build_with_user(), which allows specifying the
+components of the &quot;userinfo&quot; separately.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="flags">
+<parameter_description> flags describing how to build the #GUri
+</parameter_description>
+</parameter>
+<parameter name="scheme">
+<parameter_description> the URI scheme
+</parameter_description>
+</parameter>
+<parameter name="userinfo">
+<parameter_description> the userinfo component, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="host">
+<parameter_description> the host component, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="port">
+<parameter_description> the port, or `-1`
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> the path component
+</parameter_description>
+</parameter>
+<parameter name="query">
+<parameter_description> the query component, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="fragment">
+<parameter_description> the fragment, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GUri
+
+</return>
+</function>
+
+<function name="g_uri_build_with_user">
+<description>
+Creates a new #GUri from the given components according to @flags
+(%G_URI_FLAGS_HAS_PASSWORD is added unconditionally). The @flags must be
+coherent with the passed values, in particular use `%`-encoded values with
+%G_URI_FLAGS_ENCODED.
+
+In contrast to g_uri_build(), this allows specifying the components
+of the ‘userinfo’ field separately. Note that @user must be non-%NULL
+if either @password or @auth_params is non-%NULL.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="flags">
+<parameter_description> flags describing how to build the #GUri
+</parameter_description>
+</parameter>
+<parameter name="scheme">
+<parameter_description> the URI scheme
+</parameter_description>
+</parameter>
+<parameter name="user">
+<parameter_description> the user component of the userinfo, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="password">
+<parameter_description> the password component of the userinfo, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="auth_params">
+<parameter_description> the auth params of the userinfo, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="host">
+<parameter_description> the host component, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="port">
+<parameter_description> the port, or `-1`
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> the path component
+</parameter_description>
+</parameter>
+<parameter name="query">
+<parameter_description> the query component, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="fragment">
+<parameter_description> the fragment, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GUri
+
+</return>
+</function>
+
+<function name="g_uri_escape_bytes">
+<description>
+Escapes arbitrary data for use in a URI.
+
+Normally all characters that are not ‘unreserved’ (i.e. ASCII
+alphanumerical characters plus dash, dot, underscore and tilde) are
+escaped. But if you specify characters in @reserved_chars_allowed
+they are not escaped. This is useful for the ‘reserved’ characters
+in the URI specification, since those are allowed unescaped in some
+portions of a URI.
+
+Though technically incorrect, this will also allow escaping nul
+bytes as `%``00`.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="unescaped">
+<parameter_description> the unescaped input data.
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> the length of @unescaped
+</parameter_description>
+</parameter>
+<parameter name="reserved_chars_allowed">
+<parameter_description> a string of reserved
+characters that are allowed to be used, or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> an escaped version of @unescaped.
+The returned string should be freed when no longer needed.
+
+</return>
+</function>
+
 <function name="g_uri_escape_string">
 <description>
 Escapes a string for use in a URI.
 
-Normally all characters that are not &quot;unreserved&quot; (i.e. ASCII alphanumerical
-characters plus dash, dot, underscore and tilde) are escaped.
-But if you specify characters in @reserved_chars_allowed they are not
-escaped. This is useful for the &quot;reserved&quot; characters in the URI
-specification, since those are allowed unescaped in some portions of
-a URI. 
+Normally all characters that are not &quot;unreserved&quot; (i.e. ASCII
+alphanumerical characters plus dash, dot, underscore and tilde) are
+escaped. But if you specify characters in @reserved_chars_allowed
+they are not escaped. This is useful for the &quot;reserved&quot; characters
+in the URI specification, since those are allowed unescaped in some
+portions of a URI.
 
 Since: 2.16
 
@@ -56978,8 +57994,8 @@ Since: 2.16
 </parameter_description>
 </parameter>
 <parameter name="reserved_chars_allowed">
-<parameter_description> a string of reserved characters that
-are allowed to be used, or %NULL.
+<parameter_description> a string of reserved
+characters that are allowed to be used, or %NULL.
 </parameter_description>
 </parameter>
 <parameter name="allow_utf8">
@@ -56987,8 +58003,389 @@ are allowed to be used, or %NULL.
 </parameter_description>
 </parameter>
 </parameters>
-<return> an escaped version of @unescaped. The returned string should be 
-freed when no longer needed.
+<return> an escaped version of @unescaped. The
+returned string should be freed when no longer needed.
+
+</return>
+</function>
+
+<function name="g_uri_get_auth_params">
+<description>
+Gets @uri's authentication parameters, which may contain
+`%`-encoding, depending on the flags with which @uri was created.
+(If @uri was not created with %G_URI_FLAGS_HAS_AUTH_PARAMS then this will
+be %NULL.)
+
+Depending on the URI scheme, g_uri_parse_params() may be useful for
+further parsing this information.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #GUri
+</parameter_description>
+</parameter>
+</parameters>
+<return> @uri's authentication parameters.
+
+</return>
+</function>
+
+<function name="g_uri_get_flags">
+<description>
+Gets @uri's flags set upon construction.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #GUri
+</parameter_description>
+</parameter>
+</parameters>
+<return> @uri's flags.
+
+</return>
+</function>
+
+<function name="g_uri_get_fragment">
+<description>
+Gets @uri's fragment, which may contain `%`-encoding, depending on
+the flags with which @uri was created.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #GUri
+</parameter_description>
+</parameter>
+</parameters>
+<return> @uri's fragment.
+
+</return>
+</function>
+
+<function name="g_uri_get_host">
+<description>
+Gets @uri's host. This will never have `%`-encoded characters,
+unless it is non-UTF-8 (which can only be the case if @uri was
+created with %G_URI_FLAGS_NON_DNS).
+
+If @uri contained an IPv6 address literal, this value will be just
+that address, without the brackets around it that are necessary in
+the string form of the URI. Note that in this case there may also
+be a scope ID attached to the address. Eg, `fe80::1234%``em1` (or
+`fe80::1234%``25em1` if the string is still encoded).
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #GUri
+</parameter_description>
+</parameter>
+</parameters>
+<return> @uri's host.
+
+</return>
+</function>
+
+<function name="g_uri_get_password">
+<description>
+Gets @uri's password, which may contain `%`-encoding, depending on
+the flags with which @uri was created. (If @uri was not created
+with %G_URI_FLAGS_HAS_PASSWORD then this will be %NULL.)
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #GUri
+</parameter_description>
+</parameter>
+</parameters>
+<return> @uri's password.
+
+</return>
+</function>
+
+<function name="g_uri_get_path">
+<description>
+Gets @uri's path, which may contain `%`-encoding, depending on the
+flags with which @uri was created.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #GUri
+</parameter_description>
+</parameter>
+</parameters>
+<return> @uri's path.
+
+</return>
+</function>
+
+<function name="g_uri_get_port">
+<description>
+Gets @uri's port.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #GUri
+</parameter_description>
+</parameter>
+</parameters>
+<return> @uri's port, or `-1` if no port was specified.
+
+</return>
+</function>
+
+<function name="g_uri_get_query">
+<description>
+Gets @uri's query, which may contain `%`-encoding, depending on the
+flags with which @uri was created.
+
+For queries consisting of a series of `name=value` parameters,
+#GUriParamsIter or g_uri_parse_params() may be useful.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #GUri
+</parameter_description>
+</parameter>
+</parameters>
+<return> @uri's query.
+
+</return>
+</function>
+
+<function name="g_uri_get_scheme">
+<description>
+Gets @uri's scheme. Note that this will always be all-lowercase,
+regardless of the string or strings that @uri was created from.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #GUri
+</parameter_description>
+</parameter>
+</parameters>
+<return> @uri's scheme.
+
+</return>
+</function>
+
+<function name="g_uri_get_user">
+<description>
+Gets the ‘username’ component of @uri's userinfo, which may contain
+`%`-encoding, depending on the flags with which @uri was created.
+If @uri was not created with %G_URI_FLAGS_HAS_PASSWORD or
+%G_URI_FLAGS_HAS_AUTH_PARAMS, this is the same as g_uri_get_userinfo().
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #GUri
+</parameter_description>
+</parameter>
+</parameters>
+<return> @uri's user.
+
+</return>
+</function>
+
+<function name="g_uri_get_userinfo">
+<description>
+Gets @uri's userinfo, which may contain `%`-encoding, depending on
+the flags with which @uri was created.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #GUri
+</parameter_description>
+</parameter>
+</parameters>
+<return> @uri's userinfo.
+
+</return>
+</function>
+
+<function name="g_uri_is_valid">
+<description>
+Parses @uri_string according to @flags, to determine whether it is a valid
+[absolute URI][relative-absolute-uris], i.e. it does not need to be resolved
+relative to another URI using g_uri_parse_relative().
+
+If it’s not a valid URI, an error is returned explaining how it’s invalid.
+
+See g_uri_split(), and the definition of #GUriFlags, for more
+information on the effect of @flags.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri_string">
+<parameter_description> a string containing an absolute URI
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags for parsing @uri_string
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @uri_string is a valid absolute URI, %FALSE on error.
+
+</return>
+</function>
+
+<function name="g_uri_join">
+<description>
+Joins the given components together according to @flags to create
+an absolute URI string. @path may not be %NULL (though it may be the empty
+string).
+
+When @host is present, @path must either be empty or begin with a slash (`/`)
+character. When @host is not present, @path cannot begin with two slash
+   characters (`//`). See
+[RFC 3986, section 3](https://tools.ietf.org/html/rfc3986#section-3).
+
+See also g_uri_join_with_user(), which allows specifying the
+components of the ‘userinfo’ separately.
+
+%G_URI_FLAGS_HAS_PASSWORD and %G_URI_FLAGS_HAS_AUTH_PARAMS are ignored if set
+in @flags.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="flags">
+<parameter_description> flags describing how to build the URI string
+</parameter_description>
+</parameter>
+<parameter name="scheme">
+<parameter_description> the URI scheme, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="userinfo">
+<parameter_description> the userinfo component, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="host">
+<parameter_description> the host component, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="port">
+<parameter_description> the port, or `-1`
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> the path component
+</parameter_description>
+</parameter>
+<parameter name="query">
+<parameter_description> the query component, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="fragment">
+<parameter_description> the fragment, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> an absolute URI string
+
+</return>
+</function>
+
+<function name="g_uri_join_with_user">
+<description>
+Joins the given components together according to @flags to create
+an absolute URI string. @path may not be %NULL (though it may be the empty
+string).
+
+In contrast to g_uri_join(), this allows specifying the components
+of the ‘userinfo’ separately. It otherwise behaves the same.
+
+%G_URI_FLAGS_HAS_PASSWORD and %G_URI_FLAGS_HAS_AUTH_PARAMS are ignored if set
+in @flags.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="flags">
+<parameter_description> flags describing how to build the URI string
+</parameter_description>
+</parameter>
+<parameter name="scheme">
+<parameter_description> the URI scheme, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="user">
+<parameter_description> the user component of the userinfo, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="password">
+<parameter_description> the password component of the userinfo, or
+%NULL
+</parameter_description>
+</parameter>
+<parameter name="auth_params">
+<parameter_description> the auth params of the userinfo, or
+%NULL
+</parameter_description>
+</parameter>
+<parameter name="host">
+<parameter_description> the host component, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="port">
+<parameter_description> the port, or `-1`
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> the path component
+</parameter_description>
+</parameter>
+<parameter name="query">
+<parameter_description> the query component, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="fragment">
+<parameter_description> the fragment, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> an absolute URI string
 
 </return>
 </function>
@@ -57015,13 +58412,250 @@ with g_strfreev().
 </return>
 </function>
 
+<function name="g_uri_params_iter_init">
+<description>
+Initializes an attribute/value pair iterator.
+
+The iterator keeps pointers to the @params and @separators arguments, those
+variables must thus outlive the iterator and not be modified during the
+iteration.
+
+If %G_URI_PARAMS_WWW_FORM is passed in @flags, `+` characters in the param
+string will be replaced with spaces in the output. For example, `foo=bar+baz`
+will give attribute `foo` with value `bar baz`. This is commonly used on the
+web (the `https` and `http` schemes only), but is deprecated in favour of
+the equivalent of encoding spaces as `%20`.
+
+Unlike with g_uri_parse_params(), %G_URI_PARAMS_CASE_INSENSITIVE has no
+effect if passed to @flags for g_uri_params_iter_init(). The caller is
+responsible for doing their own case-insensitive comparisons.
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
+GUriParamsIter iter;
+GError *error = NULL;
+gchar *unowned_attr, *unowned_value;
+
+g_uri_params_iter_init (&amp;iter, &quot;foo=bar&amp;baz=bar&amp;Foo=frob&amp;baz=bar2&quot;, -1, &quot;&amp;&quot;, G_URI_PARAMS_NONE);
+while (g_uri_params_iter_next (&amp;iter, &amp;unowned_attr, &amp;unowned_value, &amp;error))
+{
+g_autofree gchar *attr = g_steal_pointer (&amp;unowned_attr);
+g_autofree gchar *value = g_steal_pointer (&amp;unowned_value);
+// do something with attr and value; this code will be called 4 times
+// for the params string in this example: once with attr=foo and value=bar,
+// then with baz/bar, then Foo/frob, then baz/bar2.
+}
+if (error)
+// handle parsing error
+]|
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> an uninitialized #GUriParamsIter
+</parameter_description>
+</parameter>
+<parameter name="params">
+<parameter_description> a `%`-encoded string containing `attribute=value`
+parameters
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> the length of @params, or `-1` if it is nul-terminated
+</parameter_description>
+</parameter>
+<parameter name="separators">
+<parameter_description> the separator byte character set between parameters. (usually
+`&amp;`, but sometimes `;` or both `&amp;;`). Note that this function works on
+bytes not characters, so it can't be used to delimit UTF-8 strings for
+anything but ASCII characters. You may pass an empty set, in which case
+no splitting will occur.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags to modify the way the parameters are handled.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_uri_params_iter_next">
+<description>
+Advances @iter and retrieves the next attribute/value. %FALSE is returned if
+an error has occurred (in which case @error is set), or if the end of the
+iteration is reached (in which case @attribute and @value are set to %NULL
+and the iterator becomes invalid). If %TRUE is returned,
+g_uri_params_iter_next() may be called again to receive another
+attribute/value pair.
+
+Note that the same @attribute may be returned multiple times, since URIs
+allow repeated attributes.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> an initialized #GUriParamsIter
+</parameter_description>
+</parameter>
+<parameter name="attribute">
+<parameter_description> on return, contains
+the attribute, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> on return, contains
+the value, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %FALSE if the end of the parameters has been reached or an error was
+encountered. %TRUE otherwise.
+
+</return>
+</function>
+
+<function name="g_uri_parse">
+<description>
+Parses @uri_string according to @flags. If the result is not a
+valid [absolute URI][relative-absolute-uris], it will be discarded, and an
+error returned.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri_string">
+<parameter_description> a string representing an absolute URI
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags describing how to parse @uri_string
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GUri, or NULL on error.
+
+</return>
+</function>
+
+<function name="g_uri_parse_params">
+<description>
+Many URI schemes include one or more attribute/value pairs as part of the URI
+value. This method can be used to parse them into a hash table. When an
+attribute has multiple occurrences, the last value is the final returned
+value. If you need to handle repeated attributes differently, use
+#GUriParamsIter.
+
+The @params string is assumed to still be `%`-encoded, but the returned
+values will be fully decoded. (Thus it is possible that the returned values
+may contain `=` or @separators, if the value was encoded in the input.)
+Invalid `%`-encoding is treated as with the %G_URI_FLAGS_PARSE_RELAXED
+rules for g_uri_parse(). (However, if @params is the path or query string
+from a #GUri that was parsed without %G_URI_FLAGS_PARSE_RELAXED and
+%G_URI_FLAGS_ENCODED, then you already know that it does not contain any
+invalid encoding.)
+
+%G_URI_PARAMS_WWW_FORM is handled as documented for g_uri_params_iter_init().
+
+If %G_URI_PARAMS_CASE_INSENSITIVE is passed to @flags, attributes will be
+compared case-insensitively, so a params string `attr=123&amp;Attr=456` will only
+return a single attribute–value pair, `Attr=456`. Case will be preserved in
+the returned attributes.
+
+If @params cannot be parsed (for example, it contains two @separators
+characters in a row), then @error is set and %NULL is returned.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="params">
+<parameter_description> a `%`-encoded string containing `attribute=value`
+parameters
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> the length of @params, or `-1` if it is nul-terminated
+</parameter_description>
+</parameter>
+<parameter name="separators">
+<parameter_description> the separator byte character set between parameters. (usually
+`&amp;`, but sometimes `;` or both `&amp;;`). Note that this function works on
+bytes not characters, so it can't be used to delimit UTF-8 strings for
+anything but ASCII characters. You may pass an empty set, in which case
+no splitting will occur.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags to modify the way the parameters are handled.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return>
+A hash table of attribute/value pairs, with both names and values
+fully-decoded; or %NULL on error.
+
+</return>
+</function>
+
+<function name="g_uri_parse_relative">
+<description>
+Parses @uri_ref according to @flags and, if it is a
+[relative URI][relative-absolute-uris], resolves it relative to @base_uri.
+If the result is not a valid absolute URI, it will be discarded, and an error
+returned.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="base_uri">
+<parameter_description> a base absolute URI
+</parameter_description>
+</parameter>
+<parameter name="uri_ref">
+<parameter_description> a string representing a relative or absolute URI
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags describing how to parse @uri_ref
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GUri, or NULL on error.
+
+</return>
+</function>
+
 <function name="g_uri_parse_scheme">
 <description>
-Gets the scheme portion of a URI string. RFC 3986 decodes the scheme as:
+Gets the scheme portion of a URI string.
+[RFC 3986](https://tools.ietf.org/html/rfc3986#section-3) decodes the scheme
+as:
 |[
-URI = scheme &quot;:&quot; hier-part [ &quot;?&quot; query ] [ &quot;#&quot; fragment ] 
+URI = scheme &quot;:&quot; hier-part [ &quot;?&quot; query ] [ &quot;#&quot; fragment ]
 ]|
-Common schemes include &quot;file&quot;, &quot;http&quot;, &quot;svn+ssh&quot;, etc.
+Common schemes include `file`, `https`, `svn+ssh`, etc.
 
 Since: 2.16
 
@@ -57032,8 +58666,395 @@ Since: 2.16
 </parameter_description>
 </parameter>
 </parameters>
-<return> The &quot;Scheme&quot; component of the URI, or %NULL on error. 
-The returned string should be freed when no longer needed.
+<return> The ‘scheme’ component of the URI, or
+%NULL on error. The returned string should be freed when no longer needed.
+
+</return>
+</function>
+
+<function name="g_uri_peek_scheme">
+<description>
+Gets the scheme portion of a URI string.
+[RFC 3986](https://tools.ietf.org/html/rfc3986#section-3) decodes the scheme
+as:
+|[
+URI = scheme &quot;:&quot; hier-part [ &quot;?&quot; query ] [ &quot;#&quot; fragment ]
+]|
+Common schemes include `file`, `https`, `svn+ssh`, etc.
+
+Unlike g_uri_parse_scheme(), the returned scheme is normalized to
+all-lowercase and does not need to be freed.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a valid URI.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The ‘scheme’ component of the URI, or
+%NULL on error. The returned string is normalized to all-lowercase, and
+interned via g_intern_string(), so it does not need to be freed.
+
+</return>
+</function>
+
+<function name="g_uri_ref">
+<description>
+Increments the reference count of @uri by one.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #GUri
+</parameter_description>
+</parameter>
+</parameters>
+<return> @uri
+
+</return>
+</function>
+
+<function name="g_uri_resolve_relative">
+<description>
+Parses @uri_ref according to @flags and, if it is a
+[relative URI][relative-absolute-uris], resolves it relative to
+@base_uri_string. If the result is not a valid absolute URI, it will be
+discarded, and an error returned.
+
+(If @base_uri_string is %NULL, this just returns @uri_ref, or
+%NULL if @uri_ref is invalid or not absolute.)
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="base_uri_string">
+<parameter_description> a string representing a base URI
+</parameter_description>
+</parameter>
+<parameter name="uri_ref">
+<parameter_description> a string representing a relative or absolute URI
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags describing how to parse @uri_ref
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the resolved URI string,
+or NULL on error.
+
+</return>
+</function>
+
+<function name="g_uri_split">
+<description>
+Parses @uri_ref (which can be an
+[absolute or relative URI][relative-absolute-uris]) according to @flags, and
+returns the pieces. Any component that doesn't appear in @uri_ref will be
+returned as %NULL (but note that all URIs always have a path component,
+though it may be the empty string).
+
+If @flags contains %G_URI_FLAGS_ENCODED, then `%`-encoded characters in
+@uri_ref will remain encoded in the output strings. (If not,
+then all such characters will be decoded.) Note that decoding will
+only work if the URI components are ASCII or UTF-8, so you will
+need to use %G_URI_FLAGS_ENCODED if they are not.
+
+Note that the %G_URI_FLAGS_HAS_PASSWORD and
+%G_URI_FLAGS_HAS_AUTH_PARAMS @flags are ignored by g_uri_split(),
+since it always returns only the full userinfo; use
+g_uri_split_with_user() if you want it split up.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri_ref">
+<parameter_description> a string containing a relative or absolute URI
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags for parsing @uri_ref
+</parameter_description>
+</parameter>
+<parameter name="scheme">
+<parameter_description> on return, contains
+the scheme (converted to lowercase), or %NULL
+</parameter_description>
+</parameter>
+<parameter name="userinfo">
+<parameter_description> on return, contains
+the userinfo, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="host">
+<parameter_description> on return, contains the
+host, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="port">
+<parameter_description> on return, contains the
+port, or `-1`
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> on return, contains the
+path
+</parameter_description>
+</parameter>
+<parameter name="query">
+<parameter_description> on return, contains the
+query, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="fragment">
+<parameter_description> on return, contains
+the fragment, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @uri_ref parsed successfully, %FALSE
+on error.
+
+</return>
+</function>
+
+<function name="g_uri_split_network">
+<description>
+Parses @uri_string (which must be an [absolute URI][relative-absolute-uris])
+according to @flags, and returns the pieces relevant to connecting to a host.
+See the documentation for g_uri_split() for more details; this is
+mostly a wrapper around that function with simpler arguments.
+However, it will return an error if @uri_string is a relative URI,
+or does not contain a hostname component.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri_string">
+<parameter_description> a string containing an absolute URI
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags for parsing @uri_string
+</parameter_description>
+</parameter>
+<parameter name="scheme">
+<parameter_description> on return, contains
+the scheme (converted to lowercase), or %NULL
+</parameter_description>
+</parameter>
+<parameter name="host">
+<parameter_description> on return, contains the
+host, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="port">
+<parameter_description> on return, contains the
+port, or `-1`
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @uri_string parsed successfully,
+%FALSE on error.
+
+</return>
+</function>
+
+<function name="g_uri_split_with_user">
+<description>
+Parses @uri_ref (which can be an
+[absolute or relative URI][relative-absolute-uris]) according to @flags, and
+returns the pieces. Any component that doesn't appear in @uri_ref will be
+returned as %NULL (but note that all URIs always have a path component,
+though it may be the empty string).
+
+See g_uri_split(), and the definition of #GUriFlags, for more
+information on the effect of @flags. Note that @password will only
+be parsed out if @flags contains %G_URI_FLAGS_HAS_PASSWORD, and
+@auth_params will only be parsed out if @flags contains
+%G_URI_FLAGS_HAS_AUTH_PARAMS.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri_ref">
+<parameter_description> a string containing a relative or absolute URI
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags for parsing @uri_ref
+</parameter_description>
+</parameter>
+<parameter name="scheme">
+<parameter_description> on return, contains
+the scheme (converted to lowercase), or %NULL
+</parameter_description>
+</parameter>
+<parameter name="user">
+<parameter_description> on return, contains
+the user, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="password">
+<parameter_description> on return, contains
+the password, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="auth_params">
+<parameter_description> on return, contains
+the auth_params, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="host">
+<parameter_description> on return, contains the
+host, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="port">
+<parameter_description> on return, contains the
+port, or `-1`
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> on return, contains the
+path
+</parameter_description>
+</parameter>
+<parameter name="query">
+<parameter_description> on return, contains the
+query, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="fragment">
+<parameter_description> on return, contains
+the fragment, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @uri_ref parsed successfully, %FALSE
+on error.
+
+</return>
+</function>
+
+<function name="g_uri_to_string">
+<description>
+Returns a string representing @uri.
+
+This is not guaranteed to return a string which is identical to the
+string that @uri was parsed from. However, if the source URI was
+syntactically correct (according to RFC 3986), and it was parsed
+with %G_URI_FLAGS_ENCODED, then g_uri_to_string() is guaranteed to return
+a string which is at least semantically equivalent to the source
+URI (according to RFC 3986).
+
+If @uri might contain sensitive details, such as authentication parameters,
+or private data in its query string, and the returned string is going to be
+logged, then consider using g_uri_to_string_partial() to redact parts.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #GUri
+</parameter_description>
+</parameter>
+</parameters>
+<return> a string representing @uri,
+which the caller must free.
+
+</return>
+</function>
+
+<function name="g_uri_to_string_partial">
+<description>
+Returns a string representing @uri, subject to the options in
+@flags. See g_uri_to_string() and #GUriHideFlags for more details.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #GUri
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags describing what parts of @uri to hide
+</parameter_description>
+</parameter>
+</parameters>
+<return> a string representing
+@uri, which the caller must free.
+
+</return>
+</function>
+
+<function name="g_uri_unescape_bytes">
+<description>
+Unescapes a segment of an escaped string as binary data.
+
+Note that in contrast to g_uri_unescape_string(), this does allow
+nul bytes to appear in the output.
+
+If any of the characters in @illegal_characters appears as an escaped
+character in @escaped_string, then that is an error and %NULL will be
+returned. This is useful if you want to avoid for instance having a slash
+being expanded in an escaped path element, which might confuse pathname
+handling.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="escaped_string">
+<parameter_description> A URI-escaped string
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> the length (in bytes) of @escaped_string to escape, or `-1` if it
+is nul-terminated.
+</parameter_description>
+</parameter>
+<parameter name="illegal_characters">
+<parameter_description> a string of illegal characters
+not to be allowed, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> an unescaped version of @escaped_string
+or %NULL on error (if decoding failed, using %G_URI_ERROR_FAILED error
+code). The returned #GBytes should be unreffed when no longer needed.
 
 </return>
 </function>
@@ -57042,11 +59063,14 @@ The returned string should be freed when no longer needed.
 <description>
 Unescapes a segment of an escaped string.
 
-If any of the characters in @illegal_characters or the character zero appears
-as an escaped character in @escaped_string then that is an error and %NULL
-will be returned. This is useful it you want to avoid for instance having a
-slash being expanded in an escaped path element, which might confuse pathname
-handling.
+If any of the characters in @illegal_characters or the NUL
+character appears as an escaped character in @escaped_string, then
+that is an error and %NULL will be returned. This is useful if you
+want to avoid for instance having a slash being expanded in an
+escaped path element, which might confuse pathname handling.
+
+Note: `NUL` byte is not accepted in the output, in contrast to
+g_uri_unescape_bytes().
 
 Since: 2.16
 
@@ -57057,18 +59081,20 @@ Since: 2.16
 </parameter_description>
 </parameter>
 <parameter name="escaped_string_end">
-<parameter_description> Pointer to end of @escaped_string, may be %NULL
+<parameter_description> Pointer to end of @escaped_string,
+may be %NULL
 </parameter_description>
 </parameter>
 <parameter name="illegal_characters">
-<parameter_description> An optional string of illegal characters not to be allowed, may be %NULL
+<parameter_description> An optional string of illegal
+characters not to be allowed, may be %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> an unescaped version of @escaped_string or %NULL on error.
-The returned string should be freed when no longer needed.  As a
-special case if %NULL is given for @escaped_string, this function
-will return %NULL.
+<return> an unescaped version of @escaped_string,
+or %NULL on error. The returned string should be freed when no longer
+needed.  As a special case if %NULL is given for @escaped_string, this
+function will return %NULL.
 
 </return>
 </function>
@@ -57077,11 +59103,11 @@ will return %NULL.
 <description>
 Unescapes a whole escaped string.
 
-If any of the characters in @illegal_characters or the character zero appears
-as an escaped character in @escaped_string then that is an error and %NULL
-will be returned. This is useful it you want to avoid for instance having a
-slash being expanded in an escaped path element, which might confuse pathname
-handling.
+If any of the characters in @illegal_characters or the NUL
+character appears as an escaped character in @escaped_string, then
+that is an error and %NULL will be returned. This is useful if you
+want to avoid for instance having a slash being expanded in an
+escaped path element, which might confuse pathname handling.
 
 Since: 2.16
 
@@ -57092,15 +59118,34 @@ Since: 2.16
 </parameter_description>
 </parameter>
 <parameter name="illegal_characters">
-<parameter_description> a string of illegal characters not to be
-allowed, or %NULL.
+<parameter_description> a string of illegal characters
+not to be allowed, or %NULL.
 </parameter_description>
 </parameter>
 </parameters>
-<return> an unescaped version of @escaped_string. The returned string 
-should be freed when no longer needed.
+<return> an unescaped version of @escaped_string.
+The returned string should be freed when no longer needed.
 
 </return>
+</function>
+
+<function name="g_uri_unref">
+<description>
+Atomically decrements the reference count of @uri by one.
+
+When the reference count reaches zero, the resources allocated by
+@uri are freed
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #GUri
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_usleep">
@@ -57173,13 +59218,13 @@ terminated with a 0 byte.
 Note that the input is expected to be already in native endianness,
 an initial byte-order-mark character is not handled specially.
 g_convert() can be used to convert a byte buffer of UTF-16 data of
-ambiguous endianess.
+ambiguous endianness.
 
 Further note that this function does not validate the result
 string; it may e.g. include embedded NUL characters. The only
 validation done by this function is to ensure that the input can
 be correctly interpreted as UTF-16, i.e. it doesn't contain
-things unpaired surrogates.
+unpaired surrogates or partial character sequences.
 
 
 </description>
@@ -59125,6 +61170,28 @@ Set the contents of a %G_TYPE_INT64 #GValue to @v_int64.
 <return></return>
 </function>
 
+<function name="g_value_set_interned_string">
+<description>
+Set the contents of a %G_TYPE_STRING #GValue to @v_string.  The string is
+assumed to be static and interned (canonical, for example from
+g_intern_string()), and is thus not duplicated when setting the #GValue.
+
+Since: 2.66
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> a valid #GValue of type %G_TYPE_STRING
+</parameter_description>
+</parameter>
+<parameter name="v_string">
+<parameter_description> static string to be set
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_value_set_long">
 <description>
 Set the contents of a %G_TYPE_LONG #GValue to @v_long.
@@ -59292,6 +61359,9 @@ when setting the #GValue.
 Set the contents of a %G_TYPE_STRING #GValue to @v_string.
 The string is assumed to be static, and is thus not duplicated
 when setting the #GValue.
+
+If the the string is a canonical string, using g_value_set_interned_string()
+is more appropriate.
 
 </description>
 <parameters>
@@ -60865,6 +62935,12 @@ in the container.  See g_variant_n_children().
 The returned value is never floating.  You should free it with
 g_variant_unref() when you're done with it.
 
+Note that values borrowed from the returned child are not guaranteed to
+still be valid after the child is freed even if you still hold a reference
+to @value, if @value has not been serialised at the time this function is
+called. To avoid this, you can serialize @value by calling
+g_variant_get_data() and optionally ignoring the return value.
+
 There may be implementation specific restrictions on deeply nested values,
 which would result in the unit tuple being returned as the child value,
 instead of further nested children. #GVariant is guaranteed to handle
@@ -61238,11 +63314,15 @@ Returns the string value of a #GVariant instance with a string
 type.  This includes the types %G_VARIANT_TYPE_STRING,
 %G_VARIANT_TYPE_OBJECT_PATH and %G_VARIANT_TYPE_SIGNATURE.
 
-The string will always be UTF-8 encoded, and will never be %NULL.
+The string will always be UTF-8 encoded, will never be %NULL, and will never
+contain nul bytes.
 
 If @length is non-%NULL then the length of the string (in bytes) is
 returned there.  For trusted values, this information is already
-known.  For untrusted values, a strlen() will be performed.
+known.  Untrusted values will be validated and, if valid, a strlen() will be
+performed. If invalid, a default value will be returned — for
+%G_VARIANT_TYPE_OBJECT_PATH, this is `&quot;/&quot;`, and for other types it is the
+empty string.
 
 It is an error to call this function with a @value of any type
 other than those three.
@@ -61655,7 +63735,7 @@ Use g_variant_iter_free() to free the return value when you no longer
 need it.
 
 A reference is taken to the container that @iter is iterating over
-and will be releated only when g_variant_iter_free() is called.
+and will be related only when g_variant_iter_free() is called.
 
 Since: 2.24
 
@@ -63271,7 +65351,7 @@ reference.
 
 Using this function on the return value of the user's callback allows
 the user to do whichever is more convenient for them.  The caller
-will alway receives exactly one full reference to the value: either
+will always receives exactly one full reference to the value: either
 the one that was returned in the first place, or a floating reference
 that has been converted to a full reference.
 
@@ -64637,7 +66717,7 @@ parallel installations of the library. Enabling multiple
 installations of different versions of some GLib-using library, or
 GLib itself, is desirable for various reasons.
 
-For this reason it is recommeded to always pass %NULL as
+For this reason it is recommended to always pass %NULL as
 @package to this function, to avoid the temptation to use the
 Registry. In version 2.20 of GLib the @package parameter
 will be ignored and this function won't look in the Registry at all.
@@ -65149,7 +67229,7 @@ the internals of glib (such as libgio).
 </parameter_description>
 </parameter>
 </parameters>
-<return> the transation of @str to the current locale
+<return> the translation of @str to the current locale
 </return>
 </function>
 
