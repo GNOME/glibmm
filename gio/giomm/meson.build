@@ -212,6 +212,7 @@ install_headers('..' / 'giomm.h', subdir: giomm_pcname)
 install_headers(giomm_extra_h_files, subdir: giomm_pcname / 'giomm')
 
 untracked_giomm = 'untracked' / 'gio' / 'giomm'
+rel_untracked_giomm = '..' / '..' / untracked_giomm
 src_untracked_giomm = project_source_root / untracked_giomm
 
 extra_giomm_objects = []
@@ -346,9 +347,9 @@ else # not maintainer_mode
     giomm_hg_ccg_basenames,
   )
 
-  built_cc_files = [ src_untracked_giomm / 'wrap_init.cc' ]
+  built_cc_files = [ rel_untracked_giomm / 'wrap_init.cc' ]
   foreach file : giomm_used_hg_ccg_basenames
-    built_cc_files += src_untracked_giomm / file + '.cc'
+    built_cc_files += rel_untracked_giomm / file + '.cc'
   endforeach
 
   extra_include_dirs = [ '..', '..' / '..' / 'untracked' / 'gio',

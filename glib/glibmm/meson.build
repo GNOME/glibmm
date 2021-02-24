@@ -129,6 +129,7 @@ install_headers(glibmm_extra_h_files, subdir: glibmm_pcname / 'glibmm')
 install_headers(glibmm_extra_ph_files, subdir: glibmm_pcname / 'glibmm' / 'private')
 
 untracked_glibmm = 'untracked' / 'glib' / 'glibmm'
+rel_untracked_glibmm = '..' / '..' / untracked_glibmm
 src_untracked_glibmm = project_source_root / untracked_glibmm
 
 extra_glibmm_objects = []
@@ -286,12 +287,12 @@ else # not maintainer_mode
     glibmm_h_m4_files + glibmm_cc_m4_files,
   )
 
-  built_cc_files = [ src_untracked_glibmm / 'wrap_init.cc' ]
+  built_cc_files = [ rel_untracked_glibmm / 'wrap_init.cc' ]
   foreach file : glibmm_hg_ccg_basenames
-    built_cc_files += src_untracked_glibmm / file + '.cc'
+    built_cc_files += rel_untracked_glibmm / file + '.cc'
   endforeach
   foreach file : glibmm_cc_m4_files
-    built_cc_files += src_untracked_glibmm / file
+    built_cc_files += rel_untracked_glibmm / file
   endforeach
 
   extra_include_dirs = [ '..', '..' / '..' / 'untracked' / 'glib' ]
