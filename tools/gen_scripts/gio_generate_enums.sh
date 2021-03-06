@@ -27,8 +27,8 @@ shopt -s nullglob # Skip a filename pattern that matches no file
 if [ $# -eq 0 ]
 then
   # Process files whose names end with .h, but not with private.h.
-  # Exclude $build_prefix/gio/xdp-dbus.h.
-  "$gen_enums" "$source_prefix"/gio/!(*private).h "$build_prefix"/gio/!(*private|xdp-dbus).h > "$out_dir_file"
+  # Exclude $source_prefix/gio/gwin32api-*.h and $build_prefix/gio/xdp-dbus.h.
+  "$gen_enums" "$source_prefix"/gio/!(*private|gwin32api-*).h "$build_prefix"/gio/!(*private|xdp-dbus).h > "$out_dir_file"
   # patch version 2.7.5 does not like directory names.
   cd "$out_dir"
   patch_options="--backup --version-control=simple --suffix=.orig"
