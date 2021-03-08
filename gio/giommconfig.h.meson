@@ -26,8 +26,10 @@
 #ifdef GIOMM_DLL
 # if defined(GIOMM_BUILD)
 #  define GIOMM_API __declspec(dllexport)
-# else
+# elif !defined (__GNUC__)
 #  define GIOMM_API __declspec(dllimport)
+# else /* don't dllimport classes/methods on GCC/MinGW */
+#  define GIOMM_API
 # endif
 /* Build a static library or non-native-Windows library */
 #else

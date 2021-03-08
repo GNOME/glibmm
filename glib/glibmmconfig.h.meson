@@ -99,8 +99,10 @@
 #ifdef GLIBMM_DLL
 # if defined(GLIBMM_BUILD)
 #  define GLIBMM_API __declspec(dllexport)
-# else
+# elif !defined (__GNUC__)
 #  define GLIBMM_API __declspec(dllimport)
+# else /* don't dllimport classes/methods on GCC/MinGW */
+#  define GLIBMM_API
 # endif
 /* Build a static or non-native-Windows library */
 #else
