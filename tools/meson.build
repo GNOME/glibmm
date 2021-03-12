@@ -1,7 +1,8 @@
 # tools
 
 # Input: perl, m4, install_prefix, install_libdir, glibmm_pcname
-# Output: install_procdir, m4_files, pm_files, gmmproc, generate_wrap_init_pl
+# Output: install_procdir, m4_basefiles, m4_files, pm_basefiles, pm_files,
+#         gmmproc_conf_data, gmmproc, generate_wrap_init_pl
 
 subdir('extra_defs_gen')
 

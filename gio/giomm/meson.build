@@ -6,7 +6,7 @@
 #        is_host_windows, gmmproc, generate_wrap_init_pl, giomm_libname,
 #        macos_darwin_versions
 # Output: giomm_hg_ccg_basenames, giomm_extra_h_files, built_files_root,
-#         giomm_built_h_file_targets, giomm_dep
+#         giomm_built_h_file_targets, giomm_own_dep
 
 giomm_defs_basefiles = [
   'gio.defs',
@@ -390,9 +390,9 @@ if not meson.is_subproject()
   )
 endif
 
-# This is useful in the main project when giomm is used as a subproject.
-# It's also used when building example programs and test programs.
-giomm_dep = declare_dependency(
+# This is used when building example programs and test programs.
+# It's also a part of giomm_dep, when glibmm is a subproject.
+giomm_own_dep = declare_dependency(
   sources: glibmm_built_h_file_targets + giomm_used_built_h_file_targets,
   link_with: [glibmm_library, giomm_library],
   include_directories: extra_include_dirs,

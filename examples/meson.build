@@ -1,6 +1,6 @@
 # examples
 
-# input: glibmm_dep, giomm_dep, build_examples, compile_schemas_py
+# input: glibmm_own_dep, giomm_own_dep, build_examples, compile_schemas_py
 
 examples = [
 # [[dir-name], exe-name, [sources], giomm-example (not just glibmm-example)]
@@ -63,7 +63,7 @@ foreach ex : examples
   endforeach
 
   is_multithread = ex[0][0] == 'network' or ex[0][0] == 'thread'
-  mm_dep = ex[3] ? giomm_dep : glibmm_dep
+  mm_dep = ex[3] ? giomm_own_dep : glibmm_own_dep
 
   executable(ex_name, ex_sources,
     cpp_args: ['-DGLIBMM_DISABLE_DEPRECATED', '-DGIOMM_DISABLE_DEPRECATED'],
