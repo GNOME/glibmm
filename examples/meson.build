@@ -28,6 +28,7 @@ if not is_host_windows
   ]
 endif
 
+thread_dep = dependency('threads')
 
 # import('gnome').compile_schemas() can't be use here.
 # It can only compile schemas in the current directory.
@@ -61,9 +62,12 @@ foreach ex : examples
     endif
   endforeach
 
+  is_multithread = ex[0][0] == 'network' or ex[0][0] == 'thread'
+  mm_dep = ex[3] ? giomm_dep : glibmm_dep
+
   executable(ex_name, ex_sources,
     cpp_args: ['-DGLIBMM_DISABLE_DEPRECATED', '-DGIOMM_DISABLE_DEPRECATED'],
-    dependencies: ex[3] ? giomm_dep : glibmm_dep,
+    dependencies: is_multithread ? [mm_dep, thread_dep] : mm_dep,
     gui_app: false,
     build_by_default: build_examples,
     install: false,
