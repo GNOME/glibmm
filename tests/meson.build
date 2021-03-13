@@ -40,6 +40,8 @@ test_programs = [
   [['glibmm_weakref'], 'test', ['main.cc'], true],
 ]
 
+thread_dep = dependency('threads')
+
 foreach ex : test_programs
   dir = ''
   foreach dir_part : ex[0]
@@ -51,9 +53,12 @@ foreach ex : test_programs
     ex_sources += dir / src
   endforeach
 
+  is_multithread = ex[0][0] == 'glibmm_mainloop'
+  mm_dep = ex[3] ? giomm_dep : glibmm_dep
+
   exe_file = executable(ex_name, ex_sources,
     cpp_args: ['-DGLIBMM_DISABLE_DEPRECATED', '-DGIOMM_DISABLE_DEPRECATED'],
-    dependencies: ex[3] ? giomm_dep : glibmm_dep,
+    dependencies: is_multithread ? [mm_dep, thread_dep] : mm_dep,
     gui_app: false,
     build_by_default: true,
     install: false,
