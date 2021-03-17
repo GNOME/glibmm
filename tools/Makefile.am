@@ -55,6 +55,7 @@ AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
 
 EXTRA_DIST = defs_gen/definitions.py \
   defs_gen/defsparser.py \
+  defs_gen/enumextract.py \
   defs_gen/h2def.py \
   defs_gen/scmexpr.py \
   defs_gen/docextract.py \
