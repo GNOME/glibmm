@@ -1,5 +1,9 @@
 #! /usr/bin/perl
 
+# glibmm/tools/defs_gen/enumextract.py is a Python script with almost
+# the same functionality as this Perl script.
+# enumextract.py is newer and recommended.
+
 # The lisp definitions for flags does not include order.
 # thus we must extract it ourselves.
 # Usage: ./enum.pl /gnome/head/cvs/gconf/gconf/*.h > gconf_enums.defs
