@@ -10,6 +10,7 @@ glibmm_generate_extra_defs_library = library(
   'generate_extra_defs.cc',
   version: glibmm_libversion,
   darwin_versions: macos_darwin_versions,
+  implicit_include_directories: false,
   cpp_args: '-DGLIBMM_GEN_EXTRA_DEFS_BUILD',
   dependencies: glibmm_build_dep,
   install: true,

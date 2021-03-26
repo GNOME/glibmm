@@ -246,6 +246,7 @@ if maintainer_mode
 
   glibmm_library = library(glibmm_libname, extra_glibmm_objects,
     glibmm_built_cc_file_targets, glibmm_extra_cc_files, built_dummy_h_file_target,
+    implicit_include_directories: false,
     include_directories: extra_include_dirs,
     cpp_args: glibmm_cpp_args,
     version: glibmm_libversion,
@@ -299,6 +300,7 @@ else # not maintainer_mode
 
   glibmm_library = library(glibmm_libname, extra_glibmm_objects,
     built_cc_files, glibmm_extra_cc_files,
+    implicit_include_directories: false,
     include_directories: extra_include_dirs,
     cpp_args: glibmm_cpp_args,
     version: glibmm_libversion,
