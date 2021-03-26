@@ -6,7 +6,7 @@
 #        is_host_windows, gmmproc, generate_wrap_init_pl, glibmm_libname,
 #        macos_darwin_versions
 # Output: glibmm_hg_ccg_basenames, glibmm_extra_h_files, built_files_root,
-#         glibmm_built_h_file_targets, glibmm_h_m4_files, glibmm_dep
+#         glibmm_built_h_file_targets, glibmm_h_m4_files, glibmm_own_dep
 
 glibmm_defs_basefiles = [
   'glib.defs',
@@ -261,6 +261,7 @@ if maintainer_mode
 
   glibmm_library = library(glibmm_libname, extra_glibmm_objects,
     glibmm_built_cc_file_targets, glibmm_extra_cc_files, built_dummy_h_file_target,
+    implicit_include_directories: false,
     include_directories: extra_include_dirs,
     cpp_args: glibmm_cpp_args,
     version: glibmm_libversion,
@@ -314,6 +315,7 @@ else # not maintainer_mode
 
   glibmm_library = library(glibmm_libname, extra_glibmm_objects,
     built_cc_files, glibmm_extra_cc_files,
+    implicit_include_directories: false,
     include_directories: extra_include_dirs,
     cpp_args: glibmm_cpp_args,
     version: glibmm_libversion,
@@ -358,9 +360,9 @@ if not meson.is_subproject()
   )
 endif
 
-# This is useful in the main project when glibmm is used as a subproject.
-# It's also used when building example programs and test programs.
-glibmm_dep = declare_dependency(
+# This is used when building example programs and test programs.
+# It's also a part of glibmm_dep, when glibmm is a subproject.
+glibmm_own_dep = declare_dependency(
   sources: glibmm_built_h_file_targets,
   link_with: glibmm_library,
   include_directories: extra_include_dirs,

@@ -6,7 +6,8 @@ project('glibmm', 'cpp',
   default_options: [
     'cpp_std=c++11'
   ],
-  meson_version: '>= 0.50.0', # required for python3.path()
+  meson_version: '>= 0.54.0', # required for meson.override_dependency()
+                              # and dep.get_variable(internal:)
 )
 
 glibmm_api_version = '2.4'
@@ -254,6 +255,71 @@ if not meson.is_subproject()
     project_source_root,
     'untracked' / 'build_scripts',
   )
+else
+  # This is a subproject.
+
+  # A version of gmmproc that can be executed uninstalled by a main project.
+  conf_data_subproj = configuration_data()
+  conf_data_subproj.merge_from(gmmproc_conf_data)
+  conf_data_subproj.set('configure_input', 'tools/gmmproc (for execution uninstalled).  Generated from gmmproc.in')
+  conf_data_subproj.set('libdir', project_build_root)
+  gmmproc_subproj = configure_file(
+    input: 'tools' / 'gmmproc.in',
+    output: '@BASENAME@',
+    configuration: conf_data_subproj,
+    install: false,
+  )
+  gmmproc_subproj_dir = project_build_root / glibmm_pcname / 'proc'
+  run_command(
+    python3, handle_built_files_py, 'copy_built_files',
+    project_build_root,
+    gmmproc_subproj_dir,
+    'gmmproc',
+  )
+  run_command(
+    python3, handle_built_files_py, 'copy_built_files',
+    project_build_root / 'tools',
+    gmmproc_subproj_dir,
+    'generate_wrap_init.pl',
+  )
+
+  # Copy files needed by gmmproc from source dir to build dir.
+  # The directory structure must be the same as in the installation directory.
+  run_command(
+    python3, handle_built_files_py, 'copy_built_files',
+    project_source_root / 'tools' / 'm4',
+    gmmproc_subproj_dir / 'm4',
+    m4_basefiles,
+  )
+  run_command(
+    python3, handle_built_files_py, 'copy_built_files',
+    project_source_root / 'tools' / 'pm',
+    gmmproc_subproj_dir / 'pm',
+    pm_basefiles,
+  )
+
+  glibmm_dep = declare_dependency(
+    dependencies: glibmm_own_dep,
+    variables: {
+      'gmmprocdir': gmmproc_subproj_dir,
+      'doxytagfile': tag_file.full_path(),
+      'htmlrefdir': install_prefix / install_docdir / 'reference' / 'html',
+      'htmlrefpub': 'http://library.gnome.org/devel/' + pkg_conf_data.get_unquoted('PACKAGE_TARNAME') + '/unstable/'
+    }
+  )
+  giomm_dep = declare_dependency(
+    dependencies: giomm_own_dep,
+    variables: {
+      'doxytagfile': tag_file.full_path(),
+      'htmlrefdir': install_prefix / install_docdir / 'reference' / 'html',
+      'htmlrefpub': 'http://library.gnome.org/devel/' + pkg_conf_data.get_unquoted('PACKAGE_TARNAME') + '/unstable/'
+    }
+  )
+
+  # A main project that looks for glibmm_pcname.pc and giomm_pcname.pc
+  # shall find glibmm_dep and giomm_dep.
+  meson.override_dependency(glibmm_pcname, glibmm_dep)
+  meson.override_dependency(giomm_pcname, giomm_dep)
 endif
 
 # Print a summary.

@@ -1,6 +1,7 @@
 # examples
 
-# input: glibmm_dep, giomm_dep, build_examples, compile_schemas_py
+# input: glibmm_own_dep, giomm_own_dep, build_examples, compile_schemas_py,
+#        sigcxx_dep, is_host_windows
 
 examples = [
 # [[dir-name], exe-name, [sources], giomm-example (not just glibmm-example)]
@@ -10,7 +11,6 @@ examples = [
   [['dbus'], 'client_bus_listnames', ['client_bus_listnames.cc'], true],
   [['keyfile'], 'example', ['main.cc'], false],
   [['markup'], 'parser', ['parser.cc'], false],
-  [['network'], 'resolver', ['resolver.cc'], true],
   [['network'], 'socket-client', ['socket-client.cc'], true],
   [['network'], 'socket-server', ['socket-server.cc'], true],
   [['options'], 'example', ['main.cc'], false],
@@ -22,6 +22,16 @@ examples = [
   [['thread'], 'thread', ['thread.cc'], false],
   [['thread'], 'threadpool', ['threadpool.cc'], false],
 ]
+
+# Can't compile resolver.cc if sigc++-2.0 is a subproject.
+# See https://github.com/mesonbuild/meson/issues/8562
+#TODO: When the Meson issue has been fixed, and a fixed Meson version is used,
+# network/resolver can be built even if sigc++-2.0 is a subproject.
+if sigcxx_dep.type_name() != 'internal'
+  examples += [
+    [['network'], 'resolver', ['resolver.cc'], true],
+  ]
+endif
 
 if not is_host_windows
   examples += [
@@ -65,7 +75,7 @@ foreach ex : examples
   endforeach
 
   is_multithread = ex[0][0] == 'network' or ex[0][0] == 'thread'
-  mm_dep = ex[3] ? giomm_dep : glibmm_dep
+  mm_dep = ex[3] ? giomm_own_dep : glibmm_own_dep
 
   executable(ex_name, ex_sources,
     cpp_args: ['-DGLIBMM_DISABLE_DEPRECATED', '-DGIOMM_DISABLE_DEPRECATED'],

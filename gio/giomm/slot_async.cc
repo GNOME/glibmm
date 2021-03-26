@@ -14,7 +14,7 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "slot_async.h"
+#include <giomm/slot_async.h>
 #include <glibmm/exceptionhandler.h>
 #include <giomm/asyncresult.h>
 

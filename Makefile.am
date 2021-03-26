@@ -67,6 +67,8 @@ EXTRA_DIST = \
   gio/meson.build \
   gio/giommconfig.h.meson \
   gio/giomm/meson.build \
+  subprojects/glib.wrap \
+  subprojects/sigc++-2.0.wrap \
   tests/meson.build \
   tools/meson.build \
   tools/build_scripts/compile-schemas.py \

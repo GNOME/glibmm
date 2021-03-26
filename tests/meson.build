@@ -1,6 +1,6 @@
 # tests
 
-# input: glibmm_dep, giomm_dep
+# input: glibmm_own_dep, giomm_own_dep
 
 test_programs = [
 # [[dir-name], exe-name, [sources], giomm-example (not just glibmm-example)]
@@ -54,7 +54,7 @@ foreach ex : test_programs
   endforeach
 
   is_multithread = ex[0][0] == 'glibmm_mainloop'
-  mm_dep = ex[3] ? giomm_dep : glibmm_dep
+  mm_dep = ex[3] ? giomm_own_dep : glibmm_own_dep
 
   exe_file = executable(ex_name, ex_sources,
     cpp_args: ['-DGLIBMM_DISABLE_DEPRECATED', '-DGIOMM_DISABLE_DEPRECATED'],
