@@ -59,6 +59,7 @@ foreach ex : test_programs
   exe_file = executable(ex_name, ex_sources,
     cpp_args: ['-DGLIBMM_DISABLE_DEPRECATED', '-DGIOMM_DISABLE_DEPRECATED'],
     dependencies: is_multithread ? [mm_dep, thread_dep] : mm_dep,
+    implicit_include_directories: false,
     gui_app: false,
     build_by_default: true,
     install: false,
