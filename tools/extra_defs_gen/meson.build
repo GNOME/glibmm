@@ -34,12 +34,14 @@ install_headers('generate_extra_defs.h', subdir: glibmm_pcname / 'glibmm_generat
 
 executable('generate_defs_glib', 'generate_defs_glib.cc',
   dependencies: glibmm_build_dep,
+  implicit_include_directories: false,
   link_with: glibmm_generate_extra_defs_library,
   install: false,
 )
 
 executable('generate_defs_gio', 'generate_defs_gio.cc',
   dependencies: giomm_build_dep,
+  implicit_include_directories: false,
   link_with: glibmm_generate_extra_defs_library,
   install: false,
 )
