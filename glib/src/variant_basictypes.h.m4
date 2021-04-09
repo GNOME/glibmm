@@ -45,7 +45,7 @@ public:
   using CType = $2;
 
   /// Default constructor.
-  Variant<$1>()
+  Variant()
   : VariantBase()
   {}
 
@@ -55,7 +55,7 @@ public:
    * GVariant or not (not taking one could destroy the GVariant with the
    * wrapper).
    */
-  explicit Variant<$1>(GVariant* castitem, bool take_a_reference = false)
+  explicit Variant(GVariant* castitem, bool take_a_reference = false)
   : VariantBase(castitem, take_a_reference)
   {}
 
