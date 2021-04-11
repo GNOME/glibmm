@@ -1,26 +1,13 @@
 #include <glibmm.h>
-
 #include <iostream>
-
-// Helper class to check for non-existing overload
-template<typename T>
-struct Convertible
-{
-  Convertible(const T&){};
-};
-
-static bool expect_missing_overload = false;
-
-void
-operator==(Convertible<std::string> const&, Glib::ustring const&)
-{
-  g_assert_true(expect_missing_overload);
-  expect_missing_overload = false;
-}
 
 int
 main(int, char**)
 {
+  const char *cstr1 = "Hello";
+  Glib::ustring ustr1 = cstr1;
+
+#ifndef GLIBMM_TEST_THAT_COMPILATION_FAILS
   // allocating
   static_assert(std::is_convertible<const char*, Glib::ustring>::value, "");
   // non-allocating
@@ -30,12 +17,10 @@ main(int, char**)
   static_assert(!std::is_convertible<Glib::UStringView, Glib::ustring>::value, "");
   static_assert(!std::is_convertible<Glib::UStringView, const char *>::value, "");
 
-  const char *cstr1 = "Hello";
   const char *cstr2 = "World";
   const char *cstr12 = "HelloWorld";
   const char *cstr12_25 = "lloWo"; // cstr12[2:2 + 5]
 
-  Glib::ustring ustr1 = cstr1;
   Glib::ustring ustr2 = cstr2;
   Glib::ustring ustr12 = cstr12;
   Glib::ustring ustr12_25 = cstr12_25;
@@ -98,17 +83,19 @@ main(int, char**)
   static_assert(!std::is_convertible<std::string, Glib::UStringView>::value, "");
   static_assert(!std::is_convertible<Glib::UStringView, std::string>::value, "");
 
+#else // GLIBMM_TEST_THAT_COMPILATION_FAILS
+
+  // By design some combinations of std::string and Glib::ustring are not allowed.
+  // Copied from ustring.h: Using the wrong string class shall not be as easy as
+  // using the right string class.
+
   std::string sstr1 = cstr1;
 
-  // Would not compile without the helper overload
-  expect_missing_overload = true;
-  sstr1 == ustr1;
-  g_assert_false(expect_missing_overload);
-
-  // Doesn't compile because of missing Glib::ustring::compare overload (expected), but
-  // unfortunately not testable like the other way round.
-#if 0
-  ustr1 == sstr1;
+#if GLIBMM_TEST_THAT_COMPILATION_FAILS == 1
+  sstr1 == ustr1; // Shall not compile
+#else
+  ustr1 == sstr1; // Shall not compile
+#endif
 #endif
 
   return EXIT_SUCCESS;
