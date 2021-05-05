@@ -4,7 +4,7 @@
 #        glibmm_hg_ccg_basenames, giomm_hg_ccg_basenames, build_documentation,
 #        glibmm_extra_h_files, giomm_extra_h_files, glibmm_built_h_file_targets,
 #        giomm_built_h_file_targets, glibmm_h_m4_files, install_datadir,
-#        python3, doc_reference_py
+#        python3, doc_reference_py, can_add_dist_script
 # Output: install_docdir, install_devhelpdir, tag_file
 
 tag_file_modules = [
@@ -161,9 +161,8 @@ endforeach
 
 install_data(image_files, install_dir: install_image_docdir)
 
-if not meson.is_subproject()
+if can_add_dist_script
   # Distribute built files and files copied by mm-common-get.
-  # (add_dist_script() is not allowed in a subproject)
   meson.add_dist_script(
     python3.path(), doc_reference_py, 'dist_doc',
     doctool_dir,
