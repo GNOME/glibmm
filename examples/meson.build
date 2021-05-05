@@ -23,11 +23,9 @@ examples = [
   [['thread'], 'threadpool', ['threadpool.cc'], false],
 ]
 
-# Can't compile resolver.cc if sigc++-2.0 is a subproject.
+# Can't compile resolver.cc if sigc++-2.0 is a subproject and meson.version() < 0.58.0.
 # See https://github.com/mesonbuild/meson/issues/8562
-#TODO: When the Meson issue has been fixed, and a fixed Meson version is used,
-# network/resolver can be built even if sigc++-2.0 is a subproject.
-if sigcxx_dep.type_name() != 'internal'
+if sigcxx_dep.type_name() != 'internal' or meson.version().version_compare('>= 0.58.0')
   examples += [
     [['network'], 'resolver', ['resolver.cc'], true],
   ]

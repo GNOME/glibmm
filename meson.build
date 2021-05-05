@@ -230,6 +230,9 @@ endif
 glibmm_libname = meson.project_name() + msvc14x_toolset_ver + '-' + glibmm_api_version
 giomm_libname = 'giomm' + msvc14x_toolset_ver + '-' + glibmm_api_version
 
+# add_dist_script() is not allowed in a subproject if meson.version() < 0.58.0.
+can_add_dist_script = not meson.is_subproject() or meson.version().version_compare('>= 0.58.0')
+
 subdir('tools')
 subdir('glib')
 subdir('MSVC_NMake/glibmm')
@@ -241,23 +244,22 @@ subdir('examples')
 subdir('tests')
 subdir('docs/reference')
 
-if not meson.is_subproject()
+if can_add_dist_script
   # Add a ChangeLog file to the distribution directory.
-  # (add_dist_script() is not allowed in a subproject)
   meson.add_dist_script(
     python3.path(), dist_changelog_py,
     project_source_root,
   )
   # Add build scripts to the distribution directory, and delete .gitignore
-  # files and an empty $MESON_DIST_ROOT/build/ directory.
+  # files and an empty $MESON_PROJECT_DIST_ROOT/build/ directory.
   meson.add_dist_script(
     python3.path(), dist_build_scripts_py,
     project_source_root,
     'untracked' / 'build_scripts',
   )
-else
-  # This is a subproject.
+endif
 
+if meson.is_subproject()
   # A version of gmmproc that can be executed uninstalled by a main project.
   conf_data_subproj = configuration_data()
   conf_data_subproj.merge_from(gmmproc_conf_data)
