@@ -25,8 +25,7 @@ M4 = m4
 GLIBMM_BASE_CFLAGS =			\
 	/Ivs$(VSVER)\$(CFG)\$(PLAT)	\
 	/I..\untracked\glib /I..\untracked\glib\glibmm		\
-	/I..\glib /I..\glib\glibmm /I.\glibmm		\
-	/wd4530 /wd4251 /wd4275 /EHsc	\
+	/I..\glib /I..\glib\glibmm /I.\glibmm /EHsc	\
 	/FImsvc_recommended_pragmas.h
 
 GIOMM_BASE_CFLAGS =	\
