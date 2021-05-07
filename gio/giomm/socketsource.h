@@ -102,31 +102,31 @@ SignalSocket signal_socket(
  * @newin{2,42}
  * @ingroup NetworkIO
  */
-class GIOMM_API SocketSource : public Glib::IOSource
+class SocketSource : public Glib::IOSource
 {
 public:
   using CppObjectType = Gio::SocketSource;
 
-  static Glib::RefPtr<SocketSource> create(const Glib::RefPtr<Socket>& socket,
+  GIOMM_API static Glib::RefPtr<SocketSource> create(const Glib::RefPtr<Socket>& socket,
     Glib::IOCondition condition,
     const Glib::RefPtr<Cancellable>& cancellable = {});
 
 
 protected:
-  SocketSource(const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
+  GIOMM_API SocketSource(const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
     const Glib::RefPtr<Cancellable>& cancellable);
-  ~SocketSource() noexcept override;
+  GIOMM_API ~SocketSource() noexcept override;
 
 private:
-  friend Socket;
+  friend GIOMM_API Socket;
 
   // This is just to avoid the need for Gio::Socket to create a RefPtr<> to itself.
-  static Glib::RefPtr<SocketSource> create(GSocket* socket,
+  GIOMM_API static Glib::RefPtr<SocketSource> create(GSocket* socket,
     Glib::IOCondition condition,
     const Glib::RefPtr<Cancellable>& cancellable = {});
 
   // This is just to avoid the need for Gio::Socket to create a RefPtr<> to itself.
-  SocketSource(GSocket* socket, Glib::IOCondition condition,
+  GIOMM_API SocketSource(GSocket* socket, Glib::IOCondition condition,
     const Glib::RefPtr<Cancellable>& cancellable);
 };
 

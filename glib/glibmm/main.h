@@ -701,7 +701,7 @@ private:
 GLIBMM_API
 Glib::RefPtr<MainLoop> wrap(GMainLoop* gobject, bool take_copy = false);
 
-class GLIBMM_API Source
+class Source
 {
 public:
   using CppObjectType = Glib::Source;
@@ -711,19 +711,19 @@ public:
   Source(const Source&) = delete;
   Source& operator=(const Source&) = delete;
 
-  static Glib::RefPtr<Source> create() /* = 0 */;
+  GLIBMM_API static Glib::RefPtr<Source> create() /* = 0 */;
 
   /** Adds a Source to a context so that it will be executed within that context.
    * @param context A MainContext.
    * @return The ID for the source within the MainContext.
    */
-  unsigned int attach(const Glib::RefPtr<MainContext>& context);
+  GLIBMM_API unsigned int attach(const Glib::RefPtr<MainContext>& context);
 
   /** Adds a Source to a context so that it will be executed within that context.
    * The default context will be used.
    * @return The ID for the source within the MainContext.
    */
-  unsigned int attach();
+  GLIBMM_API unsigned int attach();
 
   // TODO: Does this destroy step make sense in C++? Should it just be something that happens in a
   // destructor?
@@ -731,19 +731,19 @@ public:
   /** Removes a source from its MainContext, if any, and marks it as destroyed.
    * The source cannot be subsequently added to another context.
    */
-  void destroy();
+  GLIBMM_API void destroy();
 
   /** Sets the priority of a source. While the main loop is being run, a source will be dispatched
    * if it is ready to be dispatched and no sources at a higher (numerically smaller) priority are
    * ready to be dispatched.
    * @param priority The new priority.
    */
-  void set_priority(int priority);
+  GLIBMM_API void set_priority(int priority);
 
   /** Gets the priority of a source.
    * @return The priority of the source.
    */
-  int get_priority() const;
+  GLIBMM_API int get_priority() const;
 
   /** Sets whether a source can be called recursively.
    * If @a can_recurse is true, then while the source is being dispatched then this source will be
@@ -751,19 +751,19 @@ public:
    * function returns.
    * @param can_recurse Whether recursion is allowed for this source.
    */
-  void set_can_recurse(bool can_recurse);
+  GLIBMM_API void set_can_recurse(bool can_recurse);
 
   /** Checks whether a source is allowed to be called recursively. see set_can_recurse().
    * @return Whether recursion is allowed.
    */
-  bool get_can_recurse() const;
+  GLIBMM_API bool get_can_recurse() const;
 
   /** Returns the numeric ID for a particular source.
    * The ID of a source is unique within a particular main loop context. The reverse mapping from ID
    * to source is done by MainContext::find_source_by_id().
    * @return The ID for the source.
    */
-  unsigned int get_id() const;
+  GLIBMM_API unsigned int get_id() const;
 
   // TODO: Add a const version of this method?
   /** Gets the MainContext with which the source is associated.
@@ -771,19 +771,19 @@ public:
    * @return The MainContext with which the source is associated, or a null RefPtr if the context
    * has not yet been added to a source.
    */
-  Glib::RefPtr<MainContext> get_context();
+  GLIBMM_API Glib::RefPtr<MainContext> get_context();
 
-  GSource* gobj() { return gobject_; }
-  const GSource* gobj() const { return gobject_; }
-  GSource* gobj_copy() const;
+  GLIBMM_API GSource* gobj() { return gobject_; }
+  GLIBMM_API const GSource* gobj() const { return gobject_; }
+  GLIBMM_API GSource* gobj_copy() const;
 
-  void reference() const;
-  void unreference() const;
+  GLIBMM_API void reference() const;
+  GLIBMM_API void unreference() const;
 
 protected:
   /** Construct an object that uses the virtual functions prepare(), check() and dispatch().
    */
-  Source();
+  GLIBMM_API Source();
 
   /** Wrap an existing GSource object and install the given callback function.
    * The constructed object doesn't use the virtual functions prepare(), check() and dispatch().
@@ -792,23 +792,23 @@ protected:
    * depending on the actual implementation of the GSource's virtual functions
    * the expected type of the callback function can differ from GSourceFunc.
    */
-  Source(GSource* cast_item, GSourceFunc callback_func);
+  GLIBMM_API Source(GSource* cast_item, GSourceFunc callback_func);
 
-  virtual ~Source() noexcept;
+  GLIBMM_API virtual ~Source() noexcept;
 
-  sigc::connection connect_generic(const sigc::slot_base& slot);
+  GLIBMM_API sigc::connection connect_generic(const sigc::slot_base& slot);
 
   /** Adds a file descriptor to the set of file descriptors polled for this source.
    * The event source's check function will typically test the revents field in the PollFD  and
    * return true if events need to be processed.
    * @param poll_fd A PollFD object holding information about a file descriptor to watch.
    */
-  void add_poll(PollFD& poll_fd);
+  GLIBMM_API void add_poll(PollFD& poll_fd);
 
   /** Removes a file descriptor from the set of file descriptors polled for this source.
    * @param poll_fd A PollFD object previously passed to add_poll().
    */
-  void remove_poll(PollFD& poll_fd);
+  GLIBMM_API void remove_poll(PollFD& poll_fd);
 
   // TODO: Remove mention of g_get_monotonic time when we wrap it in C++.
   /** Gets the time to be used when checking this source. The advantage of
@@ -823,11 +823,11 @@ protected:
    *
    * @newin{2,28}
    */
-  gint64 get_time() const;
+  GLIBMM_API gint64 get_time() const;
 
-  virtual bool prepare(int& timeout) = 0;
-  virtual bool check() = 0;
-  virtual bool dispatch(sigc::slot_base* slot) = 0;
+  GLIBMM_API virtual bool prepare(int& timeout) = 0;
+  GLIBMM_API virtual bool check() = 0;
+  GLIBMM_API virtual bool dispatch(sigc::slot_base* slot) = 0;
 
 private:
   GSource* gobject_;
@@ -840,100 +840,100 @@ private:
   std::atomic_int keep_wrapper_ {2};
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  static inline Source* get_wrapper(GSource* source);
+  GLIBMM_API static inline Source* get_wrapper(GSource* source);
 
   static const GSourceFuncs vfunc_table_;
 
-  static gboolean prepare_vfunc(GSource* source, int* timeout);
-  static gboolean check_vfunc(GSource* source);
-  static gboolean dispatch_vfunc(GSource* source, GSourceFunc callback, void* user_data);
+  GLIBMM_API static gboolean prepare_vfunc(GSource* source, int* timeout);
+  GLIBMM_API static gboolean check_vfunc(GSource* source);
+  GLIBMM_API static gboolean dispatch_vfunc(GSource* source, GSourceFunc callback, void* user_data);
 
 public:
   // Really destroys the object during the second call. See keep_wrapper_.
-  static void destroy_notify_callback2(void* data);
+  GLIBMM_API static void destroy_notify_callback2(void* data);
   // Used by SignalXyz, possibly in other files.
-  static sigc::connection attach_signal_source(const sigc::slot_base& slot, int priority,
+  GLIBMM_API static sigc::connection attach_signal_source(const sigc::slot_base& slot, int priority,
     GSource* source, GMainContext* context, GSourceFunc callback_func);
   // Used by SignalXyz in other files.
-  static sigc::slot_base* get_slot_from_connection_node(void* data);
+  GLIBMM_API static sigc::slot_base* get_slot_from_connection_node(void* data);
   // Used by derived Source classes in other files.
-  static sigc::slot_base* get_slot_from_callback_data(void* data);
+  GLIBMM_API static sigc::slot_base* get_slot_from_callback_data(void* data);
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 };
 
-class GLIBMM_API TimeoutSource : public Glib::Source
+class TimeoutSource : public Glib::Source
 {
 public:
   using CppObjectType = Glib::TimeoutSource;
 
-  static Glib::RefPtr<TimeoutSource> create(unsigned int interval);
-  sigc::connection connect(const sigc::slot<bool()>& slot);
+  GLIBMM_API static Glib::RefPtr<TimeoutSource> create(unsigned int interval);
+  GLIBMM_API sigc::connection connect(const sigc::slot<bool()>& slot);
 
 protected:
-  explicit TimeoutSource(unsigned int interval);
-  ~TimeoutSource() noexcept override;
+  GLIBMM_API explicit TimeoutSource(unsigned int interval);
+  GLIBMM_API ~TimeoutSource() noexcept override;
 
-  bool prepare(int& timeout) override;
-  bool check() override;
-  bool dispatch(sigc::slot_base* slot) override;
+  GLIBMM_API bool prepare(int& timeout) override;
+  GLIBMM_API bool check() override;
+  GLIBMM_API bool dispatch(sigc::slot_base* slot) override;
 
 private:
   gint64 expiration_;     // microseconds
   unsigned int interval_; // milliseconds
 };
 
-class GLIBMM_API IdleSource : public Glib::Source
+class IdleSource : public Glib::Source
 {
 public:
   using CppObjectType = Glib::IdleSource;
 
-  static Glib::RefPtr<IdleSource> create();
-  sigc::connection connect(const sigc::slot<bool()>& slot);
+  GLIBMM_API static Glib::RefPtr<IdleSource> create();
+  GLIBMM_API sigc::connection connect(const sigc::slot<bool()>& slot);
 
 protected:
-  IdleSource();
-  ~IdleSource() noexcept override;
+  GLIBMM_API IdleSource();
+  GLIBMM_API ~IdleSource() noexcept override;
 
-  bool prepare(int& timeout) override;
-  bool check() override;
-  bool dispatch(sigc::slot_base* slot_data) override;
+  GLIBMM_API bool prepare(int& timeout) override;
+  GLIBMM_API bool check() override;
+  GLIBMM_API bool dispatch(sigc::slot_base* slot_data) override;
 };
 
-class GLIBMM_API IOSource : public Glib::Source
+class IOSource : public Glib::Source
 {
 public:
   using CppObjectType = Glib::IOSource;
 
-  static Glib::RefPtr<IOSource> create(PollFD::fd_t fd, IOCondition condition);
-  static Glib::RefPtr<IOSource> create(
+  GLIBMM_API static Glib::RefPtr<IOSource> create(PollFD::fd_t fd, IOCondition condition);
+  GLIBMM_API static Glib::RefPtr<IOSource> create(
     const Glib::RefPtr<IOChannel>& channel, IOCondition condition);
-  sigc::connection connect(const sigc::slot<bool(IOCondition)>& slot);
+  GLIBMM_API sigc::connection connect(const sigc::slot<bool(IOCondition)>& slot);
 
 protected:
-  IOSource(PollFD::fd_t fd, IOCondition condition);
-  IOSource(const Glib::RefPtr<IOChannel>& channel, IOCondition condition);
+  GLIBMM_API IOSource(PollFD::fd_t fd, IOCondition condition);
+  GLIBMM_API IOSource(const Glib::RefPtr<IOChannel>& channel, IOCondition condition);
 
   /** Wrap an existing GSource object and install the given callback function.
    * This constructor is for use by derived types that need to wrap a GSource object.
    * @see Source::Source(GSource*, GSourceFunc).
    * @newin{2,42}
    */
-  IOSource(GSource* cast_item, GSourceFunc callback_func);
+  GLIBMM_API IOSource(GSource* cast_item, GSourceFunc callback_func);
 
-  ~IOSource() noexcept override;
+  GLIBMM_API ~IOSource() noexcept override;
 
-  bool prepare(int& timeout) override;
-  bool check() override;
-  bool dispatch(sigc::slot_base* slot) override;
+  GLIBMM_API bool prepare(int& timeout) override;
+  GLIBMM_API bool check() override;
+  GLIBMM_API bool dispatch(sigc::slot_base* slot) override;
 
 private:
-  friend IOChannel;
+  friend GLIBMM_API IOChannel;
 
   // This is just to avoid the need for Gio::Socket to create a RefPtr<> to itself.
-  static Glib::RefPtr<IOSource> create(GIOChannel* channel, IOCondition condition);
+  GLIBMM_API static Glib::RefPtr<IOSource> create(GIOChannel* channel, IOCondition condition);
 
   // This is just to avoid the need for Gio::Socket to create a RefPtr<> to itself.
-  IOSource(GIOChannel* channel, IOCondition condition);
+  GLIBMM_API IOSource(GIOChannel* channel, IOCondition condition);
 
   PollFD poll_fd_;
 };
