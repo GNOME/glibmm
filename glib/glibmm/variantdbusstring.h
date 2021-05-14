@@ -36,7 +36,7 @@ namespace Glib
  * @newin{2,54}
  * @ingroup Variant
 */
-class GLIBMM_API DBusObjectPathString : public Glib::ustring
+class DBusObjectPathString : public Glib::ustring
 {
 public:
   using Glib::ustring::ustring;
@@ -53,7 +53,7 @@ public:
  * @newin{2,54}
  * @ingroup Variant
 */
-class GLIBMM_API DBusSignatureString : public Glib::ustring
+class DBusSignatureString : public Glib::ustring
 {
 public:
   using Glib::ustring::ustring;
