@@ -17,7 +17,7 @@ ifelse(`$6',,,`dnl
 /** $6
  */
 ')dnl
-class $9 __CPPNAME__ : public Glib::Error
+class __CPPNAME__ : public Glib::Error
 {
 public:
   /** $7
@@ -27,14 +27,14 @@ public:
 $4
   };
 
-  __CPPNAME__`'(Code error_code, const Glib::ustring& error_message);
-  explicit __CPPNAME__`'(GError* gobject);
-  Code code() const;
+  $9 __CPPNAME__`'(Code error_code, const Glib::ustring& error_message);
+  $9 explicit __CPPNAME__`'(GError* gobject);
+  $9 Code code() const;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 private:
 
-  static void throw_func(GError* gobject);
+  $9 static void throw_func(GError* gobject);
 
   friend $9 void wrap_init(); // uses throw_func()
 

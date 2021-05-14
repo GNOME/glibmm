@@ -25,44 +25,44 @@
 namespace Glib
 {
 
-class GLIBMM_API Error : public std::exception
+class Error : public std::exception
 {
 public:
-  Error();
-  Error(GQuark error_domain, int error_code, const Glib::ustring& message);
-  explicit Error(GError* gobject, bool take_copy = false);
+  GLIBMM_API Error();
+  GLIBMM_API Error(GQuark error_domain, int error_code, const Glib::ustring& message);
+  GLIBMM_API explicit Error(GError* gobject, bool take_copy = false);
 
-  Error(const Error& other);
-  Error& operator=(const Error& other);
+  GLIBMM_API Error(const Error& other);
+  GLIBMM_API Error& operator=(const Error& other);
 
-  ~Error() noexcept override;
+  GLIBMM_API ~Error() noexcept override;
 
   /** Test whether the %Error has an underlying instance.
    *
    * @newin{2,60}
    */
-  explicit operator bool() const;
+  GLIBMM_API explicit operator bool() const;
 
-  GQuark domain() const;
-  int code() const;
-  const char* what() const noexcept override;
+  GLIBMM_API GQuark domain() const;
+  GLIBMM_API int code() const;
+  GLIBMM_API const char* what() const noexcept override;
 
-  bool matches(GQuark error_domain, int error_code) const;
+  GLIBMM_API bool matches(GQuark error_domain, int error_code) const;
 
-  GError* gobj();
-  const GError* gobj() const;
+  GLIBMM_API GError* gobj();
+  GLIBMM_API const GError* gobj() const;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-  void propagate(GError** dest);
+  GLIBMM_API void propagate(GError** dest);
 
   using ThrowFunc = void(*)(GError*);
 
-  static void register_init();
-  static void register_cleanup();
-  static void register_domain(GQuark error_domain, ThrowFunc throw_func);
+  GLIBMM_API static void register_init();
+  GLIBMM_API static void register_cleanup();
+  GLIBMM_API static void register_domain(GQuark error_domain, ThrowFunc throw_func);
 
-  static void throw_exception(GError* gobject) G_GNUC_NORETURN;
+  GLIBMM_API static void throw_exception(GError* gobject) G_GNUC_NORETURN;
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
