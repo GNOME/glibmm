@@ -133,7 +133,11 @@ giomm_requires = ' '.join(giomm_requires)
 # reference documentation shall be built.
 mm_common_get = find_program('mm-common-get', required: false)
 if maintainer_mode and not mm_common_get.found()
-  error('mm-common-get not found. mm-common >= 1.0.0 is required.')
+  message('Maintainer mode requires the \'mm-common-get\' command. If it is not found,\n' +
+          'install the \'mm-common\' package, version 1.0.0 or higher.')
+  # If meson --wrap-mode != forcefallback, Meson falls back to the mm-common
+  # subproject only if mm-common-get is required.
+  mm_common_get = find_program('mm-common-get', required: true)
 endif
 m4 = find_program('m4', required: maintainer_mode) # Used by gmmproc
 perl = find_program('perl', required: maintainer_mode or build_documentation)
@@ -300,22 +304,22 @@ if meson.is_subproject()
     pm_basefiles,
   )
 
-  glibmm_dep = declare_dependency(
-    dependencies: glibmm_own_dep,
-    variables: {
-      'gmmprocdir': gmmproc_subproj_dir,
-      'doxytagfile': tag_file.full_path(),
-      'htmlrefdir': install_prefix / install_docdir / 'reference' / 'html',
-      'htmlrefpub': 'http://library.gnome.org/devel/' + pkg_conf_data.get_unquoted('PACKAGE_TARNAME') + '/unstable/'
-    }
-  )
+  pkgconfig_vars = {
+    'htmlrefdir': install_prefix / install_docdir / 'reference' / 'html',
+    'htmlrefpub': 'http://library.gnome.org/devel/' + pkg_conf_data.get_unquoted('PACKAGE_TARNAME') + '/unstable/'
+  }
+  if build_documentation
+    pkgconfig_vars += {'doxytagfile': tag_file.full_path()}
+  endif
   giomm_dep = declare_dependency(
     dependencies: giomm_own_dep,
-    variables: {
-      'doxytagfile': tag_file.full_path(),
-      'htmlrefdir': install_prefix / install_docdir / 'reference' / 'html',
-      'htmlrefpub': 'http://library.gnome.org/devel/' + pkg_conf_data.get_unquoted('PACKAGE_TARNAME') + '/unstable/'
-    }
+    variables: pkgconfig_vars,
+  )
+
+  pkgconfig_vars += {'gmmprocdir': gmmproc_subproj_dir}
+  glibmm_dep = declare_dependency(
+    dependencies: glibmm_own_dep,
+    variables: pkgconfig_vars,
   )
 
   # A main project that looks for glibmm_pcname.pc and giomm_pcname.pc
