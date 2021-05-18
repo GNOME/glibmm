@@ -310,6 +310,8 @@ if meson.is_subproject()
   }
   if build_documentation
     pkgconfig_vars += {'doxytagfile': tag_file.full_path()}
+    # May be used in a main project.
+    global_tag_file_target = tag_file
   endif
   giomm_dep = declare_dependency(
     dependencies: giomm_own_dep,
