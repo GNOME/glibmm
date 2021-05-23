@@ -29,7 +29,7 @@ namespace Glib
 {
 
 /** Portable stop watch interface.
- * This resembles a convient and portable timer with microseconds resolution.
+ * This resembles a convenient and portable timer with microseconds resolution.
  */
 class GLIBMM_API Timer
 {
@@ -48,6 +48,14 @@ public:
   void stop();
   void reset();
 
+  // Can't call it Timer::continue(). continue is a keyword in C and C++.
+  /** Resumes a timer that has previously been stopped with stop().
+   * stop() must be called before using this function.
+   *
+   * @newin{2,70]
+   */
+  void resume();
+
   /** Get the elapsed time.
    * @return The value in seconds.
    */
@@ -59,6 +67,13 @@ public:
    */
   double elapsed(unsigned long& microseconds) const;
 
+  /** Exposes whether the timer is currently active.
+   *
+   * @newin{2,70]
+   * @return <tt>true</tt> if the timer is running, <tt>false</tt> otherwise.
+   */
+  bool is_active() const;
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   GTimer* gobj() { return gobject_; }
   const GTimer* gobj() const { return gobject_; }
@@ -68,6 +83,7 @@ private:
   GTimer* gobject_;
 };
 
+/// Pauses the current thread for the given number of microseconds.
 GLIBMM_API
 void usleep(unsigned long microseconds);
 

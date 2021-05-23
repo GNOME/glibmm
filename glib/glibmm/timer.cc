@@ -49,6 +49,12 @@ Timer::reset()
   g_timer_reset(gobject_);
 }
 
+void
+Timer::resume()
+{
+  g_timer_continue(gobject_);
+}
+
 double
 Timer::elapsed() const
 {
@@ -59,6 +65,12 @@ double
 Timer::elapsed(unsigned long& microseconds) const
 {
   return g_timer_elapsed(gobject_, &microseconds);
+}
+
+bool
+Timer::is_active() const
+{
+  return g_timer_is_active(gobject_);
 }
 
 void
