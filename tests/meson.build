@@ -18,6 +18,7 @@ test_programs = [
   [['glibmm_buildfilename'], 'test', ['main.cc'], false],
   [['glibmm_bytearray'], 'test', ['main.cc'], false],
   [['glibmm_date'], 'test', ['main.cc'], false],
+  [['glibmm_environ'], 'test', ['main.cc'], false],
   [['glibmm_interface_implementation'], 'test', ['main.cc'], true],
   [['glibmm_interface_move'], 'test', ['main.cc'], false],
   [['glibmm_mainloop'], 'test', ['main.cc'], false],

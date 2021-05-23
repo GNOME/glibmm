@@ -76,6 +76,7 @@ glibmm_extra_h_cc_basenames = [
   'class',
   'debug',
   'dispatcher',
+  'environ',
   'error',
   'exceptionhandler',
   'extraclassinit',

@@ -112,6 +112,7 @@
 #include <glibmm/datetime.h>
 #include <glibmm/dispatcher.h>
 #include <glibmm/enums.h>
+#include <glibmm/environ.h>
 #include <glibmm/error.h>
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/fileutils.h>

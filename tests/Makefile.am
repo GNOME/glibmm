@@ -29,6 +29,7 @@ check_PROGRAMS =				\
 	glibmm_base64/test			\
 	glibmm_binding/test     \
 	glibmm_date/test			\
+	glibmm_environ/test			\
 	glibmm_buildfilename/test		\
 	glibmm_interface_implementation/test	\
 	glibmm_interface_move/test			\
@@ -97,6 +98,7 @@ glibmm_base64_test_SOURCES               = glibmm_base64/main.cc
 glibmm_binding_test_SOURCES              = glibmm_binding/main.cc
 glibmm_buildfilename_test_SOURCES        = glibmm_buildfilename/main.cc
 glibmm_date_test_SOURCES                 = glibmm_date/main.cc
+glibmm_environ_test_SOURCES              = glibmm_environ/main.cc
 
 glibmm_interface_implementation_test_SOURCES = glibmm_interface_implementation/main.cc
 glibmm_interface_implementation_test_LDADD = $(giomm_ldadd)
