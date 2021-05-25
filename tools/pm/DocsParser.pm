@@ -403,9 +403,9 @@ sub convert_value_to_cpp($)
 {
   my ($text) = @_;
 
-  $$text =~ s"\bFALSE\b"<tt>false</tt>"g;
-  $$text =~ s"\bTRUE\b"<tt>true</tt>"g;
-  $$text =~ s"\bNULL\b"<tt>nullptr</tt>"g;
+  $$text =~ s"`?\bFALSE\b`?"<tt>false</tt>"g;
+  $$text =~ s"`?\bTRUE\b`?"<tt>true</tt>"g;
+  $$text =~ s"`?\bNULL\b`?"<tt>nullptr</tt>"g;
 
   # Enumerator names
   $$text =~ s/\b([A-Z]+)_([A-Z\d_]+)\b/&DocsParser::substitute_enumerator_name($1, $2)/eg;
@@ -423,6 +423,9 @@ sub remove_example_code($$)
   $example_removals +=
     ($$text =~ s"<programlisting>.*?</programlisting>"\n[C example ellipted]"sg);
   $example_removals += ($$text =~ s"\|\[.*?]\|"\n[C example ellipted]"sg);
+  # gi-docgen syntax.
+  # remove_example_code() is called after add_m4_quotes().
+  $example_removals += ($$text =~ s"(?:'__BT__`){3}[cC].*?(?:'__BT__`){3}"\n[C example ellipted]"sg);
 
   # See "MS Visual Studio" comment in gmmproc.in.
   print STDERR "gmmproc, $main::source, $obj_name: Example code discarded.\n"
@@ -698,10 +701,13 @@ sub convert_tags_to_doxygen($)
     # gtk-doc uses @thearg, but doxygen uses @a thearg.
     s" ?\@([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?\b" \@a $1"g;
 
-    # Don't convert Doxygen's $throw, @throws and @param, so these can be used
+    # Don't convert Doxygen's @throw, @throws and @param, so these can be used
     # in the docs_override.xml.
     # Also don't convert @enum and @var which are used for enum documentation.
     s" \@a (throws?|param|enum|var)\b" \@$1"g;
+
+    # gi-docgen uses [type@Module.*]. Don't convert them.
+    s"(\[[a-z]+?) \@a (.+?])"$1\@$2"g;
 
     s"^Note ?\d?: "\@note "mg;
     s"</?programlisting>""g;
@@ -738,9 +744,9 @@ sub convert_tags_to_doxygen($)
     # Doxygen is too dumb to handle &mdash;
     s"&mdash;" \@htmlonly&mdash;\@endhtmlonly "g;
 
-    s"\%?\bFALSE\b"<tt>false</tt>"g;
-    s"\%?\bTRUE\b"<tt>true</tt>"g;
-    s"\%?\bNULL\b"<tt>nullptr</tt>"g;
+    s"`?\%?\bFALSE\b`?"<tt>false</tt>"g;
+    s"`?\%?\bTRUE\b`?"<tt>true</tt>"g;
+    s"`?\%?\bNULL\b`?"<tt>nullptr</tt>"g;
 
     s"#?\bgboolean\b"<tt>bool</tt>"g;
     s"#?\bg(int|short|long)\b"<tt>$1</tt>"g;
@@ -838,13 +844,18 @@ sub substitute_identifiers($$)
     # but a few are written with the double colon in the gtk+ docs so this
     # protects against those errors.
     s/([A-Z]\w+)::([a-z\d-]+)(\s+property)/my $name = "$1::property_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
+    # gi-docgen syntax.
+    s/\[property@([A-Z]\w*?)\.([A-Z]\w+?):([a-z\d-]+?)]/&DocsParser::substitute_property_or_signal_name($doc_func, $1, $2, "property", $3)/ge;
 
     # Convert signal names to C++.
     s/(^|\s)::([a-z\d-]+)(\(\))*([^:\w]|$)/my $name = "$1signal_$2()$4"; $name =~ s"-"_"g; "$name";/ge;
     s/(#[A-Z]\w+)::([a-z\d-]+)(\(\))*([^:\w]|$)/my $name = "$1::signal_$2()$4"; $name =~ s"-"_"g; "$name";/ge;
+    s/\[signal@([A-Z]\w*?)\.([A-Z]\w+?)::([a-z\d-]+?)]/&DocsParser::substitute_property_or_signal_name($doc_func, $1, $2, "signal", $3)/ge;
 
     # Type names
-    s/[#%]([A-Z][a-z]*)([A-Z][A-Za-z]+)\b/&DocsParser::substitute_type_name($1, $2)/eg;
+    s/[#%]([A-Z][a-z]*)([A-Z][A-Za-z]+)\b/&DocsParser::substitute_type_name($1, $2, undef)/eg;
+    s/`([A-Z][a-z]*)([A-Z][a-z]+[A-Za-z]*)`/&DocsParser::substitute_type_name($1, $2, "`")/eg;
+    s/\[(?:class|iface|struct|enum|flags)@([A-Z]\w*?)\.([A-Z]\w+?)]/&DocsParser::substitute_type_name($1, $2, undef)/eg;
 
     # Enumerator names
     s/[#%]([A-Z]+)_([A-Z\d_]+)\b/&DocsParser::substitute_enumerator_name($1, $2)/eg;
@@ -855,18 +866,23 @@ sub substitute_identifiers($$)
     s/(\b\w+)Callback/Slot$1/g;
 
     # Replace C function names with C++ counterparts.
-    s/\b([a-z]+_[a-z][a-z\d_]+) ?\(\)/&DocsParser::substitute_function($doc_func, $1)/eg;
+    s/`?\b([a-z]+_[a-z][a-z\d_]+) ?\(\)`?/&DocsParser::substitute_function($doc_func, $1)/eg;
+    s/\[(?:method|ctor|vfunc|func)@((?:[A-Z]\w*?\.){1,2})([a-z][a-z\d_]+?)(?:\(\))?]/&DocsParser::substitute_split_function($doc_func, $1, $2)/eg;
   }
 }
 
-sub substitute_type_name($$)
+sub substitute_type_name($$$)
 {
-  my ($module, $name) = @_;
+  my ($module, $name, $delimiter) = @_;
   my $c_name = $module . $name;
 
   if (exists $DocsParser::type_names{$c_name})
   {
     return $DocsParser::type_names{$c_name};
+  }
+  if (defined($delimiter))
+  {
+    return $delimiter . $c_name . $delimiter;
   }
   #print "DocsParser.pm: Assuming the type $c_name shall become " . (($module eq "G") ? "" : "${module}::") . "$name.\n";
   return $module . "::" . $name;
@@ -921,6 +937,51 @@ sub substitute_enumerator_name($$)
   print "DocsParser.pm: Assuming the enumerator $c_name shall become $cxx_name.\n";
 
   return $cxx_name;
+}
+
+sub substitute_property_or_signal_name($$$$$)
+{
+  # $doc_func can be the name of a property (ModuleClass:property_name),
+  # signal (ModuleClass::signal_name) or function/method (module_class_method_name).
+  my ($doc_func, $module, $class, $prop_or_sig, $name) = @_;
+
+  my $prefix = $module . $class;
+  $name =~ s"-"_"g;
+  $name = $prop_or_sig . "_" . $name . "()";
+  if (index($doc_func, $prefix . ":") == 0)
+  {
+    # Documentation of property or signal in the same class as the referred
+    # property or signal.
+    return $name;
+  }
+  if (index($doc_func, ":") == -1)
+  {
+    # Documentation of a function or method.
+    if (my $defs_method = GtkDefs::lookup_method_dont_mark($doc_func))
+    {
+      if ($$defs_method{class} eq $prefix)
+      {
+        # Documentation of function/method in the same class as the referred
+        # property or signal.
+        return $name;
+      }
+    }
+  }
+  return $module . "::" . $class . "::" . $name;
+}
+
+sub substitute_split_function($$$)
+{
+  my ($doc_func, $prefix, $name) = @_;
+
+  # Compare build_method_name().
+  $prefix =~ s/\.//g;
+  $prefix =~ s/([a-z])([A-Z])/$1_$2/g;
+  $prefix =~ s/^(Gdk|Gtk)_GL([A-Z][a-z])/$1_GL_$2/; # Special cases, add an underline
+  $prefix = lc($prefix) . '_';
+  $name = $prefix . $name;
+
+  return DocsParser::substitute_function($doc_func, $name);
 }
 
 sub substitute_function($$)
@@ -998,6 +1059,7 @@ sub build_method_name($$$$)
   my $prefix = $module . $class;
 
   $prefix =~ s/([a-z])([A-Z])/$1_$2/g;
+  $prefix =~ s/^(Gdk|Gtk)_GL([A-Z][a-z])/$1_GL_$2/; # Special cases, add an underline
   $prefix = lc($prefix) . '_';
 
   if($$name =~ m/^\Q$prefix\E/)
