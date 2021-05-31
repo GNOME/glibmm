@@ -1076,8 +1076,8 @@ class ustring::FormatStream
 {
 public:
   // noncopyable
-  GLIBMM_API FormatStream(const ustring::FormatStream&) = delete;
-  GLIBMM_API FormatStream& operator=(const ustring::FormatStream&) = delete;
+  FormatStream(const ustring::FormatStream&) = delete;
+  FormatStream& operator=(const ustring::FormatStream&) = delete;
 
 private:
 #ifdef GLIBMM_HAVE_WIDE_STREAM
