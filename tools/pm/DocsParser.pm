@@ -829,6 +829,9 @@ sub substitute_identifiers($$)
   {
     # TODO: handle more than one namespace
 
+    # gi-docgen syntax for links to symbols is described at
+    # https://gnome.pages.gitlab.gnome.org/gi-docgen/linking.html
+
     # Convert property names to C++.
     # The standard (and correct) gtk-doc way of referring to properties.
     s/(#[A-Z]\w+):([a-z\d-]+)/my $name = "$1::property_$2()"; $name =~ s"-"_"g; "$name";/ge;
@@ -845,17 +848,17 @@ sub substitute_identifiers($$)
     # protects against those errors.
     s/([A-Z]\w+)::([a-z\d-]+)(\s+property)/my $name = "$1::property_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
     # gi-docgen syntax.
-    s/\[property@([A-Z]\w*?)\.([A-Z]\w+?):([a-z\d-]+?)]/&DocsParser::substitute_property_or_signal_name($doc_func, $1, $2, "property", $3)/ge;
+    s/\[`?property@(?:([A-Z]\w*)\.)?([A-Z]\w+):([a-z\d-]+)`?]/&DocsParser::substitute_property_or_signal_name($doc_func, $1, $2, "property", $3)/ge;
 
     # Convert signal names to C++.
     s/(^|\s)::([a-z\d-]+)(\(\))*([^:\w]|$)/my $name = "$1signal_$2()$4"; $name =~ s"-"_"g; "$name";/ge;
     s/(#[A-Z]\w+)::([a-z\d-]+)(\(\))*([^:\w]|$)/my $name = "$1::signal_$2()$4"; $name =~ s"-"_"g; "$name";/ge;
-    s/\[signal@([A-Z]\w*?)\.([A-Z]\w+?)::([a-z\d-]+?)]/&DocsParser::substitute_property_or_signal_name($doc_func, $1, $2, "signal", $3)/ge;
+    s/\[`?signal@(?:([A-Z]\w*)\.)?([A-Z]\w+)::([a-z\d-]+)`?]/&DocsParser::substitute_property_or_signal_name($doc_func, $1, $2, "signal", $3)/ge;
 
     # Type names
-    s/[#%]([A-Z][a-z]*)([A-Z][A-Za-z]+)\b/&DocsParser::substitute_type_name($1, $2, undef)/eg;
-    s/`([A-Z][a-z]*)([A-Z][a-z]+[A-Za-z]*)`/&DocsParser::substitute_type_name($1, $2, "`")/eg;
-    s/\[(?:class|iface|struct|enum|flags)@([A-Z]\w*?)\.([A-Z]\w+?)]/&DocsParser::substitute_type_name($1, $2, undef)/eg;
+    s/[#%]([A-Z][a-z]*)([A-Z][A-Za-z]+)\b/&DocsParser::substitute_type_name($doc_func, $1, $2, undef)/eg;
+    s/`([A-Z][a-z]*)([A-Z][a-z]+[A-Za-z]*)`/&DocsParser::substitute_type_name($doc_func, $1, $2, "`")/eg;
+    s/\[`?(?:class|enum|error|flags|iface|struct|type)@(?:([A-Z]\w*)\.)?([A-Z]\w+)`?]/&DocsParser::substitute_type_name($doc_func, $1, $2, undef)/eg;
 
     # Enumerator names
     s/[#%]([A-Z]+)_([A-Z\d_]+)\b/&DocsParser::substitute_enumerator_name($1, $2)/eg;
@@ -867,13 +870,18 @@ sub substitute_identifiers($$)
 
     # Replace C function names with C++ counterparts.
     s/`?\b([a-z]+_[a-z][a-z\d_]+) ?\(\)`?/&DocsParser::substitute_function($doc_func, $1)/eg;
-    s/\[(?:method|ctor|vfunc|func)@((?:[A-Z]\w*?\.){1,2})([a-z][a-z\d_]+?)(?:\(\))?]/&DocsParser::substitute_split_function($doc_func, $1, $2)/eg;
+    s/\[`?id@([a-z\d_]+)(?:\(\))?`?]/&DocsParser::substitute_function($doc_func, $1)/eg;
+    s/\[`?(?:ctor|method)@(?:([A-Z]\w*)\.)?([A-Z]\w+)\.([a-z\d_]+)(?:\(\))?`?]/&DocsParser::substitute_split_function($doc_func, $1, $2, $3)/eg;
+    s/\[`?vfunc@(?:([A-Z]\w*)\.)?([A-Z]\w+)\.([a-z\d_]+)(?:\(\))?`?]/&DocsParser::substitute_split_function($doc_func, $1, $2, $3 . "_vfunc")/eg;
+    s/\[`?func@([\w.]+)(?:\(\))?`?]/&DocsParser::substitute_func_function($doc_func, $1)/eg;
   }
 }
 
-sub substitute_type_name($$$)
+sub substitute_type_name($$$$)
 {
-  my ($module, $name, $delimiter) = @_;
+  my ($doc_func, $module, $name, $delimiter) = @_;
+  $module = get_module_from_doc_func($doc_func) if !$module;
+
   my $c_name = $module . $name;
 
   if (exists $DocsParser::type_names{$c_name})
@@ -942,8 +950,10 @@ sub substitute_enumerator_name($$)
 sub substitute_property_or_signal_name($$$$$)
 {
   # $doc_func can be the name of a property (ModuleClass:property_name),
-  # signal (ModuleClass::signal_name) or function/method (module_class_method_name).
+  # signal (ModuleClass::signal_name),function/method (module_class_method_name)
+  # or class/enum/etc. (ModuleClass).
   my ($doc_func, $module, $class, $prop_or_sig, $name) = @_;
+  $module = get_module_from_doc_func($doc_func) if !$module;
 
   my $prefix = $module . $class;
   $name =~ s"-"_"g;
@@ -970,18 +980,44 @@ sub substitute_property_or_signal_name($$$$$)
   return $module . "::" . $class . "::" . $name;
 }
 
-sub substitute_split_function($$$)
+sub substitute_split_function($$$$)
 {
-  my ($doc_func, $prefix, $name) = @_;
+  my ($doc_func, $module, $class, $name) = @_;
+  $module = get_module_from_doc_func($doc_func) if !$module;
 
-  # Compare build_method_name().
-  $prefix =~ s/\.//g;
-  $prefix =~ s/([a-z])([A-Z])/$1_$2/g;
-  $prefix =~ s/^(Gdk|Gtk)_GL([A-Z][a-z])/$1_GL_$2/; # Special cases, add an underline
-  $prefix = lc($prefix) . '_';
-  $name = $prefix . $name;
+  my $prefix = build_method_prefix($module, $class);
 
-  return DocsParser::substitute_function($doc_func, $name);
+  if ($doc_func =~ m/^$prefix/)
+  {
+    return $name . "()";
+  }
+  else
+  {
+    return $module . "::" . $class . "::" . $name . "()";
+  }
+}
+
+sub substitute_func_function($$)
+{
+  # $name == Gtk.WidgetPaintable.func or Gtk.func or func.
+  my ($doc_func, $name) = @_;
+  $name =~ s/\./_/g;
+  $name =~ s/([a-z])([A-Z])/$1_$2/g;
+  return DocsParser::substitute_function($doc_func, lc($name));
+}
+
+sub get_module_from_doc_func($)
+{
+  my ($doc_func) = @_;
+
+  if ($doc_func =~ /^([a-z]+)_/)
+  {
+    # Function name. gtk_foo_bar -> Gtk
+    return "\u$1";
+  }
+  # Class name. GtkFooBar -> Gtk
+  $doc_func =~ /^([A-Z][a-z]*?)[A-Z]/;
+  return $1;
 }
 
 sub substitute_function($$)
@@ -1051,16 +1087,11 @@ sub lookup_object_of_method($$)
   return undef;
 }
 
-
 sub build_method_name($$$$)
 {
   my ($doc_func, $module, $class, $name) = @_;
 
-  my $prefix = $module . $class;
-
-  $prefix =~ s/([a-z])([A-Z])/$1_$2/g;
-  $prefix =~ s/^(Gdk|Gtk)_GL([A-Z][a-z])/$1_GL_$2/; # Special cases, add an underline
-  $prefix = lc($prefix) . '_';
+  my $prefix = build_method_prefix($module, $class);
 
   if($$name =~ m/^\Q$prefix\E/)
   {
@@ -1071,5 +1102,15 @@ sub build_method_name($$$$)
   }
 }
 
+sub build_method_prefix($$)
+{
+  my ($module, $class) = @_;
+
+  my $prefix = $module . $class;
+
+  $prefix =~ s/([a-z])([A-Z])/$1_$2/g;
+  $prefix =~ s/^(Gdk|Gtk)_GL([A-Z][a-z])/$1_GL_$2/; # Special cases, add an underline
+  return lc($prefix) . '_';
+}
 
 1; # indicate proper module load.
