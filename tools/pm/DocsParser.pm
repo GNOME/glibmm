@@ -848,20 +848,21 @@ sub substitute_identifiers($$)
     # protects against those errors.
     s/([A-Z]\w+)::([a-z\d-]+)(\s+property)/my $name = "$1::property_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
     # gi-docgen syntax.
-    s/\[`?property@(?:([A-Z]\w*)\.)?([A-Z]\w+):([a-z\d-]+)`?]/&DocsParser::substitute_property_or_signal_name($doc_func, $1, $2, "property", $3)/ge;
+    s/\[(`?)property@(?:([A-Z]\w*)\.)?([A-Z]\w+):([a-z\d-]+)\1]/"$1" . &DocsParser::substitute_property_or_signal_name($doc_func, $2, $3, "property", $4) . "$1"/ge;
 
     # Convert signal names to C++.
     s/(^|\s)::([a-z\d-]+)(\(\))*([^:\w]|$)/my $name = "$1signal_$2()$4"; $name =~ s"-"_"g; "$name";/ge;
     s/(#[A-Z]\w+)::([a-z\d-]+)(\(\))*([^:\w]|$)/my $name = "$1::signal_$2()$4"; $name =~ s"-"_"g; "$name";/ge;
-    s/\[`?signal@(?:([A-Z]\w*)\.)?([A-Z]\w+)::([a-z\d-]+)`?]/&DocsParser::substitute_property_or_signal_name($doc_func, $1, $2, "signal", $3)/ge;
+    s/\[(`?)signal@(?:([A-Z]\w*)\.)?([A-Z]\w+)::([a-z\d-]+)\1]/"$1" . &DocsParser::substitute_property_or_signal_name($doc_func, $2, $3, "signal", $4) . "$1"/ge;
 
     # Type names
-    s/[#%]([A-Z][a-z]*)([A-Z][A-Za-z]+)\b/&DocsParser::substitute_type_name($doc_func, $1, $2, undef)/eg;
-    s/`([A-Z][a-z]*)([A-Z][a-z]+[A-Za-z]*)`/&DocsParser::substitute_type_name($doc_func, $1, $2, "`")/eg;
-    s/\[`?(?:class|enum|error|flags|iface|struct|type)@(?:([A-Z]\w*)\.)?([A-Z]\w+)`?]/&DocsParser::substitute_type_name($doc_func, $1, $2, undef)/eg;
+    s/[#%]([A-Z][a-z]*)([A-Z][A-Za-z]+)\b/&DocsParser::substitute_type_name($doc_func, $1, $2)/eg;
+    s/`([A-Z][a-z]*)([A-Z][A-Za-z]*[a-z])`/"`" . &DocsParser::substitute_type_name($doc_func, $1, $2) . "`"/eg;
+    s/\[(`?)(?:class|enum|error|flags|iface|struct|type)@(?:([A-Z]\w*)\.)?([A-Z]\w+)\1]/"$1" . &DocsParser::substitute_type_name($doc_func, $2, $3) . "$1"/eg;
 
     # Enumerator names
     s/[#%]([A-Z]+)_([A-Z\d_]+)\b/&DocsParser::substitute_enumerator_name($1, $2)/eg;
+    s/`([A-Z]+)_([A-Z\d_]+)`/"`" . &DocsParser::substitute_enumerator_name($1, $2) . "`"/eg;
 
     s/\bG:://g; #Rename G::Something to Something.
 
@@ -869,17 +870,17 @@ sub substitute_identifiers($$)
     s/(\b\w+)Callback/Slot$1/g;
 
     # Replace C function names with C++ counterparts.
-    s/`?\b([a-z]+_[a-z][a-z\d_]+) ?\(\)`?/&DocsParser::substitute_function($doc_func, $1)/eg;
-    s/\[`?id@([a-z\d_]+)(?:\(\))?`?]/&DocsParser::substitute_function($doc_func, $1)/eg;
-    s/\[`?(?:ctor|method)@(?:([A-Z]\w*)\.)?([A-Z]\w+)\.([a-z\d_]+)(?:\(\))?`?]/&DocsParser::substitute_split_function($doc_func, $1, $2, $3)/eg;
-    s/\[`?vfunc@(?:([A-Z]\w*)\.)?([A-Z]\w+)\.([a-z\d_]+)(?:\(\))?`?]/&DocsParser::substitute_split_function($doc_func, $1, $2, $3 . "_vfunc")/eg;
-    s/\[`?func@([\w.]+)(?:\(\))?`?]/&DocsParser::substitute_func_function($doc_func, $1)/eg;
+    s/\b([a-z]+_[a-z][a-z\d_]+) ?\(\)/&DocsParser::substitute_function($doc_func, $1)/eg;
+    s/\[(`?)id@([a-z\d_]+)\1]/"$1" . &DocsParser::substitute_function($doc_func, $2) . "$1"/eg;
+    s/\[(`?)(?:ctor|method)@(?:([A-Z]\w*)\.)?([A-Z]\w+)\.([a-z\d_]+)\1]/"$1" . &DocsParser::substitute_split_function($doc_func, $2, $3, $4) . "$1"/eg;
+    s/\[(`?)vfunc@(?:([A-Z]\w*)\.)?([A-Z]\w+)\.([a-z\d_]+)\1]/"$1" . &DocsParser::substitute_split_function($doc_func, $2, $3, $4 . "_vfunc") . "$1"/eg;
+    s/\[(`?)func@([\w.]+)\1]/"$1" . &DocsParser::substitute_func_function($doc_func, $2) . "$1"/eg;
   }
 }
 
-sub substitute_type_name($$$$)
+sub substitute_type_name($$$)
 {
-  my ($doc_func, $module, $name, $delimiter) = @_;
+  my ($doc_func, $module, $name) = @_;
   $module = get_module_from_doc_func($doc_func) if !$module;
 
   my $c_name = $module . $name;
@@ -887,10 +888,6 @@ sub substitute_type_name($$$$)
   if (exists $DocsParser::type_names{$c_name})
   {
     return $DocsParser::type_names{$c_name};
-  }
-  if (defined($delimiter))
-  {
-    return $delimiter . $c_name . $delimiter;
   }
   #print "DocsParser.pm: Assuming the type $c_name shall become " . (($module eq "G") ? "" : "${module}::") . "$name.\n";
   return $module . "::" . $name;
@@ -935,7 +932,7 @@ sub substitute_enumerator_name($$)
 
   # Don't apply the default substitution to these module names.
   # They are not really modules.
-  if (grep {$module eq $_} qw(HAS NO O SO AF))
+  if (grep {$module eq $_} qw(HAS NO O SO AF XDG))
   {
     return $c_name;
   }
@@ -950,7 +947,7 @@ sub substitute_enumerator_name($$)
 sub substitute_property_or_signal_name($$$$$)
 {
   # $doc_func can be the name of a property (ModuleClass:property_name),
-  # signal (ModuleClass::signal_name),function/method (module_class_method_name)
+  # signal (ModuleClass::signal_name), function/method (module_class_method_name)
   # or class/enum/etc. (ModuleClass).
   my ($doc_func, $module, $class, $prop_or_sig, $name) = @_;
   $module = get_module_from_doc_func($doc_func) if !$module;
