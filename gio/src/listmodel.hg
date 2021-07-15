@@ -90,6 +90,10 @@ public:
   //It doesn't do anything differently.
   _IGNORE(g_list_model_get_item)
 
+  // Don't use Glib::RefPtr<Glib::Object> Glib::wrap(GObject* object, bool take_copy).
+  // The object may be an interface object, e.g. Gio::File. Such an object can't be
+  // cast to Glib::Object. https://gitlab.gnome.org/GNOME/glibmm/-/issues/93
+#m4 _CONVERSION(`GObject*',`Glib::RefPtr<Glib::ObjectBase>',`Glib::RefPtr<Glib::ObjectBase>(Glib::wrap_auto($3))')
   _WRAP_METHOD(Glib::RefPtr<Glib::ObjectBase> get_object(guint position), g_list_model_get_object, newin "2,50")
   _WRAP_METHOD(Glib::RefPtr<const Glib::ObjectBase> get_object(guint position) const, g_list_model_get_object, constversion, newin "2,50")
 
