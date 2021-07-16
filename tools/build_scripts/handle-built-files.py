@@ -83,11 +83,8 @@ def build_from_m4():
     '-I', include_dir,
     input_file,
   ]
-  output_file_obj = open(output_file, mode='w')
-  result = subprocess.run(cmd, stdout=output_file_obj)
-  output_file_obj.close()
-
-  return result.returncode
+  with open(output_file, mode='w', encoding='utf-8') as output_file_obj:
+    return subprocess.run(cmd, stdout=output_file_obj).returncode
 
 # Invoked from meson.add_install_script().
 def install_built_h_files():
