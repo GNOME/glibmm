@@ -19,6 +19,35 @@
 #include <giomm/slot_async.h>
 #include <gio/gio.h>
 
+namespace
+{
+/* Special type traits for pointers to the GAppInfo interface.
+ * The partial specialization in glibmm/glib/glibmm/containerhandle_shared.h
+ * is not well suited for interfaces which do not already have a wrapper.
+ * Its to_cpp_type() calls Glib::wrap_auto() instead id Glib::wrap_auto_interface().
+ * These type traits are used by Glib::ListHandler<>::list_to_vector() in
+ * Gio::AppInfo::get_all() and Gio::AppInfo::get_all_for_type().
+ * https://gitlab.gnome.org/GNOME/glibmm/-/issues/94
+ */
+struct TypeTraits_AppInfo
+{
+  using T = Gio::AppInfo;
+  using CppType = Glib::RefPtr<T>;
+  using CType = typename T::BaseObjectType*;
+  using CTypeNonConst = typename T::BaseObjectType*;
+
+  static CType to_c_type(const CppType& ptr) { return Glib::unwrap(ptr); }
+  static CType to_c_type(CType ptr) { return ptr; }
+  static CppType to_cpp_type(CType ptr) { return Glib::wrap(ptr, true); }
+
+  static void release_c_type(CType ptr)
+  {
+    GLIBMM_DEBUG_UNREFERENCE(nullptr, ptr);
+    g_object_unref(ptr);
+  }
+};
+} // anonymous namespace
+
 namespace Gio
 {
 
