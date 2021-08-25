@@ -3,7 +3,7 @@
 image: ubuntu:devel
 
 stages:
-  - sigc
+  - deps
   - build
   - deploy
 
@@ -29,22 +29,39 @@ variables:
     - export DEBIAN_FRONTEND=noninteractive
     - apt update && apt -y upgrade && apt -y install $DEPENDENCIES
 
-build_sigc:
+# Clear the cache manually.
+clear_cache:
+  stage: deps
+  when: manual
+  script:
+    - echo Clearing the build-deps cache
+  cache:
+    key: build-deps
+    paths:
+      - libsigc/
+    policy: push
+
+build_deps:
   extends: .build_default
-  stage: sigc
+  stage: deps
   variables:
     DEPENDENCIES: $MESON_DEPS
   script:
-    - git clone --branch 3.0.7 --depth 1 https://github.com/libsigcplusplus/libsigcplusplus libsigc
+    # Build and cache dependencies that can't be installed with apt.
+    # Build libsigc++3
+    - if test ! -d libsigc; then
+    - git clone --branch 3.0.7 --depth 1 https://github.com/libsigcplusplus/libsigcplusplus.git libsigc
     - cd libsigc
     - mkdir _build && cd _build
     - meson --prefix=/usr --libdir=lib -Dwarnings=fatal -Dbuild-examples=false -Dbuildtype=release
     - meson compile
+    - cd ../..
+    - fi
   cache:
-    key: build-sigc
+    key: build-deps
     paths:
       - libsigc/
-    policy: push
+    policy: pull-push
 
 autotools_build:
   extends: .build_default
@@ -58,7 +75,7 @@ autotools_build:
     - make check
     - make install
   cache:
-    key: build-sigc
+    key: build-deps
     paths:
       - libsigc/
     policy: pull
@@ -78,7 +95,7 @@ debug_build:
     - meson test
     - meson install
   cache:
-    key: build-sigc
+    key: build-deps
     paths:
       - libsigc/
     policy: pull
@@ -103,7 +120,7 @@ release_gcc_9_build:
     - meson test
     - meson install
   cache:
-    key: build-sigc
+    key: build-deps
     paths:
       - libsigc/
     policy: pull
@@ -127,7 +144,7 @@ release_gcc_10_build:
     - meson install
   allow_failure: true
   cache:
-    key: build-sigc
+    key: build-deps
     paths:
       - libsigc/
     policy: pull
@@ -153,7 +170,7 @@ release_clang_build:
     - meson install
   allow_failure: true
   cache:
-    key: build-sigc
+    key: build-deps
     paths:
       - libsigc/
     policy: pull
@@ -164,6 +181,7 @@ release_clang_build:
       - _build/meson-logs/meson-log.txt
     expire_in: 1 week
 
+# Publish reference documentation at gnome.pages.gitlab.gnome.org/glibmm
 pages:
   stage: deploy
   needs: [release_gcc_9_build]
