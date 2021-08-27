@@ -82,7 +82,7 @@ private:
   GMainContext* context_;
 
   // no copy assignment
-  SignalSocket& operator=(const SignalSocket&);
+  SignalSocket& operator=(const SignalSocket&) = delete;
 };
 
 /** Convenience socket signal.

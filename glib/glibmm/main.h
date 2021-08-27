@@ -190,7 +190,7 @@ private:
   GMainContext* context_;
 
   // no copy assignment
-  SignalTimeout& operator=(const SignalTimeout&);
+  SignalTimeout& operator=(const SignalTimeout&) = delete;
 };
 
 class GLIBMM_API SignalIdle
@@ -248,7 +248,7 @@ private:
   GMainContext* context_;
 
   // no copy assignment
-  SignalIdle& operator=(const SignalIdle&);
+  SignalIdle& operator=(const SignalIdle&) = delete;
 };
 
 class GLIBMM_API SignalIO
@@ -319,7 +319,7 @@ private:
   GMainContext* context_;
 
   // no copy assignment
-  SignalIO& operator=(const SignalIO&);
+  SignalIO& operator=(const SignalIO&) = delete;
 };
 
 class GLIBMM_API SignalChildWatch
@@ -350,7 +350,7 @@ private:
   GMainContext* context_;
 
   // no copy assignment
-  SignalChildWatch& operator=(const SignalChildWatch&);
+  SignalChildWatch& operator=(const SignalChildWatch&) = delete;
 };
 
 /** Convenience timeout signal.
@@ -693,8 +693,9 @@ private:
   MainLoop();
   void operator delete(void*, std::size_t);
 
-  MainLoop(const MainLoop&);
-  MainLoop& operator=(const MainLoop&);
+  // noncopyable
+  MainLoop(const MainLoop&) = delete;
+  MainLoop& operator=(const MainLoop&) = delete;
 };
 
 /** @relates Glib::MainLoop */
