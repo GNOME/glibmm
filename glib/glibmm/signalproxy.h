@@ -66,7 +66,7 @@ protected:
   ObjectBase* obj_;
 
 private:
-  SignalProxyBase& operator=(const SignalProxyBase&); // not implemented
+  SignalProxyBase& operator=(const SignalProxyBase&) = delete;
 };
 
 // Shared portion of a Signal without detail
@@ -139,7 +139,7 @@ private:
   sigc::slot_base& connect_impl_(GCallback callback, const sigc::slot_base& slot, bool after);
 
   // no copy assignment
-  SignalProxyNormal& operator=(const SignalProxyNormal&);
+  SignalProxyNormal& operator=(const SignalProxyNormal&) = delete;
 };
 
 /**** Glib::SignalProxy ***************************************************/
@@ -291,7 +291,7 @@ private:
   const Glib::ustring detailed_name_; // signal_name[::detail_name]
 
   // no copy assignment
-  SignalProxyDetailed& operator=(const SignalProxyDetailed&);
+  SignalProxyDetailed& operator=(const SignalProxyDetailed&) = delete;
 };
 
 /** Proxy for signals with any number of arguments and possibly a detailed name.
