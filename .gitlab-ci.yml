@@ -1,4 +1,4 @@
-# Currently we track two versions of gcc: gcc-9 and gcc-10.
+# Currently we track two versions of gcc: gcc-10 and gcc-11.
 
 image: debian:testing
 
@@ -106,16 +106,16 @@ debug_build:
       - _build/meson-logs/meson-log.txt
     expire_in: 1 week
 
-release_gcc_9_build:
+release_gcc_10_build:
   extends: .build_default
   stage: build
   variables:
-    DEPENDENCIES: $MESON_DEPS g++-9
+    DEPENDENCIES: $MESON_DEPS g++-10
   script:
     - ninja -C libsigc/_build install
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
-    - CC=gcc-9 CXX=g++-9 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
+    - CC=gcc-10 CXX=g++-10 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
     - meson compile
     - meson test
     - meson install
@@ -129,16 +129,16 @@ release_gcc_9_build:
     paths:
       - _build/docs/reference
 
-release_gcc_10_build:
+release_gcc_11_build:
   extends: .build_default
   stage: build
   variables:
-    DEPENDENCIES: $MESON_DEPS g++-10
+    DEPENDENCIES: $MESON_DEPS g++-11
   script:
     - ninja -C libsigc/_build install
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
-    - CC=gcc-10 CXX=g++-10 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
+    - CC=gcc-11 CXX=g++-11 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
     - meson compile
     - meson test
     - meson install
@@ -184,7 +184,7 @@ release_clang_build:
 # Publish reference documentation at gnome.pages.gitlab.gnome.org/glibmm
 pages:
   stage: deploy
-  needs: [release_gcc_9_build]
+  needs: [release_gcc_10_build]
   script:
     - mkdir public
     - mv _build/docs/reference/html/* public
