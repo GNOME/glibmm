@@ -49,9 +49,9 @@ wrap_register_init()
 
   if (!Glib::quark_)
   {
-    Glib::quark_ = g_quark_from_static_string("glibmm__Glib::quark_");
+    Glib::quark_ = g_quark_from_string("glibmm__Glib::quark_");
     Glib::quark_cpp_wrapper_deleted_ =
-      g_quark_from_static_string("glibmm__Glib::quark_cpp_wrapper_deleted_");
+      g_quark_from_string("glibmm__Glib::quark_cpp_wrapper_deleted_");
   }
 
   if (!wrap_func_table)
