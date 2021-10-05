@@ -13,8 +13,23 @@
   )
 )
 
+(define-enum Error
+  (in-module "GModule")
+  (c-name "GModuleError")
+  (gtype-id "G_TYPE_MODULE_ERROR")
+  (values
+    '("failed" "G_MODULE_ERROR_FAILED")
+    '("check-failed" "G_MODULE_ERROR_CHECK_FAILED")
+  )
+)
+
 
 ;; From gmodule.h
+
+(define-function g_module_error_quark
+  (c-name "g_module_error_quark")
+  (return-type "GQuark")
+)
 
 (define-function g_module_supported
   (c-name "g_module_supported")
@@ -27,6 +42,16 @@
   (parameters
     '("const-gchar*" "file_name")
     '("GModuleFlags" "flags")
+  )
+)
+
+(define-function g_module_open_full
+  (c-name "g_module_open_full")
+  (return-type "GModule*")
+  (parameters
+    '("const-gchar*" "file_name")
+    '("GModuleFlags" "flags")
+    '("GError**" "error")
   )
 )
 

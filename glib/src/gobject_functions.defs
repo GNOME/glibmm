@@ -61,6 +61,7 @@
     '("no-hooks" "G_SIGNAL_NO_HOOKS")
     '("must-collect" "G_SIGNAL_MUST_COLLECT")
     '("deprecated" "G_SIGNAL_DEPRECATED")
+    '("accumulator-first-run" "G_SIGNAL_ACCUMULATOR_FIRST_RUN")
   )
 )
 
@@ -120,6 +121,7 @@
   (values
     '("abstract" "G_TYPE_FLAG_ABSTRACT")
     '("value-abstract" "G_TYPE_FLAG_VALUE_ABSTRACT")
+    '("final" "G_TYPE_FLAG_FINAL")
   )
 )
 
@@ -152,9 +154,21 @@
   (return-type "GObject*")
 )
 
+(define-method dup_source
+  (of-object "GBinding")
+  (c-name "g_binding_dup_source")
+  (return-type "GObject*")
+)
+
 (define-method get_target
   (of-object "GBinding")
   (c-name "g_binding_get_target")
+  (return-type "GObject*")
+)
+
+(define-method dup_target
+  (of-object "GBinding")
+  (c-name "g_binding_dup_target")
   (return-type "GObject*")
 )
 
@@ -776,6 +790,16 @@
 
 (define-function g_uri_get_type
   (c-name "g_uri_get_type")
+  (return-type "GType")
+)
+
+(define-function g_tree_get_type
+  (c-name "g_tree_get_type")
+  (return-type "GType")
+)
+
+(define-function g_pattern_spec_get_type
+  (c-name "g_pattern_spec_get_type")
   (return-type "GType")
 )
 
@@ -1658,6 +1682,14 @@
 
 (define-function g_object_ref_sink
   (c-name "g_object_ref_sink")
+  (return-type "gpointer")
+  (parameters
+    '("gpointer" "object")
+  )
+)
+
+(define-function g_object_take_ref
+  (c-name "g_object_take_ref")
   (return-type "gpointer")
   (parameters
     '("gpointer" "object")
@@ -3327,6 +3359,12 @@
   (parameters
     '("guint*" "n_prerequisites")
   )
+)
+
+(define-method interface_instantiatable_prerequisite
+  (of-object "GType")
+  (c-name "g_type_interface_instantiatable_prerequisite")
+  (return-type "GType")
 )
 
 (define-function g_type_class_add_private

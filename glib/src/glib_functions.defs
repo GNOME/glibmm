@@ -826,6 +826,7 @@
     '("hangul-lv-syllable" "G_UNICODE_BREAK_HANGUL_LV_SYLLABLE")
     '("hangul-lvt-syllable" "G_UNICODE_BREAK_HANGUL_LVT_SYLLABLE")
     '("close-paranthesis" "G_UNICODE_BREAK_CLOSE_PARANTHESIS")
+    '("close-parenthesis" "G_UNICODE_BREAK_CLOSE_PARENTHESIS")
     '("conditional-japanese-starter" "G_UNICODE_BREAK_CONDITIONAL_JAPANESE_STARTER")
     '("hebrew-letter" "G_UNICODE_BREAK_HEBREW_LETTER")
     '("regional-indicator" "G_UNICODE_BREAK_REGIONAL_INDICATOR")
@@ -1031,6 +1032,7 @@
     '("encoded-query" "G_URI_FLAGS_ENCODED_QUERY")
     '("encoded-path" "G_URI_FLAGS_ENCODED_PATH")
     '("encoded-fragment" "G_URI_FLAGS_ENCODED_FRAGMENT")
+    '("scheme-normalize" "G_URI_FLAGS_SCHEME_NORMALIZE")
   )
 )
 
@@ -2967,6 +2969,17 @@
   )
 )
 
+(define-method get_region
+  (of-object "GBytes")
+  (c-name "g_bytes_get_region")
+  (return-type "gconstpointer")
+  (parameters
+    '("gsize" "element_size")
+    '("gsize" "offset")
+    '("gsize" "n_elements")
+  )
+)
+
 
 
 ;; From gcharset.h
@@ -4350,6 +4363,30 @@
 
 ;; From gerror.h
 
+(define-function g_error_domain_register_static
+  (c-name "g_error_domain_register_static")
+  (return-type "GQuark")
+  (parameters
+    '("const-char*" "error_type_name")
+    '("gsize" "error_type_private_size")
+    '("GErrorInitFunc" "error_type_init")
+    '("GErrorCopyFunc" "error_type_copy")
+    '("GErrorClearFunc" "error_type_clear")
+  )
+)
+
+(define-function g_error_domain_register
+  (c-name "g_error_domain_register")
+  (return-type "GQuark")
+  (parameters
+    '("const-char*" "error_type_name")
+    '("gsize" "error_type_private_size")
+    '("GErrorInitFunc" "error_type_init")
+    '("GErrorCopyFunc" "error_type_copy")
+    '("GErrorClearFunc" "error_type_clear")
+  )
+)
+
 (define-function g_error_new
   (c-name "g_error_new")
   (is-constructor-of "GError")
@@ -4453,6 +4490,15 @@
     '("const-gchar*" "format")
   )
   (varargs #t)
+)
+
+(define-function g_prefix_error_literal
+  (c-name "g_prefix_error_literal")
+  (return-type "none")
+  (parameters
+    '("GError**" "err")
+    '("const-gchar*" "prefix")
+  )
 )
 
 (define-function g_propagate_prefixed_error
@@ -6445,6 +6491,11 @@
   (return-type "none")
 )
 
+(define-function g_error_init
+  (c-name "g_error_init")
+  (return-type "none")
+)
+
 (define-function g_thread_win32_process_detach
   (c-name "g_thread_win32_process_detach")
   (return-type "none")
@@ -6508,6 +6559,10 @@
 
 
 ;; From glib_trace.h
+
+
+
+;; From glib-typeof.h
 
 
 
@@ -7264,6 +7319,15 @@
 (define-method set_name
   (of-object "GSource")
   (c-name "g_source_set_name")
+  (return-type "none")
+  (parameters
+    '("const-char*" "name")
+  )
+)
+
+(define-method set_static_name
+  (of-object "GSource")
+  (c-name "g_source_set_static_name")
   (return-type "none")
   (parameters
     '("const-char*" "name")
@@ -8157,6 +8221,23 @@
   )
 )
 
+(define-function g_log_writer_default_set_use_stderr
+  (c-name "g_log_writer_default_set_use_stderr")
+  (return-type "none")
+  (parameters
+    '("gboolean" "use_stderr")
+  )
+)
+
+(define-function g_log_writer_default_would_drop
+  (c-name "g_log_writer_default_would_drop")
+  (return-type "gboolean")
+  (parameters
+    '("GLogLevelFlags" "log_level")
+    '("const-char*" "log_domain")
+  )
+)
+
 (define-function g_return_if_fail_warning
   (c-name "g_return_if_fail_warning")
   (return-type "none")
@@ -8179,18 +8260,6 @@
   )
 )
 
-(define-function g_assert_warning
-  (c-name "g_assert_warning")
-  (return-type "none")
-  (parameters
-    '("const-char*" "log_domain")
-    '("const-char*" "file")
-    '("const-int" "line")
-    '("const-char*" "pretty_function")
-    '("const-char*" "expression")
-  )
-)
-
 (define-function g_log_structured_standard
   (c-name "g_log_structured_standard")
   (return-type "none")
@@ -8205,8 +8274,8 @@
   (varargs #t)
 )
 
-(define-function g_error
-  (c-name "g_error")
+(define-function g_critical
+  (c-name "g_critical")
   (return-type "none")
   (parameters
     '("const-gchar*" "format")
@@ -8214,8 +8283,8 @@
   (varargs #t)
 )
 
-(define-function g_critical
-  (c-name "g_critical")
+(define-function g_error
+  (c-name "g_error")
   (return-type "none")
   (parameters
     '("const-gchar*" "format")
@@ -8797,12 +8866,38 @@
   (return-type "none")
 )
 
+(define-method copy
+  (of-object "GPatternSpec")
+  (c-name "g_pattern_spec_copy")
+  (return-type "GPatternSpec*")
+)
+
 (define-method equal
   (of-object "GPatternSpec")
   (c-name "g_pattern_spec_equal")
   (return-type "gboolean")
   (parameters
     '("GPatternSpec*" "pspec2")
+  )
+)
+
+(define-method match
+  (of-object "GPatternSpec")
+  (c-name "g_pattern_spec_match")
+  (return-type "gboolean")
+  (parameters
+    '("gsize" "string_length")
+    '("const-gchar*" "string")
+    '("const-gchar*" "string_reversed")
+  )
+)
+
+(define-method match_string
+  (of-object "GPatternSpec")
+  (c-name "g_pattern_spec_match_string")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "string")
   )
 )
 
@@ -11019,6 +11114,30 @@
   )
 )
 
+(define-function g_spawn_async_with_pipes_and_fds
+  (c-name "g_spawn_async_with_pipes_and_fds")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "working_directory")
+    '("const-gchar*-const*" "argv")
+    '("const-gchar*-const*" "envp")
+    '("GSpawnFlags" "flags")
+    '("GSpawnChildSetupFunc" "child_setup")
+    '("gpointer" "user_data")
+    '("gint" "stdin_fd")
+    '("gint" "stdout_fd")
+    '("gint" "stderr_fd")
+    '("const-gint*" "source_fds")
+    '("const-gint*" "target_fds")
+    '("gsize" "n_fds")
+    '("GPid*" "child_pid_out")
+    '("gint*" "stdin_pipe_out")
+    '("gint*" "stdout_pipe_out")
+    '("gint*" "stderr_pipe_out")
+    '("GError**" "error")
+  )
+)
+
 (define-function g_spawn_async_with_fds
   (c-name "g_spawn_async_with_fds")
   (return-type "gboolean")
@@ -11049,7 +11168,7 @@
     '("gpointer" "user_data")
     '("gchar**" "standard_output")
     '("gchar**" "standard_error")
-    '("gint*" "exit_status")
+    '("gint*" "wait_status")
     '("GError**" "error")
   )
 )
@@ -11061,7 +11180,7 @@
     '("const-gchar*" "command_line")
     '("gchar**" "standard_output")
     '("gchar**" "standard_error")
-    '("gint*" "exit_status")
+    '("gint*" "wait_status")
     '("GError**" "error")
   )
 )
@@ -11075,11 +11194,20 @@
   )
 )
 
+(define-function g_spawn_check_wait_status
+  (c-name "g_spawn_check_wait_status")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "wait_status")
+    '("GError**" "error")
+  )
+)
+
 (define-function g_spawn_check_exit_status
   (c-name "g_spawn_check_exit_status")
   (return-type "gboolean")
   (parameters
-    '("gint" "exit_status")
+    '("gint" "wait_status")
     '("GError**" "error")
   )
 )
@@ -11636,6 +11764,15 @@
   )
 )
 
+(define-function g_memdup2
+  (c-name "g_memdup2")
+  (return-type "gpointer")
+  (parameters
+    '("gconstpointer" "mem")
+    '("gsize" "byte_size")
+  )
+)
+
 (define-function g_strsplit
   (c-name "g_strsplit")
   (return-type "gchar**")
@@ -12054,6 +12191,17 @@
   )
 )
 
+(define-method replace
+  (of-object "GString")
+  (c-name "g_string_replace")
+  (return-type "guint")
+  (parameters
+    '("const-gchar*" "find")
+    '("const-gchar*" "replace")
+    '("guint" "limit")
+  )
+)
+
 (define-method ascii_down
   (of-object "GString")
   (c-name "g_string_ascii_down")
@@ -12140,6 +12288,61 @@
 
 
 
+;; From gstrvbuilder.h
+
+(define-function g_strv_builder_new
+  (c-name "g_strv_builder_new")
+  (is-constructor-of "GStrvBuilder")
+  (return-type "GStrvBuilder*")
+)
+
+(define-method unref
+  (of-object "GStrvBuilder")
+  (c-name "g_strv_builder_unref")
+  (return-type "none")
+)
+
+(define-method ref
+  (of-object "GStrvBuilder")
+  (c-name "g_strv_builder_ref")
+  (return-type "GStrvBuilder*")
+)
+
+(define-method add
+  (of-object "GStrvBuilder")
+  (c-name "g_strv_builder_add")
+  (return-type "none")
+  (parameters
+    '("const-char*" "value")
+  )
+)
+
+(define-method addv
+  (of-object "GStrvBuilder")
+  (c-name "g_strv_builder_addv")
+  (return-type "none")
+  (parameters
+    '("const-char**" "value")
+  )
+)
+
+(define-method add_many
+  (of-object "GStrvBuilder")
+  (c-name "g_strv_builder_add_many")
+  (return-type "none")
+  (parameters
+  )
+  (varargs #t)
+)
+
+(define-method end
+  (of-object "GStrvBuilder")
+  (c-name "g_strv_builder_end")
+  (return-type "GStrv")
+)
+
+
+
 ;; From gtestutils.h
 
 (define-function g_strcmp0
@@ -12221,9 +12424,23 @@
   )
 )
 
+(define-function g_test_get_path
+  (c-name "g_test_get_path")
+  (return-type "const-char*")
+)
+
 (define-function g_test_fail
   (c-name "g_test_fail")
   (return-type "none")
+)
+
+(define-function g_test_fail_printf
+  (c-name "g_test_fail_printf")
+  (return-type "none")
+  (parameters
+    '("const-char*" "format")
+  )
+  (varargs #t)
 )
 
 (define-function g_test_incomplete
@@ -12234,12 +12451,30 @@
   )
 )
 
+(define-function g_test_incomplete_printf
+  (c-name "g_test_incomplete_printf")
+  (return-type "none")
+  (parameters
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
 (define-function g_test_skip
   (c-name "g_test_skip")
   (return-type "none")
   (parameters
     '("const-gchar*" "msg")
   )
+)
+
+(define-function g_test_skip_printf
+  (c-name "g_test_skip_printf")
+  (return-type "none")
+  (parameters
+    '("const-char*" "format")
+  )
+  (varargs #t)
 )
 
 (define-function g_test_failed
@@ -12426,6 +12661,18 @@
   )
 )
 
+(define-method free
+  (of-object "GTestCase")
+  (c-name "g_test_case_free")
+  (return-type "none")
+)
+
+(define-method free
+  (of-object "GTestSuite")
+  (c-name "g_test_suite_free")
+  (return-type "none")
+)
+
 (define-function g_test_trap_assertions
   (c-name "g_test_trap_assertions")
   (return-type "none")
@@ -12451,18 +12698,6 @@
   )
 )
 
-(define-function g_assertion_message_expr
-  (c-name "g_assertion_message_expr")
-  (return-type "none")
-  (parameters
-    '("const-char*" "domain")
-    '("const-char*" "file")
-    '("int" "line")
-    '("const-char*" "func")
-    '("const-char*" "expr")
-  )
-)
-
 (define-function g_assertion_message_cmpstr
   (c-name "g_assertion_message_cmpstr")
   (return-type "none")
@@ -12475,6 +12710,21 @@
     '("const-char*" "arg1")
     '("const-char*" "cmp")
     '("const-char*" "arg2")
+  )
+)
+
+(define-function g_assertion_message_cmpstrv
+  (c-name "g_assertion_message_cmpstrv")
+  (return-type "none")
+  (parameters
+    '("const-char*" "domain")
+    '("const-char*" "file")
+    '("int" "line")
+    '("const-char*" "func")
+    '("const-char*" "expr")
+    '("const-char*-const*" "arg1")
+    '("const-char*-const*" "arg2")
+    '("gsize" "first_wrong_idx")
   )
 )
 
@@ -12912,6 +13162,19 @@
   )
 )
 
+(define-function g_thread_pool_new_full
+  (c-name "g_thread_pool_new_full")
+  (return-type "GThreadPool*")
+  (parameters
+    '("GFunc" "func")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "item_free_func")
+    '("gint" "max_threads")
+    '("gboolean" "exclusive")
+    '("GError**" "error")
+  )
+)
+
 (define-method free
   (of-object "GThreadPool")
   (c-name "g_thread_pool_free")
@@ -13115,6 +13378,14 @@
   )
 )
 
+(define-function g_time_zone_new_identifier
+  (c-name "g_time_zone_new_identifier")
+  (return-type "GTimeZone*")
+  (parameters
+    '("const-gchar*" "identifier")
+  )
+)
+
 (define-function g_time_zone_new_utc
   (c-name "g_time_zone_new_utc")
   (return-type "GTimeZone*")
@@ -13272,6 +13543,30 @@
   )
 )
 
+(define-method node_first
+  (of-object "GTree")
+  (c-name "g_tree_node_first")
+  (return-type "GTreeNode*")
+)
+
+(define-method node_last
+  (of-object "GTree")
+  (c-name "g_tree_node_last")
+  (return-type "GTreeNode*")
+)
+
+(define-method previous
+  (of-object "GTreeNode")
+  (c-name "g_tree_node_previous")
+  (return-type "GTreeNode*")
+)
+
+(define-method next
+  (of-object "GTreeNode")
+  (c-name "g_tree_node_next")
+  (return-type "GTreeNode*")
+)
+
 (define-method ref
   (of-object "GTree")
   (c-name "g_tree_ref")
@@ -13290,10 +13585,30 @@
   (return-type "none")
 )
 
+(define-method insert_node
+  (of-object "GTree")
+  (c-name "g_tree_insert_node")
+  (return-type "GTreeNode*")
+  (parameters
+    '("gpointer" "key")
+    '("gpointer" "value")
+  )
+)
+
 (define-method insert
   (of-object "GTree")
   (c-name "g_tree_insert")
   (return-type "none")
+  (parameters
+    '("gpointer" "key")
+    '("gpointer" "value")
+  )
+)
+
+(define-method replace_node
+  (of-object "GTree")
+  (c-name "g_tree_replace_node")
+  (return-type "GTreeNode*")
   (parameters
     '("gpointer" "key")
     '("gpointer" "value")
@@ -13319,10 +13634,37 @@
   )
 )
 
+(define-method remove_all
+  (of-object "GTree")
+  (c-name "g_tree_remove_all")
+  (return-type "none")
+)
+
 (define-method steal
   (of-object "GTree")
   (c-name "g_tree_steal")
   (return-type "gboolean")
+  (parameters
+    '("gconstpointer" "key")
+  )
+)
+
+(define-method key
+  (of-object "GTreeNode")
+  (c-name "g_tree_node_key")
+  (return-type "gpointer")
+)
+
+(define-method value
+  (of-object "GTreeNode")
+  (c-name "g_tree_node_value")
+  (return-type "gpointer")
+)
+
+(define-method lookup_node
+  (of-object "GTree")
+  (c-name "g_tree_lookup_node")
+  (return-type "GTreeNode*")
   (parameters
     '("gconstpointer" "key")
   )
@@ -13358,6 +13700,16 @@
   )
 )
 
+(define-method foreach_node
+  (of-object "GTree")
+  (c-name "g_tree_foreach_node")
+  (return-type "none")
+  (parameters
+    '("GTraverseNodeFunc" "func")
+    '("gpointer" "user_data")
+  )
+)
+
 (define-method traverse
   (of-object "GTree")
   (c-name "g_tree_traverse")
@@ -13366,6 +13718,16 @@
     '("GTraverseFunc" "traverse_func")
     '("GTraverseType" "traverse_type")
     '("gpointer" "user_data")
+  )
+)
+
+(define-method search_node
+  (of-object "GTree")
+  (c-name "g_tree_search_node")
+  (return-type "GTreeNode*")
+  (parameters
+    '("GCompareFunc" "search_func")
+    '("gconstpointer" "user_data")
   )
 )
 
@@ -13379,6 +13741,24 @@
   )
 )
 
+(define-method lower_bound
+  (of-object "GTree")
+  (c-name "g_tree_lower_bound")
+  (return-type "GTreeNode*")
+  (parameters
+    '("gconstpointer" "key")
+  )
+)
+
+(define-method upper_bound
+  (of-object "GTree")
+  (c-name "g_tree_upper_bound")
+  (return-type "GTreeNode*")
+  (parameters
+    '("gconstpointer" "key")
+  )
+)
+
 (define-method height
   (of-object "GTree")
   (c-name "g_tree_height")
@@ -13389,6 +13769,12 @@
   (of-object "GTree")
   (c-name "g_tree_nnodes")
   (return-type "gint")
+)
+
+(define-method dump
+  (of-object "GTree")
+  (c-name "g_tree_dump")
+  (return-type "none")
 )
 
 
@@ -14493,11 +14879,6 @@
   (parameters
     '("gulong" "number")
   )
-)
-
-(define-function g_abort
-  (c-name "g_abort")
-  (return-type "none")
 )
 
 

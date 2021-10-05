@@ -1405,6 +1405,7 @@
     '("authentication-allow-anonymous" "G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS")
     '("message-bus-connection" "G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION")
     '("delay-message-processing" "G_DBUS_CONNECTION_FLAGS_DELAY_MESSAGE_PROCESSING")
+    '("authentication-require-same-user" "G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER")
   )
 )
 
@@ -1501,6 +1502,7 @@
     '("none" "G_DBUS_SERVER_FLAGS_NONE")
     '("run-in-thread" "G_DBUS_SERVER_FLAGS_RUN_IN_THREAD")
     '("authentication-allow-anonymous" "G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS")
+    '("authentication-require-same-user" "G_DBUS_SERVER_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER")
   )
 )
 
@@ -1702,6 +1704,22 @@
   (gtype-id "G_TYPE_TLS_CERTIFICATE_REQUEST_FLAGS")
   (values
     '("none" "G_TLS_CERTIFICATE_REQUEST_NONE")
+  )
+)
+
+(define-enum ProtocolVersion
+  (in-module "GTls")
+  (c-name "GTlsProtocolVersion")
+  (gtype-id "G_TYPE_TLS_PROTOCOL_VERSION")
+  (values
+    '("unknown" "G_TLS_PROTOCOL_VERSION_UNKNOWN")
+    '("ssl-3-0" "G_TLS_PROTOCOL_VERSION_SSL_3_0")
+    '("tls-1-0" "G_TLS_PROTOCOL_VERSION_TLS_1_0")
+    '("tls-1-1" "G_TLS_PROTOCOL_VERSION_TLS_1_1")
+    '("tls-1-2" "G_TLS_PROTOCOL_VERSION_TLS_1_2")
+    '("tls-1-3" "G_TLS_PROTOCOL_VERSION_TLS_1_3")
+    '("dtls-1-0" "G_TLS_PROTOCOL_VERSION_DTLS_1_0")
+    '("dtls-1-2" "G_TLS_PROTOCOL_VERSION_DTLS_1_2")
   )
 )
 
@@ -6792,6 +6810,14 @@
   )
 )
 
+(define-function g_dbus_is_error_name
+  (c-name "g_dbus_is_error_name")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "string")
+  )
+)
+
 (define-function g_dbus_gvariant_to_gvalue
   (c-name "g_dbus_gvariant_to_gvalue")
   (return-type "none")
@@ -6807,6 +6833,30 @@
   (parameters
     '("const-GValue*" "gvalue")
     '("const-GVariantType*" "type")
+  )
+)
+
+(define-function g_dbus_escape_object_path_bytestring
+  (c-name "g_dbus_escape_object_path_bytestring")
+  (return-type "gchar*")
+  (parameters
+    '("const-guint8*" "bytes")
+  )
+)
+
+(define-function g_dbus_escape_object_path
+  (c-name "g_dbus_escape_object_path")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "s")
+  )
+)
+
+(define-function g_dbus_unescape_object_path
+  (c-name "g_dbus_unescape_object_path")
+  (return-type "guint8*")
+  (parameters
+    '("const-gchar*" "s")
   )
 )
 
@@ -7609,6 +7659,18 @@
     '("GByteArray*" "data")
     '("GError**" "error")
   )
+)
+
+(define-method get_protocol_version
+  (of-object "GDtlsConnection")
+  (c-name "g_dtls_connection_get_protocol_version")
+  (return-type "GTlsProtocolVersion")
+)
+
+(define-method get_ciphersuite_name
+  (of-object "GDtlsConnection")
+  (c-name "g_dtls_connection_get_ciphersuite_name")
+  (return-type "gchar*")
 )
 
 
@@ -9015,6 +9077,17 @@
   )
 )
 
+(define-method build_attribute_list_for_copy
+  (of-object "GFile")
+  (c-name "g_file_build_attribute_list_for_copy")
+  (return-type "char*")
+  (parameters
+    '("GFileCopyFlags" "flags")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
 (define-method copy_attributes
   (of-object "GFile")
   (c-name "g_file_copy_attributes")
@@ -9773,6 +9846,18 @@
   (return-type "GDateTime*")
 )
 
+(define-method get_access_date_time
+  (of-object "GFileInfo")
+  (c-name "g_file_info_get_access_date_time")
+  (return-type "GDateTime*")
+)
+
+(define-method get_creation_date_time
+  (of-object "GFileInfo")
+  (c-name "g_file_info_get_creation_date_time")
+  (return-type "GDateTime*")
+)
+
 (define-method get_symlink_target
   (of-object "GFileInfo")
   (c-name "g_file_info_get_symlink_target")
@@ -9911,6 +9996,24 @@
   (return-type "none")
   (parameters
     '("GDateTime*" "mtime")
+  )
+)
+
+(define-method set_access_date_time
+  (of-object "GFileInfo")
+  (c-name "g_file_info_set_access_date_time")
+  (return-type "none")
+  (parameters
+    '("GDateTime*" "atime")
+  )
+)
+
+(define-method set_creation_date_time
+  (of-object "GFileInfo")
+  (c-name "g_file_info_set_creation_date_time")
+  (return-type "none")
+  (parameters
+    '("GDateTime*" "creation_time")
   )
 )
 
@@ -11337,6 +11440,16 @@
   )
 )
 
+(define-function handle_launch
+  (c-name "handle_launch")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
 (define-function handle_list
   (c-name "handle_list")
   (return-type "int")
@@ -11485,6 +11598,14 @@
   (parameters
     '("gint" "fd")
     '("gboolean" "close_fd")
+  )
+)
+
+(define-function gio_win32_appinfo_init
+  (c-name "gio_win32_appinfo_init")
+  (return-type "none")
+  (parameters
+    '("gboolean" "do_wait")
   )
 )
 
@@ -13220,6 +13341,15 @@
   )
 )
 
+(define-method set_category
+  (of-object "GNotification")
+  (c-name "g_notification_set_category")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "category")
+  )
+)
+
 (define-method add_button
   (of-object "GNotification")
   (c-name "g_notification_add_button")
@@ -13330,7 +13460,7 @@
 (define-method get_filename
   (of-object "GOsxAppInfo")
   (c-name "g_osx_app_info_get_filename")
-  (return-type "char*")
+  (return-type "const-char*")
 )
 
 (define-function g_osx_app_info_get_all_for_scheme
@@ -13975,6 +14105,29 @@
   (c-name "glib_has_dconf_access_in_sandbox")
   (return-type "gboolean")
 )
+
+
+
+;; From gpowerprofilemonitordbus.h
+
+
+
+;; From gpowerprofilemonitor.h
+
+(define-function g_power_profile_monitor_dup_default
+  (c-name "g_power_profile_monitor_dup_default")
+  (return-type "GPowerProfileMonitor*")
+)
+
+(define-method get_power_saver_enabled
+  (of-object "GPowerProfileMonitor")
+  (c-name "g_power_profile_monitor_get_power_saver_enabled")
+  (return-type "gboolean")
+)
+
+
+
+;; From gpowerprofilemonitorportal.h
 
 
 
@@ -15627,6 +15780,15 @@
   (return-type "const-gchar*")
   (parameters
     '("const-gchar*" "key")
+  )
+)
+
+(define-method get_child_schema
+  (of-object "GSettingsSchema")
+  (c-name "g_settings_schema_get_child_schema")
+  (return-type "GSettingsSchema*")
+  (parameters
+    '("const-gchar*" "name")
   )
 )
 
@@ -17925,6 +18087,12 @@
   )
 )
 
+(define-method close
+  (of-object "GSubprocessLauncher")
+  (c-name "g_subprocess_launcher_close")
+  (return-type "none")
+)
+
 (define-method set_child_setup
   (of-object "GSubprocessLauncher")
   (c-name "g_subprocess_launcher_set_child_setup")
@@ -18555,6 +18723,16 @@
   )
 )
 
+(define-function g_tls_certificate_new_from_pkcs11_uris
+  (c-name "g_tls_certificate_new_from_pkcs11_uris")
+  (return-type "GTlsCertificate*")
+  (parameters
+    '("const-gchar*" "pkcs11_uri")
+    '("const-gchar*" "private_key_pkcs11_uri")
+    '("GError**" "error")
+  )
+)
+
 (define-function g_tls_certificate_list_new_from_file
   (c-name "g_tls_certificate_list_new_from_file")
   (return-type "GList*")
@@ -18587,6 +18765,42 @@
   (parameters
     '("GTlsCertificate*" "cert_two")
   )
+)
+
+(define-method get_not_valid_before
+  (of-object "GTlsCertificate")
+  (c-name "g_tls_certificate_get_not_valid_before")
+  (return-type "GDateTime*")
+)
+
+(define-method get_not_valid_after
+  (of-object "GTlsCertificate")
+  (c-name "g_tls_certificate_get_not_valid_after")
+  (return-type "GDateTime*")
+)
+
+(define-method get_subject_name
+  (of-object "GTlsCertificate")
+  (c-name "g_tls_certificate_get_subject_name")
+  (return-type "gchar*")
+)
+
+(define-method get_issuer_name
+  (of-object "GTlsCertificate")
+  (c-name "g_tls_certificate_get_issuer_name")
+  (return-type "gchar*")
+)
+
+(define-method get_dns_names
+  (of-object "GTlsCertificate")
+  (c-name "g_tls_certificate_get_dns_names")
+  (return-type "GPtrArray*")
+)
+
+(define-method get_ip_addresses
+  (of-object "GTlsCertificate")
+  (c-name "g_tls_certificate_get_ip_addresses")
+  (return-type "GPtrArray*")
 )
 
 
@@ -18836,6 +19050,18 @@
     '("GAsyncResult*" "result")
     '("GError**" "error")
   )
+)
+
+(define-method get_protocol_version
+  (of-object "GTlsConnection")
+  (c-name "g_tls_connection_get_protocol_version")
+  (return-type "GTlsProtocolVersion")
+)
+
+(define-method get_ciphersuite_name
+  (of-object "GTlsConnection")
+  (c-name "g_tls_connection_get_ciphersuite_name")
+  (return-type "gchar*")
 )
 
 (define-function g_tls_error_quark
@@ -20300,6 +20526,22 @@
 
 
 
+;; From gwin32file-sync-stream.h
+
+(define-function g_win32_file_sync_stream_new
+  (c-name "g_win32_file_sync_stream_new")
+  (is-constructor-of "GWin32FileSyncStream")
+  (return-type "IStream*")
+  (parameters
+    '("HANDLE" "file_handle")
+    '("gboolean" "owns_handle")
+    '("DWORD" "stgm_mode")
+    '("HRESULT*" "output_hresult")
+  )
+)
+
+
+
 ;; From gwin32inputstream.h
 
 (define-function g_win32_input_stream_get_type
@@ -20384,6 +20626,20 @@
   (of-object "GWin32OutputStream")
   (c-name "g_win32_output_stream_get_handle")
   (return-type "void*")
+)
+
+
+
+;; From gwin32packageparser.h
+
+(define-function g_win32_package_parser_enum_packages
+  (c-name "g_win32_package_parser_enum_packages")
+  (return-type "gboolean")
+  (parameters
+    '("GWin32PackageParserCallback" "callback")
+    '("gpointer" "user_data")
+    '("GError**" "error")
+  )
 )
 
 
@@ -20523,7 +20779,7 @@
   (c-name "g_win32_registry_subkey_iter_get_name")
   (return-type "gboolean")
   (parameters
-    '("gchar**" "subkey_name")
+    '("const-gchar**" "subkey_name")
     '("gsize*" "subkey_name_len")
     '("GError**" "error")
   )
@@ -20534,7 +20790,7 @@
   (c-name "g_win32_registry_subkey_iter_get_name_w")
   (return-type "gboolean")
   (parameters
-    '("gunichar2**" "subkey_name")
+    '("const-gunichar2**" "subkey_name")
     '("gsize*" "subkey_name_len")
     '("GError**" "error")
   )
@@ -21140,6 +21396,11 @@
 
 (define-function g_tls_certificate_request_flags_get_type
   (c-name "g_tls_certificate_request_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_tls_protocol_version_get_type
+  (c-name "g_tls_protocol_version_get_type")
   (return-type "GType")
 )
 

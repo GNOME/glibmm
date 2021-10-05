@@ -986,7 +986,7 @@ authenticating.
 
 If you are constructing a #GDBusConnection and pass
 %G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER in the
-#GDBusConnection:flags property then you MUST also set this
+#GDBusConnection:flags property then you **must** also set this
 property to a valid guid.
 
 If you are constructing a #GDBusConnection and pass
@@ -994,6 +994,15 @@ If you are constructing a #GDBusConnection and pass
 #GDBusConnection:flags property you will be able to read the GUID
 of the other peer here after the connection has been successfully
 initialized.
+
+Note that the
+[D-Bus specification](https://dbus.freedesktop.org/doc/dbus-specification.html#addresses)
+uses the term ‘UUID’ to refer to this, whereas GLib consistently uses the
+term ‘GUID’ for historical reasons.
+
+Despite its name, the format of #GDBusConnection:guid does not follow
+[RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) or the Microsoft
+GUID format.
 
 Since: 2.26
 
@@ -1069,6 +1078,11 @@ message bus. This means that the Hello() method will be invoked as part of the c
 <parameter name="G_DBUS_CONNECTION_FLAGS_DELAY_MESSAGE_PROCESSING">
 <parameter_description> If set, processing of D-Bus messages is
 delayed until g_dbus_connection_start_message_processing() is called.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER">
+<parameter_description> When authenticating
+as a server, require the UID of the peer to be the same as the UID of the server. (Since: 2.68)
 </parameter_description>
 </parameter>
 </parameters>
@@ -2296,7 +2310,9 @@ Since: 2.26
 
 <property name="GDBusServer:guid">
 <description>
-The guid of the server.
+The GUID of the server.
+
+See #GDBusConnection:guid for more details.
 
 Since: 2.26
 
@@ -2324,6 +2340,11 @@ details).
 <parameter name="G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS">
 <parameter_description> Allow the anonymous
 authentication method.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_SERVER_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER">
+<parameter_description> Require the UID of the
+peer to be the same as the UID of the server when authenticating. (Since: 2.68)
 </parameter_description>
 </parameter>
 </parameters>
@@ -2382,27 +2403,27 @@ to dynamically spawn objects in the subtree.
 </parameters>
 </enum>
 
-<property name="GDataOutputStream:byte-order">
+<property name="GDataInputStream:byte-order">
 <description>
-Determines the byte ordering that is used when writing 
-multi-byte entities (such as integers) to the stream.
-
-</description>
-</property>
-
-<property name="GDataStream:byte-order">
-<description>
-The ::byte-order property determines the byte ordering that
+The :byte-order property determines the byte ordering that
 is used when reading multi-byte entities (such as integers)
 from the stream.
 
 </description>
 </property>
 
-<property name="GDataStream:newline-type">
+<property name="GDataInputStream:newline-type">
 <description>
 The :newline-type property determines what is considered
 as a line ending when reading complete lines from the stream.
+
+</description>
+</property>
+
+<property name="GDataOutputStream:byte-order">
+<description>
+Determines the byte ordering that is used when writing 
+multi-byte entities (such as integers) to the stream.
 
 </description>
 </property>
@@ -2720,6 +2741,15 @@ Since: 2.48
 </description>
 </property>
 
+<property name="GDtlsConnection:ciphersuite-name">
+<description>
+The name of the DTLS ciphersuite in use. See g_dtls_connection_get_ciphersuite_name().
+
+Since: 2.70
+
+</description>
+</property>
+
 <property name="GDtlsConnection:database">
 <description>
 The certificate database to use when verifying this TLS connection.
@@ -2776,6 +2806,15 @@ it may not be if #GDtlsClientConnection:validation-flags is not
 behavior.
 
 Since: 2.48
+
+</description>
+</property>
+
+<property name="GDtlsConnection:protocol-version">
+<description>
+The DTLS protocol version in use. See g_dtls_connection_get_protocol_version().
+
+Since: 2.70
 
 </description>
 </property>
@@ -4528,6 +4567,15 @@ Since: 2.60
 </parameters>
 </enum>
 
+<property name="GPowerProfileMonitor:power-saver-enabled">
+<description>
+Whether “Power Saver” mode is enabled on the system.
+
+Since: 2.70
+
+</description>
+</property>
+
 <property name="GPropertyAction:enabled">
 <description>
 If @action is currently enabled.
@@ -5364,7 +5412,7 @@ Each event except %G_SOCKET_CLIENT_COMPLETE may be emitted
 multiple times (or not at all) for a given connectable (in
 particular, if @client ends up attempting to connect to more than
 one address). However, if @client emits the #GSocketClient::event
-signal at all for a given connectable, that it will always emit
+signal at all for a given connectable, then it will always emit
 it with %G_SOCKET_CLIENT_COMPLETE when it is done.
 
 Note that there may be additional #GSocketClientEvent values in
@@ -5907,6 +5955,26 @@ Since: 2.28
 </description>
 </property>
 
+<property name="GTlsCertificate:dns-names">
+<description>
+The DNS names from the certificate's Subject Alternative Names (SANs),
+%NULL if unavailable.
+
+Since: 2.70
+
+</description>
+</property>
+
+<property name="GTlsCertificate:ip-addresses">
+<description>
+The IP addresses from the certificate's Subject Alternative Names (SANs),
+%NULL if unavailable.
+
+Since: 2.70
+
+</description>
+</property>
+
 <property name="GTlsCertificate:issuer">
 <description>
 A #GTlsCertificate representing the entity that issued this
@@ -5914,7 +5982,62 @@ certificate. If %NULL, this means that the certificate is either
 self-signed, or else the certificate of the issuer is not
 available.
 
+Beware the issuer certificate may not be the same as the
+certificate that would actually be used to construct a valid
+certification path during certificate verification.
+[RFC 4158](https://datatracker.ietf.org/doc/html/rfc4158) explains
+why an issuer certificate cannot be naively assumed to be part of the
+the certification path (though GLib's TLS backends may not follow the
+path building strategies outlined in this RFC). Due to the complexity
+of certification path building, GLib does not provide any way to know
+which certification path will actually be used. Accordingly, this
+property cannot be used to make security-related decisions. Only
+GLib itself should make security decisions about TLS certificates.
+
 Since: 2.28
+
+</description>
+</property>
+
+<property name="GTlsCertificate:issuer-name">
+<description>
+The issuer from the certificate,
+%NULL if unavailable.
+
+Since: 2.70
+
+</description>
+</property>
+
+<property name="GTlsCertificate:not-valid-after">
+<description>
+The time at which this cert is no longer valid,
+%NULL if unavailable.
+
+Since: 2.70
+
+</description>
+</property>
+
+<property name="GTlsCertificate:not-valid-before">
+<description>
+The time at which this cert is considered to be valid,
+%NULL if unavailable.
+
+Since: 2.70
+
+</description>
+</property>
+
+<property name="GTlsCertificate:pkcs11-uri">
+<description>
+A URI referencing the [PKCS \#11](https://docs.oasis-open.org/pkcs11/pkcs11-base/v3.0/os/pkcs11-base-v3.0-os.html)
+objects containing an X.509 certificate and optionally a private key.
+
+If %NULL, the certificate is either not backed by PKCS \#11 or the
+#GTlsBackend does not support PKCS \#11.
+
+Since: 2.68
 
 </description>
 </property>
@@ -5922,14 +6045,22 @@ Since: 2.28
 <property name="GTlsCertificate:private-key">
 <description>
 The DER (binary) encoded representation of the certificate's
-private key, in either PKCS#1 format or unencrypted PKCS#8
-format. This property (or the #GTlsCertificate:private-key-pem
-property) can be set when constructing a key (eg, from a file),
-but cannot be read.
+private key, in either [PKCS \#1 format](https://datatracker.ietf.org/doc/html/rfc8017)
+or unencrypted [PKCS \#8 format.](https://datatracker.ietf.org/doc/html/rfc5208)
+PKCS \#8 format is supported since 2.32; earlier releases only
+support PKCS \#1. You can use the `openssl rsa` tool to convert
+PKCS \#8 keys to PKCS \#1.
 
-PKCS#8 format is supported since 2.32; earlier releases only
-support PKCS#1. You can use the `openssl rsa`
-tool to convert PKCS#8 keys to PKCS#1.
+This property (or the #GTlsCertificate:private-key-pem property)
+can be set when constructing a key (for example, from a file).
+Since GLib 2.70, it is now also readable; however, be aware that if
+the private key is backed by a PKCS \#11 URI – for example, if it
+is stored on a smartcard – then this property will be %NULL. If so,
+the private key must be referenced via its PKCS \#11 URI,
+#GTlsCertificate:private-key-pkcs11-uri. You must check both
+properties to see if the certificate really has a private key.
+When this property is read, the output format will be unencrypted
+PKCS \#8.
 
 Since: 2.28
 
@@ -5939,17 +6070,45 @@ Since: 2.28
 <property name="GTlsCertificate:private-key-pem">
 <description>
 The PEM (ASCII) encoded representation of the certificate's
-private key in either PKCS#1 format (&quot;`BEGIN RSA PRIVATE
-KEY`&quot;) or unencrypted PKCS#8 format (&quot;`BEGIN
-PRIVATE KEY`&quot;). This property (or the
-#GTlsCertificate:private-key property) can be set when
-constructing a key (eg, from a file), but cannot be read.
+private key in either [PKCS \#1 format](https://datatracker.ietf.org/doc/html/rfc8017)
+(&quot;`BEGIN RSA PRIVATE KEY`&quot;) or unencrypted
+[PKCS \#8 format](https://datatracker.ietf.org/doc/html/rfc5208)
+(&quot;`BEGIN PRIVATE KEY`&quot;). PKCS \#8 format is supported since 2.32;
+earlier releases only support PKCS \#1. You can use the `openssl rsa`
+tool to convert PKCS \#8 keys to PKCS \#1.
 
-PKCS#8 format is supported since 2.32; earlier releases only
-support PKCS#1. You can use the `openssl rsa`
-tool to convert PKCS#8 keys to PKCS#1.
+This property (or the #GTlsCertificate:private-key property)
+can be set when constructing a key (for example, from a file).
+Since GLib 2.70, it is now also readable; however, be aware that if
+the private key is backed by a PKCS \#11 URI - for example, if it
+is stored on a smartcard - then this property will be %NULL. If so,
+the private key must be referenced via its PKCS \#11 URI,
+#GTlsCertificate:private-key-pkcs11-uri. You must check both
+properties to see if the certificate really has a private key.
+When this property is read, the output format will be unencrypted
+PKCS \#8.
 
 Since: 2.28
+
+</description>
+</property>
+
+<property name="GTlsCertificate:private-key-pkcs11-uri">
+<description>
+A URI referencing a [PKCS \#11](https://docs.oasis-open.org/pkcs11/pkcs11-base/v3.0/os/pkcs11-base-v3.0-os.html)
+object containing a private key.
+
+Since: 2.68
+
+</description>
+</property>
+
+<property name="GTlsCertificate:subject-name">
+<description>
+The subject from the cert,
+%NULL if unavailable.
+
+Since: 2.70
 
 </description>
 </property>
@@ -6250,6 +6409,15 @@ Since: 2.28
 </description>
 </property>
 
+<property name="GTlsConnection:ciphersuite-name">
+<description>
+The name of the TLS ciphersuite in use. See g_tls_connection_get_ciphersuite_name().
+
+Since: 2.70
+
+</description>
+</property>
+
 <property name="GTlsConnection:database">
 <description>
 The certificate database to use when verifying this TLS connection.
@@ -6306,6 +6474,15 @@ it may not be if #GTlsClientConnection:validation-flags is not
 behavior.
 
 Since: 2.28
+
+</description>
+</property>
+
+<property name="GTlsConnection:protocol-version">
+<description>
+The TLS protocol version in use. See g_tls_connection_get_protocol_version().
+
+Since: 2.70
 
 </description>
 </property>
@@ -6496,6 +6673,72 @@ wrong many times, and the user may not have many chances left.
 <parameter name="G_TLS_PASSWORD_FINAL_TRY">
 <parameter_description> Hint to the user that this is the last try to get
 this password right.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_PASSWORD_PKCS11_USER">
+<parameter_description> For PKCS #11, the user PIN is required.
+Since: 2.70.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_PASSWORD_PKCS11_SECURITY_OFFICER">
+<parameter_description> For PKCS #11, the security officer
+PIN is required. Since: 2.70.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_PASSWORD_PKCS11_CONTEXT_SPECIFIC">
+<parameter_description> For PKCS #11, the context-specific
+PIN is required. Since: 2.70.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GTlsProtocolVersion">
+<description>
+The TLS or DTLS protocol version used by a #GTlsConnection or
+#GDtlsConnection. The integer values of these versions are sequential
+to ensure newer known protocol versions compare greater than older
+known versions. Any known DTLS protocol version will compare greater
+than any SSL or TLS protocol version. The protocol version may be
+%G_TLS_PROTOCOL_VERSION_UNKNOWN if the TLS backend supports a newer
+protocol version that GLib does not yet know about. This means that
+it's possible for an unknown DTLS protocol version to compare less
+than the TLS protocol versions.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="G_TLS_PROTOCOL_VERSION_UNKNOWN">
+<parameter_description> No protocol version or unknown protocol version
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_PROTOCOL_VERSION_SSL_3_0">
+<parameter_description> SSL 3.0, which is insecure and should not be used
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_PROTOCOL_VERSION_TLS_1_0">
+<parameter_description> TLS 1.0, which is insecure and should not be used
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_PROTOCOL_VERSION_TLS_1_1">
+<parameter_description> TLS 1.1, which is insecure and should not be used
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_PROTOCOL_VERSION_TLS_1_2">
+<parameter_description> TLS 1.2, defined by [RFC 5246](https://datatracker.ietf.org/doc/html/rfc5246)
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_PROTOCOL_VERSION_TLS_1_3">
+<parameter_description> TLS 1.3, defined by [RFC 8446](https://datatracker.ietf.org/doc/html/rfc8446)
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_PROTOCOL_VERSION_DTLS_1_0">
+<parameter_description> DTLS 1.0, which is insecure and should not be used
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_PROTOCOL_VERSION_DTLS_1_2">
+<parameter_description> DTLS 1.2, defined by [RFC 6347](https://datatracker.ietf.org/doc/html/rfc6347)
 </parameter_description>
 </parameter>
 </parameters>
@@ -7388,6 +7631,33 @@ parameter must be given as @parameter.  If the action is expecting no
 parameters then @parameter must be %NULL.  See
 g_action_group_get_action_parameter_type().
 
+If the #GActionGroup implementation supports asynchronous remote
+activation over D-Bus, this call may return before the relevant
+D-Bus traffic has been sent, or any replies have been received. In
+order to block on such asynchronous activation calls,
+g_dbus_connection_flush() should be called prior to the code, which
+depends on the result of the action activation. Without flushing
+the D-Bus connection, there is no guarantee that the action would
+have been activated.
+
+The following code which runs in a remote app instance, shows an
+example of a &quot;quit&quot; action being activated on the primary app
+instance over D-Bus. Here g_dbus_connection_flush() is called
+before `exit()`. Without g_dbus_connection_flush(), the &quot;quit&quot; action
+may fail to be activated on the primary instance.
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
+// call &quot;quit&quot; action on primary instance
+g_action_group_activate_action (G_ACTION_GROUP (app), &quot;quit&quot;, NULL);
+
+// make sure the action is activated now
+g_dbus_connection_flush (...);
+
+g_debug (&quot;application has been terminated. exiting.&quot;);
+
+exit (0);
+]|
+
 Since: 2.28
 
 </description>
@@ -8100,7 +8370,7 @@ Creates a duplicate of a #GAppInfo.
 <description>
 Checks if two #GAppInfos are equal.
 
-Note that the check &lt;emphasis&gt;may not&lt;/emphasis&gt; compare each individual
+Note that the check *may not* compare each individual
 field, and only does an identity check. In case detecting changes in the 
 contents is needed, program code must additionally compare relevant fields.
 
@@ -9432,7 +9702,7 @@ Gets the stdin of the invoking process.
 The #GInputStream can be used to read data passed to the standard
 input of the invoking process.
 This doesn't work on all platforms.  Presently, it is only available
-on UNIX when using a DBus daemon capable of passing file descriptors.
+on UNIX when using a D-Bus daemon capable of passing file descriptors.
 If stdin is not available then %NULL will be returned.  In the
 future, support may be expanded to other platforms.
 
@@ -9902,6 +10172,8 @@ spinner).
 
 To cancel the busy indication, use g_application_unmark_busy().
 
+The application must be registered before calling this function.
+
 Since: 2.38
 
 </description>
@@ -10123,7 +10395,7 @@ commandline then you should implement your own #GApplication subclass
 and override local_command_line(). In this case, you most likely want
 to return %TRUE from your local_command_line() implementation to
 suppress the default handling. See
-[gapplication-example-cmdline2.c][gapplication-example-cmdline2]
+[gapplication-example-cmdline2.c][https://gitlab.gnome.org/GNOME/glib/-/blob/HEAD/gio/tests/gapplication-example-cmdline2.c]
 for an example.
 
 If, after the above is done, the use count of the application is zero
@@ -11901,7 +12173,7 @@ Since: 2.38
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GBytes, or %NULL.
+<return> a #GBytes.
 
 </return>
 </function>
@@ -11909,6 +12181,9 @@ Since: 2.38
 <function name="g_bytes_icon_new">
 <description>
 Creates a new icon for a bytes.
+
+This cannot fail, but loading and interpreting the bytes may fail later on
+(for example, if g_loadable_icon_load() is called) if the image is invalid.
 
 Since: 2.38
 
@@ -11920,7 +12195,7 @@ Since: 2.38
 </parameter>
 </parameters>
 <return> a #GIcon for the given
-@bytes, or %NULL on error.
+@bytes.
 
 </return>
 </function>
@@ -12964,10 +13239,10 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> The pointer to native credentials or %NULL if the
-operation there is no #GCredentials support for the OS or if
-@native_type isn't supported by the OS. Do not free the returned
-data, it is owned by @credentials.
+<return> The pointer to native credentials or
+%NULL if there is no #GCredentials support for the OS or if @native_type
+isn't supported by the OS. Do not free the returned data, it is owned
+by @credentials.
 
 </return>
 </function>
@@ -12995,7 +13270,7 @@ Since: 2.36
 </parameter_description>
 </parameter>
 </parameters>
-<return> The UNIX process ID, or -1 if @error is set.
+<return> The UNIX process ID, or `-1` if @error is set.
 
 </return>
 </function>
@@ -13022,7 +13297,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> The UNIX user identifier or -1 if @error is set.
+<return> The UNIX user identifier or `-1` if @error is set.
 
 </return>
 </function>
@@ -14656,6 +14931,9 @@ Since: 2.26
 <description>
 Finishes an operation started with g_dbus_address_get_stream().
 
+A server is not required to set a GUID, so @out_guid may be set to %NULL
+even on success.
+
 Since: 2.26
 
 </description>
@@ -14684,6 +14962,9 @@ Synchronously connects to an endpoint specified by @address and
 sets up the connection so it is in a state to run the client-side
 of the D-Bus authentication conversation. @address must be in the
 [D-Bus address format](https://dbus.freedesktop.org/doc/dbus-specification.html#addresses).
+
+A server is not required to set a GUID, so @out_guid may be set to %NULL
+even on success.
 
 This is a synchronous failable function. See
 g_dbus_address_get_stream() for the asynchronous version.
@@ -15063,8 +15344,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> %NULL if @error is set. Otherwise a #GVariant tuple with
-return values. Free with g_variant_unref().
+<return> %NULL if @error is set. Otherwise a non-floating
+#GVariant tuple with return values. Free with g_variant_unref().
 
 </return>
 </function>
@@ -15160,8 +15441,8 @@ timeout or %G_MAXINT for no timeout
 </parameter_description>
 </parameter>
 </parameters>
-<return> %NULL if @error is set. Otherwise a #GVariant tuple with
-return values. Free with g_variant_unref().
+<return> %NULL if @error is set. Otherwise a non-floating
+#GVariant tuple with return values. Free with g_variant_unref().
 
 </return>
 </function>
@@ -15169,6 +15450,18 @@ return values. Free with g_variant_unref().
 <function name="g_dbus_connection_call_with_unix_fd_list">
 <description>
 Like g_dbus_connection_call() but also takes a #GUnixFDList object.
+
+The file descriptors normally correspond to %G_VARIANT_TYPE_HANDLE
+values in the body of the message. For example, if a message contains
+two file descriptors, @fd_list would have length 2, and
+`g_variant_new_handle (0)` and `g_variant_new_handle (1)` would appear
+somewhere in the body of the message (not necessarily in that order!)
+to represent the file descriptors at indexes 0 and 1 respectively.
+
+When designing D-Bus APIs that are intended to be interoperable,
+please note that non-GDBus implementations of D-Bus can usually only
+access file descriptors if they are referenced in this way by a
+value of type %G_VARIANT_TYPE_HANDLE in the body of the message.
 
 This method is only available on UNIX.
 
@@ -15241,6 +15534,17 @@ method invocation
 <description>
 Finishes an operation started with g_dbus_connection_call_with_unix_fd_list().
 
+The file descriptors normally correspond to %G_VARIANT_TYPE_HANDLE
+values in the body of the message. For example,
+if g_variant_get_handle() returns 5, that is intended to be a reference
+to the file descriptor that can be accessed by
+`g_unix_fd_list_get (*out_fd_list, 5, ...)`.
+
+When designing D-Bus APIs that are intended to be interoperable,
+please note that non-GDBus implementations of D-Bus can usually only
+access file descriptors if they are referenced in this way by a
+value of type %G_VARIANT_TYPE_HANDLE in the body of the message.
+
 Since: 2.30
 
 </description>
@@ -15263,8 +15567,8 @@ g_dbus_connection_call_with_unix_fd_list()
 </parameter_description>
 </parameter>
 </parameters>
-<return> %NULL if @error is set. Otherwise a #GVariant tuple with
-return values. Free with g_variant_unref().
+<return> %NULL if @error is set. Otherwise a non-floating
+#GVariant tuple with return values. Free with g_variant_unref().
 
 </return>
 </function>
@@ -15272,6 +15576,8 @@ return values. Free with g_variant_unref().
 <function name="g_dbus_connection_call_with_unix_fd_list_sync">
 <description>
 Like g_dbus_connection_call_sync() but also takes and returns #GUnixFDList objects.
+See g_dbus_connection_call_with_unix_fd_list() and
+g_dbus_connection_call_with_unix_fd_list_finish() for more details.
 
 This method is only available on UNIX.
 
@@ -15335,8 +15641,8 @@ timeout or %G_MAXINT for no timeout
 </parameter_description>
 </parameter>
 </parameters>
-<return> %NULL if @error is set. Otherwise a #GVariant tuple with
-return values. Free with g_variant_unref().
+<return> %NULL if @error is set. Otherwise a non-floating
+#GVariant tuple with return values. Free with g_variant_unref().
 
 </return>
 </function>
@@ -15970,8 +16276,9 @@ which must be in the
 This constructor can only be used to initiate client-side
 connections - use g_dbus_connection_new() if you need to act as the
 server. In particular, @flags cannot contain the
-%G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER or
-%G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS flags.
+%G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER,
+%G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS or
+%G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER flags.
 
 When the operation is finished, @callback will be invoked. You can
 then call g_dbus_connection_new_for_address_finish() to get the result of
@@ -16034,8 +16341,8 @@ to g_dbus_connection_new()
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GDBusConnection or %NULL if @error is set. Free with
-g_object_unref().
+<return> a #GDBusConnection or %NULL if @error is set.
+Free with g_object_unref().
 
 </return>
 </function>
@@ -16050,8 +16357,9 @@ which must be in the
 This constructor can only be used to initiate client-side
 connections - use g_dbus_connection_new_sync() if you need to act
 as the server. In particular, @flags cannot contain the
-%G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER or
-%G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS flags.
+%G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER,
+%G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS or
+%G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER flags.
 
 This is a synchronous failable constructor. See
 g_dbus_connection_new_for_address() for the asynchronous version.
@@ -16084,8 +16392,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GDBusConnection or %NULL if @error is set. Free with
-g_object_unref().
+<return> a #GDBusConnection or %NULL if @error is set.
+Free with g_object_unref().
 
 </return>
 </function>
@@ -16137,7 +16445,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GDBusConnection or %NULL if @error is set. Free with g_object_unref().
+<return> a #GDBusConnection or %NULL if @error is set.
+Free with g_object_unref().
 
 </return>
 </function>
@@ -16260,7 +16569,7 @@ Since: 2.46
 </parameter_description>
 </parameter>
 </parameters>
-<return> 0 if @error is set, otherwise a registration id (never 0)
+<return> 0 if @error is set, otherwise a registration ID (never 0)
 that can be used with g_dbus_connection_unregister_object() .
 
 </return>
@@ -16337,8 +16646,8 @@ dispatch nodes in the subtree
 </parameter_description>
 </parameter>
 </parameters>
-<return> 0 if @error is set, otherwise a subtree registration id (never 0)
-that can be used with g_dbus_connection_unregister_subtree() .
+<return> 0 if @error is set, otherwise a subtree registration ID (never 0)
+that can be used with g_dbus_connection_unregister_subtree()
 
 </return>
 </function>
@@ -16379,7 +16688,9 @@ Unless @flags contain the
 will be assigned by @connection and set on @message via
 g_dbus_message_set_serial(). If @out_serial is not %NULL, then the
 serial number used will be written to this location prior to
-submitting the message to the underlying transport.
+submitting the message to the underlying transport. While it has a `volatile`
+qualifier, this is a historical artifact and the argument passed to it should
+not be `volatile`.
 
 If @connection is closed then the operation will fail with
 %G_IO_ERROR_CLOSED. If @message is not well-formed,
@@ -16433,7 +16744,9 @@ Unless @flags contain the
 will be assigned by @connection and set on @message via
 g_dbus_message_set_serial(). If @out_serial is not %NULL, then the
 serial number used will be written to this location prior to
-submitting the message to the underlying transport.
+submitting the message to the underlying transport. While it has a `volatile`
+qualifier, this is a historical artifact and the argument passed to it should
+not be `volatile`.
 
 If @connection is closed then the operation will fail with
 %G_IO_ERROR_CLOSED. If @cancellable is canceled, the operation will
@@ -16545,7 +16858,9 @@ Unless @flags contain the
 will be assigned by @connection and set on @message via
 g_dbus_message_set_serial(). If @out_serial is not %NULL, then the
 serial number used will be written to this location prior to
-submitting the message to the underlying transport.
+submitting the message to the underlying transport. While it has a `volatile`
+qualifier, this is a historical artifact and the argument passed to it should
+not be `volatile`.
 
 If @connection is closed then the operation will fail with
 %G_IO_ERROR_CLOSED. If @cancellable is canceled, the operation will
@@ -16755,6 +17070,9 @@ until the #GDestroyNotify function passed to
 g_dbus_connection_signal_subscribe() is called, in order to avoid memory
 leaks through callbacks queued on the #GMainContext after it’s stopped being
 iterated.
+Alternatively, any idle source with a priority lower than %G_PRIORITY_DEFAULT
+that was scheduled after unsubscription, also indicates that all resources
+of this subscription are released.
 
 Since: 2.26
 
@@ -16911,7 +17229,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> A D-Bus error name (never %NULL). Free with g_free().
+<return> A D-Bus error name (never %NULL).
+Free with g_free().
 
 </return>
 </function>
@@ -16934,8 +17253,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> an allocated string or %NULL if the D-Bus error name
-could not be found. Free with g_free().
+<return> an allocated string or %NULL if the
+D-Bus error name could not be found. Free with g_free().
 
 </return>
 </function>
@@ -17041,6 +17360,9 @@ exists.
 <function name="g_dbus_error_register_error_domain">
 <description>
 Helper function for associating a #GError error domain with D-Bus error names.
+
+While @quark_volatile has a `volatile` qualifier, this is a historical
+artifact and the argument passed to it should not be `volatile`.
 
 Since: 2.26
 
@@ -17181,13 +17503,71 @@ Since: 2.26
 </return>
 </function>
 
+<function name="g_dbus_escape_object_path">
+<description>
+This is a language binding friendly version of g_dbus_escape_object_path_bytestring().
+
+Since: 2.68
+
+</description>
+<parameters>
+<parameter name="s">
+<parameter_description> the string to escape
+</parameter_description>
+</parameter>
+</parameters>
+<return> an escaped version of @s. Free with g_free().
+
+</return>
+</function>
+
+<function name="g_dbus_escape_object_path_bytestring">
+<description>
+Escapes @bytes for use in a D-Bus object path component.
+@bytes is an array of zero or more nonzero bytes in an
+unspecified encoding, followed by a single zero byte.
+
+The escaping method consists of replacing all non-alphanumeric
+characters (see g_ascii_isalnum()) with their hexadecimal value
+preceded by an underscore (`_`). For example:
+`foo.bar.baz` will become `foo_2ebar_2ebaz`.
+
+This method is appropriate to use when the input is nearly
+a valid object path component but is not when your input
+is far from being a valid object path component.
+Other escaping algorithms are also valid to use with
+D-Bus object paths.
+
+This can be reversed with g_dbus_unescape_object_path().
+
+Since: 2.68
+
+
+</description>
+<parameters>
+<parameter name="bytes">
+<parameter_description> the string of bytes to escape
+</parameter_description>
+</parameter>
+</parameters>
+<return> an escaped version of @bytes. Free with g_free().
+
+</return>
+</function>
+
 <function name="g_dbus_generate_guid">
 <description>
 Generate a D-Bus GUID that can be used with
 e.g. g_dbus_connection_new().
 
-See the D-Bus specification regarding what strings are valid D-Bus
-GUID (for example, D-Bus GUIDs are not RFC-4122 compliant).
+See the
+[D-Bus specification](https://dbus.freedesktop.org/doc/dbus-specification.html#uuids)
+regarding what strings are valid D-Bus GUIDs. The specification refers to
+these as ‘UUIDs’ whereas GLib (for historical reasons) refers to them as
+‘GUIDs’. The terms are interchangeable.
+
+Note that D-Bus GUIDs do not follow
+[RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122).
 
 Since: 2.26
 
@@ -17243,9 +17623,9 @@ Since: 2.30
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GVariant (never floating) of #GVariantType @type holding
-the data from @gvalue or %NULL in case of failure. Free with
-g_variant_unref().
+<return> A #GVariant (never floating) of
+#GVariantType @type holding the data from @gvalue or an empty #GVariant
+in case of failure. Free with g_variant_unref().
 
 </return>
 </function>
@@ -17851,12 +18231,34 @@ Since: 2.26
 </return>
 </function>
 
+<function name="g_dbus_is_error_name">
+<description>
+Check whether @string is a valid D-Bus error name.
+
+This function returns the same result as g_dbus_is_interface_name(),
+because D-Bus error names are defined to have exactly the
+same syntax as interface names.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="string">
+<parameter_description> The string to check.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if valid, %FALSE otherwise.
+
+</return>
+</function>
+
 <function name="g_dbus_is_guid">
 <description>
 Checks if @string is a D-Bus GUID.
 
-See the D-Bus specification regarding what strings are valid D-Bus
-GUID (for example, D-Bus GUIDs are not RFC-4122 compliant).
+See the documentation for g_dbus_generate_guid() for more information about
+the format of a GUID.
 
 Since: 2.26
 
@@ -17867,7 +18269,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @string is a guid, %FALSE otherwise.
+<return> %TRUE if @string is a GUID, %FALSE otherwise.
 
 </return>
 </function>
@@ -18384,6 +18786,8 @@ Since: 2.26
 <description>
 Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE header field.
 
+This will always be non-%NULL, but may be an empty string.
+
 Since: 2.26
 
 </description>
@@ -18404,6 +18808,12 @@ Gets the UNIX file descriptors associated with @message, if any.
 
 This method is only available on UNIX.
 
+The file descriptors normally correspond to %G_VARIANT_TYPE_HANDLE
+values in the body of the message. For example,
+if g_variant_get_handle() returns 5, that is intended to be a reference
+to the file descriptor that can be accessed by
+`g_unix_fd_list_get (list, 5, ...)`.
+
 Since: 2.26
 
 </description>
@@ -18413,7 +18823,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return>A #GUnixFDList or %NULL if no file descriptors are
+<return> A #GUnixFDList or %NULL if no file descriptors are
 associated. Do not free, this object is owned by @message.
 
 </return>
@@ -19021,6 +19431,11 @@ field is set to the number of fds in @fd_list (or cleared if
 @fd_list is %NULL).
 
 This method is only available on UNIX.
+
+When designing D-Bus APIs that are intended to be interoperable,
+please note that non-GDBus implementations of D-Bus can usually only
+access file descriptors if they are referenced by a value of type
+%G_VARIANT_TYPE_HANDLE in the body of the message.
 
 Since: 2.26
 
@@ -21101,6 +21516,10 @@ Since: 2.26
 <description>
 Gets the name that @proxy was constructed for.
 
+When connected to a message bus, this will usually be non-%NULL.
+However, it may be %NULL for a proxy that communicates using a peer-to-peer
+pattern.
+
 Since: 2.26
 
 </description>
@@ -21552,6 +21971,8 @@ Gets a
 [D-Bus address](https://dbus.freedesktop.org/doc/dbus-specification.html#addresses)
 string that can be used by clients to connect to @server.
 
+This is valid and non-empty if initializing the #GDBusServer succeeded.
+
 Since: 2.26
 
 </description>
@@ -21587,7 +22008,7 @@ Since: 2.26
 
 <function name="g_dbus_server_get_guid">
 <description>
-Gets the GUID for @server.
+Gets the GUID for @server, as provided to g_dbus_server_new_sync().
 
 Since: 2.26
 
@@ -21748,6 +22169,33 @@ Since: 2.26
 <return></return>
 </function>
 
+<function name="g_dbus_unescape_object_path">
+<description>
+Unescapes an string that was previously escaped with
+g_dbus_escape_object_path(). If the string is in a format that could
+not have been returned by g_dbus_escape_object_path(), this function
+returns %NULL.
+
+Encoding alphanumeric characters which do not need to be
+encoded is not allowed (e.g `_63` is not valid, the string
+should contain `c` instead).
+
+Since: 2.68
+
+</description>
+<parameters>
+<parameter name="s">
+<parameter_description> the string to unescape
+</parameter_description>
+</parameter>
+</parameters>
+<return> an
+unescaped version of @s, or %NULL if @s is not a string returned
+from g_dbus_escape_object_path(). Free with g_free().
+
+</return>
+</function>
+
 <function name="g_desktop_app_info_get_action_name">
 <description>
 Gets the user-visible display name of the &quot;additional application
@@ -21839,7 +22287,7 @@ or %NULL if not known.
 
 <function name="g_desktop_app_info_get_generic_name">
 <description>
-Gets the generic name from the destkop file.
+Gets the generic name from the desktop file.
 
 
 </description>
@@ -23407,6 +23855,31 @@ filled with the binding data, or %NULL
 </return>
 </function>
 
+<function name="g_dtls_connection_get_ciphersuite_name">
+<description>
+Returns the name of the current DTLS ciphersuite, or %NULL if the
+connection has not handshaked or has been closed. Beware that the TLS
+backend may use any of multiple different naming conventions, because
+OpenSSL and GnuTLS have their own ciphersuite naming conventions that
+are different from each other and different from the standard, IANA-
+registered ciphersuite names. The ciphersuite name is intended to be
+displayed to the user for informative purposes only, and parsing it
+is not recommended.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDTlsConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> The name of the current DTLS ciphersuite, or %NULL
+
+</return>
+</function>
+
 <function name="g_dtls_connection_get_database">
 <description>
 Gets the certificate database that @conn uses to verify
@@ -23506,6 +23979,27 @@ Since: 2.48
 </parameter>
 </parameters>
 <return> @conn's peer's certificate errors
+
+</return>
+</function>
+
+<function name="g_dtls_connection_get_protocol_version">
+<description>
+Returns the current DTLS protocol version, which may be
+%G_TLS_PROTOCOL_VERSION_UNKNOWN if the connection has not handshaked, or
+has been closed, or if the TLS backend has implemented a protocol version
+that is not a recognized #GTlsProtocolVersion.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDTlsConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current DTLS protocol version
 
 </return>
 </function>
@@ -24629,6 +25123,46 @@ Sets an attribute's value from another attribute.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_file_build_attribute_list_for_copy">
+<description>
+Prepares the file attribute query string for copying to @file.
+
+This function prepares an attribute query string to be
+passed to g_file_query_info() to get a list of attributes
+normally copied with the file (see g_file_copy_attributes()
+for the detailed description). This function is used by the
+implementation of g_file_copy_attributes() and is useful
+when one needs to query and set the attributes in two
+stages (e.g., for recursive move of a directory).
+
+Since: 2.68
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> a #GFile to copy attributes to
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> a set of #GFileCopyFlags
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, %NULL to ignore
+</parameter_description>
+</parameter>
+</parameters>
+<return> an attribute query string for g_file_query_info(),
+or %NULL if an error occurs.
+
+</return>
 </function>
 
 <function name="g_file_copy">
@@ -26223,7 +26757,8 @@ This call does no blocking I/O.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the #GFile's URI.
+<return> a string containing the #GFile's URI. If the #GFile was constructed
+with an invalid URI, an invalid URI is returned.
 The returned string should be freed with g_free()
 when no longer needed.
 </return>
@@ -26238,6 +26773,9 @@ URI = scheme &quot;:&quot; hier-part [ &quot;?&quot; query ] [ &quot;#&quot; fra
 ]|
 Common schemes include &quot;file&quot;, &quot;http&quot;, &quot;ftp&quot;, etc.
 
+The scheme can be different from the one used to construct the #GFile,
+in that it might be replaced with one that is logically equivalent to the #GFile.
+
 This call does no blocking I/O.
 
 
@@ -26249,8 +26787,8 @@ This call does no blocking I/O.
 </parameter>
 </parameters>
 <return> a string containing the URI scheme for the given
-#GFile. The returned string should be freed with g_free()
-when no longer needed.
+#GFile or %NULL if the #GFile was constructed with an invalid URI. The
+returned string should be freed with g_free() when no longer needed.
 </return>
 </function>
 
@@ -26374,7 +26912,7 @@ Gets the #GFile associated with the given @icon.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFile, or %NULL.
+<return> a #GFile.
 </return>
 </function>
 
@@ -26441,6 +26979,28 @@ Duplicates a file info structure.
 </parameter>
 </parameters>
 <return> a duplicate #GFileInfo of @other.
+</return>
+</function>
+
+<function name="g_file_info_get_access_date_time">
+<description>
+Gets the access time of the current @info and returns it as a
+#GDateTime.
+
+This requires the %G_FILE_ATTRIBUTE_TIME_ACCESS attribute. If
+%G_FILE_ATTRIBUTE_TIME_ACCESS_USEC is provided, the resulting #GDateTime
+will have microsecond precision.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GFileInfo.
+</parameter_description>
+</parameter>
+</parameters>
+<return> access time, or %NULL if unknown
 </return>
 </function>
 
@@ -26761,6 +27321,28 @@ or %NULL if unknown.
 </return>
 </function>
 
+<function name="g_file_info_get_creation_date_time">
+<description>
+Gets the creation time of the current @info and returns it as a
+#GDateTime.
+
+This requires the %G_FILE_ATTRIBUTE_TIME_CREATED attribute. If
+%G_FILE_ATTRIBUTE_TIME_CREATED_USEC is provided, the resulting #GDateTime
+will have microsecond precision.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GFileInfo.
+</parameter_description>
+</parameter>
+</parameters>
+<return> creation time, or %NULL if unknown
+</return>
+</function>
+
 <function name="g_file_info_get_deletion_date">
 <description>
 Returns the #GDateTime representing the deletion date of the file, as
@@ -26973,7 +27555,9 @@ Gets the name for a file. This is guaranteed to always be set.
 
 <function name="g_file_info_get_size">
 <description>
-Gets the file's size.
+Gets the file's size (in bytes). The size is retrieved through the value of
+the %G_FILE_ATTRIBUTE_STANDARD_SIZE attribute and is converted
+from #guint64 to #goffset before returning the result.
 
 
 </description>
@@ -26983,7 +27567,7 @@ Gets the file's size.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #goffset containing the file's size.
+<return> a #goffset containing the file's size (in bytes).
 </return>
 </function>
 
@@ -27130,6 +27714,28 @@ Removes all cases of @attribute from @info if it exists.
 </parameter>
 <parameter name="attribute">
 <parameter_description> a file attribute key.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_file_info_set_access_date_time">
+<description>
+Sets the %G_FILE_ATTRIBUTE_TIME_ACCESS and
+%G_FILE_ATTRIBUTE_TIME_ACCESS_USEC attributes in the file info to the
+given date/time value.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GFileInfo.
+</parameter_description>
+</parameter>
+<parameter name="atime">
+<parameter_description> a #GDateTime.
 </parameter_description>
 </parameter>
 </parameters>
@@ -27436,6 +28042,28 @@ See %G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE.
 </parameter>
 <parameter name="content_type">
 <parameter_description> a content type. See [GContentType][gio-GContentType]
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_file_info_set_creation_date_time">
+<description>
+Sets the %G_FILE_ATTRIBUTE_TIME_CREATED and
+%G_FILE_ATTRIBUTE_TIME_CREATED_USEC attributes in the file info to the
+given date/time value.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GFileInfo.
+</parameter_description>
+</parameter>
+<parameter name="creation_time">
+<parameter_description> a #GDateTime.
 </parameter_description>
 </parameter>
 </parameters>
@@ -31680,9 +32308,9 @@ Obtains a completion for @initial_text from @completer.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a completed string, or %NULL if no completion exists. 
-This string is not owned by GIO, so remember to g_free() it 
-when finished.
+<return> a completed string, or %NULL if no
+completion exists. This string is not owned by GIO, so remember to g_free()
+it when finished.
 </return>
 </function>
 
@@ -37513,7 +38141,7 @@ Gets the domain of the mount operation.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string set to the domain. 
+<return> a string set to the domain.
 </return>
 </function>
 
@@ -38489,7 +39117,8 @@ Since: 2.32
 </description>
 <parameters>
 </parameters>
-<return> a #GNetworkMonitor
+<return> a #GNetworkMonitor, which will be
+a dummy object if no network monitor is available
 
 </return>
 </function>
@@ -38810,6 +39439,31 @@ Since: 2.40
 </parameter>
 <parameter name="body">
 <parameter_description> the new body for @notification, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_notification_set_category">
+<description>
+Sets the type of @notification to @category. Categories have a main
+type like `email`, `im` or `device` and can have a detail separated
+by a `.`, e.g. `im.received` or `email.arrived`. Setting the category
+helps the notification server to select proper feedback to the user.
+
+Standard categories are [listed in the specification](https://specifications.freedesktop.org/notification-spec/latest/ar01s06.html).
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="notification">
+<parameter_description> a #GNotification
+</parameter_description>
+</parameter>
+<parameter name="category">
+<parameter_description> the category for @notification, or %NULL for no category
 </parameter_description>
 </parameter>
 </parameters>
@@ -40644,8 +41298,8 @@ Virtual: read_nonblocking
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description> a buffer to
-read data into (which should be at least @count bytes long).
+<parameter_description> a
+buffer to read data into (which should be at least @count bytes long).
 </parameter_description>
 </parameter>
 <parameter name="count">
@@ -41063,6 +41717,42 @@ written to the stream
 </return>
 </function>
 
+<function name="g_power_profile_monitor_dup_default">
+<description>
+Gets a reference to the default #GPowerProfileMonitor for the system.
+
+Since: 2.70
+
+</description>
+<parameters>
+</parameters>
+<return> a new reference to the default #GPowerProfileMonitor
+
+</return>
+</function>
+
+<function name="g_power_profile_monitor_get_power_saver_enabled">
+<description>
+Gets whether the system is in “Power Saver” mode.
+
+You are expected to listen to the
+#GPowerProfileMonitor::notify::power-saver-enabled signal to know when the profile has
+changed.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="monitor">
+<parameter_description> a #GPowerProfileMonitor
+</parameter_description>
+</parameter>
+</parameters>
+<return> Whether the system is in “Power Saver” mode.
+
+</return>
+</function>
+
 <function name="g_property_action_new">
 <description>
 Creates a #GAction corresponding to the value of property
@@ -41407,7 +42097,8 @@ Since: 2.26
 </description>
 <parameters>
 </parameters>
-<return> the default #GProxyResolver.
+<return> the default #GProxyResolver, which
+will be a dummy object if no proxy resolver is available
 
 </return>
 </function>
@@ -42869,7 +43560,8 @@ Tells the current position within the stream.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the offset from the beginning of the buffer.
+<return> the (positive or zero) offset from the beginning of the
+buffer, zero if the target is not seekable.
 </return>
 </function>
 
@@ -43049,7 +43741,9 @@ Since: 2.28
 </description>
 <parameters>
 </parameters>
-<return> the default #GSettingsBackend
+<return> the default #GSettingsBackend,
+which will be a dummy (memory) settings backend if no other settings
+backend is available.
 
 </return>
 </function>
@@ -44568,10 +45262,10 @@ Since: 2.40
 
 <function name="g_settings_schema_key_range_check">
 <description>
-Checks if the given @value is of the correct type and within the
+Checks if the given @value is within the
 permitted range for @key.
 
-It is a programmer error if @value is not of the correct type -- you
+It is a programmer error if @value is not of the correct type — you
 must check for this first.
 
 Since: 2.40
@@ -46842,6 +47536,15 @@ Since: 2.22
 <description>
 This is the asynchronous version of g_socket_client_connect().
 
+You may wish to prefer the asynchronous version even in synchronous
+command line programs because, since 2.60, it implements
+[RFC 8305](https://tools.ietf.org/html/rfc8305) &quot;Happy Eyeballs&quot;
+recommendations to work around long connection timeouts in networks
+where IPv6 is broken by performing an IPv4 connection simultaneously
+without waiting for IPv6 to time out, which is not supported by the
+synchronous call. (This is not an API guarantee, and may change in
+the future.)
+
 When the operation is finished @callback will be
 called. You can then call g_socket_client_connect_finish() to get
 the result of the operation.
@@ -49099,7 +49802,7 @@ Since: 2.22
 This is the asynchronous version of g_socket_listener_accept().
 
 When the operation is finished @callback will be
-called. You can then call g_socket_listener_accept_socket()
+called. You can then call g_socket_listener_accept_finish()
 to get the result of the operation.
 
 Since: 2.22
@@ -50018,6 +50721,11 @@ will be returned. To be notified when space is available, wait for the
 %G_IO_ERROR_WOULD_BLOCK from g_socket_send() even if you were previously
 notified of a %G_IO_OUT condition. (On Windows in particular, this is
 very common due to the way the underlying APIs work.)
+
+The sum of the sizes of each #GOutputVector in vectors must not be
+greater than %G_MAXSSIZE. If the message can be larger than this,
+then it is mandatory to use the g_socket_send_message_with_timeout()
+function.
 
 On error -1 is returned and @error is set accordingly.
 
@@ -51305,7 +52013,7 @@ Gets the raw status code of the process, as from waitpid().
 
 This value has no particular meaning, but it can be used with the
 macros defined by the system headers such as WIFEXITED.  It can also
-be used with g_spawn_check_exit_status().
+be used with g_spawn_check_wait_status().
 
 It is more likely that you want to use g_subprocess_get_if_exited()
 followed by g_subprocess_get_exit_status().
@@ -51332,8 +52040,8 @@ Since: 2.40
 Gets the #GInputStream from which to read the stderr output of
 @subprocess.
 
-The process must have been created with
-%G_SUBPROCESS_FLAGS_STDERR_PIPE.
+The process must have been created with %G_SUBPROCESS_FLAGS_STDERR_PIPE,
+otherwise %NULL will be returned.
 
 Since: 2.40
 
@@ -51354,8 +52062,8 @@ Since: 2.40
 Gets the #GOutputStream that you can write to in order to give data
 to the stdin of @subprocess.
 
-The process must have been created with
-%G_SUBPROCESS_FLAGS_STDIN_PIPE.
+The process must have been created with %G_SUBPROCESS_FLAGS_STDIN_PIPE and
+not %G_SUBPROCESS_FLAGS_STDIN_INHERIT, otherwise %NULL will be returned.
 
 Since: 2.40
 
@@ -51376,8 +52084,8 @@ Since: 2.40
 Gets the #GInputStream from which to read the stdout output of
 @subprocess.
 
-The process must have been created with
-%G_SUBPROCESS_FLAGS_STDOUT_PIPE.
+The process must have been created with %G_SUBPROCESS_FLAGS_STDOUT_PIPE,
+otherwise %NULL will be returned.
 
 Since: 2.40
 
@@ -51438,6 +52146,31 @@ Since: 2.40
 <return> the signal causing termination
 
 </return>
+</function>
+
+<function name="g_subprocess_launcher_close">
+<description>
+Closes all the file descriptors previously passed to the object with
+g_subprocess_launcher_take_fd(), g_subprocess_launcher_take_stderr_fd(), etc.
+
+After calling this method, any subsequent calls to g_subprocess_launcher_spawn() or g_subprocess_launcher_spawnv() will
+return %G_IO_ERROR_CLOSED. This method is idempotent if
+called more than once.
+
+This function is called automatically when the #GSubprocessLauncher
+is disposed, but is provided separately so that garbage collected
+language bindings can call it earlier to guarantee when FDs are closed.
+
+Since: 2.68
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GSubprocessLauncher
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_subprocess_launcher_getenv">
@@ -51804,16 +52537,16 @@ Since: 2.40
 <function name="g_subprocess_launcher_take_fd">
 <description>
 Transfer an arbitrary file descriptor from parent process to the
-child.  This function takes &quot;ownership&quot; of the fd; it will be closed
+child.  This function takes ownership of the @source_fd; it will be closed
 in the parent when @self is freed.
 
 By default, all file descriptors from the parent will be closed.
-This function allows you to create (for example) a custom pipe() or
-socketpair() before launching the process, and choose the target
+This function allows you to create (for example) a custom `pipe()` or
+`socketpair()` before launching the process, and choose the target
 descriptor in the child.
 
 An example use case is GNUPG, which has a command line argument
---passphrase-fd providing a file descriptor number where it expects
+`--passphrase-fd` providing a file descriptor number where it expects
 the passphrase to be written.
 
 </description>
@@ -52127,7 +52860,7 @@ Since: 2.40
 
 <function name="g_subprocess_wait_check">
 <description>
-Combines g_subprocess_wait() with g_spawn_check_exit_status().
+Combines g_subprocess_wait() with g_spawn_check_wait_status().
 
 Since: 2.40
 
@@ -52154,7 +52887,7 @@ Since: 2.40
 
 <function name="g_subprocess_wait_check_async">
 <description>
-Combines g_subprocess_wait_async() with g_spawn_check_exit_status().
+Combines g_subprocess_wait_async() with g_spawn_check_wait_status().
 
 This is the asynchronous version of g_subprocess_wait_check().
 
@@ -52970,9 +53703,9 @@ See #GTaskThreadFunc for more details about how @task_func is handled.
 
 Although GLib currently rate-limits the tasks queued via
 g_task_run_in_thread(), you should not assume that it will always
-do this. If you have a very large number of tasks to run, but don't
-want them to all run at once, you should only queue a limited
-number of them at a time.
+do this. If you have a very large number of tasks to run (several tens of
+tasks), but don't want them to all run at once, you should only queue a
+limited number of them (around ten) at a time.
 
 Since: 2.36
 
@@ -53669,7 +54402,8 @@ Since: 2.28
 </description>
 <parameters>
 </parameters>
-<return> a #GTlsBackend
+<return> a #GTlsBackend, which will be a
+dummy object if no TLS backend is available
 
 </return>
 </function>
@@ -53833,6 +54567,44 @@ Since: 2.28
 </return>
 </function>
 
+<function name="g_tls_certificate_get_dns_names">
+<description>
+Gets the value of #GTlsCertificate:dns-names.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="cert">
+<parameter_description> a #GTlsCertificate
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #GPtrArray of
+#GBytes elements, or %NULL if it's not available.
+
+</return>
+</function>
+
+<function name="g_tls_certificate_get_ip_addresses">
+<description>
+Gets the value of #GTlsCertificate:ip-addresses.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="cert">
+<parameter_description> a #GTlsCertificate
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #GPtrArray
+of #GInetAddress elements, or %NULL if it's not available.
+
+</return>
+</function>
+
 <function name="g_tls_certificate_get_issuer">
 <description>
 Gets the #GTlsCertificate representing @cert's issuer, if known
@@ -53849,6 +54621,78 @@ Since: 2.28
 <return> The certificate of @cert's issuer,
 or %NULL if @cert is self-signed or signed with an unknown
 certificate.
+
+</return>
+</function>
+
+<function name="g_tls_certificate_get_issuer_name">
+<description>
+Returns the issuer name from the certificate.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="cert">
+<parameter_description> a #GTlsCertificate
+</parameter_description>
+</parameter>
+</parameters>
+<return> The issuer name, or %NULL if it's not available.
+
+</return>
+</function>
+
+<function name="g_tls_certificate_get_not_valid_after">
+<description>
+Returns the time at which the certificate became or will become invalid.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="cert">
+<parameter_description> a #GTlsCertificate
+</parameter_description>
+</parameter>
+</parameters>
+<return> The not-valid-after date, or %NULL if it's not available.
+
+</return>
+</function>
+
+<function name="g_tls_certificate_get_not_valid_before">
+<description>
+Returns the time at which the certificate became or will become valid.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="cert">
+<parameter_description> a #GTlsCertificate
+</parameter_description>
+</parameter>
+</parameters>
+<return> The not-valid-before date, or %NULL if it's not available.
+
+</return>
+</function>
+
+<function name="g_tls_certificate_get_subject_name">
+<description>
+Returns the subject name from the certificate.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="cert">
+<parameter_description> a #GTlsCertificate
+</parameter_description>
+</parameter>
+</parameters>
+<return> The subject name, or %NULL if it's not available.
 
 </return>
 </function>
@@ -54021,6 +54865,55 @@ Since: 2.28
 </return>
 </function>
 
+<function name="g_tls_certificate_new_from_pkcs11_uris">
+<description>
+Creates a #GTlsCertificate from a
+[PKCS \#11](https://docs.oasis-open.org/pkcs11/pkcs11-base/v3.0/os/pkcs11-base-v3.0-os.html) URI.
+
+An example @pkcs11_uri would be `pkcs11:model=Model;manufacturer=Manufacture;serial=1;token=My%20Client%20Certificate;id=%01`
+
+Where the token’s layout is:
+
+|[
+Object 0:
+URL: pkcs11:model=Model;manufacturer=Manufacture;serial=1;token=My%20Client%20Certificate;id=%01;object=private%20key;type=private
+Type: Private key (RSA-2048)
+ID: 01
+
+Object 1:
+URL: pkcs11:model=Model;manufacturer=Manufacture;serial=1;token=My%20Client%20Certificate;id=%01;object=Certificate%20for%20Authentication;type=cert
+Type: X.509 Certificate (RSA-2048)
+ID: 01
+]|
+
+In this case the certificate and private key would both be detected and used as expected.
+@pkcs_uri may also just reference an X.509 certificate object and then optionally
+@private_key_pkcs11_uri allows using a private key exposed under a different URI.
+
+Note that the private key is not accessed until usage and may fail or require a PIN later.
+
+Since: 2.68
+
+</description>
+<parameters>
+<parameter name="pkcs11_uri">
+<parameter_description> A PKCS \#11 URI
+</parameter_description>
+</parameter>
+<parameter name="private_key_pkcs11_uri">
+<parameter_description> A PKCS \#11 URI
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new certificate, or %NULL on error
+
+</return>
+</function>
+
 <function name="g_tls_certificate_verify">
 <description>
 This verifies @cert and returns a set of #GTlsCertificateFlags
@@ -54042,6 +54935,13 @@ value.
 
 (All other #GTlsCertificateFlags values will always be set or unset
 as appropriate.)
+
+Because TLS session context is not used, #GTlsCertificate may not
+perform as many checks on the certificates as #GTlsConnection would.
+For example, certificate constraints cannot be honored, and some
+revocation checks cannot be performed. The best way to verify TLS
+certificates used by a TLS connection is to let #GTlsConnection
+handle the verification.
 
 Since: 2.28
 
@@ -54410,6 +55310,31 @@ filled with the binding data, or %NULL
 </return>
 </function>
 
+<function name="g_tls_connection_get_ciphersuite_name">
+<description>
+Returns the name of the current TLS ciphersuite, or %NULL if the
+connection has not handshaked or has been closed. Beware that the TLS
+backend may use any of multiple different naming conventions, because
+OpenSSL and GnuTLS have their own ciphersuite naming conventions that
+are different from each other and different from the standard, IANA-
+registered ciphersuite names. The ciphersuite name is intended to be
+displayed to the user for informative purposes only, and parsing it
+is not recommended.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GTlsConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> The name of the current TLS ciphersuite, or %NULL
+
+</return>
+</function>
+
 <function name="g_tls_connection_get_database">
 <description>
 Gets the certificate database that @conn uses to verify
@@ -54509,6 +55434,27 @@ Since: 2.28
 </parameter>
 </parameters>
 <return> @conn's peer's certificate errors
+
+</return>
+</function>
+
+<function name="g_tls_connection_get_protocol_version">
+<description>
+Returns the current TLS protocol version, which may be
+%G_TLS_PROTOCOL_VERSION_UNKNOWN if the connection has not handshaked, or
+has been closed, or if the TLS backend has implemented a protocol version
+that is not a recognized #GTlsProtocolVersion.
+
+Since: 2.70
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GTlsConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current TLS protocol version
 
 </return>
 </function>
@@ -55065,14 +56011,26 @@ Use g_object_unref() to release the certificate.
 
 <function name="g_tls_database_lookup_certificate_issuer">
 <description>
-Look up the issuer of @certificate in the database.
+Look up the issuer of @certificate in the database. The
+#GTlsCertificate:issuer property of @certificate is not modified, and
+the two certificates are not hooked into a chain.
 
-The #GTlsCertificate:issuer property
-of @certificate is not modified, and the two certificates are not hooked
-into a chain.
+This function can block. Use g_tls_database_lookup_certificate_issuer_async()
+to perform the lookup operation asynchronously.
 
-This function can block, use g_tls_database_lookup_certificate_issuer_async() to perform
-the lookup operation asynchronously.
+Beware this function cannot be used to build certification paths. The
+issuer certificate returned by this function may not be the same as
+the certificate that would actually be used to construct a valid
+certification path during certificate verification.
+[RFC 4158](https://datatracker.ietf.org/doc/html/rfc4158) explains
+why an issuer certificate cannot be naively assumed to be part of the
+the certification path (though GLib's TLS backends may not follow the
+path building strategies outlined in this RFC). Due to the complexity
+of certification path building, GLib does not provide any way to know
+which certification path will actually be used when verifying a TLS
+certificate. Accordingly, this function cannot be used to make
+security-related decisions. Only GLib itself should make security
+decisions about TLS certificates.
 
 Since: 2.30
 
@@ -55295,15 +56253,11 @@ objects. Use g_object_unref() on each certificate, and g_list_free() on the rele
 
 <function name="g_tls_database_verify_chain">
 <description>
-Determines the validity of a certificate chain after looking up and
-adding any missing certificates to the chain.
+Determines the validity of a certificate chain, outside the context
+of a TLS session.
 
 @chain is a chain of #GTlsCertificate objects each pointing to the next
-certificate in the chain by its #GTlsCertificate:issuer property. The chain may initially
-consist of one or more certificates. After the verification process is
-complete, @chain may be modified by adding missing certificates, or removing
-extra certificates. If a certificate anchor was found, then it is added to
-the @chain.
+certificate in the chain by its #GTlsCertificate:issuer property.
 
 @purpose describes the purpose (or usage) for which the certificate
 is being used. Typically @purpose will be set to #G_TLS_DATABASE_PURPOSE_AUTHENTICATE_SERVER
@@ -55330,8 +56284,27 @@ before it completes) then the return value will be
 accordingly. @error is not set when @chain is successfully analyzed
 but found to be invalid.
 
-This function can block, use g_tls_database_verify_chain_async() to perform
-the verification operation asynchronously.
+Prior to GLib 2.48, GLib's default TLS backend modified @chain to
+represent the certification path built by #GTlsDatabase during
+certificate verification by adjusting the #GTlsCertificate:issuer
+property of each certificate in @chain. Since GLib 2.48, this no
+longer occurs, so you cannot rely on #GTlsCertificate:issuer to
+represent the actual certification path used during certificate
+verification.
+
+Because TLS session context is not used, #GTlsDatabase may not
+perform as many checks on the certificates as #GTlsConnection would.
+For example, certificate constraints cannot be honored, and some
+revocation checks cannot be performed. The best way to verify TLS
+certificates used by a TLS connection is to let #GTlsConnection
+handle the verification.
+
+The TLS backend may attempt to look up and add missing certificates
+to the chain. Since GLib 2.70, this may involve HTTP requests to
+download missing certificates.
+
+This function can block. Use g_tls_database_verify_chain_async() to
+perform the verification operation asynchronously.
 
 Since: 2.30
 
@@ -56956,6 +57929,8 @@ if the mounts have changed since with g_unix_mounts_changed_since().
 If more mounts have the same mount path, the last matching mount
 is returned.
 
+This will return %NULL if there is no mount point at @mount_path.
+
 
 </description>
 <parameters>
@@ -57019,6 +57994,9 @@ if the mounts have changed since with g_unix_mounts_changed_since().
 
 If more mounts have the same mount path, the last matching mount
 is returned.
+
+This will return %NULL if looking up the mount entry fails, if
+@file_path doesn’t exist or there is an I/O error.
 
 Since: 2.52
 
@@ -57989,7 +58967,8 @@ Gets the default #GVfs for the system.
 </description>
 <parameters>
 </parameters>
-<return> a #GVfs.
+<return> a #GVfs, which will be the local
+file system #GVfs if no other implementation is available.
 </return>
 </function>
 
@@ -58823,6 +59802,49 @@ Returns whether the volume should be automatically mounted.
 </parameter>
 </parameters>
 <return> %TRUE if the volume should be automatically mounted
+</return>
+</function>
+
+<function name="g_win32_file_sync_stream_new">
+<description>
+Creates an IStream object backed by a HANDLE.
+
+@stgm_mode should match the mode of the @handle, otherwise the stream might
+attempt to perform operations that the @handle does not allow. The implementation
+itself ignores these flags completely, they are only used to report
+the mode of the stream to third parties.
+
+The stream only does synchronous access and will never return `E_PENDING` on I/O.
+
+The returned stream object should be treated just like any other
+COM object, and released via `IUnknown_Release()`.
+its elements have been unreffed with g_object_unref().
+
+
+</description>
+<parameters>
+<parameter name="handle">
+<parameter_description> a Win32 HANDLE for a file.
+</parameter_description>
+</parameter>
+<parameter name="owns_handle">
+<parameter_description> %TRUE if newly-created stream owns the handle
+(and closes it when destroyed)
+</parameter_description>
+</parameter>
+<parameter name="stgm_mode">
+<parameter_description> a combination of [STGM constants](https://docs.microsoft.com/en-us/windows/win32/stg/stgm-constants)
+that specify the mode with which the stream
+is opened.
+</parameter_description>
+</parameter>
+<parameter name="output_hresult">
+<parameter_description> a HRESULT from the internal COM calls.
+Will be `S_OK` on success.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new IStream object on success, %NULL on failure.
 </return>
 </function>
 
