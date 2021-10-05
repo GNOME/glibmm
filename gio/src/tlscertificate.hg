@@ -17,6 +17,7 @@
 _CONFIGINCLUDE(giommconfig.h)
 
 #include <glibmm/object.h>
+#include <glibmm/datetime.h>
 #include <giomm/enums.h>
 
 _DEFS(giomm,gio)
@@ -71,9 +72,18 @@ public:
   _WRAP_METHOD(TlsCertificateFlags verify(const Glib::RefPtr<const SocketConnectable>& identity{?}, const Glib::RefPtr<const TlsCertificate>& trusted_ca{?}) const, g_tls_certificate_verify)
   _WRAP_METHOD(bool is_same(const Glib::RefPtr<const TlsCertificate>& cert_two) const, g_tls_certificate_is_same)
 
+  _WRAP_METHOD(Glib::DateTime get_not_valid_before() const, g_tls_certificate_get_not_valid_before)
+  _WRAP_METHOD(Glib::DateTime get_not_valid_after() const, g_tls_certificate_get_not_valid_after)
+  _WRAP_METHOD(Glib::ustring get_subject_name() const, g_tls_certificate_get_subject_name)
+  _WRAP_METHOD(Glib::ustring get_issuer_name() const, g_tls_certificate_get_issuer_name)
+
   _WRAP_PROPERTY("certificate", Glib::RefPtr<Glib::ByteArray>)
   _WRAP_PROPERTY("certificate-pem", std::string)
   _WRAP_PROPERTY("issuer", Glib::RefPtr<TlsCertificate>)
+  _WRAP_PROPERTY("not-valid-before", Glib::DateTime)
+  _WRAP_PROPERTY("not-valid-after", Glib::DateTime)
+  _WRAP_PROPERTY("subject-name", Glib::ustring)
+  _WRAP_PROPERTY("issuer-name", Glib::ustring)
 
   // Write-only and construct-only
   //_WRAP_PROPERTY("private-key", Glib::RefPtr<Glib::ByteArray>)

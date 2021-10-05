@@ -25,6 +25,7 @@ _PINCLUDE(giomm/private/iostream_p.h)
 
 namespace Gio
 {
+_WRAP_ENUM(TlsProtocolVersion, GTlsProtocolVersion, decl_prefix GIOMM_API)
 
 class GIOMM_API Cancellable;
 class GIOMM_API TlsDatabase;
@@ -77,6 +78,9 @@ public:
   _WRAP_METHOD(void handshake_async(const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.?}, int io_priority{.} = Glib::PRIORITY_DEFAULT), g_tls_connection_handshake_async, slot_name slot, slot_callback SignalProxy_async_callback)
   _WRAP_METHOD(bool handshake_finish(const Glib::RefPtr<AsyncResult>& result), g_tls_connection_handshake_finish, errthrow)
 
+  _WRAP_METHOD(TlsProtocolVersion get_protocol_version() const, g_tls_connection_get_protocol_version)
+  _WRAP_METHOD(Glib::ustring get_ciphersuite_name() const, g_tls_connection_get_ciphersuite_name)
+
   _WRAP_METHOD(bool emit_accept_certificate(const Glib::RefPtr<const TlsCertificate>& peer_cert, TlsCertificateFlags errors), g_tls_connection_emit_accept_certificate)
 
   _WRAP_PROPERTY("base-io-stream", Glib::RefPtr<IOStream>)
@@ -86,6 +90,8 @@ public:
   _WRAP_PROPERTY("peer-certificate", Glib::RefPtr<TlsCertificate>)
   _WRAP_PROPERTY("peer-certificate-errors", TlsCertificateFlags)
   _WRAP_PROPERTY("require-close-notify", bool)
+  _WRAP_PROPERTY("protocol-version", TlsProtocolVersion)
+  _WRAP_PROPERTY("ciphersuite-name", Glib::ustring)
   _IGNORE_PROPERTY("use-system-certdb", "rehandshake-mode")dnl // deprecated
 
 #m4 _CONVERSION(`GTlsCertificate*',`const Glib::RefPtr<const TlsCertificate>&',`Glib::wrap($3, true)')

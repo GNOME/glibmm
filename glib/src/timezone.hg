@@ -61,16 +61,19 @@ class GLIBMM_API TimeZone
   _IGNORE(g_time_zone_ref, g_time_zone_unref)
 
 public:
-  // We hand-code create(const Glib::ustring& identifier).
-  // g_time_zone_new() is deprecated in glib 2.68.
-  // We can't use the replacement g_time_zone_new_identifier(),
-  // which is new in glib 2.68. This version of glibmm does not require glib 2.68.
-  //_WRAP_METHOD(static TimeZone create(const Glib::ustring& identifier), g_time_zone_new_identifier)
-  _WRAP_METHOD_DOCS_ONLY(g_time_zone_new)
-  static TimeZone create(const Glib::ustring& identifier);
-
+  _WRAP_METHOD(static TimeZone create(const Glib::ustring& identifier),
+    g_time_zone_new, deprecated "Use create_identifier() instead.")
+  _WRAP_METHOD(static TimeZone create_identifier(const Glib::ustring& identifier),
+    g_time_zone_new_identifier, newin "2,70")
   _WRAP_METHOD(static TimeZone create_local(), g_time_zone_new_local)
   _WRAP_METHOD(static TimeZone create_utc(), g_time_zone_new_utc)
+
+  /** Returns true if the %TimeZone object is valid.
+   * This will return false, for instance, if create_identifier()
+   * has been called with an @a identifier that cannot be parsed or loaded.
+   * @newin{2,70}
+   */
+  explicit operator bool() const;
 
   _WRAP_METHOD(int find_interval(TimeType type, gint64 time) const, g_time_zone_find_interval)
   _WRAP_METHOD(int adjust_time(TimeType type, gint64& time) const, g_time_zone_adjust_time)

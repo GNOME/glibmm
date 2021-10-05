@@ -19,15 +19,9 @@
 namespace Glib
 {
 
-// We hand-code create(const Glib::ustring& identifier).
-// g_time_zone_new() is deprecated in glib 2.68.
-// We can't use the replacement g_time_zone_new_identifier(),
-// which is new in glib 2.68. This version of glibmm does not require glib 2.68.
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-TimeZone TimeZone::create(const Glib::ustring& identifier)
+TimeZone::operator bool() const
 {
-  return Glib::wrap(g_time_zone_new(identifier.c_str()));
+  return gobject_ != nullptr;
 }
-G_GNUC_END_IGNORE_DEPRECATIONS
 
 } // namespace Glib

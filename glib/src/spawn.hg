@@ -283,13 +283,13 @@ void spawn_async(const std::string& working_directory,
  * if those parameters are non-nullptr. Note that you must set the
  * SpawnFlags::STDOUT_TO_DEV_NULL and SpawnFlags::STDERR_TO_DEV_NULL flags when
  * passing nullptr for @a standard_output and @a standard_error.
- * If @a exit_status is non-nullptr, the exit status of the child is stored
+ * If @a wait_status is non-nullptr, the wait status of the child is stored
  * there as it would be returned by waitpid(); standard UNIX macros such
- * as WIFEXITED() and WEXITSTATUS() must be used to evaluate the exit status.
- * Note that this function calls waitpid() even if @a exit_status is nullptr, and
+ * as WIFEXITED() and WEXITSTATUS() must be used to evaluate the wait status.
+ * Note that this function calls waitpid() even if @a wait_status is nullptr, and
  * does not accept the SpawnFlags::DO_NOT_REAP_CHILD flag.
  * If an error occurs, no data is returned in @a standard_output,
- * @a standard_error, or @a exit_status.
+ * @a standard_error, or @a wait_status.
  *
  * This function calls spawn_async_with_pipes() internally; see that
  * function for full details on the other parameters and details on
@@ -302,7 +302,7 @@ void spawn_async(const std::string& working_directory,
  * @param child_setup Slot to run in the child just before exec(), or an empty slot.
  * @param standard_output Return location for file descriptor to read child's stdout, or nullptr.
  * @param standard_error Return location for file descriptor to read child's stderr, or nullptr.
- * @param exit_status Return location for child exit status, as returned by waitpid(), or nullptr
+ * @param wait_status Return location for child wait status, as returned by waitpid(), or nullptr
  *
  * @throws SpawnError Errors are reported even if they occur in the child (for example if the
  * executable in argv[0] is not found). Typically
@@ -318,7 +318,7 @@ void spawn_sync(const std::string& working_directory,
                 const SlotSpawnChildSetup& child_setup = {},
                 std::string* standard_output = nullptr,
                 std::string* standard_error = nullptr,
-                int* exit_status = nullptr);
+                int* wait_status = nullptr);
 
 /** Like the main spawn_sync() method, but inheriting the parent's environment.
  *
@@ -328,7 +328,7 @@ void spawn_sync(const std::string& working_directory,
  * @param child_setup Slot to run in the child just before exec(), or an empty slot.
  * @param standard_output Return location for file descriptor to read child's stdout, or nullptr.
  * @param standard_error Return location for file descriptor to read child's stderr, or nullptr.
- * @param exit_status Return location for child exit status, as returned by waitpid(), or nullptr
+ * @param wait_status Return location for child wait status, as returned by waitpid(), or nullptr
  *
  * @throws SpawnError Errors are reported even if they occur in the child (for example if the
  * executable in argv[0] is not found). Typically
@@ -343,7 +343,7 @@ void spawn_sync(const std::string& working_directory,
                 const SlotSpawnChildSetup& child_setup = {},
                 std::string* standard_output = nullptr,
                 std::string* standard_error = nullptr,
-                int* exit_status = nullptr);
+                int* wait_status = nullptr);
 
 /** A simple version of spawn_async() that parses a command line with
  * shell_parse_argv() and passes it to spawn_async(). It runs a
@@ -373,9 +373,9 @@ void spawn_command_line_async(const std::string& command_line);
  * implications, so consider using spawn_sync() directly if
  * appropriate.
  *
- * If @a exit_status is non-nullptr, the exit status of the child is stored there as
+ * If @a wait_status is non-nullptr, the wait status of the child is stored there as
  * it would be returned by waitpid(); standard UNIX macros such as WIFEXITED()
- * and WEXITSTATUS() must be used to evaluate the exit status.
+ * and WEXITSTATUS() must be used to evaluate the wait status.
  *
  * On Windows, please note the implications of shell_parse_argv()
  * parsing @a command_line. Parsing is done according to Unix shell rules, not
@@ -390,7 +390,7 @@ void spawn_command_line_async(const std::string& command_line);
  * @param command_line A command line.
  * @param standard_output Return location for child output.
  * @param standard_error Return location for child errors.
- * @param exit_status Return location for child exit status, as returned by waitpid().
+ * @param wait_status Return location for child wait status, as returned by waitpid().
  *
  * @throws SpawnError Errors are reported even if they occur in the child (for example if the
  * executable in argv[0] is not found). Typically
@@ -402,7 +402,7 @@ GLIBMM_API
 void spawn_command_line_sync(const std::string& command_line,
                              std::string* standard_output = nullptr,
                              std::string* standard_error = nullptr,
-                             int* exit_status = nullptr);
+                             int* wait_status = nullptr);
 
 /** On some platforms, notably WIN32, the Pid type represents a resource
  * which must be closed to prevent resource leaking. close_pid()

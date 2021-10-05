@@ -138,7 +138,7 @@ void
 spawn_sync(const std::string& working_directory, const std::vector<std::string>& argv,
   const std::vector<std::string>& envp, SpawnFlags flags,
   const SlotSpawnChildSetup& child_setup, std::string* standard_output, std::string* standard_error,
-  int* exit_status)
+  int* wait_status)
 {
   const bool setup_slot = !child_setup.empty();
   auto child_setup_ = child_setup;
@@ -150,7 +150,7 @@ spawn_sync(const std::string& working_directory, const std::vector<std::string>&
     const_cast<char**>(Glib::ArrayHandler<std::string>::vector_to_array(envp).data()), static_cast<GSpawnFlags>(unsigned(flags)),
     (setup_slot) ? &child_setup_callback : nullptr, (setup_slot) ? &child_setup_ : nullptr,
     (standard_output) ? &pch_buf_standard_output : nullptr,
-    (standard_error) ? &pch_buf_standard_error : nullptr, exit_status, &gerror);
+    (standard_error) ? &pch_buf_standard_error : nullptr, wait_status, &gerror);
   auto buf_standard_output = make_unique_ptr_gfree(pch_buf_standard_output);
   auto buf_standard_error = make_unique_ptr_gfree(pch_buf_standard_error);
 
@@ -164,7 +164,7 @@ spawn_sync(const std::string& working_directory, const std::vector<std::string>&
 void
 spawn_sync(const std::string& working_directory, const std::vector<std::string>& argv,
   SpawnFlags flags, const SlotSpawnChildSetup& child_setup, std::string* standard_output,
-  std::string* standard_error, int* exit_status)
+  std::string* standard_error, int* wait_status)
 {
   const bool setup_slot = !child_setup.empty();
   auto child_setup_ = child_setup;
@@ -176,7 +176,7 @@ spawn_sync(const std::string& working_directory, const std::vector<std::string>&
   g_spawn_sync(Glib::c_str_or_nullptr(working_directory), const_cast<char**>(Glib::ArrayHandler<std::string>::vector_to_array(argv).data()), nullptr,
     static_cast<GSpawnFlags>(unsigned(flags)), (setup_slot) ? &child_setup_callback : nullptr,
     (setup_slot) ? &child_setup_ : nullptr, (standard_output) ? &pch_buf_standard_output : nullptr,
-    (standard_error) ? &pch_buf_standard_error : nullptr, exit_status, &gerror);
+    (standard_error) ? &pch_buf_standard_error : nullptr, wait_status, &gerror);
   auto buf_standard_output = make_unique_ptr_gfree(pch_buf_standard_output);
   auto buf_standard_error = make_unique_ptr_gfree(pch_buf_standard_error);
 
@@ -199,7 +199,7 @@ spawn_command_line_async(const std::string& command_line)
 
 void
 spawn_command_line_sync(const std::string& command_line, std::string* standard_output,
-  std::string* standard_error, int* exit_status)
+  std::string* standard_error, int* wait_status)
 {
   char* pch_buf_standard_output = nullptr;
   char* pch_buf_standard_error = nullptr;
@@ -207,7 +207,7 @@ spawn_command_line_sync(const std::string& command_line, std::string* standard_o
 
   g_spawn_command_line_sync(command_line.c_str(),
     (standard_output) ? &pch_buf_standard_output : nullptr,
-    (standard_error) ? &pch_buf_standard_error : nullptr, exit_status, &gerror);
+    (standard_error) ? &pch_buf_standard_error : nullptr, wait_status, &gerror);
   auto buf_standard_output = make_unique_ptr_gfree(pch_buf_standard_output);
   auto buf_standard_error = make_unique_ptr_gfree(pch_buf_standard_error);
 

@@ -100,7 +100,7 @@ install_pkgconfigdir = install_libdir / 'pkgconfig'
 #   Dependencies when using the <pkg>mm library.
 
 sigcxx_req = '>= 3.0.0'
-glib_req = '>= 2.63.0'
+glib_req = '>= 2.69.1'
 
 # There are pkg-config files for sigc++ and glib on MSVC, so just use that.
 sigcxx_dep = dependency('sigc++-3.0', version: sigcxx_req)
@@ -266,12 +266,19 @@ if can_add_dist_script
     python3.path(), dist_changelog_py,
     project_source_root,
   )
+
+  # Don't distribute these files.
+  dont_distribute = [
+    'HACKING',
+    '.gitlab-ci.yml',
+  ]
   # Add build scripts to the distribution directory, and delete .gitignore
   # files and an empty $MESON_PROJECT_DIST_ROOT/build/ directory.
   meson.add_dist_script(
     python3.path(), dist_build_scripts_py,
     project_source_root,
     'untracked' / 'build_scripts',
+    dont_distribute,
   )
 endif
 
