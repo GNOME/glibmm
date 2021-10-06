@@ -1,7 +1,7 @@
 # This file is part of glibmm.
 
 project('glibmm', 'cpp',
-  version: '2.68.1',
+  version: '2.70.0',
   license: 'LGPLv2.1+',
   default_options: [
     'cpp_std=c++17'
