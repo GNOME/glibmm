@@ -1,7 +1,7 @@
 # This file is part of glibmm.
 
 project('glibmm', 'cpp',
-  version: '2.68.1',
+  version: '2.68.2',
   license: 'LGPLv2.1+',
   default_options: [
     'cpp_std=c++17'
@@ -253,12 +253,20 @@ if can_add_dist_script
     python3.path(), dist_changelog_py,
     project_source_root,
   )
+
+  # Don't distribute these files.
+  dont_distribute = [
+    'HACKING',
+    '.gitlab-ci.yml',
+  ]
+
   # Add build scripts to the distribution directory, and delete .gitignore
   # files and an empty $MESON_PROJECT_DIST_ROOT/build/ directory.
   meson.add_dist_script(
     python3.path(), dist_build_scripts_py,
     project_source_root,
     'untracked' / 'build_scripts',
+    dont_distribute,
   )
 endif
 
