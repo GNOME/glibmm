@@ -54,8 +54,31 @@ public:
   _WRAP_METHOD(Glib::RefPtr<SocketConnectable> get_server_identity(), g_tls_client_connection_get_server_identity, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const SocketConnectable> get_server_identity() const, g_tls_client_connection_get_server_identity, constversion)
 
-  _WRAP_METHOD(void set_validation_flags(TlsCertificateFlags flags), g_tls_client_connection_set_validation_flags)
-  _WRAP_METHOD(TlsCertificateFlags get_validation_flags() const, g_tls_client_connection_get_validation_flags)
+  // g_tls_client_connection_set/get_validation_flags() are deprecated in glib 2.72.
+  /** Sets this client connection's validation flags, to override the default set of
+   * checks performed when validating a server certificate. By default,
+   * Gio::TLS_CERTIFICATE_VALIDATE_ALL is used.
+   *
+   * This function does not work as originally designed and is impossible
+   * to use correctly.
+   *
+   * @newin{2,28}
+   *
+   * @param flags The TlsCertificateFlags to use.
+   */
+  void set_validation_flags(TlsCertificateFlags flags);
+
+  /** Gets this client connection's validation flags
+   *
+   * This function does not work as originally designed and is impossible
+   * to use correctly.
+   *
+   * @newin{2,28}
+   *
+   * @return The validation flags.
+   */
+  TlsCertificateFlags get_validation_flags() const;
+  _IGNORE(g_tls_client_connection_set_validation_flags, g_tls_client_connection_get_validation_flags)
 
   _WRAP_METHOD(void set_use_ssl3(bool use_ssl3 = true), g_tls_client_connection_set_use_ssl3,
     deprecated "SSL 3.0 is insecure, and this function does not generally enable or disable it, despite its name.")

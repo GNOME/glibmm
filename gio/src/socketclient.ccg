@@ -125,4 +125,16 @@ SocketClient::connect_to_uri_async(
     gobj(), uri.c_str(), default_port, nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+TlsCertificateFlags SocketClient::get_tls_validation_flags() const
+{
+  return ((TlsCertificateFlags)(g_socket_client_get_tls_validation_flags(const_cast<GSocketClient*>(gobj()))));
+}
+
+void SocketClient::set_tls_validation_flags(TlsCertificateFlags flags)
+{
+  g_socket_client_set_tls_validation_flags(gobj(), ((GTlsCertificateFlags)(flags)));
+}
+G_GNUC_END_IGNORE_DEPRECATIONS
+
 } // namespace Gio

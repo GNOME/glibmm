@@ -145,8 +145,32 @@ public:
 
   _WRAP_METHOD(bool get_tls() const, g_socket_client_get_tls)
   _WRAP_METHOD(void set_tls(bool tls = true), g_socket_client_set_tls)
-  _WRAP_METHOD(TlsCertificateFlags get_tls_validation_flags() const, g_socket_client_get_tls_validation_flags)
-  _WRAP_METHOD(void set_tls_validation_flags(TlsCertificateFlags flags), g_socket_client_set_tls_validation_flags)
+
+  // g_socket_client_get/set_tls_validation_flags() are deprecated in glib 2.72.
+  /** Gets the TLS validation flags used creating TLS connections via
+   *  this socket client.
+   *
+   * This function does not work as originally designed and is impossible
+   * to use correctly.
+   *
+   * @newin{2,28}
+   *
+   * @return The TLS validation flags.
+   */
+  TlsCertificateFlags get_tls_validation_flags() const;
+
+  /** Sets the TLS validation flags used when creating TLS connections
+   * via this socket client. The default value is Gio::TLS_CERTIFICATE_VALIDATE_ALL.
+   *
+   * This function does not work as originally designed and is impossible
+   * to use correctly.
+   *
+   * @newin{2,28}
+   *
+   * @param flags The validation flags.
+   */
+  void set_tls_validation_flags(TlsCertificateFlags flags);
+  _IGNORE(g_socket_client_get_tls_validation_flags, g_socket_client_set_tls_validation_flags)
 
   _WRAP_METHOD(Glib::RefPtr<ProxyResolver> get_proxy_resolver(), g_socket_client_get_proxy_resolver, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const ProxyResolver> get_proxy_resolver() const, g_socket_client_get_proxy_resolver, refreturn, constversion)
