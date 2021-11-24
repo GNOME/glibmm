@@ -61,8 +61,16 @@ public:
   _WRAP_METHOD(Glib::RefPtr<SocketConnectable> get_server_identity(), g_tls_client_connection_get_server_identity, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const SocketConnectable> get_server_identity() const, g_tls_client_connection_get_server_identity, constversion)
 
-  _WRAP_METHOD(void set_validation_flags(TlsCertificateFlags flags), g_tls_client_connection_set_validation_flags)
-  _WRAP_METHOD(TlsCertificateFlags get_validation_flags() const, g_tls_client_connection_get_validation_flags)
+  //TODO: Deprecate in glibmm 2.72.
+  _WRAP_METHOD_DOCS_ONLY(g_tls_client_connection_set_validation_flags)
+  void set_validation_flags(TlsCertificateFlags flags);
+  _WRAP_METHOD_DOCS_ONLY(g_tls_client_connection_get_validation_flags)
+  TlsCertificateFlags get_validation_flags() const;
+  _IGNORE(g_tls_client_connection_set_validation_flags, g_tls_client_connection_get_validation_flags)
+  //_WRAP_METHOD(void set_validation_flags(TlsCertificateFlags flags), g_tls_client_connection_set_validation_flags,
+  //  deprecated "Do not attempt to ignore validation errors.")
+  //_WRAP_METHOD(TlsCertificateFlags get_validation_flags() const, g_tls_client_connection_get_validation_flags,
+  //  deprecated "Do not attempt to ignore validation errors.")
 
   _IGNORE(g_tls_client_connection_set_use_ssl3, g_tls_client_connection_get_use_ssl3) dnl// deprecated
 
@@ -78,7 +86,10 @@ public:
   // specialization is added. Workaround: Use get_accepted_cas().
   //_WRAP_PROPERTY("accepted-cas", std::vector<Glib::RefPtr<Glib::ByteArray>>)
   _WRAP_PROPERTY("server-identity", Glib::RefPtr<SocketConnectable>)
+  //TODO: Deprecate in glibmm 2.72.
   _WRAP_PROPERTY("validation-flags", TlsCertificateFlags)
+  //_WRAP_PROPERTY("validation-flags", TlsCertificateFlags,
+  //  deprecated "Do not attempt to ignore validation errors.")
   _IGNORE_PROPERTY(use-ssl3) dnl// deprecated
 };
 
