@@ -62,7 +62,6 @@ foreach ex : test_programs
     cpp_args: ['-DGLIBMM_DISABLE_DEPRECATED', '-DGIOMM_DISABLE_DEPRECATED'],
     dependencies: is_multithread ? [mm_dep, thread_dep] : mm_dep,
     implicit_include_directories: false,
-    gui_app: false,
     build_by_default: true,
     install: false,
   )
@@ -79,7 +78,6 @@ foreach ex : test_programs
                    '-DGLIBMM_TEST_THAT_COMPILATION_FAILS=' + suffix],
         dependencies: mm_dep,
         implicit_include_directories: false,
-        gui_app: false,
         build_by_default: false,
         install: false,
       )
