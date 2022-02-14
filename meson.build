@@ -273,9 +273,8 @@ if can_add_dist_script
     project_source_root,
   )
 
-  # Don't distribute these files.
+  # Don't distribute this file.
   dont_distribute = [
-    'HACKING',
     '.gitlab-ci.yml',
   ]
   # Add build scripts to the distribution directory, and delete .gitignore
