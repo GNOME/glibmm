@@ -27,6 +27,7 @@ if meson.is_subproject()
     meson.current_source_dir(),
     project_build_root / 'glib' / 'glibmm_generate_extra_defs',
     'generate_extra_defs.h',
+    check: true,
   )
 endif
 

@@ -295,12 +295,14 @@ else # not maintainer_mode
     meson.current_build_dir(),
     src_untracked_glibmm,
     glibmm_hg_ccg_basenames,
+    check: true,
   )
   run_command(
     python3, handle_built_files_py, 'copy_built_files',
     meson.current_build_dir(),
     src_untracked_glibmm,
     glibmm_h_m4_files + glibmm_cc_m4_files,
+    check: true,
   )
 
   built_cc_files = [ rel_untracked_glibmm / 'wrap_init.cc' ]
@@ -330,14 +332,14 @@ endif
 
 # Install built .h and _p.h files.
 meson.add_install_script(
-  python3.path(), generate_binding_py, 'install_built_h_files',
+  python3, generate_binding_py, 'install_built_h_files',
   built_h_cc_dir,
   install_includedir / glibmm_pcname / 'glibmm', # subdir below {prefix}
   glibmm_hg_ccg_basenames
 )
 # Install .h files built from .m4 files.
 meson.add_install_script(
-  python3.path(), handle_built_files_py, 'install_built_h_files',
+  python3, handle_built_files_py, 'install_built_h_files',
   built_h_cc_dir,
   install_includedir / glibmm_pcname / 'glibmm', # subdir below {prefix}
   glibmm_h_m4_files,
@@ -346,13 +348,13 @@ meson.add_install_script(
 if can_add_dist_script
   # Distribute built files.
   meson.add_dist_script(
-    python3.path(), generate_binding_py, 'dist_built_files',
+    python3, generate_binding_py, 'dist_built_files',
     built_h_cc_dir,
     untracked_glibmm,
     glibmm_hg_ccg_basenames,
   )
   meson.add_dist_script(
-    python3.path(), handle_built_files_py, 'dist_built_files',
+    python3, handle_built_files_py, 'dist_built_files',
     built_h_cc_dir,
     untracked_glibmm,
     glibmm_h_m4_files + glibmm_cc_m4_files,
