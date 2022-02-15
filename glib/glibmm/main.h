@@ -84,6 +84,7 @@ class GLIBMM_API SignalTimeout
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   explicit inline SignalTimeout(GMainContext* context);
+  SignalTimeout(const SignalTimeout& other) = default;
 #endif
 
   /** Connects a timeout handler.
@@ -220,6 +221,7 @@ class GLIBMM_API SignalIdle
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   explicit inline SignalIdle(GMainContext* context);
+  SignalIdle(const SignalIdle& other) = default;
 #endif
 
   /** Connects an idle handler.
@@ -278,6 +280,7 @@ class GLIBMM_API SignalIO
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   explicit inline SignalIO(GMainContext* context);
+  SignalIO(const SignalIO& other) = default;
 #endif
 
   /** Connects an I/O handler that watches a file descriptor.
@@ -349,6 +352,7 @@ class GLIBMM_API SignalChildWatch
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   explicit inline SignalChildWatch(GMainContext* context);
+  SignalChildWatch(const SignalChildWatch& other) = default;
 #endif
   /** Connects a child watch handler.
    * @code

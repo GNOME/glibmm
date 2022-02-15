@@ -51,6 +51,7 @@ class GLIBMM_API SignalProxyBase
 {
 public:
   SignalProxyBase(Glib::ObjectBase* obj);
+  SignalProxyBase(const SignalProxyBase& other) = default;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   static inline sigc::slot_base* data_to_slot(void* data)

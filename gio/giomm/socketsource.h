@@ -35,6 +35,7 @@ class GIOMM_API SignalSocket
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   explicit inline SignalSocket(GMainContext* context);
+  SignalSocket(const SignalSocket& other) = default;
 #endif
 
   /** Connects an I/O handler that watches a socket.
