@@ -25,6 +25,7 @@
 #include <giomm/actiongroup.h>
 #include <giomm/actionmap.h>
 #include <giomm/appinfo.h>
+#include <giomm/appinfomonitor.h>
 #include <giomm/applaunchcontext.h>
 #include <giomm/application.h>
 #include <giomm/applicationcommandline.h>
