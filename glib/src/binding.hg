@@ -382,18 +382,6 @@ public:
       slot_transform_from.empty() ? SlotTransform() : TransformProp<T_target, T_source>(slot_transform_from));
   }
 
-  // We must hand-code get_source() and get_target().
-  // g_binding_get_source() and g_binding_get_target() are deprecated in glib 2.68.
-  // We can't use the replacements g_binding_dup_source() and g_binding_dup_target(),
-  // which are new in glib 2.68. This version of glibmm does not require glib 2.68.
-  //
-  //_WRAP_METHOD(Glib::RefPtr<Glib::ObjectBase> get_source(), g_binding_get_source, refreturn, newin "2,44")
-  //_WRAP_METHOD(Glib::RefPtr<const Glib::ObjectBase> get_source() const, g_binding_get_source, refreturn, constversion, newin "2,44")
-  // or
-  //_WRAP_METHOD(Glib::RefPtr<Glib::ObjectBase> get_source(), g_binding_dup_source, newin "2,44")
-  //_WRAP_METHOD(Glib::RefPtr<const Glib::ObjectBase> get_source() const, g_binding_dup_source, constversion, newin "2,44")
-  _IGNORE(g_binding_get_source)
-
   /** Retrieves the Glib::ObjectBase instance used as the source of the binding.
    *
    * A %Glib::Binding can outlive the source Glib::ObjectBase as the binding does not hold a
@@ -404,7 +392,8 @@ public:
    *
    * @return The source Glib::ObjectBase.
    */
-  Glib::RefPtr<Glib::ObjectBase> get_source();
+  _WRAP_METHOD(Glib::RefPtr<Glib::ObjectBase> get_source(), g_binding_get_source,
+    refreturn, newin "2,44", ignore_deprecations)
   
   /** Retrieves the Glib::ObjectBase instance used as the source of the binding.
    *
@@ -416,17 +405,11 @@ public:
    *
    * @return The source Glib::ObjectBase.
    */
-  Glib::RefPtr<const Glib::ObjectBase> get_source() const;
+  _WRAP_METHOD(Glib::RefPtr<const Glib::ObjectBase> get_source() const, g_binding_get_source,
+    refreturn, constversion, newin "2,44", ignore_deprecations)
 
   _WRAP_METHOD(Glib::ustring get_source_property() const, g_binding_get_source_property, newin "2,44")
 
-  //_WRAP_METHOD(Glib::RefPtr<Glib::ObjectBase> get_target(), g_binding_get_target, refreturn, newin "2,44")
-  //_WRAP_METHOD(Glib::RefPtr<const Glib::ObjectBase> get_target() const, g_binding_get_target, refreturn, constversion, newin "2,44")
-  // or
-  //_WRAP_METHOD(Glib::RefPtr<Glib::ObjectBase> get_target(), g_binding_dup_target, newin "2,44")
-  //_WRAP_METHOD(Glib::RefPtr<const Glib::ObjectBase> get_target() const, g_binding_dup_target, constversion, newin "2,44")
-  _IGNORE(g_binding_get_target)
-
   /** Retrieves the Glib::ObjectBase instance used as the target of the binding.
    *
    * A %Glib::Binding can outlive the target Glib::ObjectBase as the binding does not hold a
@@ -437,7 +420,8 @@ public:
    *
    * @return The target Glib::ObjectBase.
    */
-  Glib::RefPtr<Glib::ObjectBase> get_target();
+  _WRAP_METHOD(Glib::RefPtr<Glib::ObjectBase> get_target(), g_binding_get_target,
+    refreturn, newin "2,44", ignore_deprecations)
   
   /** Retrieves the Glib::ObjectBase instance used as the target of the binding.
    *
@@ -449,7 +433,8 @@ public:
    *
    * @return The target Glib::ObjectBase.
    */
-  Glib::RefPtr<const Glib::ObjectBase> get_target() const;
+  _WRAP_METHOD(Glib::RefPtr<const Glib::ObjectBase> get_target() const, g_binding_get_target,
+    refreturn, constversion, newin "2,44", ignore_deprecations)
 
   _WRAP_METHOD(Glib::ustring get_target_property() const, g_binding_get_target_property, newin "2,44")
   _WRAP_METHOD(BindingFlags get_flags() const, g_binding_get_flags, newin "2,44")

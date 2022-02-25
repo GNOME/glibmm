@@ -119,37 +119,10 @@ Binding::bind_property_value(const PropertyProxy_Base& source_property,
   return Glib::RefPtr<Binding>(new Binding(binding));
 }
 
-// We must hand-code get_source() and get_target().
 // g_binding_get_source() and g_binding_get_target() are deprecated in glib 2.68.
 // We can't use the replacements g_binding_dup_source() and g_binding_dup_target(),
 // which are new in glib 2.68. This version of glibmm does not require glib 2.68.
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-Glib::RefPtr<Glib::ObjectBase> Binding::get_source()
-{
-  Glib::RefPtr<Glib::ObjectBase> retvalue = Glib::wrap(g_binding_get_source(gobj()));
-  if(retvalue)
-    retvalue->reference(); //The function does not do a ref for us.
-  return retvalue;
-}
-
-Glib::RefPtr<const Glib::ObjectBase> Binding::get_source() const
-{
-  return const_cast<Binding*>(this)->get_source();
-}
-
-Glib::RefPtr<Glib::ObjectBase> Binding::get_target()
-{
-  Glib::RefPtr<Glib::ObjectBase> retvalue = Glib::wrap(g_binding_get_target(gobj()));
-  if(retvalue)
-    retvalue->reference(); //The function does not do a ref for us.
-  return retvalue;
-}
-
-Glib::RefPtr<const Glib::ObjectBase> Binding::get_target() const
-{
-  return const_cast<Binding*>(this)->get_target();
-}
-
 void
 Binding::unbind()
 {

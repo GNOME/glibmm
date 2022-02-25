@@ -60,13 +60,11 @@ class GLIBMM_API TimeZone
   _IGNORE(g_time_zone_ref, g_time_zone_unref)
 
 public:
-  // We must hand-code create(const Glib::ustring& identifier).
   // g_time_zone_new() is deprecated in glib 2.68.
   // We can't use the replacement g_time_zone_new_identifier(),
   // which is new in glib 2.68. This version of glibmm does not require glib 2.68.
-  //_WRAP_METHOD(static TimeZone create(const Glib::ustring& identifier), g_time_zone_new_identifier)
-  _WRAP_METHOD_DOCS_ONLY(g_time_zone_new)
-  static TimeZone create(const Glib::ustring& identifier);
+  _WRAP_METHOD(static TimeZone create(const Glib::ustring& identifier), g_time_zone_new,
+    ignore_deprecations)
 
   _WRAP_METHOD(static TimeZone create_local(), g_time_zone_new_local)
   _WRAP_METHOD(static TimeZone create_utc(), g_time_zone_new_utc)
