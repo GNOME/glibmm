@@ -1,7 +1,5 @@
 dnl
-dnl
 dnl  Code generation sections for making a method.
-dnl
 dnl
 
 dnl
@@ -12,12 +10,13 @@ dnl           $9     $10       $11       $12         $13             $14        
 dnl          const,refreturn,errthrow,deprecated,constversion,arglist_without_types,ifdef,
 dnl             $16        $17              $18        $19        $20         $21
 dnl          out_param,out_param_cpptype,slot_type,slot_name,no_slot_copy,wrap_line)
+dnl $12 is either "", "deprecated" or "ignore_deprecations"
 define(`_METHOD',`dnl
 _PUSH(SECTION_CC)
 ifelse(`$15',,,`#ifdef $15'
 )dnl
-ifelse(`$12',,,`_DEPRECATE_IFDEF_START`'dnl The expansion of _DEPRECATE_IFDEF_START ends with a newline
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+ifelse(`$12',`deprecated',`_DEPRECATE_IFDEF_START')`'dnl The expansion of _DEPRECATE_IFDEF_START ends with a newline
+ifelse(`$12',,,`G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 ')dnl
 $3 __CPPNAME__::$1`'($5)ifelse(`$9',1,` const')
 {
@@ -102,7 +101,8 @@ ifelse(`$3',void,,`  return retvalue;
 ')dnl
 }
 ifelse(`$12',,,`G_GNUC_END_IGNORE_DEPRECATIONS
-_DEPRECATE_IFDEF_END')`'dnl The expansion of _DEPRECATE_IFDEF_END ends with a newline
+')dnl
+ifelse(`$12',`deprecated',`_DEPRECATE_IFDEF_END')`'dnl The expansion of _DEPRECATE_IFDEF_END ends with a newline
 ifelse(`$15',,,`#endif // $15
 ')
 _POP()')
@@ -115,12 +115,13 @@ dnl                        $8            $9      $10         $11    $12     $13
 dnl                 cinitializations,refreturn,errthrow,deprecated,ifdef,out_param,
 dnl                       $14          $15      $16          $17       $18
 dnl                 out_param_type,slot_type,slot_name,no_slot_copy,wrap_line)
+dnl $11 is either "", "deprecated" or "ignore_deprecations"
 define(`_STATIC_METHOD',`dnl
 _PUSH(SECTION_CC)
 ifelse(`$12',,,`#ifdef $12'
 )dnl
-ifelse(`$11',,,`_DEPRECATE_IFDEF_START`'dnl The expansion of _DEPRECATE_IFDEF_START ends with a newline
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+ifelse(`$11',`deprecated',`_DEPRECATE_IFDEF_START')`'dnl The expansion of _DEPRECATE_IFDEF_START ends with a newline
+ifelse(`$11',,,`G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 ')dnl
 $3 __CPPNAME__::$1($5)
 {
@@ -191,7 +192,8 @@ ifelse(`$3',void,,`  return retvalue;
 ')dnl
 }
 ifelse(`$11',,,`G_GNUC_END_IGNORE_DEPRECATIONS
-_DEPRECATE_IFDEF_END')`'dnl The expansion of _DEPRECATE_IFDEF_END ends with a newline
+')dnl
+ifelse(`$11',`deprecated',`_DEPRECATE_IFDEF_END')`'dnl The expansion of _DEPRECATE_IFDEF_END ends with a newline
 ifelse(`$12',,,`#endif // $12
 ')
 _POP()')

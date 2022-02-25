@@ -441,6 +441,11 @@ sub output_wrap_meth($$$$$$$)
       $constversion = "constversion"
     }
 
+    if($$objCDefsFunc{ignore_deprecations})
+    {
+      $deprecated = "ignore_deprecations"
+    }
+
     #Implementation:
     my $str;
     if ($$objCppfunc{static}) {

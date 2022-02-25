@@ -945,6 +945,7 @@ sub on_wrap_method($)
   $$objCfunc{rettype_needs_ref} = 0;
   $$objCfunc{throw_any_errors} = 0;
   $$objCfunc{constversion} = 0;
+  $$objCfunc{ignore_deprecations} = 0;
   $$objCfunc{deprecated} = "";
   my $errthrow_docs = "";
   my $deprecation_docs = "";
@@ -966,6 +967,10 @@ sub on_wrap_method($)
     elsif($argRef eq "constversion")
     {
       $$objCfunc{constversion} = 1;
+    }
+    elsif($argRef eq "ignore_deprecations")
+    {
+      $$objCfunc{ignore_deprecations} = 1;
     }
     elsif($argRef =~ /^deprecated(.*)/) #If deprecated is at the start.
     {
