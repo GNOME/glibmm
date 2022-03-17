@@ -55,8 +55,11 @@ build_deps:
     - mkdir _build && cd _build
     - meson --prefix=/usr --libdir=lib -Dbuild-documentation=false -Dbuild-examples=false -Dbuildtype=release
     - meson compile
+    - meson configure --prefix=`pwd`/../../install
     - cd ../..
     - fi
+    - cd libsigc/_build
+    - meson install
   cache:
     key: build-deps
     paths:
@@ -64,7 +67,7 @@ build_deps:
     policy: pull-push
   artifacts:
     paths:
-      - libsigc/
+      - install/
     expire_in: 1 day
 
 autotools_build:
@@ -73,32 +76,13 @@ autotools_build:
   variables:
     DEPENDENCIES: $MESON_DEPS make autoconf
   script:
-    - ninja -C libsigc/_build install
+    - cp -r install/* /usr
     - ./autogen.sh --enable-warnings=fatal --prefix=/usr
     - make
     - make check
     - make install
   allow_failure: true
 
-debug_build:
-  extends: .build_default
-  stage: build
-  variables:
-    DEPENDENCIES: $MESON_DEPS
-  script:
-    - ninja -C libsigc/_build install
-    - mkdir _build && cd _build
-    # -Ddebug=true + -Doptimization=0 correspond to -Dbuildtype=debug
-    - meson --prefix=/usr --libdir=lib -Ddebug=true -Doptimization=0 -Dwarnings=fatal
-    - meson compile
-    - meson test
-    - meson install
-  artifacts:
-    when: on_failure
-    paths:
-      - _build/meson-logs/testlog.txt
-      - _build/meson-logs/meson-log.txt
-    expire_in: 1 week
 
 release_gcc_10_build:
   extends: .build_default
@@ -106,7 +90,7 @@ release_gcc_10_build:
   variables:
     DEPENDENCIES: $MESON_DEPS g++-10
   script:
-    - ninja -C libsigc/_build install
+    - cp -r install/* /usr
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     - CC=gcc-10 CXX=g++-10 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
@@ -117,48 +101,6 @@ release_gcc_10_build:
     when: always
     paths:
       - _build/docs/reference
-
-release_gcc_11_build:
-  extends: .build_default
-  stage: build
-  variables:
-    DEPENDENCIES: $MESON_DEPS g++-11
-  script:
-    - ninja -C libsigc/_build install
-    - mkdir _build && cd _build
-    # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
-    - CC=gcc-11 CXX=g++-11 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
-    - meson compile
-    - meson test
-    - meson install
-  allow_failure: true
-  artifacts:
-    when: on_failure
-    paths:
-      - _build/meson-logs/testlog.txt
-      - _build/meson-logs/meson-log.txt
-    expire_in: 1 week
-
-release_clang_build:
-  extends: .build_default
-  stage: build
-  variables:
-    DEPENDENCIES: $MESON_DEPS clang
-  script:
-    - ninja -C libsigc/_build install
-    - mkdir _build && cd _build
-    # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
-    - CC=clang CXX=clang++ meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
-    - meson compile
-    - meson test
-    - meson install
-  allow_failure: true
-  artifacts:
-    when: on_failure
-    paths:
-      - _build/meson-logs/testlog.txt
-      - _build/meson-logs/meson-log.txt
-    expire_in: 1 week
 
 # Publish reference documentation at gnome.pages.gitlab.gnome.org/glibmm
 pages:
