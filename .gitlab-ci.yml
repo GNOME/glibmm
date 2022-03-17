@@ -49,13 +49,14 @@ build_deps:
   script:
     # Build and cache dependencies that can't be installed with apt.
     # Build libsigc++3
+    - echo HOME= $HOME
     - if test ! -d libsigc; then
     - git clone --branch 3.2.0 --depth 1 https://github.com/libsigcplusplus/libsigcplusplus.git libsigc
     - cd libsigc
     - mkdir _build && cd _build
     - meson --prefix=/usr --libdir=lib -Dbuild-documentation=false -Dbuild-examples=false -Dbuildtype=release
     - meson compile
-    - meson configure --prefix=`pwd`/../../install
+    - meson configure --prefix=$HOME/install
     - cd ../..
     - fi
     - cd libsigc/_build
@@ -76,7 +77,7 @@ autotools_build:
   variables:
     DEPENDENCIES: $MESON_DEPS make autoconf
   script:
-    - cp -r install/* /usr
+    - echo HOME= $HOME
     - ./autogen.sh --enable-warnings=fatal --prefix=/usr
     - make
     - make check
@@ -90,7 +91,7 @@ release_gcc_10_build:
   variables:
     DEPENDENCIES: $MESON_DEPS g++-10
   script:
-    - cp -r install/* /usr
+    - echo HOME= $HOME
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     - CC=gcc-10 CXX=g++-10 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
