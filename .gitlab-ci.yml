@@ -45,23 +45,34 @@ build_deps:
   extends: .build_default
   stage: deps
   variables:
-    DEPENDENCIES: $MESON_DEPS
+    DEPENDENCIES: $MESON_DEPS docbook5-xml docbook-xsl
   script:
     # Build and cache dependencies that can't be installed with apt.
+    # Install to ./installdir, with the contents of the installed files
+    # (notably .pc files) suited for installation to /usr.
+    - export DESTDIR=`pwd`/installdir
     # Build libsigc++3
     - if test ! -d libsigc; then
     - git clone --branch 3.2.0 --depth 1 https://github.com/libsigcplusplus/libsigcplusplus.git libsigc
     - cd libsigc
     - mkdir _build && cd _build
-    - meson --prefix=/usr --libdir=lib -Dbuild-documentation=false -Dbuild-examples=false -Dbuildtype=release
+    - meson --prefix=/usr --libdir=lib -Dvalidation=false -Dbuild-examples=false -Dbuildtype=release
     - meson compile
     - cd ../..
     - fi
+    - ninja -C libsigc/_build install
   cache:
     key: build-deps
     paths:
       - libsigc/
     policy: pull-push
+  # Transfer the installed part of the built dependencies to later stages
+  # as artifacts. The cache does not always work.
+  # https://gitlab.gnome.org/Infrastructure/Infrastructure/-/issues/775
+  artifacts:
+    paths:
+      - installdir/
+    expire_in: 1 day
 
 autotools_build:
   extends: .build_default
@@ -69,16 +80,11 @@ autotools_build:
   variables:
     DEPENDENCIES: $MESON_DEPS make autoconf
   script:
-    - ninja -C libsigc/_build install
+    - cp -r installdir/usr /
     - ./autogen.sh --enable-warnings=fatal --prefix=/usr
     - make
     - make check
     - make install
-  cache:
-    key: build-deps
-    paths:
-      - libsigc/
-    policy: pull
   allow_failure: true
 
 debug_build:
@@ -87,18 +93,13 @@ debug_build:
   variables:
     DEPENDENCIES: $MESON_DEPS
   script:
-    - ninja -C libsigc/_build install
+    - cp -r installdir/usr /
     - mkdir _build && cd _build
     # -Ddebug=true + -Doptimization=0 correspond to -Dbuildtype=debug
     - meson --prefix=/usr --libdir=lib -Ddebug=true -Doptimization=0 -Dwarnings=fatal
     - meson compile
     - meson test
     - meson install
-  cache:
-    key: build-deps
-    paths:
-      - libsigc/
-    policy: pull
   artifacts:
     when: on_failure
     paths:
@@ -112,18 +113,13 @@ release_gcc_10_build:
   variables:
     DEPENDENCIES: $MESON_DEPS g++-10
   script:
-    - ninja -C libsigc/_build install
+    - cp -r installdir/usr /
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     - CC=gcc-10 CXX=g++-10 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
     - meson compile
     - meson test
     - meson install
-  cache:
-    key: build-deps
-    paths:
-      - libsigc/
-    policy: pull
   artifacts:
     when: always
     paths:
@@ -135,7 +131,7 @@ release_gcc_11_build:
   variables:
     DEPENDENCIES: $MESON_DEPS g++-11
   script:
-    - ninja -C libsigc/_build install
+    - cp -r installdir/usr /
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     - CC=gcc-11 CXX=g++-11 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
@@ -143,11 +139,6 @@ release_gcc_11_build:
     - meson test
     - meson install
   allow_failure: true
-  cache:
-    key: build-deps
-    paths:
-      - libsigc/
-    policy: pull
   artifacts:
     when: on_failure
     paths:
@@ -161,7 +152,7 @@ release_clang_build:
   variables:
     DEPENDENCIES: $MESON_DEPS clang
   script:
-    - ninja -C libsigc/_build install
+    - cp -r installdir/usr /
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     - CC=clang CXX=clang++ meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
@@ -169,11 +160,6 @@ release_clang_build:
     - meson test
     - meson install
   allow_failure: true
-  cache:
-    key: build-deps
-    paths:
-      - libsigc/
-    policy: pull
   artifacts:
     when: on_failure
     paths:
