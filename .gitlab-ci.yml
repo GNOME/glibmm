@@ -48,20 +48,17 @@ build_deps:
     DEPENDENCIES: $MESON_DEPS
   script:
     # Build and cache dependencies that can't be installed with apt.
+    - export DESTDIR=`pwd`/installdir
     # Build libsigc++3
-    - echo HOME= $HOME PWD= $PWD pwd= `pwd`
-    - START_DIR=`pwd`
     - if test ! -d libsigc; then
     - git clone --branch 3.2.0 --depth 1 https://github.com/libsigcplusplus/libsigcplusplus.git libsigc
     - cd libsigc
     - mkdir _build && cd _build
     - meson --prefix=/usr --libdir=lib -Dvalidation=false -Dbuild-examples=false -Dbuildtype=release
     - meson compile
-    - meson configure --prefix=$START_DIR/installdir
     - cd ../..
     - fi
-    - cd libsigc/_build
-    - meson install
+    - ninja -C libsigc/_build install
   cache:
     key: build-deps
     paths:
@@ -78,8 +75,7 @@ autotools_build:
   variables:
     DEPENDENCIES: $MESON_DEPS make autoconf
   script:
-    - echo HOME= $HOME PWD= $PWD pwd= `pwd`
-    - export PKG_CONFIG_PATH=`pwd`/installdir/lib/pkgconfig:$PKG_CONFIG_PATH
+    - cp -r installdir/usr /
     - ./autogen.sh --enable-warnings=fatal --prefix=/usr
     - make
     - make check
@@ -93,15 +89,13 @@ autotools_build:
       - tests/glibmm_value/test.trs
     expire_in: 1 day
 
-
 release_gcc_10_build:
   extends: .build_default
   stage: build
   variables:
     DEPENDENCIES: $MESON_DEPS g++-10
   script:
-    - echo HOME= $HOME PWD= $PWD pwd= `pwd`
-    - export PKG_CONFIG_PATH=`pwd`/installdir/lib/pkgconfig:$PKG_CONFIG_PATH
+    - cp -r installdir/usr /
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     - CC=gcc-10 CXX=g++-10 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
