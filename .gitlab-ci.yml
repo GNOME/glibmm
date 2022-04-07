@@ -98,7 +98,10 @@ debug_build:
     # -Ddebug=true + -Doptimization=0 correspond to -Dbuildtype=debug
     - meson --prefix=/usr --libdir=lib -Ddebug=true -Doptimization=0 -Dwarnings=fatal
     - meson compile
-    - meson test
+    # Must wrap the command in single quotes because of the colon.
+    # See https://gitlab.gnome.org/help/ci/yaml/script.md#use-special-characters-with-script
+    # Don't test subprojects.
+    - 'meson test --suite glibmm:'
     - meson install
   artifacts:
     when: on_failure
@@ -118,7 +121,7 @@ release_gcc_10_build:
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     - CC=gcc-10 CXX=g++-10 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
     - meson compile
-    - meson test
+    - 'meson test --suite glibmm:'
     - meson install
   artifacts:
     when: always
@@ -136,7 +139,7 @@ release_gcc_11_build:
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     - CC=gcc-11 CXX=g++-11 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
     - meson compile
-    - meson test
+    - 'meson test --suite glibmm:'
     - meson install
   allow_failure: true
   artifacts:
@@ -157,7 +160,7 @@ release_clang_build:
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     - CC=clang CXX=clang++ meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
     - meson compile
-    - meson test
+    - 'meson test --suite glibmm:'
     - meson install
   allow_failure: true
   artifacts:
