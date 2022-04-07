@@ -546,6 +546,14 @@ MainContext::create()
 
 // static
 Glib::RefPtr<MainContext>
+MainContext::create(MainContextFlags flags)
+{
+  return Glib::make_refptr_for_instance<MainContext>(
+    reinterpret_cast<MainContext*>(g_main_context_new_with_flags(static_cast<GMainContextFlags>(flags))));
+}
+
+// static
+Glib::RefPtr<MainContext>
 MainContext::get_default()
 {
   return Glib::wrap(g_main_context_default(), true);

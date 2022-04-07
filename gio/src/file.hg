@@ -145,6 +145,7 @@ public:
 
   _WRAP_METHOD(std::string get_basename() const, g_file_get_basename)
   _WRAP_METHOD(std::string get_path() const, g_file_get_path)
+  _IGNORE(g_file_peek_path)
   _WRAP_METHOD(std::string get_uri() const, g_file_get_uri)
   _WRAP_METHOD(Glib::ustring get_parse_name() const, g_file_get_parse_name)
 
@@ -1274,6 +1275,46 @@ public:
 
   bool move(const Glib::RefPtr<File>& destination, CopyFlags flags = CopyFlags::NONE);
   _IGNORE(g_file_move)
+
+  /** Asynchronously moves a file source to the location of @a destination.
+   *
+   * For details of the behaviour, see move().
+   *
+   * If @a slot_progress is not empty, then that slot will be called just like
+   * in move(). The callback will run in the default main context of the thread
+   * calling %move_async() — the same context as @a slot_ready is run in.
+   *
+   * When the operation is finished, @a slot_ready will be called. You can then call
+   * move_finish() to get the result of the operation.
+   *
+   * @newin{2,72}
+   *
+   * @param destination File pointing to the destination location.
+   * @param slot_progress The callback slot to be called with progress information.
+   * @param slot_ready A SlotAsyncReady to call when the request is satisfied.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param flags Set of Gio::File::CopyFlags.
+   * @param io_priority The I/O priority of the request.
+   */
+  void move_async(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot_progress,
+    const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable,
+    CopyFlags flags = CopyFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+
+  void move_async(const Glib::RefPtr<File>& destination,
+    const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable,
+    CopyFlags flags = CopyFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+
+  void move_async(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot_progress,
+    const SlotAsyncReady& slot_ready,
+    CopyFlags flags = CopyFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+
+  void move_async(const Glib::RefPtr<File>& destination,
+    const SlotAsyncReady& slot_ready,
+    CopyFlags flags = CopyFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  _IGNORE(g_file_move_async)
+
+  _WRAP_METHOD(bool move_finish(const Glib::RefPtr<AsyncResult>& res),
+               g_file_move_finish, errthrow)
 
   _WRAP_METHOD(bool make_directory(const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_make_directory,

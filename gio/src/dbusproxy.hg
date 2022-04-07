@@ -50,7 +50,7 @@ _WRAP_ENUM(ProxyFlags, GDBusProxyFlags, gtype_func g_dbus_proxy_flags_get_type, 
  * If a Proxy is used for a well-known name, the owner of the name is
  * tracked and can be read from property_g_name_owner().
  *
- * The generic signal_g_properties_changed() and signal_g_signal() signals are
+ * The generic signal_properties_changed() and signal_signal() signals are
  * not very convenient to work with. Therefore, the recommended way of working
  * with proxies is to subclass Proxy, and have more natural properties and
  * signals in your derived class.
@@ -356,7 +356,8 @@ public:
 
 #m4 _CONVERSION(`GVariant*', `const Glib::VariantContainerBase&', `Glib::VariantContainerBase($3, true)')
 #m4 _CONVERSION(`const Glib::VariantContainerBase&', `GVariant*', `const_cast<GVariant*>(($3).gobj())')
- _WRAP_SIGNAL(void signal(const Glib::ustring& sender_name, const Glib::ustring& signal_name, const Glib::VariantContainerBase& parameters), "g-signal")
+  _WRAP_SIGNAL(void signal(const Glib::ustring& sender_name, const Glib::ustring& signal_name, const Glib::VariantContainerBase& parameters), "g-signal",
+    detail_name signal_name, two_signal_methods)
 };
 
 } //namespace

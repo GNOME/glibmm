@@ -20,6 +20,7 @@
 #include <glibmm/refptr.h>
 #include <glibmm/priorities.h>
 #include <glibmm/iochannel.h>
+#include <glibmm/enums.h>
 #include <sigc++/sigc++.h>
 #include <vector>
 #include <cstddef>
@@ -389,10 +390,20 @@ public:
   MainContext(const MainContext& other) = delete;
   MainContext& operator=(const MainContext& other) = delete;
 
-  /** Creates a new MainContext.
-   * @return The new MainContext.
+  /** Creates a new %MainContext.
+   * @return The new %MainContext.
    */
   static Glib::RefPtr<MainContext> create();
+  /** Creates a new %MainContext.
+   *
+   * @param flags A bitwise-OR combination of MainContextFlags flags that
+   *              can only be set at creation time.
+   * @return The new %MainContext.
+   *
+   * @newin{2,72}
+   */
+  static Glib::RefPtr<MainContext> create(MainContextFlags flags);
+
   /** Returns the global default main context.
    * This is the main context used for main loop functions when a main loop
    * is not explicitly specified, and corresponds to the "main" main loop.
