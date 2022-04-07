@@ -1338,6 +1338,7 @@
     '("do-not-auto-start" "G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START")
     '("get-invalidated-properties" "G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES")
     '("do-not-auto-start-at-construction" "G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START_AT_CONSTRUCTION")
+    '("no-match-rule" "G_DBUS_PROXY_FLAGS_NO_MATCH_RULE")
   )
 )
 
@@ -1540,6 +1541,7 @@
     '("solaris-ucred" "G_CREDENTIALS_TYPE_SOLARIS_UCRED")
     '("netbsd-unpcbid" "G_CREDENTIALS_TYPE_NETBSD_UNPCBID")
     '("apple-xucred" "G_CREDENTIALS_TYPE_APPLE_XUCRED")
+    '("win32-pid" "G_CREDENTIALS_TYPE_WIN32_PID")
   )
 )
 
@@ -1584,6 +1586,7 @@
     '("certificate-required" "G_TLS_ERROR_CERTIFICATE_REQUIRED")
     '("eof" "G_TLS_ERROR_EOF")
     '("inappropriate-fallback" "G_TLS_ERROR_INAPPROPRIATE_FALLBACK")
+    '("bad-certificate-password" "G_TLS_ERROR_BAD_CERTIFICATE_PASSWORD")
   )
 )
 
@@ -1785,6 +1788,7 @@
     '("stderr-silence" "G_SUBPROCESS_FLAGS_STDERR_SILENCE")
     '("stderr-merge" "G_SUBPROCESS_FLAGS_STDERR_MERGE")
     '("inherit-fds" "G_SUBPROCESS_FLAGS_INHERIT_FDS")
+    '("search-path-from-envp" "G_SUBPROCESS_FLAGS_SEARCH_PATH_FROM_ENVP")
   )
 )
 
@@ -6862,6 +6866,46 @@
 
 
 
+;; From gdebugcontrollerdbus.h
+
+(define-function g_debug_controller_dbus_new
+  (c-name "g_debug_controller_dbus_new")
+  (is-constructor-of "GDebugControllerDbus")
+  (return-type "GDebugControllerDBus*")
+  (parameters
+    '("GDBusConnection*" "connection")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method stop
+  (of-object "GDebugControllerDBus")
+  (c-name "g_debug_controller_dbus_stop")
+  (return-type "none")
+)
+
+
+
+;; From gdebugcontroller.h
+
+(define-method get_debug_enabled
+  (of-object "GDebugController")
+  (c-name "g_debug_controller_get_debug_enabled")
+  (return-type "gboolean")
+)
+
+(define-method set_debug_enabled
+  (of-object "GDebugController")
+  (c-name "g_debug_controller_set_debug_enabled")
+  (return-type "none")
+  (parameters
+    '("gboolean" "debug_enabled")
+  )
+)
+
+
+
 ;; From gdelayedsettingsbackend.h
 
 (define-function g_delayed_settings_backend_get_type
@@ -8735,6 +8779,32 @@
     '("GCancellable*" "cancellable")
     '("GFileProgressCallback" "progress_callback")
     '("gpointer" "progress_callback_data")
+    '("GError**" "error")
+  )
+)
+
+(define-method move_async
+  (of-object "GFile")
+  (c-name "g_file_move_async")
+  (return-type "none")
+  (parameters
+    '("GFile*" "destination")
+    '("GFileCopyFlags" "flags")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GFileProgressCallback" "progress_callback")
+    '("gpointer" "progress_callback_data")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method move_finish
+  (of-object "GFile")
+  (c-name "g_file_move_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
     '("GError**" "error")
   )
 )
@@ -11587,6 +11657,10 @@
 
 
 ;; From giotypes.h
+
+
+
+;; From giowin32-afunix.h
 
 
 
@@ -18590,6 +18664,25 @@
   (return-type "GType")
 )
 
+(define-function g_resolver_records_from_res_query
+  (c-name "g_resolver_records_from_res_query")
+  (return-type "GList*")
+  (parameters
+    '("const-gchar*" "rrname")
+    '("gint" "rrtype")
+    '("const-guint8*" "answer")
+    '("gssize" "len")
+    '("gint" "herr")
+    '("GError**" "error")
+  )
+)
+
+(define-method to_rrtype
+  (of-object "GResolverRecordType")
+  (c-name "g_resolver_record_type_to_rrtype")
+  (return-type "gint")
+)
+
 
 
 ;; From gthreadedsocketservice.h
@@ -18700,6 +18793,27 @@
   (parameters
     '("const-gchar*" "data")
     '("gssize" "length")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_tls_certificate_new_from_pkcs12
+  (c-name "g_tls_certificate_new_from_pkcs12")
+  (return-type "GTlsCertificate*")
+  (parameters
+    '("const-guint8*" "data")
+    '("gsize" "length")
+    '("const-gchar*" "password")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_tls_certificate_new_from_file_with_password
+  (c-name "g_tls_certificate_new_from_file_with_password")
+  (return-type "GTlsCertificate*")
+  (parameters
+    '("const-gchar*" "file")
+    '("const-gchar*" "password")
     '("GError**" "error")
   )
 )
@@ -20960,6 +21074,10 @@
   (c-name "g_win32_registry_get_os_dirs")
   (return-type "const-gchar*-const*")
 )
+
+
+
+;; From gwin32sid.h
 
 
 

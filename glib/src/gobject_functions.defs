@@ -130,6 +130,78 @@
 
 
 
+;; From gbindinggroup.h
+
+(define-function g_binding_group_get_type
+  (c-name "g_binding_group_get_type")
+  (return-type "GType")
+)
+
+(define-function g_binding_group_new
+  (c-name "g_binding_group_new")
+  (is-constructor-of "GBindingGroup")
+  (return-type "GBindingGroup*")
+)
+
+(define-method dup_source
+  (of-object "GBindingGroup")
+  (c-name "g_binding_group_dup_source")
+  (return-type "gpointer")
+)
+
+(define-method set_source
+  (of-object "GBindingGroup")
+  (c-name "g_binding_group_set_source")
+  (return-type "none")
+  (parameters
+    '("gpointer" "source")
+  )
+)
+
+(define-method bind
+  (of-object "GBindingGroup")
+  (c-name "g_binding_group_bind")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "source_property")
+    '("gpointer" "target")
+    '("const-gchar*" "target_property")
+    '("GBindingFlags" "flags")
+  )
+)
+
+(define-method bind_full
+  (of-object "GBindingGroup")
+  (c-name "g_binding_group_bind_full")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "source_property")
+    '("gpointer" "target")
+    '("const-gchar*" "target_property")
+    '("GBindingFlags" "flags")
+    '("GBindingTransformFunc" "transform_to")
+    '("GBindingTransformFunc" "transform_from")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "user_data_destroy")
+  )
+)
+
+(define-method bind_with_closures
+  (of-object "GBindingGroup")
+  (c-name "g_binding_group_bind_with_closures")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "source_property")
+    '("gpointer" "target")
+    '("const-gchar*" "target_property")
+    '("GBindingFlags" "flags")
+    '("GClosure*" "transform_to")
+    '("GClosure*" "transform_from")
+  )
+)
+
+
+
 ;; From gbinding.h
 
 (define-function g_binding_flags_get_type
@@ -2619,6 +2691,109 @@
     '("const-GVariantType*" "type")
     '("GVariant*" "default_value")
     '("GParamFlags" "flags")
+  )
+)
+
+
+
+;; From gsignalgroup.h
+
+(define-function g_signal_group_get_type
+  (c-name "g_signal_group_get_type")
+  (return-type "GType")
+)
+
+(define-function g_signal_group_new
+  (c-name "g_signal_group_new")
+  (is-constructor-of "GSignalGroup")
+  (return-type "GSignalGroup*")
+  (parameters
+    '("GType" "target_type")
+  )
+)
+
+(define-method set_target
+  (of-object "GSignalGroup")
+  (c-name "g_signal_group_set_target")
+  (return-type "none")
+  (parameters
+    '("gpointer" "target")
+  )
+)
+
+(define-method dup_target
+  (of-object "GSignalGroup")
+  (c-name "g_signal_group_dup_target")
+  (return-type "gpointer")
+)
+
+(define-method block
+  (of-object "GSignalGroup")
+  (c-name "g_signal_group_block")
+  (return-type "none")
+)
+
+(define-method unblock
+  (of-object "GSignalGroup")
+  (c-name "g_signal_group_unblock")
+  (return-type "none")
+)
+
+(define-method connect_object
+  (of-object "GSignalGroup")
+  (c-name "g_signal_group_connect_object")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "detailed_signal")
+    '("GCallback" "c_handler")
+    '("gpointer" "object")
+    '("GConnectFlags" "flags")
+  )
+)
+
+(define-method connect_data
+  (of-object "GSignalGroup")
+  (c-name "g_signal_group_connect_data")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "detailed_signal")
+    '("GCallback" "c_handler")
+    '("gpointer" "data")
+    '("GClosureNotify" "notify")
+    '("GConnectFlags" "flags")
+  )
+)
+
+(define-method connect
+  (of-object "GSignalGroup")
+  (c-name "g_signal_group_connect")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "detailed_signal")
+    '("GCallback" "c_handler")
+    '("gpointer" "data")
+  )
+)
+
+(define-method connect_after
+  (of-object "GSignalGroup")
+  (c-name "g_signal_group_connect_after")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "detailed_signal")
+    '("GCallback" "c_handler")
+    '("gpointer" "data")
+  )
+)
+
+(define-method connect_swapped
+  (of-object "GSignalGroup")
+  (c-name "g_signal_group_connect_swapped")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "detailed_signal")
+    '("GCallback" "c_handler")
+    '("gpointer" "data")
   )
 )
 

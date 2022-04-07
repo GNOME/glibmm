@@ -282,6 +282,16 @@
   )
 )
 
+(define-enum ContextFlags
+  (in-module "GMain")
+  (c-name "GMainContextFlags")
+  (gtype-id "G_TYPE_MAIN_CONTEXT_FLAGS")
+  (values
+    '("none" "G_MAIN_CONTEXT_FLAGS_NONE")
+    '("ownerless-polling" "G_MAIN_CONTEXT_FLAGS_OWNERLESS_POLLING")
+  )
+)
+
 (define-enum Error
   (in-module "GMarkup")
   (c-name "GMarkupError")
@@ -999,6 +1009,12 @@
     '("dives-akuru" "G_UNICODE_SCRIPT_DIVES_AKURU")
     '("khitan-small-script" "G_UNICODE_SCRIPT_KHITAN_SMALL_SCRIPT")
     '("yezidi" "G_UNICODE_SCRIPT_YEZIDI")
+    '("cypro-minoan" "G_UNICODE_SCRIPT_CYPRO_MINOAN")
+    '("old-uyghur" "G_UNICODE_SCRIPT_OLD_UYGHUR")
+    '("tangsa" "G_UNICODE_SCRIPT_TANGSA")
+    '("toto" "G_UNICODE_SCRIPT_TOTO")
+    '("vithkuqi" "G_UNICODE_SCRIPT_VITHKUQI")
+    '("math" "G_UNICODE_SCRIPT_MATH")
   )
 )
 
@@ -4832,6 +4848,12 @@
   )
 )
 
+(define-method new_similar
+  (of-object "GHashTable")
+  (c-name "g_hash_table_new_similar")
+  (return-type "GHashTable*")
+)
+
 (define-method destroy
   (of-object "GHashTable")
   (c-name "g_hash_table_destroy")
@@ -6531,6 +6553,15 @@
   (return-type "none")
 )
 
+(define-function g_win32_find_helper_executable_path
+  (c-name "g_win32_find_helper_executable_path")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "process_name")
+    '("void*" "dll_handle")
+  )
+)
+
 
 
 ;; From glibintl.h
@@ -6956,6 +6987,14 @@
   (c-name "g_main_context_new")
   (is-constructor-of "GMainContext")
   (return-type "GMainContext*")
+)
+
+(define-function g_main_context_new_with_flags
+  (c-name "g_main_context_new_with_flags")
+  (return-type "GMainContext*")
+  (parameters
+    '("GMainContextFlags" "flags")
+  )
 )
 
 (define-method ref
@@ -7999,6 +8038,34 @@
   )
 )
 
+(define-function g_aligned_alloc
+  (c-name "g_aligned_alloc")
+  (return-type "gpointer")
+  (parameters
+    '("gsize" "n_blocks")
+    '("gsize" "n_block_bytes")
+    '("gsize" "alignment")
+  )
+)
+
+(define-function g_aligned_alloc0
+  (c-name "g_aligned_alloc0")
+  (return-type "gpointer")
+  (parameters
+    '("gsize" "n_blocks")
+    '("gsize" "n_block_bytes")
+    '("gsize" "alignment")
+  )
+)
+
+(define-function g_aligned_free
+  (c-name "g_aligned_free")
+  (return-type "none")
+  (parameters
+    '("gpointer" "mem")
+  )
+)
+
 (define-function g_mem_set_vtable
   (c-name "g_mem_set_vtable")
   (return-type "none")
@@ -8235,6 +8302,19 @@
   (parameters
     '("GLogLevelFlags" "log_level")
     '("const-char*" "log_domain")
+  )
+)
+
+(define-function g_log_get_debug_enabled
+  (c-name "g_log_get_debug_enabled")
+  (return-type "gboolean")
+)
+
+(define-function g_log_set_debug_enabled
+  (c-name "g_log_set_debug_enabled")
+  (return-type "none")
+  (parameters
+    '("gboolean" "enabled")
   )
 )
 
@@ -14741,6 +14821,11 @@
 
 (define-function g_get_user_cache_dir
   (c-name "g_get_user_cache_dir")
+  (return-type "const-gchar*")
+)
+
+(define-function g_get_user_state_dir
+  (c-name "g_get_user_state_dir")
   (return-type "const-gchar*")
 )
 

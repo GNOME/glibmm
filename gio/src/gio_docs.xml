@@ -181,7 +181,7 @@ or removed applications).
 
 <signal name="GAppLaunchContext::launch-failed">
 <description>
-The ::launch-failed signal is emitted when a #GAppInfo launch
+The #GAppLaunchContext::launch-failed signal is emitted when a #GAppInfo launch
 fails. The startup notification id is provided, so that the launcher
 can cancel the startup notification.
 
@@ -201,13 +201,54 @@ Since: 2.36
 <return></return>
 </signal>
 
+<signal name="GAppLaunchContext::launch-started">
+<description>
+The #GAppLaunchContext::launch-started signal is emitted when a #GAppInfo is
+about to be launched. If non-null the @platform_data is an
+GVariant dictionary mapping strings to variants (ie `a{sv}`), which
+contains additional, platform-specific data about this launch. On
+UNIX, at least the `startup-notification-id` keys will be
+present.
+
+The value of the `startup-notification-id` key (type `s`) is a startup
+notification ID corresponding to the format from the [startup-notification
+specification](https://specifications.freedesktop.org/startup-notification-spec/startup-notification-0.1.txt).
+It allows tracking the progress of the launchee through startup.
+
+It is guaranteed that this signal is followed by either a #GAppLaunchContext::launched or
+#GAppLaunchContext::launch-failed signal.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> the object emitting the signal
+</parameter_description>
+</parameter>
+<parameter name="info">
+<parameter_description> the #GAppInfo that is about to be launched
+</parameter_description>
+</parameter>
+<parameter name="platform_data">
+<parameter_description> additional platform-specific data for this launch
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <signal name="GAppLaunchContext::launched">
 <description>
-The ::launched signal is emitted when a #GAppInfo is successfully
+The #GAppLaunchContext::launched signal is emitted when a #GAppInfo is successfully
 launched. The @platform_data is an GVariant dictionary mapping
-strings to variants (ie a{sv}), which contains additional,
+strings to variants (ie `a{sv}`), which contains additional,
 platform-specific data about this launch. On UNIX, at least the
-&quot;pid&quot; and &quot;startup-notification-id&quot; keys will be present.
+`pid` and `startup-notification-id` keys will be present.
+
+Since 2.72 the `pid` may be 0 if the process id wasn't known (for
+example if the process was launched via D-Bus). The `pid` may not be
+set at all in subsequent releases.
 
 Since: 2.36
 
@@ -553,7 +594,7 @@ Since: 2.26
 </parameter>
 <parameter name="G_BUS_NAME_OWNER_FLAGS_REPLACE">
 <parameter_description> If another message bus connection owns the name and have
-specified #G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT, then take the name from the other connection.
+specified %G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT, then take the name from the other connection.
 </parameter_description>
 </parameter>
 <parameter name="G_BUS_NAME_OWNER_FLAGS_DO_NOT_QUEUE">
@@ -767,6 +808,10 @@ Since: 2.26
 </parameter>
 <parameter name="G_CREDENTIALS_TYPE_APPLE_XUCRED">
 <parameter_description> The native credentials type is a `struct xucred`. Added in 2.66.
+</parameter_description>
+</parameter>
+<parameter name="G_CREDENTIALS_TYPE_WIN32_PID">
+<parameter_description> The native credentials type is a PID `DWORD`. Added in 2.72.
 </parameter_description>
 </parameter>
 </parameters>
@@ -2019,6 +2064,10 @@ Since: 2.26
 <description>
 Emitted when a signal from the remote object and interface that @proxy is for, has been received.
 
+Since 2.72 this signal supports detailed connections. You can connect to
+the detailed signal `g-signal::x` in order to receive callbacks only when
+signal `x` is received from the remote object.
+
 Since: 2.26
 
 </description>
@@ -2194,6 +2243,12 @@ This flag is only meaningful in proxies for well-known names.
 do not ask the bus to launch an owner during proxy initialization, but allow it to be
 autostarted by a method call. This flag is only meaningful in proxies for well-known names,
 and only if %G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START is not also specified.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_PROXY_FLAGS_NO_MATCH_RULE">
+<parameter_description> Don't actually send the AddMatch D-Bus
+call for this signal subscription. This gives you more control
+over which match rules you add (but you must add them manually). (Since: 2.72)
 </parameter_description>
 </parameter>
 </parameters>
@@ -2476,6 +2531,67 @@ across various machine architectures.
 </parameters>
 </enum>
 
+<property name="GDebugController:debug-enabled">
+<description>
+%TRUE if debug output should be exposed (for example by forwarding it to
+the journal), %FALSE otherwise.
+
+Since: 2.72
+
+</description>
+</property>
+
+<signal name="GDebugControllerDBus::authorize">
+<description>
+Emitted when a D-Bus peer is trying to change the debug settings and used
+to determine if that is authorized.
+
+This signal is emitted in a dedicated worker thread, so handlers are
+allowed to perform blocking I/O. This means that, for example, it is
+appropriate to call `polkit_authority_check_authorization_sync()` to check
+authorization using polkit.
+
+If %FALSE is returned then no further handlers are run and the request to
+change the debug settings is rejected.
+
+Otherwise, if %TRUE is returned, signal emission continues. If no handlers
+return %FALSE, then the debug settings are allowed to be changed.
+
+Signal handlers must not modify @invocation, or cause it to return a value.
+
+The default class handler just returns %TRUE.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> The #GDebugControllerDBus emitting the signal.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call is authorized, %FALSE otherwise.
+
+</return>
+</signal>
+
+<property name="GDebugControllerDBus:connection">
+<description>
+The D-Bus connection to expose the debugging interface on.
+
+Typically this will be the same connection (to the system or session bus)
+which the rest of the application or service’s D-Bus objects are registered
+on.
+
+Since: 2.72
+
+</description>
+</property>
+
 <property name="GDesktopAppInfo:filename">
 <description>
 The origin filename of this #GDesktopAppInfo
@@ -2663,6 +2779,15 @@ certificate to be accepted despite @errors, return %TRUE from the
 signal handler. Otherwise, if no handler accepts the certificate,
 the handshake will fail with %G_TLS_ERROR_BAD_CERTIFICATE.
 
+GLib guarantees that if certificate verification fails, this signal
+will be emitted with at least one error will be set in @errors, but
+it does not guarantee that all possible errors will be set.
+Accordingly, you may not safely decide to ignore any particular
+type of error. For example, it would be incorrect to ignore
+%G_TLS_CERTIFICATE_EXPIRED if you want to allow expired
+certificates, because this could potentially be the only error flag
+set even if other problems exist with the certificate.
+
 For a server-side connection, @peer_cert is the certificate
 presented by the client, if this was requested via the server's
 #GDtlsServerConnection:authentication_mode. On the server side,
@@ -2756,6 +2881,19 @@ The certificate database to use when verifying this TLS connection.
 If no certificate database is set, then the default database will be
 used. See g_tls_backend_get_default_database().
 
+When using a non-default database, #GDtlsConnection must fall back to using
+the #GTlsDatabase to perform certificate verification using
+g_tls_database_verify_chain(), which means certificate verification will
+not be able to make use of TLS session context. This may be less secure.
+For example, if you create your own #GTlsDatabase that just wraps the
+default #GTlsDatabase, you might expect that you have not changed anything,
+but this is not true because you may have altered the behavior of
+#GDtlsConnection by causing it to use g_tls_database_verify_chain(). See the
+documentation of g_tls_database_verify_chain() for more details on specific
+security checks that may not be performed. Accordingly, setting a
+non-default database is discouraged except for specialty applications with
+unusual security requirements.
+
 Since: 2.48
 
 </description>
@@ -2804,6 +2942,14 @@ it may not be if #GDtlsClientConnection:validation-flags is not
 %G_TLS_CERTIFICATE_VALIDATE_ALL, or if
 #GDtlsConnection::accept-certificate overrode the default
 behavior.
+
+GLib guarantees that if certificate verification fails, at least
+one error will be set, but it does not guarantee that all possible
+errors will be set. Accordingly, you may not safely decide to
+ignore any particular type of error. For example, it would be
+incorrect to mask %G_TLS_CERTIFICATE_EXPIRED if you want to allow
+expired certificates, because this could potentially be the only
+error flag set even if other problems exist with the certificate.
 
 Since: 2.48
 
@@ -3105,7 +3251,7 @@ pair.  This is exactly how the events will be reported in the case
 that the %G_FILE_MONITOR_WATCH_MOVES flag is not in use.
 
 If using the deprecated flag %G_FILE_MONITOR_SEND_MOVED flag and @event_type is
-#G_FILE_MONITOR_EVENT_MOVED, @file will be set to a #GFile containing the
+%G_FILE_MONITOR_EVENT_MOVED, @file will be set to a #GFile containing the
 old path, and @other_file will be set to a #GFile containing the new path.
 
 In all the other cases, @other_file will be set to #NULL.
@@ -3309,7 +3455,7 @@ Emitted when the file name completion information comes available.
 <description>
 Indicates a hint from the file system whether files should be
 previewed in a file manager. Returned as the value of the key
-#G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW.
+%G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW.
 
 </description>
 <parameters>
@@ -3344,7 +3490,7 @@ if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_FAILED))
 }
 ]|
 but should instead treat all unrecognized error codes the same as
-#G_IO_ERROR_FAILED.
+%G_IO_ERROR_FAILED.
 
 See also #GPollableReturn for a cheaper way of returning
 %G_IO_ERROR_WOULD_BLOCK to callers without allocating a #GError.
@@ -3764,7 +3910,7 @@ This signal is emitted whenever items were added to or removed
 from @list. At @position, @removed items were removed and @added
 items were added in their place.
 
-Note: If @removed != @added, the positions of all later items
+Note: If `removed != added`, the positions of all later items
 in the model change.
 
 Since: 2.44
@@ -5105,7 +5251,7 @@ It is an error to use this flag if the property is not readable.
 </parameter_description>
 </parameter>
 <parameter name="G_SETTINGS_BIND_GET_NO_CHANGES">
-<parameter_description> When set in addition to #G_SETTINGS_BIND_GET, set the #GObject property
+<parameter_description> When set in addition to %G_SETTINGS_BIND_GET, set the #GObject property
 value initially from the setting, but do not listen for changes of the setting
 </parameter_description>
 </parameter>
@@ -5447,6 +5593,30 @@ Since: 2.32
 The proxy resolver to use
 
 Since: 2.36
+
+</description>
+</property>
+
+<property name="GSocketClient:tls-validation-flags">
+<description>
+The TLS validation flags used when creating TLS connections. The
+default value is %G_TLS_CERTIFICATE_VALIDATE_ALL.
+
+GLib guarantees that if certificate verification fails, at least one
+flag will be set, but it does not guarantee that all possible flags
+will be set. Accordingly, you may not safely decide to ignore any
+particular type of error. For example, it would be incorrect to mask
+%G_TLS_CERTIFICATE_EXPIRED if you want to allow expired certificates,
+because this could potentially be the only error flag set even if
+other problems exist with the certificate. Therefore, there is no
+safe way to use this property. This is not a horrible problem,
+though, because you should not be attempting to ignore validation
+errors anyway. If you really must ignore TLS certificate errors,
+connect to the #GSocketClient::event signal, wait for it to be
+emitted with %G_SOCKET_CLIENT_TLS_HANDSHAKING, and use that to
+connect to #GTlsConnection::accept-certificate.
+
+Deprecated: 2.72: Do not attempt to ignore validation errors.
 
 </description>
 </property>
@@ -5804,6 +5974,12 @@ been explicitly marked as close-on-exec.  This flag has no effect
 over the &quot;standard&quot; file descriptors (stdin, stdout, stderr).
 </parameter_description>
 </parameter>
+<parameter name="G_SUBPROCESS_FLAGS_SEARCH_PATH_FROM_ENVP">
+<parameter_description> if path searching is
+needed when spawning the subprocess, use the `PATH` in the launcher
+environment. (Since: 2.72)
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -6029,6 +6205,15 @@ Since: 2.70
 </description>
 </property>
 
+<property name="GTlsCertificate:password">
+<description>
+An optional password used when constructed with GTlsCertificate:pkcs12-data.
+
+Since: 2.72
+
+</description>
+</property>
+
 <property name="GTlsCertificate:pkcs11-uri">
 <description>
 A URI referencing the [PKCS \#11](https://docs.oasis-open.org/pkcs11/pkcs11-base/v3.0/os/pkcs11-base-v3.0-os.html)
@@ -6038,6 +6223,17 @@ If %NULL, the certificate is either not backed by PKCS \#11 or the
 #GTlsBackend does not support PKCS \#11.
 
 Since: 2.68
+
+</description>
+</property>
+
+<property name="GTlsCertificate:pkcs12-data">
+<description>
+The PKCS #12 formatted data used to construct the object.
+
+See also: g_tls_certificate_new_from_pkcs12()
+
+Since: 2.72
 
 </description>
 </property>
@@ -6116,10 +6312,16 @@ Since: 2.70
 <enum name="GTlsCertificateFlags">
 <description>
 A set of flags describing TLS certification validation. This can be
-used to set which validation steps to perform (eg, with
-g_tls_client_connection_set_validation_flags()), or to describe why
-a particular certificate was rejected (eg, in
-#GTlsConnection::accept-certificate).
+used to describe why a particular certificate was rejected (for
+example, in #GTlsConnection::accept-certificate).
+
+GLib guarantees that if certificate verification fails, at least one
+flag will be set, but it does not guarantee that all possible flags
+will be set. Accordingly, you may not safely decide to ignore any
+particular type of error. For example, it would be incorrect to mask
+%G_TLS_CERTIFICATE_EXPIRED if you want to allow expired certificates,
+because this could potentially be the only error flag set even if
+other problems exist with the certificate.
 
 Since: 2.28
 
@@ -6309,7 +6511,21 @@ a server. Server certificates that fail to validate in any of the
 ways indicated here will be rejected unless the application
 overrides the default via #GTlsConnection::accept-certificate.
 
+GLib guarantees that if certificate verification fails, at least one
+flag will be set, but it does not guarantee that all possible flags
+will be set. Accordingly, you may not safely decide to ignore any
+particular type of error. For example, it would be incorrect to mask
+%G_TLS_CERTIFICATE_EXPIRED if you want to allow expired certificates,
+because this could potentially be the only error flag set even if
+other problems exist with the certificate. Therefore, there is no
+safe way to use this property. This is not a horrible problem,
+though, because you should not be attempting to ignore validation
+errors anyway. If you really must ignore TLS certificate errors,
+connect to #GTlsConnection::accept-certificate.
+
 Since: 2.28
+
+Deprecated: 2.72: Do not attempt to ignore validation errors.
 
 </description>
 </property>
@@ -6327,6 +6543,15 @@ certificate was not acceptable according to @conn's
 certificate to be accepted despite @errors, return %TRUE from the
 signal handler. Otherwise, if no handler accepts the certificate,
 the handshake will fail with %G_TLS_ERROR_BAD_CERTIFICATE.
+
+GLib guarantees that if certificate verification fails, this signal
+will be emitted with at least one error will be set in @errors, but
+it does not guarantee that all possible errors will be set.
+Accordingly, you may not safely decide to ignore any particular
+type of error. For example, it would be incorrect to ignore
+%G_TLS_CERTIFICATE_EXPIRED if you want to allow expired
+certificates, because this could potentially be the only error flag
+set even if other problems exist with the certificate.
 
 For a server-side connection, @peer_cert is the certificate
 presented by the client, if this was requested via the server's
@@ -6424,6 +6649,19 @@ The certificate database to use when verifying this TLS connection.
 If no certificate database is set, then the default database will be
 used. See g_tls_backend_get_default_database().
 
+When using a non-default database, #GTlsConnection must fall back to using
+the #GTlsDatabase to perform certificate verification using
+g_tls_database_verify_chain(), which means certificate verification will
+not be able to make use of TLS session context. This may be less secure.
+For example, if you create your own #GTlsDatabase that just wraps the
+default #GTlsDatabase, you might expect that you have not changed anything,
+but this is not true because you may have altered the behavior of
+#GTlsConnection by causing it to use g_tls_database_verify_chain(). See the
+documentation of g_tls_database_verify_chain() for more details on specific
+security checks that may not be performed. Accordingly, setting a
+non-default database is discouraged except for specialty applications with
+unusual security requirements.
+
 Since: 2.30
 
 </description>
@@ -6472,6 +6710,14 @@ it may not be if #GTlsClientConnection:validation-flags is not
 %G_TLS_CERTIFICATE_VALIDATE_ALL, or if
 #GTlsConnection::accept-certificate overrode the default
 behavior.
+
+GLib guarantees that if certificate verification fails, at least
+one error will be set, but it does not guarantee that all possible
+errors will be set. Accordingly, you may not safely decide to
+ignore any particular type of error. For example, it would be
+incorrect to mask %G_TLS_CERTIFICATE_EXPIRED if you want to allow
+expired certificates, because this could potentially be the only
+error flag set even if other problems exist with the certificate.
 
 Since: 2.28
 
@@ -6605,6 +6851,11 @@ g_tls_connection_set_require_close_notify().
 <parameter_description> The TLS handshake failed
 because the client sent the fallback SCSV, indicating a protocol
 downgrade attack. Since: 2.60
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_ERROR_BAD_CERTIFICATE_PASSWORD">
+<parameter_description> The certificate failed
+to load because a password was incorrect. Since: 2.72
 </parameter_description>
 </parameter>
 </parameters>
@@ -11636,7 +11887,9 @@ The returned object is a singleton, that is, shared with other
 callers of g_bus_get() and g_bus_get_sync() for @bus_type. In the
 event that you need a private message bus connection, use
 g_dbus_address_get_for_bus_sync() and
-g_dbus_connection_new_for_address().
+g_dbus_connection_new_for_address() with
+G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT and
+G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION flags.
 
 Note that the returned #GDBusConnection object will (usually) have
 the #GDBusConnection:exit-on-close property set to %TRUE.
@@ -11675,7 +11928,9 @@ The returned object is a singleton, that is, shared with other
 callers of g_bus_get() and g_bus_get_sync() for @bus_type. In the
 event that you need a private message bus connection, use
 g_dbus_address_get_for_bus_sync() and
-g_dbus_connection_new_for_address().
+g_dbus_connection_new_for_address() with
+G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT and
+G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION flags.
 
 Note that the returned #GDBusConnection object will (usually) have
 the #GDBusConnection:exit-on-close property set to %TRUE.
@@ -12819,7 +13074,7 @@ on the other argument.
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a string, or %NULL
+<parameter_description> a path, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="data">
@@ -13254,8 +13509,7 @@ method is only available on UNIX platforms.
 
 This operation can fail if #GCredentials is not supported on the
 OS or if the native credentials type does not contain information
-about the UNIX process ID (for example this is the case for
-%G_CREDENTIALS_TYPE_APPLE_XUCRED).
+about the UNIX process ID.
 
 Since: 2.36
 
@@ -16477,7 +16731,7 @@ It is considered a programming error if the
 #GVariant of incorrect type.
 
 If an existing callback is already registered at @object_path and
-@interface_name, then @error is set to #G_IO_ERROR_EXISTS.
+@interface_name, then @error is set to %G_IO_ERROR_EXISTS.
 
 GDBus automatically implements the standard D-Bus interfaces
 org.freedesktop.DBus.Properties, org.freedesktop.DBus.Introspectable
@@ -16585,7 +16839,7 @@ by @object_path.
 
 When handling remote calls into any node in the subtree, first the
 @enumerate function is used to check if the node exists. If the node exists
-or the #G_DBUS_SUBTREE_FLAGS_DISPATCH_TO_UNENUMERATED_NODES flag is set
+or the %G_DBUS_SUBTREE_FLAGS_DISPATCH_TO_UNENUMERATED_NODES flag is set
 the @introspection function is used to check if the node supports the
 requested method. If so, the @dispatch function is used to determine
 where to dispatch the call. The collected #GDBusInterfaceVTable and
@@ -16597,7 +16851,7 @@ All calls into user-provided code will be invoked in the
 of the thread you are calling this method from.
 
 If an existing subtree is already registered at @object_path or
-then @error is set to #G_IO_ERROR_EXISTS.
+then @error is set to %G_IO_ERROR_EXISTS.
 
 Note that it is valid to register regular objects (using
 g_dbus_connection_register_object()) in a subtree registered with
@@ -17296,7 +17550,7 @@ create the #GError. Also, @dbus_error_name is added to the error message
 such that it can be recovered with g_dbus_error_get_remote_error().
 
 Otherwise, a #GError with the error code %G_IO_ERROR_DBUS_ERROR
-in the #G_IO_ERROR error domain is returned. Also, @dbus_error_name is
+in the %G_IO_ERROR error domain is returned. Also, @dbus_error_name is
 added to the error message such that it can be recovered with
 g_dbus_error_get_remote_error().
 
@@ -17586,23 +17840,23 @@ parameter.
 
 The conversion is using the following rules:
 
-- #G_TYPE_STRING: 's', 'o', 'g' or 'ay'
-- #G_TYPE_STRV: 'as', 'ao' or 'aay'
-- #G_TYPE_BOOLEAN: 'b'
-- #G_TYPE_UCHAR: 'y'
-- #G_TYPE_INT: 'i', 'n'
-- #G_TYPE_UINT: 'u', 'q'
-- #G_TYPE_INT64 'x'
-- #G_TYPE_UINT64: 't'
-- #G_TYPE_DOUBLE: 'd'
-- #G_TYPE_VARIANT: Any #GVariantType
+- `G_TYPE_STRING`: 's', 'o', 'g' or 'ay'
+- `G_TYPE_STRV`: 'as', 'ao' or 'aay'
+- `G_TYPE_BOOLEAN`: 'b'
+- `G_TYPE_UCHAR`: 'y'
+- `G_TYPE_INT`: 'i', 'n'
+- `G_TYPE_UINT`: 'u', 'q'
+- `G_TYPE_INT64`: 'x'
+- `G_TYPE_UINT64`: 't'
+- `G_TYPE_DOUBLE`: 'd'
+- `G_TYPE_VARIANT`: Any #GVariantType
 
-This can fail if e.g. @gvalue is of type #G_TYPE_STRING and @type
-is ['i'][G-VARIANT-TYPE-INT32:CAPS]. It will also fail for any #GType
-(including e.g. #G_TYPE_OBJECT and #G_TYPE_BOXED derived-types) not
+This can fail if e.g. @gvalue is of type %G_TYPE_STRING and @type
+is 'i', i.e. %G_VARIANT_TYPE_INT32. It will also fail for any #GType
+(including e.g. %G_TYPE_OBJECT and %G_TYPE_BOXED derived-types) not
 in the table above.
 
-Note that if @gvalue is of type #G_TYPE_VARIANT and its value is
+Note that if @gvalue is of type %G_TYPE_VARIANT and its value is
 %NULL, the empty #GVariant instance (never %NULL) for @type is
 returned (e.g. 0 for scalar types, the empty string for string types,
 '/' for object path types, the empty array for any array type and so on).
@@ -20608,7 +20862,7 @@ with g_object_unref().
 
 <function name="g_dbus_object_manager_get_object">
 <description>
-Gets the #GDBusObjectProxy at @object_path, if any.
+Gets the #GDBusObject at @object_path, if any.
 
 Since: 2.30
 
@@ -22196,6 +22450,106 @@ from g_dbus_escape_object_path(). Free with g_free().
 </return>
 </function>
 
+<function name="g_debug_controller_dbus_new">
+<description>
+Create a new #GDebugControllerDBus and synchronously initialize it.
+
+Initializing the object will export the debug object on @connection. The
+object will remain registered until the last reference to the
+#GDebugControllerDBus is dropped.
+
+Initialization may fail if registering the object on @connection fails.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="connection">
+<parameter_description> a #GDBusConnection to register the debug object on
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GDebugControllerDBus, or %NULL
+on failure
+</return>
+</function>
+
+<function name="g_debug_controller_dbus_stop">
+<description>
+Stop the debug controller, unregistering its object from the bus.
+
+Any pending method calls to the object will complete successfully, but new
+ones will return an error. This method will block until all pending
+#GDebugControllerDBus::authorize signals have been handled. This is expected
+to not take long, as it will just be waiting for threads to join. If any
+#GDebugControllerDBus::authorize signal handlers are still executing in other
+threads, this will block until after they have returned.
+
+This method will be called automatically when the final reference to the
+#GDebugControllerDBus is dropped. You may want to call it explicitly to know
+when the controller has been fully removed from the bus, or to break
+reference count cycles.
+
+Calling this method from within a #GDebugControllerDBus::authorize signal
+handler will cause a deadlock and must not be done.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GDebugControllerDBus
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_debug_controller_get_debug_enabled">
+<description>
+Get the value of #GDebugController:debug-enabled.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GDebugController
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if debug output should be exposed, %FALSE otherwise
+</return>
+</function>
+
+<function name="g_debug_controller_set_debug_enabled">
+<description>
+Set the value of #GDebugController:debug-enabled.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GDebugController
+</parameter_description>
+</parameter>
+<parameter name="debug_enabled">
+<parameter_description> %TRUE if debug output should be exposed, %FALSE otherwise
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_desktop_app_info_get_action_name">
 <description>
 Gets the user-visible display name of the &quot;additional application
@@ -22388,7 +22742,7 @@ is not found
 <description>
 Gets the value of the NoDisplay key, which helps determine if the
 application info should be shown in menus. See
-#G_KEY_FILE_DESKTOP_KEY_NO_DISPLAY and g_app_info_should_show().
+%G_KEY_FILE_DESKTOP_KEY_NO_DISPLAY and g_app_info_should_show().
 
 Since: 2.30
 
@@ -23135,7 +23489,7 @@ Free the returned object with g_object_unref().
 <description>
 Gets the identifier of the given kind for @drive. The only
 identifier currently available is
-#G_DRIVE_IDENTIFIER_KIND_UNIX_DEVICE.
+%G_DRIVE_IDENTIFIER_KIND_UNIX_DEVICE.
 
 
 </description>
@@ -24237,6 +24591,9 @@ peer certificate validation will always set the
 client-side connections, unless that bit is not set in
 #GDtlsClientConnection:validation-flags).
 
+There are nonintuitive security implications when using a non-default
+database. See #GDtlsConnection:database for details.
+
 Since: 2.48
 
 </description>
@@ -24672,7 +25029,7 @@ Gets an output stream for appending data to the file.
 If the file doesn't already exist it is created.
 
 By default files created are generally readable by everyone,
-but if you pass #G_FILE_CREATE_PRIVATE in @flags the file
+but if you pass %G_FILE_CREATE_PRIVATE in @flags the file
 will be made readable only to the current user, to the level that
 is supported on the target filesystem.
 
@@ -25170,14 +25527,14 @@ or %NULL if an error occurs.
 Copies the file @source to the location specified by @destination.
 Can not handle recursive copies of directories.
 
-If the flag #G_FILE_COPY_OVERWRITE is specified an already
+If the flag %G_FILE_COPY_OVERWRITE is specified an already
 existing @destination file is overwritten.
 
-If the flag #G_FILE_COPY_NOFOLLOW_SYMLINKS is specified then symlinks
+If the flag %G_FILE_COPY_NOFOLLOW_SYMLINKS is specified then symlinks
 will be copied as symlinks, otherwise the target of the
 @source symlink will be copied.
 
-If the flag #G_FILE_COPY_ALL_METADATA is specified then all the metadata
+If the flag %G_FILE_COPY_ALL_METADATA is specified then all the metadata
 that is possible to copy is copied, not just the default subset (which,
 for instance, does not include the owner, see #GFileInfo).
 
@@ -25194,7 +25551,7 @@ the total number of bytes copied during the operation.
 If the @source file does not exist, then the %G_IO_ERROR_NOT_FOUND error
 is returned, independent on the status of the @destination.
 
-If #G_FILE_COPY_OVERWRITE is not specified and the target exists, then
+If %G_FILE_COPY_OVERWRITE is not specified and the target exists, then
 the error %G_IO_ERROR_EXISTS is returned.
 
 If trying to overwrite a file over a directory, the %G_IO_ERROR_IS_DIRECTORY
@@ -25202,7 +25559,7 @@ error is returned. If trying to overwrite a directory with a directory the
 %G_IO_ERROR_WOULD_MERGE error is returned.
 
 If the source is a directory and the target does not exist, or
-#G_FILE_COPY_OVERWRITE is specified and the target is a file, then the
+%G_FILE_COPY_OVERWRITE is specified and the target is a file, then the
 %G_IO_ERROR_WOULD_RECURSE error is returned.
 
 If you are interested in copying the #GFile object itself (not the on-disk
@@ -25310,7 +25667,7 @@ Copies the file attributes from @source to @destination.
 Normally only a subset of the file attributes are copied,
 those that are copies in a normal file copy operation
 (which for instance does not include e.g. owner). However
-if #G_FILE_COPY_ALL_METADATA is specified in @flags, then
+if %G_FILE_COPY_ALL_METADATA is specified in @flags, then
 all the metadata that is possible to copy is copied. This
 is useful when implementing move by copy + delete source.
 
@@ -25374,7 +25731,7 @@ Creates a new file and returns an output stream for writing to it.
 The file must not already exist.
 
 By default files created are generally readable by everyone,
-but if you pass #G_FILE_CREATE_PRIVATE in @flags the file
+but if you pass %G_FILE_CREATE_PRIVATE in @flags the file
 will be made readable only to the current user, to the level
 that is supported on the target filesystem.
 
@@ -25493,7 +25850,7 @@ Creates a new file and returns a stream for reading and
 writing to it. The file must not already exist.
 
 By default files created are generally readable by everyone,
-but if you pass #G_FILE_CREATE_PRIVATE in @flags the file
+but if you pass %G_FILE_CREATE_PRIVATE in @flags the file
 will be made readable only to the current user, to the level
 that is supported on the target filesystem.
 
@@ -25928,7 +26285,9 @@ The wildcard &quot;*&quot; means all attributes, and a wildcard like
 &quot;standard::*&quot; means all attributes in the standard namespace.
 An example attribute query be &quot;standard::*,owner::user&quot;.
 The standard attributes are available as defines, like
-#G_FILE_ATTRIBUTE_STANDARD_NAME.
+%G_FILE_ATTRIBUTE_STANDARD_NAME. %G_FILE_ATTRIBUTE_STANDARD_NAME should
+always be specified if you plan to call g_file_enumerator_get_child() or
+g_file_enumerator_iterate() on the returned enumerator.
 
 If @cancellable is not %NULL, then the operation can be cancelled
 by triggering the cancellable object from another thread. If the
@@ -26148,6 +26507,9 @@ ignore.
 Return a new #GFile which refers to the file named by @info in the source
 directory of @enumerator.  This function is primarily intended to be used
 inside loops with g_file_enumerator_next_file().
+
+To use this, %G_FILE_ATTRIBUTE_STANDARD_NAME must have been listed in the
+attributes list used when creating the #GFileEnumerator.
 
 This is a convenience method that's equivalent to:
 |[&lt;!-- language=&quot;C&quot; --&gt;
@@ -29630,7 +29992,7 @@ used, otherwise a copy + delete fallback is used. The native
 implementation may support moving directories (for instance on moves
 inside the same filesystem), but the fallback code does not.
 
-If the flag #G_FILE_COPY_OVERWRITE is specified an already
+If the flag %G_FILE_COPY_OVERWRITE is specified an already
 existing @destination file is overwritten.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
@@ -29646,7 +30008,7 @@ transferred with the total number of bytes copied during the operation.
 If the @source file does not exist, then the %G_IO_ERROR_NOT_FOUND
 error is returned, independent on the status of the @destination.
 
-If #G_FILE_COPY_OVERWRITE is not specified and the target exists,
+If %G_FILE_COPY_OVERWRITE is not specified and the target exists,
 then the error %G_IO_ERROR_EXISTS is returned.
 
 If trying to overwrite a file over a directory, the %G_IO_ERROR_IS_DIRECTORY
@@ -29654,7 +30016,7 @@ error is returned. If trying to overwrite a directory with a directory the
 %G_IO_ERROR_WOULD_MERGE error is returned.
 
 If the source is a directory and the target does not exist, or
-#G_FILE_COPY_OVERWRITE is specified and the target is a file, then
+%G_FILE_COPY_OVERWRITE is specified and the target is a file, then
 the %G_IO_ERROR_WOULD_RECURSE error may be returned (if the native
 move operation isn't available).
 
@@ -29694,6 +30056,93 @@ the callback function
 </parameter>
 </parameters>
 <return> %TRUE on successful move, %FALSE otherwise.
+</return>
+</function>
+
+<function name="g_file_move_async">
+<description>
+Asynchronously moves a file @source to the location of @destination. For details of the behaviour, see g_file_move().
+
+If @progress_callback is not %NULL, then that function that will be called
+just like in g_file_move(). The callback will run in the default main context
+of the thread calling g_file_move_async() — the same context as @callback is
+run in.
+
+When the operation is finished, @callback will be called. You can then call
+g_file_move_finish() to get the result of the operation.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> #GFile pointing to the source location
+</parameter_description>
+</parameter>
+<parameter name="destination">
+<parameter_description> #GFile pointing to the destination location
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> set of #GFileCopyFlags
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the [I/O priority][io-priority] of the request
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="progress_callback">
+<parameter_description> #GFileProgressCallback
+function for updates
+</parameter_description>
+</parameter>
+<parameter name="progress_callback_data">
+<parameter_description> gpointer to user data for
+the callback function
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_file_move_finish">
+<description>
+Finishes an asynchronous file movement, started with
+g_file_move_async().
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> input source #GFile
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on successful file move, %FALSE otherwise.
+
 </return>
 </function>
 
@@ -30145,7 +30594,7 @@ or %NULL if no such path exists. The returned string is owned by @file.
 
 <function name="g_file_poll_mountable">
 <description>
-Polls a file of type #G_FILE_TYPE_MOUNTABLE.
+Polls a file of type %G_FILE_TYPE_MOUNTABLE.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
@@ -30370,7 +30819,7 @@ Since: 2.18
 </parameter_description>
 </parameter>
 </parameters>
-<return> The #GFileType of the file and #G_FILE_TYPE_UNKNOWN
+<return> The #GFileType of the file and %G_FILE_TYPE_UNKNOWN
 if the file does not exist
 
 </return>
@@ -30391,9 +30840,9 @@ attributes or attribute wildcards. The wildcard &quot;*&quot; means all
 attributes, and a wildcard like &quot;filesystem::*&quot; means all attributes
 in the filesystem namespace. The standard namespace for filesystem
 attributes is &quot;filesystem&quot;. Common attributes of interest are
-#G_FILE_ATTRIBUTE_FILESYSTEM_SIZE (the total size of the filesystem
-in bytes), #G_FILE_ATTRIBUTE_FILESYSTEM_FREE (number of bytes available),
-and #G_FILE_ATTRIBUTE_FILESYSTEM_TYPE (type of the filesystem).
+%G_FILE_ATTRIBUTE_FILESYSTEM_SIZE (the total size of the filesystem
+in bytes), %G_FILE_ATTRIBUTE_FILESYSTEM_FREE (number of bytes available),
+and %G_FILE_ATTRIBUTE_FILESYSTEM_TYPE (type of the filesystem).
 
 If @cancellable is not %NULL, then the operation can be cancelled
 by triggering the cancellable object from another thread. If the
@@ -30518,7 +30967,7 @@ The wildcard &quot;*&quot; means all attributes, and a wildcard like
 &quot;standard::*&quot; means all attributes in the standard namespace.
 An example attribute query be &quot;standard::*,owner::user&quot;.
 The standard attributes are available as defines, like
-#G_FILE_ATTRIBUTE_STANDARD_NAME.
+%G_FILE_ATTRIBUTE_STANDARD_NAME.
 
 If @cancellable is not %NULL, then the operation can be cancelled
 by triggering the cancellable object from another thread. If the
@@ -30527,7 +30976,7 @@ returned.
 
 For symlinks, normally the information about the target of the
 symlink is returned, rather than information about the symlink
-itself. However if you pass #G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS
+itself. However if you pass %G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS
 in @flags the information about the symlink itself will be returned.
 Also, for symlinks that point to non-existing files the information
 about the symlink itself will be returned.
@@ -30815,7 +31264,7 @@ may write to a temporary file and then atomically rename over
 the destination when the stream is closed.
 
 By default files created are generally readable by everyone,
-but if you pass #G_FILE_CREATE_PRIVATE in @flags the file
+but if you pass %G_FILE_CREATE_PRIVATE in @flags the file
 will be made readable only to the current user, to the level that
 is supported on the target filesystem.
 
@@ -31314,6 +31763,9 @@ Resolves a relative path for @file to an absolute path.
 
 This call does no blocking I/O.
 
+If the @relative_path is an absolute path name, the resolution
+is done absolutely (without taking @file path as base).
+
 
 </description>
 <parameters>
@@ -31326,9 +31778,7 @@ This call does no blocking I/O.
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GFile to the resolved path.
-%NULL if @relative_path is %NULL or if @file is invalid.
-Free the returned object with g_object_unref().
+<return> a #GFile for the resolved path.
 </return>
 </function>
 
@@ -31764,7 +32214,7 @@ The display name is converted from UTF-8 to the correct encoding
 for the target filesystem if possible and the @file is renamed to this.
 
 If you want to implement a rename operation in the user interface the
-edit name (#G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME) should be used as the
+edit name (%G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME) should be used as the
 initial value in the rename widget, and then the result after editing
 should be passed to g_file_set_display_name().
 
@@ -31872,7 +32322,7 @@ Free the returned object with g_object_unref().
 
 <function name="g_file_start_mountable">
 <description>
-Starts a file of type #G_FILE_TYPE_MOUNTABLE.
+Starts a file of type %G_FILE_TYPE_MOUNTABLE.
 Using @start_operation, you can request callbacks when, for instance,
 passwords are needed during authentication.
 
@@ -31948,7 +32398,7 @@ otherwise.
 
 <function name="g_file_stop_mountable">
 <description>
-Stops a file of type #G_FILE_TYPE_MOUNTABLE.
+Stops a file of type %G_FILE_TYPE_MOUNTABLE.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
@@ -32216,7 +32666,7 @@ instead.
 
 <function name="g_file_unmount_mountable_with_operation">
 <description>
-Unmounts a file of type #G_FILE_TYPE_MOUNTABLE.
+Unmounts a file of type %G_FILE_TYPE_MOUNTABLE.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
@@ -34337,7 +34787,7 @@ Gets the required type for @extension_point.
 </parameter>
 </parameters>
 <return> the #GType that all implementations must have, 
-or #G_TYPE_INVALID if the extension point has no required type
+or %G_TYPE_INVALID if the extension point has no required type
 </return>
 </function>
 
@@ -35247,11 +35697,15 @@ the same location.
 
 <function name="g_list_model_get_item">
 <description>
-Get the item at @position. If @position is greater than the number of
-items in @list, %NULL is returned.
+Get the item at @position.
+
+If @position is greater than the number of items in @list, %NULL is
+returned.
 
 %NULL is never returned for an index that is smaller than the length
-of the list.  See g_list_model_get_n_items().
+of the list.
+
+See also: g_list_model_get_n_items()
 
 Since: 2.44
 
@@ -35273,9 +35727,11 @@ Since: 2.44
 
 <function name="g_list_model_get_item_type">
 <description>
-Gets the type of the items in @list. All items returned from
-g_list_model_get_type() are of that type or a subtype, or are an
-implementation of that interface.
+Gets the type of the items in @list.
+
+All items returned from g_list_model_get_item() are of the type
+returned by this function, or a subtype, or if the type is an
+interface, they are an implementation of that interface.
 
 The item type of a #GListModel can not change during the life of the
 model.
@@ -35318,11 +35774,18 @@ Since: 2.44
 
 <function name="g_list_model_get_object">
 <description>
-Get the item at @position. If @position is greater than the number of
-items in @list, %NULL is returned.
+Get the item at @position.
+
+If @position is greater than the number of items in @list, %NULL is
+returned.
 
 %NULL is never returned for an index that is smaller than the length
-of the list.  See g_list_model_get_n_items().
+of the list.
+
+This function is meant to be used by language bindings in place
+of g_list_model_get_item().
+
+See also: g_list_model_get_n_items()
 
 Since: 2.44
 
@@ -42628,7 +43091,7 @@ for more details.
 <description>
 This differs from g_resolver_lookup_by_name() in that you can modify
 the lookup behavior with @flags. For example this can be used to limit
-results with #G_RESOLVER_NAME_LOOKUP_FLAGS_IPV4_ONLY.
+results with %G_RESOLVER_NAME_LOOKUP_FLAGS_IPV4_ONLY.
 
 Since: 2.60
 
@@ -44167,7 +44630,10 @@ Creates a child settings object which has a base path of
 @settings.
 
 The schema for the child settings object must have been declared
-in the schema of @settings using a &lt;child&gt; element.
+in the schema of @settings using a `&lt;child&gt;` element.
+
+The created child settings object will inherit the #GSettings:delay-apply
+mode from @settings.
 
 Since: 2.26
 
@@ -44690,8 +45156,8 @@ with it.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a list of the children on
-@settings, in no defined order
+<return> a list of the children
+on @settings, in no defined order
 </return>
 </function>
 
@@ -44715,8 +45181,8 @@ Deprecated: 2.46: Use g_settings_schema_list_keys() instead.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a list of the keys on
-@settings, in no defined order
+<return> a list
+of the keys on @settings, in no defined order
 </return>
 </function>
 
@@ -44731,9 +45197,9 @@ Deprecated: 2.40: Use g_settings_schema_source_list_schemas() instead
 </description>
 <parameters>
 </parameters>
-<return> a list of relocatable
-#GSettings schemas that are available, in no defined order.  The list must
-not be modified or freed.
+<return> a list of
+relocatable #GSettings schemas that are available, in no defined order.
+The list must not be modified or freed.
 
 </return>
 </function>
@@ -44752,9 +45218,9 @@ of your whole loop.
 </description>
 <parameters>
 </parameters>
-<return>  a list of #GSettings
-schemas that are available, in no defined order.  The list must not be
-modified or freed.
+<return> a list of
+#GSettings schemas that are available, in no defined order.  The list
+must not be modified or freed.
 
 </return>
 </function>
@@ -45336,8 +45802,8 @@ Since: 2.44
 </parameter_description>
 </parameter>
 </parameters>
-<return> a list of the children on
-@settings, in no defined order
+<return> a list of
+the children on @settings, in no defined order
 
 </return>
 </function>
@@ -45359,8 +45825,8 @@ Since: 2.46
 </parameter_description>
 </parameter>
 </parameters>
-<return> a list of the keys on
-@schema, in no defined order
+<return> a list
+of the keys on @schema, in no defined order
 
 </return>
 </function>
@@ -46315,7 +46781,7 @@ Deprecated: 2.46: Use g_task_report_error().
 </parameter_description>
 </parameter>
 <parameter name="domain">
-<parameter_description> a #GQuark containing the error domain (usually #G_IO_ERROR).
+<parameter_description> a #GQuark containing the error domain (usually %G_IO_ERROR).
 </parameter_description>
 </parameter>
 <parameter name="code">
@@ -46805,7 +47271,7 @@ Deprecated: 2.46: Use #GTask and g_task_return_new_error() instead.
 </parameter_description>
 </parameter>
 <parameter name="domain">
-<parameter_description> a #GQuark (usually #G_IO_ERROR).
+<parameter_description> a #GQuark (usually %G_IO_ERROR).
 </parameter_description>
 </parameter>
 <parameter name="code">
@@ -46838,7 +47304,7 @@ Deprecated: 2.46: Use #GTask and g_task_return_error() instead.
 </parameter_description>
 </parameter>
 <parameter name="domain">
-<parameter_description> a #GQuark (usually #G_IO_ERROR).
+<parameter_description> a #GQuark (usually %G_IO_ERROR).
 </parameter_description>
 </parameter>
 <parameter name="code">
@@ -48127,7 +48593,13 @@ Since: 2.28
 Gets the TLS validation flags used creating TLS connections via
 @client.
 
+This function does not work as originally designed and is impossible
+to use correctly. See #GSocketClient:tls-validation-flags for more
+information.
+
 Since: 2.28
+
+Deprecated: 2.72: Do not attempt to ignore validation errors.
 
 </description>
 <parameters>
@@ -48378,7 +48850,13 @@ Since: 2.28
 Sets the TLS validation flags used when creating TLS connections
 via @client. The default value is %G_TLS_CERTIFICATE_VALIDATE_ALL.
 
+This function does not work as originally designed and is impossible
+to use correctly. See #GSocketClient:tls-validation-flags for more
+information.
+
 Since: 2.28
+
+Deprecated: 2.72: Do not attempt to ignore validation errors.
 
 </description>
 <parameters>
@@ -53668,7 +54146,7 @@ function
 <description>
 Sets @task's result to @result (by copying it) and completes the task.
 
-If @result is %NULL then a #GValue of type #G_TYPE_POINTER
+If @result is %NULL then a #GValue of type %G_TYPE_POINTER
 with a value of %NULL will be used for the result.
 
 This is a very generic low-level method intended primarily for use
@@ -53802,7 +54280,8 @@ For example, ‘Open file’ or ‘Connect to network host’. It is used to set
 name of the #GSource used for idle completion of the task.
 
 This function may only be called before the @task is first used in a thread
-other than the one it was constructed in.
+other than the one it was constructed in. It is called automatically by
+g_task_set_source_tag() if not called already.
 
 Since: 2.60
 
@@ -53900,12 +54379,18 @@ cancelled.
 
 <function name="g_task_set_source_tag">
 <description>
-Sets @task's source tag. You can use this to tag a task return
+Sets @task's source tag.
+
+You can use this to tag a task return
 value with a particular pointer (usually a pointer to the function
 doing the tagging) and then later check it using
 g_task_get_source_tag() (or g_async_result_is_tagged()) in the
 task's &quot;finish&quot; function, to figure out if the response came from a
 particular place.
+
+A macro wrapper around this function will automatically set the
+task’s name to the string form of @source_tag if it’s not already
+set, for convenience.
 
 Since: 2.36
 
@@ -54753,30 +55238,59 @@ and its contents when you are done with it.
 
 <function name="g_tls_certificate_new_from_file">
 <description>
-Creates a #GTlsCertificate from the PEM-encoded data in @file. The
-returned certificate will be the first certificate found in @file. As
-of GLib 2.44, if @file contains more certificates it will try to load
-a certificate chain. All certificates will be verified in the order
-found (top-level certificate should be the last one in the file) and
-the #GTlsCertificate:issuer property of each certificate will be set
-accordingly if the verification succeeds. If any certificate in the
-chain cannot be verified, the first certificate in the file will
-still be returned.
+Creates a #GTlsCertificate from the data in @file.
+
+As of 2.72, if the filename ends in `.p12` or `.pfx` the data is loaded by
+g_tls_certificate_new_from_pkcs12() otherwise it is loaded by
+g_tls_certificate_new_from_pem(). See those functions for
+exact details.
 
 If @file cannot be read or parsed, the function will return %NULL and
-set @error. Otherwise, this behaves like
-g_tls_certificate_new_from_pem().
+set @error.
 
 Since: 2.28
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> file containing a PEM-encoded certificate to import
+<parameter_description> file containing a certificate to import
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> #GError for error reporting, or %NULL to ignore.
+<parameter_description> #GError for error reporting, or %NULL to ignore
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new certificate, or %NULL on error
+
+</return>
+</function>
+
+<function name="g_tls_certificate_new_from_file_with_password">
+<description>
+Creates a #GTlsCertificate from the data in @file.
+
+If @file cannot be read or parsed, the function will return %NULL and
+set @error.
+
+Any unknown file types will error with %G_IO_ERROR_NOT_SUPPORTED.
+Currently only `.p12` and `.pfx` files are supported.
+See g_tls_certificate_new_from_pkcs12() for more details.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> file containing a certificate to import
+</parameter_description>
+</parameter>
+<parameter name="password">
+<parameter_description> password for PKCS #12 files
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore
 </parameter_description>
 </parameter>
 </parameters>
@@ -54914,6 +55428,52 @@ Since: 2.68
 </return>
 </function>
 
+<function name="g_tls_certificate_new_from_pkcs12">
+<description>
+Creates a #GTlsCertificate from the data in @data. It must contain
+a certificate and matching private key.
+
+If extra certificates are included they will be verified as a chain
+and the #GTlsCertificate:issuer property will be set.
+All other data will be ignored.
+
+You can pass as single password for all of the data which will be
+used both for the PKCS #12 container as well as encrypted
+private keys. If decryption fails it will error with
+%G_TLS_ERROR_BAD_CERTIFICATE_PASSWORD.
+
+This constructor requires support in the current #GTlsBackend.
+If support is missing it will error with
+%G_IO_ERROR_NOT_SUPPORTED.
+
+Other parsing failures will error with %G_TLS_ERROR_BAD_CERTIFICATE.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="data">
+<parameter_description> DER-encoded PKCS #12 format certificate data
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> the length of @data
+</parameter_description>
+</parameter>
+<parameter name="password">
+<parameter_description> optional password for encrypted certificate data
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new certificate, or %NULL if @data is invalid
+
+</return>
+</function>
+
 <function name="g_tls_certificate_verify">
 <description>
 This verifies @cert and returns a set of #GTlsCertificateFlags
@@ -54933,13 +55493,18 @@ in its chain) must be signed by it, or else
 @trusted_ca is %NULL, that bit will never be set in the return
 value.
 
-(All other #GTlsCertificateFlags values will always be set or unset
-as appropriate.)
+GLib guarantees that if certificate verification fails, at least one
+error will be set in the return value, but it does not guarantee
+that all possible errors will be set. Accordingly, you may not safely
+decide to ignore any particular type of error. For example, it would
+be incorrect to mask %G_TLS_CERTIFICATE_EXPIRED if you want to allow
+expired certificates, because this could potentially be the only
+error flag set even if other problems exist with the certificate.
 
 Because TLS session context is not used, #GTlsCertificate may not
 perform as many checks on the certificates as #GTlsConnection would.
-For example, certificate constraints cannot be honored, and some
-revocation checks cannot be performed. The best way to verify TLS
+For example, certificate constraints may not be honored, and
+revocation checks may not be performed. The best way to verify TLS
 certificates used by a TLS connection is to let #GTlsConnection
 handle the verification.
 
@@ -55097,7 +55662,13 @@ Deprecated: 2.56: SSL 3.0 is insecure.
 <description>
 Gets @conn's validation flags
 
+This function does not work as originally designed and is impossible
+to use correctly. See #GTlsClientConnection:validation-flags for more
+information.
+
 Since: 2.28
+
+Deprecated: 2.72: Do not attempt to ignore validation errors.
 
 </description>
 <parameters>
@@ -55204,7 +55775,13 @@ Sets @conn's validation flags, to override the default set of
 checks performed when validating a server certificate. By default,
 %G_TLS_CERTIFICATE_VALIDATE_ALL is used.
 
+This function does not work as originally designed and is impossible
+to use correctly. See #GTlsClientConnection:validation-flags for more
+information.
+
 Since: 2.28
+
+Deprecated: 2.72: Do not attempt to ignore validation errors.
 
 </description>
 <parameters>
@@ -55423,6 +56000,8 @@ Since: 2.28
 Gets the errors associated with validating @conn's peer's
 certificate, after the handshake has completed or failed. (It is
 not set during the emission of #GTlsConnection::accept-certificate.)
+
+See #GTlsConnection:peer-certificate-errors for more information.
 
 Since: 2.28
 
@@ -55716,6 +56295,9 @@ peer certificate validation will always set the
 #GTlsConnection::accept-certificate will always be emitted on
 client-side connections, unless that bit is not set in
 #GTlsClientConnection:validation-flags).
+
+There are nonintuitive security implications when using a non-default
+database. See #GTlsConnection:database for details.
 
 Since: 2.30
 
@@ -56260,7 +56842,7 @@ of a TLS session.
 certificate in the chain by its #GTlsCertificate:issuer property.
 
 @purpose describes the purpose (or usage) for which the certificate
-is being used. Typically @purpose will be set to #G_TLS_DATABASE_PURPOSE_AUTHENTICATE_SERVER
+is being used. Typically @purpose will be set to %G_TLS_DATABASE_PURPOSE_AUTHENTICATE_SERVER
 which means that the certificate is being used to authenticate a server
 (and we are acting as the client).
 
@@ -56276,13 +56858,21 @@ Currently there are no @flags, and %G_TLS_DATABASE_VERIFY_NONE should be
 used.
 
 If @chain is found to be valid, then the return value will be 0. If
-@chain is found to be invalid, then the return value will indicate
-the problems found. If the function is unable to determine whether
-@chain is valid or not (eg, because @cancellable is triggered
-before it completes) then the return value will be
-%G_TLS_CERTIFICATE_GENERIC_ERROR and @error will be set
-accordingly. @error is not set when @chain is successfully analyzed
-but found to be invalid.
+@chain is found to be invalid, then the return value will indicate at
+least one problem found. If the function is unable to determine
+whether @chain is valid (for example, because @cancellable is
+triggered before it completes) then the return value will be
+%G_TLS_CERTIFICATE_GENERIC_ERROR and @error will be set accordingly.
+@error is not set when @chain is successfully analyzed but found to
+be invalid.
+
+GLib guarantees that if certificate verification fails, at least one
+error will be set in the return value, but it does not guarantee
+that all possible errors will be set. Accordingly, you may not safely
+decide to ignore any particular type of error. For example, it would
+be incorrect to mask %G_TLS_CERTIFICATE_EXPIRED if you want to allow
+expired certificates, because this could potentially be the only
+error flag set even if other problems exist with the certificate.
 
 Prior to GLib 2.48, GLib's default TLS backend modified @chain to
 represent the certification path built by #GTlsDatabase during
@@ -56294,14 +56884,14 @@ verification.
 
 Because TLS session context is not used, #GTlsDatabase may not
 perform as many checks on the certificates as #GTlsConnection would.
-For example, certificate constraints cannot be honored, and some
-revocation checks cannot be performed. The best way to verify TLS
+For example, certificate constraints may not be honored, and
+revocation checks may not be performed. The best way to verify TLS
 certificates used by a TLS connection is to let #GTlsConnection
 handle the verification.
 
 The TLS backend may attempt to look up and add missing certificates
-to the chain. Since GLib 2.70, this may involve HTTP requests to
-download missing certificates.
+to the chain. This may involve HTTP requests to download missing
+certificates.
 
 This function can block. Use g_tls_database_verify_chain_async() to
 perform the verification operation asynchronously.

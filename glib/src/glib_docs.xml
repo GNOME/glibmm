@@ -91,6 +91,15 @@ transformation functions to g_object_bind_property_full().
 </parameters>
 </enum>
 
+<property name="GBindingGroup:source">
+<description>
+The source object used for binding properties.
+
+Since: 2.72
+
+</description>
+</property>
+
 <enum name="GBookmarkFileError">
 <description>
 Error codes returned by bookmark file parsing.
@@ -177,7 +186,7 @@ connection.
 </description>
 <parameters>
 <parameter name="G_CONNECT_AFTER">
-<parameter_description> whether the handler should be called before or after the 
+<parameter_description> whether the handler should be called before or after the
 default handler of the signal.
 </parameter_description>
 </parameter>
@@ -321,8 +330,8 @@ Enumeration representing a month; values are %G_DATE_JANUARY,
 
 <enum name="GDateWeekday">
 <description>
-Enumeration representing a day of the week; #G_DATE_MONDAY,
-#G_DATE_TUESDAY, etc. #G_DATE_BAD_WEEKDAY is an invalid weekday.
+Enumeration representing a day of the week; %G_DATE_MONDAY,
+%G_DATE_TUESDAY, etc. %G_DATE_BAD_WEEKDAY is an invalid weekday.
 
 </description>
 <parameters>
@@ -1015,6 +1024,29 @@ Since: 2.50
 </parameters>
 </enum>
 
+<enum name="GMainContextFlags">
+<description>
+Flags to pass to g_main_context_new_with_flags() which affect the behaviour
+of a #GMainContext.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="G_MAIN_CONTEXT_FLAGS_NONE">
+<parameter_description> Default behaviour.
+</parameter_description>
+</parameter>
+<parameter name="G_MAIN_CONTEXT_FLAGS_OWNERLESS_POLLING">
+<parameter_description> Assume that polling for events will
+free the thread to process other jobs. That's useful if you're using
+`g_main_context_{prepare,query,check,dispatch}` to integrate GMainContext in
+other event loops.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GMarkupCollectType">
 <description>
 A mixed enumerated type and flags field. You must specify one type
@@ -1559,8 +1591,8 @@ of a single line of characters (even if it actually contains
 newlines). The &quot;start of line&quot; metacharacter (&quot;^&quot;) matches only
 at the start of the string, while the &quot;end of line&quot; metacharacter
 (&quot;$&quot;) matches only at the end of the string, or before a terminating
-newline (unless #G_REGEX_DOLLAR_ENDONLY is set). When
-#G_REGEX_MULTILINE is set, the &quot;start of line&quot; and &quot;end of line&quot;
+newline (unless %G_REGEX_DOLLAR_ENDONLY is set). When
+%G_REGEX_MULTILINE is set, the &quot;start of line&quot; and &quot;end of line&quot;
 constructs match immediately following or immediately before any
 newline in the string, respectively, as well as at the very start
 and end. This can be changed within a pattern by a &quot;(?m)&quot; option
@@ -1595,7 +1627,7 @@ metacharacter.
 matches only at the end of the string. Without this option, a
 dollar also matches immediately before the final character if
 it is a newline (but not before any other newlines). This option
-is ignored if #G_REGEX_MULTILINE is set.
+is ignored if %G_REGEX_MULTILINE is set.
 </parameter_description>
 </parameter>
 <parameter name="G_REGEX_UNGREEDY">
@@ -1974,7 +2006,7 @@ metacharacter.
 <parameter name="G_REGEX_MATCH_NOTBOL">
 <parameter_description> Specifies that first character of the string is
 not the beginning of a line, so the circumflex metacharacter should
-not match before it. Setting this without #G_REGEX_MULTILINE (at
+not match before it. Setting this without %G_REGEX_MULTILINE (at
 compile time) causes circumflex never to match. This option affects
 only the behaviour of the circumflex metacharacter, it does not
 affect &quot;\A&quot;.
@@ -1984,7 +2016,7 @@ affect &quot;\A&quot;.
 <parameter_description> Specifies that the end of the subject string is
 not the end of a line, so the dollar metacharacter should not match
 it nor (except in multiline mode) a newline immediately before it.
-Setting this without #G_REGEX_MULTILINE (at compile time) causes
+Setting this without %G_REGEX_MULTILINE (at compile time) causes
 dollar never to match. This option affects only the behaviour of
 the dollar metacharacter, it does not affect &quot;\Z&quot; or &quot;\z&quot;.
 </parameter_description>
@@ -2051,18 +2083,18 @@ U+2029 PARAGRAPH SEPARATOR. Since: 2.34
 </parameter_description>
 </parameter>
 <parameter name="G_REGEX_MATCH_PARTIAL_SOFT">
-<parameter_description> An alias for #G_REGEX_MATCH_PARTIAL. Since: 2.34
+<parameter_description> An alias for %G_REGEX_MATCH_PARTIAL. Since: 2.34
 </parameter_description>
 </parameter>
 <parameter name="G_REGEX_MATCH_PARTIAL_HARD">
 <parameter_description> Turns on the partial matching feature. In contrast to
-to #G_REGEX_MATCH_PARTIAL_SOFT, this stops matching as soon as a partial match
+to %G_REGEX_MATCH_PARTIAL_SOFT, this stops matching as soon as a partial match
 is found, without continuing to search for a possible complete match. See
 g_match_info_is_partial_match() for more information. Since: 2.34
 </parameter_description>
 </parameter>
 <parameter name="G_REGEX_MATCH_NOTEMPTY_ATSTART">
-<parameter_description> Like #G_REGEX_MATCH_NOTEMPTY, but only applied to
+<parameter_description> Like %G_REGEX_MATCH_NOTEMPTY, but only applied to
 the start of the matched string. For anchored
 patterns this can only happen for pattern containing &quot;\K&quot;. Since: 2.34
 </parameter_description>
@@ -2174,6 +2206,67 @@ call to the accumulator function for a signal emission.  Since 2.68.
 </parameter>
 </parameters>
 </enum>
+
+<signal name="GSignalGroup::bind">
+<description>
+This signal is emitted when #GSignalGroup:target is set to a new value
+other than %NULL. It is similar to #GObject::notify on `target` except it
+will not emit when #GSignalGroup:target is %NULL and also allows for
+receiving the #GObject without a data-race.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GSignalGroup
+</parameter_description>
+</parameter>
+<parameter name="instance">
+<parameter_description> a #GObject containing the new value for #GSignalGroup:target
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GSignalGroup::unbind">
+<description>
+This signal is emitted when the target instance of @self is set to a
+new #GObject.
+
+This signal will only be emitted if the previous target of @self is
+non-%NULL.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GSignalGroup
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<property name="GSignalGroup:target">
+<description>
+The target instance used when connecting signals.
+
+Since: 2.72
+
+</description>
+</property>
+
+<property name="GSignalGroup:target-type">
+<description>
+The #GType of the target property.
+
+Since: 2.72
+
+</description>
+</property>
 
 <enum name="GSignalMatchType">
 <description>
@@ -3651,6 +3744,30 @@ Old South Arabian. Since 2.26
 <parameter_description>               Yezidi. Since: 2.66
 </parameter_description>
 </parameter>
+<parameter name="G_UNICODE_SCRIPT_CYPRO_MINOAN">
+<parameter_description>         Cypro-Minoan. Since: 2.72
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_OLD_UYGHUR">
+<parameter_description>           Old Uyghur. Since: 2.72
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_TANGSA">
+<parameter_description>               Tangsa. Since: 2.72
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_TOTO">
+<parameter_description>                 Toto. Since: 2.72
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_VITHKUQI">
+<parameter_description>             Vithkuqi. Since: 2.72
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_MATH">
+<parameter_description>                 Mathematical notation. Since: 2.72
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -4280,6 +4397,83 @@ or on error.
 </return>
 </function>
 
+<function name="g_aligned_alloc">
+<description>
+This function is similar to g_malloc(), allocating (@n_blocks * @n_block_bytes)
+bytes, but care is taken to align the allocated memory to with the given
+alignment value. Additionally, it will detect possible overflow during
+multiplication.
+
+Aligned memory allocations returned by this function can only be
+freed using g_aligned_free().
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="n_blocks">
+<parameter_description> the number of blocks to allocate
+</parameter_description>
+</parameter>
+<parameter name="n_block_bytes">
+<parameter_description> the size of each block in bytes
+</parameter_description>
+</parameter>
+<parameter name="alignment">
+<parameter_description> the alignment to be enforced, which must be a positive power of 2
+and a multiple of `sizeof(void*)`
+</parameter_description>
+</parameter>
+</parameters>
+<return> the allocated memory
+
+</return>
+</function>
+
+<function name="g_aligned_alloc0">
+<description>
+This function is similar to g_aligned_alloc(), but it will
+also clear the allocated memory before returning it.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="n_blocks">
+<parameter_description> the number of blocks to allocate
+</parameter_description>
+</parameter>
+<parameter name="n_block_bytes">
+<parameter_description> the size of each block in bytes
+</parameter_description>
+</parameter>
+<parameter name="alignment">
+<parameter_description> the alignment to be enforced, which must be a positive power of 2
+and a multiple of `sizeof(void*)`
+</parameter_description>
+</parameter>
+</parameters>
+<return> the allocated, cleared memory
+
+</return>
+</function>
+
+<function name="g_aligned_free">
+<description>
+Frees the memory allocated by g_aligned_alloc().
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="mem">
+<parameter_description> the memory to deallocate
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_alloca">
 <description>
 Allocates @size bytes on the stack; these bytes will be freed when the current
@@ -4321,6 +4515,27 @@ not upon exit of the enclosing function scope.
 </parameter>
 </parameters>
 <return> space for @size bytes, allocated on the stack
+</return>
+</function>
+
+<function name="g_alloca0">
+<description>
+Wraps g_alloca() and initializes allocated memory to zeroes.
+If @size is `0` it returns %NULL.
+
+Note that the @size argument will be evaluated multiple times.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="size">
+<parameter_description> number of bytes to allocate.
+</parameter_description>
+</parameter>
+</parameters>
+<return> space for @size bytes, allocated on the stack
+
 </return>
 </function>
 
@@ -5036,7 +5251,7 @@ This function generates enough precision that converting
 the string back using g_ascii_strtod() gives the same machine-number
 (on machines with IEEE compatible 64bit doubles). It is
 guaranteed that the size of the resulting string will never
-be larger than @G_ASCII_DTOSTR_BUF_SIZE bytes, including the terminating
+be larger than %G_ASCII_DTOSTR_BUF_SIZE bytes, including the terminating
 nul character, which is always added.
 
 
@@ -5066,6 +5281,9 @@ decimal point. To format the number you pass in
 a printf()-style format string. Allowed conversion
 specifiers are 'e', 'E', 'f', 'F', 'g' and 'G'.
 
+The @format must just be a single format specifier
+starting with `%`, expecting a #gdouble argument.
+
 The returned buffer is guaranteed to be nul-terminated.
 
 If you just want to want to serialize the value into a
@@ -5084,7 +5302,7 @@ string, use g_ascii_dtostr().
 </parameter>
 <parameter name="format">
 <parameter_description> The printf()-style format to use for the
-code to use for converting.
+code to use for converting
 </parameter_description>
 </parameter>
 <parameter name="d">
@@ -5521,7 +5739,9 @@ Since: 2.54
 <function name="g_ascii_strncasecmp">
 <description>
 Compare @s1 and @s2, ignoring the case of ASCII characters and any
-characters after the first @n in each string.
+characters after the first @n in each string. If either string is
+less than @n bytes long, comparison will stop at the first nul byte
+encountered.
 
 Unlike the BSD strcasecmp() function, this only recognizes standard
 ASCII letters and ignores the locale, treating all non-ASCII
@@ -8505,6 +8725,210 @@ Since: 2.26
 </return>
 </function>
 
+<function name="g_binding_group_bind">
+<description>
+Creates a binding between @source_property on the source object
+and @target_property on @target. Whenever the @source_property
+is changed the @target_property is updated using the same value.
+The binding flag %G_BINDING_SYNC_CREATE is automatically specified.
+
+See g_object_bind_property() for more information.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GBindingGroup
+</parameter_description>
+</parameter>
+<parameter name="source_property">
+<parameter_description> the property on the source to bind
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description> the target #GObject
+</parameter_description>
+</parameter>
+<parameter name="target_property">
+<parameter_description> the property on @target to bind
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> the flags used to create the #GBinding
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_binding_group_bind_full">
+<description>
+Creates a binding between @source_property on the source object and
+@target_property on @target, allowing you to set the transformation
+functions to be used by the binding. The binding flag
+%G_BINDING_SYNC_CREATE is automatically specified.
+
+See g_object_bind_property_full() for more information.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GBindingGroup
+</parameter_description>
+</parameter>
+<parameter name="source_property">
+<parameter_description> the property on the source to bind
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description> the target #GObject
+</parameter_description>
+</parameter>
+<parameter name="target_property">
+<parameter_description> the property on @target to bind
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> the flags used to create the #GBinding
+</parameter_description>
+</parameter>
+<parameter name="transform_to">
+<parameter_description> the transformation function
+from the source object to the @target, or %NULL to use the default
+</parameter_description>
+</parameter>
+<parameter name="transform_from">
+<parameter_description> the transformation function
+from the @target to the source object, or %NULL to use the default
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> custom data to be passed to the transformation
+functions, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="user_data_destroy">
+<parameter_description> function to be called when disposing the binding,
+to free the resources used by the transformation functions
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_binding_group_bind_with_closures">
+<description>
+Creates a binding between @source_property on the source object and
+@target_property on @target, allowing you to set the transformation
+functions to be used by the binding. The binding flag
+%G_BINDING_SYNC_CREATE is automatically specified.
+
+This function is the language bindings friendly version of
+g_binding_group_bind_property_full(), using #GClosures
+instead of function pointers.
+
+See g_object_bind_property_with_closures() for more information.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GBindingGroup
+</parameter_description>
+</parameter>
+<parameter name="source_property">
+<parameter_description> the property on the source to bind
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description> the target #GObject
+</parameter_description>
+</parameter>
+<parameter name="target_property">
+<parameter_description> the property on @target to bind
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> the flags used to create the #GBinding
+</parameter_description>
+</parameter>
+<parameter name="transform_to">
+<parameter_description> a #GClosure wrapping the
+transformation function from the source object to the @target,
+or %NULL to use the default
+</parameter_description>
+</parameter>
+<parameter name="transform_from">
+<parameter_description> a #GClosure wrapping the
+transformation function from the @target to the source object,
+or %NULL to use the default
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_binding_group_dup_source">
+<description>
+Gets the source object used for binding properties.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GBindingGroup
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GObject or %NULL.
+
+</return>
+</function>
+
+<function name="g_binding_group_new">
+<description>
+Creates a new #GBindingGroup.
+
+Since: 2.72
+
+</description>
+<parameters>
+</parameters>
+<return> a new #GBindingGroup
+
+</return>
+</function>
+
+<function name="g_binding_group_set_source">
+<description>
+Sets @source as the source object used for creating property
+bindings. If there is already a source object all bindings from it
+will be removed.
+
+Note that all properties that have been bound must exist on @source.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GBindingGroup
+</parameter_description>
+</parameter>
+<parameter name="source">
+<parameter_description> the source #GObject,
+or %NULL to clear it
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_binding_unbind">
 <description>
 Explicitly releases the binding between the source and the target
@@ -8789,7 +9213,7 @@ Since: 2.12
 Gets the time the bookmark for @uri was added to @bookmark
 
 In the event the URI cannot be found, -1 is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.12
 Deprecated: 2.66: Use g_bookmark_file_get_added_date_time() instead, as
@@ -8820,7 +9244,7 @@ Deprecated: 2.66: Use g_bookmark_file_get_added_date_time() instead, as
 Gets the time the bookmark for @uri was added to @bookmark
 
 In the event the URI cannot be found, %NULL is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.66
 
@@ -8853,11 +9277,11 @@ the returned data.
 The string returned in @app_exec must be freed.
 
 In the event the URI cannot be found, %FALSE is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.  In the
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.  In the
 event that no application with name @app_name has registered a bookmark
 for @uri,  %FALSE is returned and error is set to
-#G_BOOKMARK_FILE_ERROR_APP_NOT_REGISTERED. In the event that unquoting
-the command line fails, an error of the #G_SHELL_ERROR domain is
+%G_BOOKMARK_FILE_ERROR_APP_NOT_REGISTERED. In the event that unquoting
+the command line fails, an error of the %G_SHELL_ERROR domain is
 set and %FALSE is returned.
 
 Since: 2.12
@@ -8909,11 +9333,11 @@ the returned data.
 The string returned in @app_exec must be freed.
 
 In the event the URI cannot be found, %FALSE is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.  In the
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.  In the
 event that no application with name @app_name has registered a bookmark
 for @uri,  %FALSE is returned and error is set to
-#G_BOOKMARK_FILE_ERROR_APP_NOT_REGISTERED. In the event that unquoting
-the command line fails, an error of the #G_SHELL_ERROR domain is
+%G_BOOKMARK_FILE_ERROR_APP_NOT_REGISTERED. In the event that unquoting
+the command line fails, an error of the %G_SHELL_ERROR domain is
 set and %FALSE is returned.
 
 Since: 2.66
@@ -8960,7 +9384,7 @@ Retrieves the names of the applications that have registered the
 bookmark for @uri.
 
 In the event the URI cannot be found, %NULL is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.12
 
@@ -8994,7 +9418,7 @@ Use g_strfreev() to free it.
 Retrieves the description of the bookmark for @uri.
 
 In the event the URI cannot be found, %NULL is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.12
 
@@ -9024,7 +9448,7 @@ URI cannot be found.
 Retrieves the list of group names of the bookmark for @uri.
 
 In the event the URI cannot be found, %NULL is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 The returned array is %NULL terminated, so @length may optionally
 be %NULL.
@@ -9061,7 +9485,7 @@ Use g_strfreev() to free it.
 Gets the icon of the bookmark for @uri.
 
 In the event the URI cannot be found, %FALSE is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.12
 
@@ -9099,9 +9523,9 @@ You should free the returned strings.
 Gets whether the private flag of the bookmark for @uri is set.
 
 In the event the URI cannot be found, %FALSE is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.  In the
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.  In the
 event that the private flag cannot be found, %FALSE is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_INVALID_VALUE.
+@error is set to %G_BOOKMARK_FILE_ERROR_INVALID_VALUE.
 
 Since: 2.12
 
@@ -9130,9 +9554,9 @@ Since: 2.12
 Retrieves the MIME type of the resource pointed by @uri.
 
 In the event the URI cannot be found, %NULL is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.  In the
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.  In the
 event that the MIME type cannot be found, %NULL is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_INVALID_VALUE.
+@error is set to %G_BOOKMARK_FILE_ERROR_INVALID_VALUE.
 
 Since: 2.12
 
@@ -9162,7 +9586,7 @@ URI cannot be found.
 Gets the time when the bookmark for @uri was last modified.
 
 In the event the URI cannot be found, -1 is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.12
 Deprecated: 2.66: Use g_bookmark_file_get_modified_date_time() instead, as
@@ -9193,7 +9617,7 @@ Deprecated: 2.66: Use g_bookmark_file_get_modified_date_time() instead, as
 Gets the time when the bookmark for @uri was last modified.
 
 In the event the URI cannot be found, %NULL is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.66
 
@@ -9242,7 +9666,7 @@ Returns the title of the bookmark for @uri.
 If @uri is %NULL, the title of @bookmark is returned.
 
 In the event the URI cannot be found, %NULL is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.12
 
@@ -9297,7 +9721,7 @@ Use g_strfreev() to free it.
 Gets the time the bookmark for @uri was last visited.
 
 In the event the URI cannot be found, -1 is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.12
 Deprecated: 2.66: Use g_bookmark_file_get_visited_date_time() instead, as
@@ -9328,7 +9752,7 @@ Deprecated: 2.66: Use g_bookmark_file_get_visited_date_time() instead, as
 Gets the time the bookmark for @uri was last visited.
 
 In the event the URI cannot be found, %NULL is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.66
 
@@ -9358,7 +9782,7 @@ Checks whether the bookmark for @uri inside @bookmark has been
 registered by application @name.
 
 In the event the URI cannot be found, %FALSE is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.12
 
@@ -9392,7 +9816,7 @@ Checks whether @group appears in the list of groups to which
 the bookmark for @uri belongs to.
 
 In the event the URI cannot be found, %FALSE is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.12
 
@@ -9546,7 +9970,7 @@ existing bookmark for @new_uri will be overwritten.  If @new_uri is
 %NULL, then the bookmark is removed.
 
 In the event the URI cannot be found, %FALSE is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 
 Since: 2.12
 
@@ -9598,10 +10022,10 @@ Removes application registered with @name from the list of applications
 that have registered a bookmark for @uri inside @bookmark.
 
 In the event the URI cannot be found, %FALSE is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 In the event that no application with name @app_name has registered
 a bookmark for @uri,  %FALSE is returned and error is set to
-#G_BOOKMARK_FILE_ERROR_APP_NOT_REGISTERED.
+%G_BOOKMARK_FILE_ERROR_APP_NOT_REGISTERED.
 
 Since: 2.12
 
@@ -9635,9 +10059,9 @@ Removes @group from the list of groups to which the bookmark
 for @uri belongs to.
 
 In the event the URI cannot be found, %FALSE is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
 In the event no group was defined, %FALSE is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_INVALID_VALUE.
+@error is set to %G_BOOKMARK_FILE_ERROR_INVALID_VALUE.
 
 Since: 2.12
 
@@ -9770,10 +10194,10 @@ current time will be used.
 
 If you try to remove an application by setting its registration count to
 zero, and no bookmark for @uri is found, %FALSE is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND; similarly,
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND; similarly,
 in the event that no application @name has registered a bookmark
 for @uri,  %FALSE is returned and error is set to
-#G_BOOKMARK_FILE_ERROR_APP_NOT_REGISTERED.  Otherwise, if no bookmark
+%G_BOOKMARK_FILE_ERROR_APP_NOT_REGISTERED.  Otherwise, if no bookmark
 for @uri is found, one is created.
 
 Since: 2.12
@@ -9841,10 +10265,10 @@ the list of registered applications.
 
 If you try to remove an application by setting its registration count to
 zero, and no bookmark for @uri is found, %FALSE is returned and
-@error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND; similarly,
+@error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND; similarly,
 in the event that no application @name has registered a bookmark
 for @uri,  %FALSE is returned and error is set to
-#G_BOOKMARK_FILE_ERROR_APP_NOT_REGISTERED.  Otherwise, if no bookmark
+%G_BOOKMARK_FILE_ERROR_APP_NOT_REGISTERED.  Otherwise, if no bookmark
 for @uri is found, one is created.
 
 Since: 2.66
@@ -10291,7 +10715,7 @@ boxed type with name @name.
 Boxed type handling functions have to be provided to copy and free
 opaque boxed structures of this type.
 
-For the general case, it is recommended to use #G_DEFINE_BOXED_TYPE 
+For the general case, it is recommended to use G_DEFINE_BOXED_TYPE()
 instead of calling g_boxed_type_register_static() directly. The macro 
 will create the appropriate `*_get_type()` function for the boxed type.
 
@@ -10331,7 +10755,7 @@ parameters (reading from left to right) is used.
 
 No attempt is made to force the resulting filename to be an absolute
 path. If the first element is a relative path, the result will
-be a relative path. 
+be a relative path.
 
 
 </description>
@@ -10345,8 +10769,8 @@ be a relative path.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string that must be freed with
-g_free().
+<return> a newly-allocated string that
+must be freed with g_free().
 </return>
 </function>
 
@@ -10368,8 +10792,8 @@ Since: 2.56
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string that must be freed
-with g_free().
+<return> a newly-allocated string that
+must be freed with g_free().
 
 </return>
 </function>
@@ -10390,8 +10814,8 @@ array of strings containing the path elements.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string that must be freed
-with g_free().
+<return> a newly-allocated string that
+must be freed with g_free().
 
 </return>
 </function>
@@ -10441,8 +10865,8 @@ of the separator are ignored.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string that must be freed with
-g_free().
+<return> a newly-allocated string that
+must be freed with g_free().
 </return>
 </function>
 
@@ -10466,8 +10890,8 @@ array of strings containing the path elements.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string that must be freed
-with g_free().
+<return> a newly-allocated string that
+must be freed with g_free().
 
 </return>
 </function>
@@ -15264,7 +15688,7 @@ the input string that were successfully converted, or %NULL.
 Even if the conversion was successful, this may be 
 less than @len if there were partial characters
 at the end of the input. If the error
-#G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
+%G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
 stored will be the byte offset after the last valid
 input sequence.
 </parameter_description>
@@ -15411,7 +15835,7 @@ the input string that were successfully converted, or %NULL.
 Even if the conversion was successful, this may be 
 less than @len if there were partial characters
 at the end of the input. If the error
-#G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
+%G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
 stored will be the byte offset after the last valid
 input sequence.
 </parameter_description>
@@ -15729,7 +16153,7 @@ operation, for a member of @datalist.
 If the previous value was replaced then ownership of the
 old value (@oldval) is passed to the caller, including
 the registered destroy notify for it (passed out in @old_destroy).
-Its up to the caller to free this as he wishes, which may
+Its up to the caller to free this as they wish, which may
 or may not include using @old_destroy as sometimes replacement
 should not destroy the object in the normal way.
 
@@ -16737,9 +17161,11 @@ represent an existing day). Free the return value with g_date_free().
 
 <function name="g_date_new_dmy">
 <description>
-Like g_date_new(), but also sets the value of the date. Assuming the
-day-month-year triplet you pass in represents an existing day, the
-returned date will be valid.
+Create a new #GDate representing the given day-month-year triplet.
+
+The triplet you pass in must represent a valid date. Use g_date_valid_dmy()
+if needed to validate it. The returned #GDate is guaranteed to be non-%NULL
+and valid.
 
 
 </description>
@@ -16757,15 +17183,18 @@ returned date will be valid.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated #GDate initialized with @day, @month, and @year
+<return> a newly-allocated #GDate
+initialized with @day, @month, and @year
 </return>
 </function>
 
 <function name="g_date_new_julian">
 <description>
-Like g_date_new(), but also sets the value of the date. Assuming the
-Julian day number you pass in is valid (greater than 0, less than an
-unreasonably large number), the returned date will be valid.
+Create a new #GDate representing the given Julian date.
+
+The @julian_day you pass in must be valid. Use g_date_valid_julian() if
+needed to validate it. The returned #GDate is guaranteed to be non-%NULL and
+valid.
 
 
 </description>
@@ -16775,7 +17204,8 @@ unreasonably large number), the returned date will be valid.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated #GDate initialized with @julian_day
+<return> a newly-allocated #GDate initialized
+with @julian_day
 </return>
 </function>
 
@@ -19704,7 +20134,7 @@ If the call was successful, it returns %TRUE and sets @contents to the file
 contents and @length to the length of the file contents in bytes. The string
 stored in @contents will be nul-terminated, so for text files you can pass
 %NULL for the @length argument. If the call was not successful, it returns
-%FALSE and sets @error. The error domain is #G_FILE_ERROR. Possible error
+%FALSE and sets @error. The error domain is %G_FILE_ERROR. Possible error
 codes are those in the #GFileError enumeration. In the error case,
 @contents is set to %NULL and @length is set to zero.
 
@@ -19796,8 +20226,8 @@ Since: 2.4
 </parameter_description>
 </parameter>
 </parameters>
-<return> A newly-allocated string with the contents of
-the symbolic link, or %NULL if an error occurred.
+<return> A newly-allocated string with
+the contents of the symbolic link, or %NULL if an error occurred.
 
 </return>
 </function>
@@ -19883,7 +20313,7 @@ process, or mapped into memory. Thus, this function will fail if
 @filename already exists and is open.
 
 If the call was successful, it returns %TRUE. If the call was not successful,
-it returns %FALSE and sets @error. The error domain is #G_FILE_ERROR.
+it returns %FALSE and sets @error. The error domain is %G_FILE_ERROR.
 Possible error codes are those in the #GFileError enumeration.
 
 Note that the name for the temporary file is constructed by appending up
@@ -21372,9 +21802,40 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> the path to the specified special directory, or
-%NULL if the logical id was not found. The returned string is owned by
-GLib and should not be modified or freed.
+<return> the path to the specified special
+directory, or %NULL if the logical id was not found. The returned string is
+owned by GLib and should not be modified or freed.
+
+</return>
+</function>
+
+<function name="g_get_user_state_dir">
+<description>
+Returns a base directory in which to store state files specific to
+particular user.
+
+On UNIX platforms this is determined using the mechanisms described
+in the
+[XDG Base Directory Specification](http://www.freedesktop.org/Standards/basedir-spec).
+In this case the directory retrieved will be `XDG_STATE_HOME`.
+
+On Windows it follows XDG Base Directory Specification if `XDG_STATE_HOME` is defined.
+If `XDG_STATE_HOME` is undefined, the folder to use for local (as opposed
+to roaming) application data is used instead. See the
+[documentation for `FOLDERID_LocalAppData`](https://docs.microsoft.com/en-us/windows/win32/shell/knownfolderid).
+Note that in this case on Windows it will be the same
+as what g_get_user_data_dir() returns.
+
+The return value is cached and modifying it at runtime is not supported, as
+it’s not thread-safe to modify environment variables at runtime.
+
+Since: 2.72
+
+</description>
+<parameters>
+</parameters>
+<return> a string owned by GLib that
+must not be modified or freed.
 
 </return>
 </function>
@@ -22045,6 +22506,30 @@ if you don't want to supply such a function.
 <parameter_description> a function to free the memory allocated for the
 value used when removing the entry from the #GHashTable, or %NULL
 if you don't want to supply such a function.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GHashTable
+</return>
+</function>
+
+<function name="g_hash_table_new_similar">
+<description>
+Creates a new #GHashTable like g_hash_table_new_full() with a reference
+count of 1.
+
+It inherits the hash function, the key equal function, the key destroy function,
+as well as the value destroy function, from @other_hash_table.
+
+The returned hash table will be empty; it will not contain the keys
+or values from @other_hash_table.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="other_hash_table">
+<parameter_description> Another #GHashTable
 </parameter_description>
 </parameter>
 </parameters>
@@ -23647,8 +24132,8 @@ Flushes the write buffer for the GIOChannel.
 </parameter>
 </parameters>
 <return> the status of the operation: One of
-#G_IO_STATUS_NORMAL, #G_IO_STATUS_AGAIN, or
-#G_IO_STATUS_ERROR.
+%G_IO_STATUS_NORMAL, %G_IO_STATUS_AGAIN, or
+%G_IO_STATUS_ERROR.
 </return>
 </function>
 
@@ -24575,7 +25060,7 @@ or #GIOChannelError
 <function name="g_io_create_watch">
 <description>
 Creates a #GSource that's dispatched when @condition is met for the 
-given @channel. For example, if condition is #G_IO_IN, the source will 
+given @channel. For example, if condition is %G_IO_IN, the source will
 be dispatched when there's data available for reading.
 
 The callback function invoked by the #GSource should be added with
@@ -24629,9 +25114,9 @@ Returns the value associated with @key under @group_name as a
 boolean. 
 
 If @key cannot be found then %FALSE is returned and @error is set
-to #G_KEY_FILE_ERROR_KEY_NOT_FOUND. Likewise, if the value
+to %G_KEY_FILE_ERROR_KEY_NOT_FOUND. Likewise, if the value
 associated with @key cannot be interpreted as a boolean then %FALSE
-is returned and @error is set to #G_KEY_FILE_ERROR_INVALID_VALUE.
+is returned and @error is set to %G_KEY_FILE_ERROR_INVALID_VALUE.
 
 Since: 2.6
 
@@ -24666,9 +25151,9 @@ Returns the values associated with @key under @group_name as
 booleans. 
 
 If @key cannot be found then %NULL is returned and @error is set to
-#G_KEY_FILE_ERROR_KEY_NOT_FOUND. Likewise, if the values associated
+%G_KEY_FILE_ERROR_KEY_NOT_FOUND. Likewise, if the values associated
 with @key cannot be interpreted as booleans then %NULL is returned
-and @error is set to #G_KEY_FILE_ERROR_INVALID_VALUE.
+and @error is set to %G_KEY_FILE_ERROR_INVALID_VALUE.
 
 Since: 2.6
 
@@ -24746,9 +25231,9 @@ Returns the value associated with @key under @group_name as a
 double. If @group_name is %NULL, the start_group is used.
 
 If @key cannot be found then 0.0 is returned and @error is set to
-#G_KEY_FILE_ERROR_KEY_NOT_FOUND. Likewise, if the value associated
+%G_KEY_FILE_ERROR_KEY_NOT_FOUND. Likewise, if the value associated
 with @key cannot be interpreted as a double then 0.0 is returned
-and @error is set to #G_KEY_FILE_ERROR_INVALID_VALUE.
+and @error is set to %G_KEY_FILE_ERROR_INVALID_VALUE.
 
 Since: 2.12
 
@@ -24783,9 +25268,9 @@ Returns the values associated with @key under @group_name as
 doubles. 
 
 If @key cannot be found then %NULL is returned and @error is set to
-#G_KEY_FILE_ERROR_KEY_NOT_FOUND. Likewise, if the values associated
+%G_KEY_FILE_ERROR_KEY_NOT_FOUND. Likewise, if the values associated
 with @key cannot be interpreted as doubles then %NULL is returned
-and @error is set to #G_KEY_FILE_ERROR_INVALID_VALUE.
+and @error is set to %G_KEY_FILE_ERROR_INVALID_VALUE.
 
 Since: 2.12
 
@@ -24883,10 +25368,10 @@ Returns the value associated with @key under @group_name as an
 integer. 
 
 If @key cannot be found then 0 is returned and @error is set to
-#G_KEY_FILE_ERROR_KEY_NOT_FOUND. Likewise, if the value associated
+%G_KEY_FILE_ERROR_KEY_NOT_FOUND. Likewise, if the value associated
 with @key cannot be interpreted as an integer, or is out of range
 for a #gint, then 0 is returned
-and @error is set to #G_KEY_FILE_ERROR_INVALID_VALUE.
+and @error is set to %G_KEY_FILE_ERROR_INVALID_VALUE.
 
 Since: 2.6
 
@@ -24921,10 +25406,10 @@ Returns the values associated with @key under @group_name as
 integers. 
 
 If @key cannot be found then %NULL is returned and @error is set to
-#G_KEY_FILE_ERROR_KEY_NOT_FOUND. Likewise, if the values associated
+%G_KEY_FILE_ERROR_KEY_NOT_FOUND. Likewise, if the values associated
 with @key cannot be interpreted as integers, or are out of range for
 #gint, then %NULL is returned
-and @error is set to #G_KEY_FILE_ERROR_INVALID_VALUE.
+and @error is set to %G_KEY_FILE_ERROR_INVALID_VALUE.
 
 Since: 2.6
 
@@ -24965,7 +25450,7 @@ Returns all keys for the group name @group_name.  The array of
 returned keys will be %NULL-terminated, so @length may
 optionally be %NULL. In the event that the @group_name cannot
 be found, %NULL is returned and @error is set to
-#G_KEY_FILE_ERROR_GROUP_NOT_FOUND.
+%G_KEY_FILE_ERROR_GROUP_NOT_FOUND.
 
 Since: 2.6
 
@@ -25044,7 +25529,7 @@ the lifetime of the #GKeyFile, it must be loaded with
 %G_KEY_FILE_KEEP_TRANSLATIONS in order to load strings for all locales.
 
 If @key cannot be found then %NULL is returned and @error is set 
-to #G_KEY_FILE_ERROR_KEY_NOT_FOUND. If the value associated
+to %G_KEY_FILE_ERROR_KEY_NOT_FOUND. If the value associated
 with @key cannot be interpreted or no suitable translation can
 be found then the untranslated value is returned.
 
@@ -25090,7 +25575,7 @@ the lifetime of the #GKeyFile, it must be loaded with
 %G_KEY_FILE_KEEP_TRANSLATIONS in order to load strings for all locales.
 
 If @key cannot be found then %NULL is returned and @error is set 
-to #G_KEY_FILE_ERROR_KEY_NOT_FOUND. If the values associated
+to %G_KEY_FILE_ERROR_KEY_NOT_FOUND. If the values associated
 with @key cannot be interpreted or no suitable translations
 can be found then the untranslated values are returned. The 
 returned array is %NULL-terminated, so @length may optionally 
@@ -25157,9 +25642,9 @@ Unlike g_key_file_get_value(), this function handles escape sequences
 like \s.
 
 In the event the key cannot be found, %NULL is returned and 
-@error is set to #G_KEY_FILE_ERROR_KEY_NOT_FOUND.  In the 
+@error is set to %G_KEY_FILE_ERROR_KEY_NOT_FOUND.  In the
 event that the @group_name cannot be found, %NULL is returned 
-and @error is set to #G_KEY_FILE_ERROR_GROUP_NOT_FOUND.
+and @error is set to %G_KEY_FILE_ERROR_GROUP_NOT_FOUND.
 
 Since: 2.6
 
@@ -25193,9 +25678,9 @@ key cannot be found.
 Returns the values associated with @key under @group_name.
 
 In the event the key cannot be found, %NULL is returned and
-@error is set to #G_KEY_FILE_ERROR_KEY_NOT_FOUND.  In the
+@error is set to %G_KEY_FILE_ERROR_KEY_NOT_FOUND.  In the
 event that the @group_name cannot be found, %NULL is returned
-and @error is set to #G_KEY_FILE_ERROR_GROUP_NOT_FOUND.
+and @error is set to %G_KEY_FILE_ERROR_GROUP_NOT_FOUND.
 
 Since: 2.6
 
@@ -25268,9 +25753,9 @@ Returns the raw value associated with @key under @group_name.
 Use g_key_file_get_string() to retrieve an unescaped UTF-8 string. 
 
 In the event the key cannot be found, %NULL is returned and 
-@error is set to #G_KEY_FILE_ERROR_KEY_NOT_FOUND.  In the 
+@error is set to %G_KEY_FILE_ERROR_KEY_NOT_FOUND.  In the
 event that the @group_name cannot be found, %NULL is returned 
-and @error is set to #G_KEY_FILE_ERROR_GROUP_NOT_FOUND.
+and @error is set to %G_KEY_FILE_ERROR_GROUP_NOT_FOUND.
 
 
 Since: 2.6
@@ -27326,6 +27811,27 @@ default &quot;&quot; application domain
 <return></return>
 </function>
 
+<function name="g_log_get_debug_enabled">
+<description>
+Return whether debug output from the GLib logging system is enabled.
+
+Note that this should not be used to conditionalise calls to g_debug() or
+other logging functions; it should only be used from %GLogWriterFunc
+implementations.
+
+Note also that the value of this does not depend on `G_MESSAGES_DEBUG`; see
+the docs for g_log_set_debug_enabled().
+
+Since: 2.72
+
+</description>
+<parameters>
+</parameters>
+<return> %TRUE if debug output is enabled, %FALSE otherwise
+
+</return>
+</function>
+
 <function name="g_log_remove_handler">
 <description>
 Removes the log handler.
@@ -27378,6 +27884,27 @@ of error which is to be fatal
 </parameters>
 <return> the old fatal mask
 </return>
+</function>
+
+<function name="g_log_set_debug_enabled">
+<description>
+Enable or disable debug output from the GLib logging system for all domains.
+This value interacts disjunctively with `G_MESSAGES_DEBUG` — if either of
+them would allow a debug message to be outputted, it will be.
+
+Note that this should not be used from within library code to enable debug
+output — it is intended for external use.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="enabled">
+<parameter_description> %TRUE to enable debug output, %FALSE otherwise
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_log_set_default_handler">
@@ -27730,7 +28257,7 @@ The only mandatory item in the @fields dictionary is the &quot;MESSAGE&quot; whi
 contain the text shown to the user.
 
 The values in the @fields dictionary are likely to be of type String
-(#G_VARIANT_TYPE_STRING). Array of bytes (#G_VARIANT_TYPE_BYTESTRING) is also
+(%G_VARIANT_TYPE_STRING). Array of bytes (%G_VARIANT_TYPE_BYTESTRING) is also
 supported. In this case the message is handled as binary and will be forwarded
 to the log writer as such. The size of the array should not be higher than
 %G_MAXSSIZE. Otherwise it will be truncated to this size. For other types
@@ -28509,6 +29036,25 @@ Creates a new #GMainContext structure.
 <parameters>
 </parameters>
 <return> the new #GMainContext
+</return>
+</function>
+
+<function name="g_main_context_new_with_flags">
+<description>
+Creates a new #GMainContext structure.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="flags">
+<parameter_description> a bitwise-OR combination of #GMainContextFlags flags that can only be
+set at creation time.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new #GMainContext
+
 </return>
 </function>
 
@@ -29481,7 +30027,7 @@ atomically (e.g. using g_file_set_contents()).
 If @filename is the name of an empty, regular file, the function
 will successfully return an empty #GMappedFile. In other cases of
 size 0 (e.g. device files such as /dev/null), @error will be set
-to the #GFileError value #G_FILE_ERROR_INVAL.
+to the #GFileError value %G_FILE_ERROR_INVAL.
 
 Since: 2.8
 
@@ -30174,7 +30720,7 @@ references and escape sequences expanded. References refer to the last
 match done with @string against @regex and have the same syntax used by
 g_regex_replace().
 
-The @string_to_expand must be UTF-8 encoded even if #G_REGEX_RAW was
+The @string_to_expand must be UTF-8 encoded even if %G_REGEX_RAW was
 passed to g_regex_new().
 
 The backreferences are extracted from the string passed to the match
@@ -30494,19 +31040,19 @@ check that what has been typed so far is potentially valid, it is
 able to raise an error as soon as a mistake is made.
 
 GRegex supports the concept of partial matching by means of the
-#G_REGEX_MATCH_PARTIAL_SOFT and #G_REGEX_MATCH_PARTIAL_HARD flags.
+%G_REGEX_MATCH_PARTIAL_SOFT and %G_REGEX_MATCH_PARTIAL_HARD flags.
 When they are used, the return code for
 g_regex_match() or g_regex_match_full() is, as usual, %TRUE
 for a complete match, %FALSE otherwise. But, when these functions
 return %FALSE, you can check if the match was partial calling
 g_match_info_is_partial_match().
 
-The difference between #G_REGEX_MATCH_PARTIAL_SOFT and 
-#G_REGEX_MATCH_PARTIAL_HARD is that when a partial match is encountered
-with #G_REGEX_MATCH_PARTIAL_SOFT, matching continues to search for a
-possible complete match, while with #G_REGEX_MATCH_PARTIAL_HARD matching
+The difference between %G_REGEX_MATCH_PARTIAL_SOFT and
+%G_REGEX_MATCH_PARTIAL_HARD is that when a partial match is encountered
+with %G_REGEX_MATCH_PARTIAL_SOFT, matching continues to search for a
+possible complete match, while with %G_REGEX_MATCH_PARTIAL_HARD matching
 stops at the partial match.
-When both #G_REGEX_MATCH_PARTIAL_SOFT and #G_REGEX_MATCH_PARTIAL_HARD
+When both %G_REGEX_MATCH_PARTIAL_SOFT and %G_REGEX_MATCH_PARTIAL_HARD
 are set, the latter takes precedence.
 
 There were formerly some restrictions on the pattern for partial matching.
@@ -31092,7 +31638,7 @@ First of all g_module_open_full() tries to open @file_name as a module.
 If that fails and @file_name has the &quot;.la&quot;-suffix (and is a libtool
 archive) it tries to open the corresponding module. If that fails
 and it doesn't have the proper module suffix for the platform
-(#G_MODULE_SUFFIX), this suffix will be appended and the corresponding
+(%G_MODULE_SUFFIX), this suffix will be appended and the corresponding
 module will be opened. If that fails and @file_name doesn't have the
 &quot;.la&quot;-suffix, this suffix is appended and g_module_open_full() tries to open
 the corresponding module. If eventually that fails as well, %NULL is
@@ -31137,7 +31683,7 @@ Checks if modules are supported on the current platform.
 <function name="g_module_symbol">
 <description>
 Gets a symbol pointer from a module, such as one exported
-by #G_MODULE_EXPORT. Note that a valid symbol can be %NULL.
+by %G_MODULE_EXPORT. Note that a valid symbol can be %NULL.
 
 
 </description>
@@ -31462,6 +32008,29 @@ vulnerability.
 </parameter>
 </parameters>
 <return> Pointer to stack space for @n_structs chunks of type @struct_type
+</return>
+</function>
+
+<function name="g_newa0">
+<description>
+Wraps g_alloca0() in a more typesafe manner.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="struct_type">
+<parameter_description> the type of the elements to allocate.
+</parameter_description>
+</parameter>
+<parameter name="n_structs">
+<parameter_description> the number of elements to allocate.
+</parameter_description>
+</parameter>
+</parameters>
+<return> Pointer to stack space for @n_structs
+chunks of type @struct_type
+
 </return>
 </function>
 
@@ -33242,7 +33811,7 @@ Since: 2.10
 <description>
 Creates a new instance of a #GObject subtype and sets its properties.
 
-Construction parameters (see #G_PARAM_CONSTRUCT, #G_PARAM_CONSTRUCT_ONLY)
+Construction parameters (see %G_PARAM_CONSTRUCT, %G_PARAM_CONSTRUCT_ONLY)
 which are not explicitly specified are set to their default values. Any
 private data for the object is guaranteed to be initialized with zeros, as
 per g_type_create_instance().
@@ -33260,6 +33829,12 @@ make use of the %G_GINT64_CONSTANT or %G_GUINT64_CONSTANT macros.
 
 Similarly, #gfloat is promoted to #gdouble, so you must ensure that the value
 you provide is a #gdouble, even for a property of type #gfloat.
+
+Since GLib 2.72, all #GObjects are guaranteed to be aligned to at least the
+alignment of the largest basic GLib type (typically this is #guint64 or
+#gdouble). If you need larger alignment for an element in a #GObject, you
+should allocate it on the heap (aligned), or arrange for your #GObject to be
+appropriately padded.
 
 
 </description>
@@ -33287,7 +33862,7 @@ name/value pairs, followed by %NULL
 <description>
 Creates a new instance of a #GObject subtype and sets its properties.
 
-Construction parameters (see #G_PARAM_CONSTRUCT, #G_PARAM_CONSTRUCT_ONLY)
+Construction parameters (see %G_PARAM_CONSTRUCT, %G_PARAM_CONSTRUCT_ONLY)
 which are not explicitly specified are set to their default values.
 
 
@@ -33351,7 +33926,7 @@ Since: 2.54
 <description>
 Creates a new instance of a #GObject subtype and sets its properties.
 
-Construction parameters (see #G_PARAM_CONSTRUCT, #G_PARAM_CONSTRUCT_ONLY)
+Construction parameters (see %G_PARAM_CONSTRUCT, %G_PARAM_CONSTRUCT_ONLY)
 which are not explicitly specified are set to their default values.
 
 Deprecated: 2.54: Use g_object_new_with_properties() instead.
@@ -34638,7 +35213,7 @@ Creates a new option context.
 The @parameter_string can serve multiple purposes. It can be used
 to add descriptions for &quot;rest&quot; arguments, which are not parsed by
 the #GOptionContext, typically something like &quot;FILES&quot; or
-&quot;FILE1 FILE2...&quot;. If you are using #G_OPTION_REMAINING for
+&quot;FILE1 FILE2...&quot;. If you are using %G_OPTION_REMAINING for
 collecting &quot;rest&quot; arguments, GLib handles this automatically by
 using the @arg_description of the corresponding #GOptionEntry in
 the usage summary.
@@ -35766,7 +36341,7 @@ e.g. a tooltip. The @nick and @blurb should ideally be localized.
 </description>
 <parameters>
 <parameter name="param_type">
-<parameter_description> the #GType for the property; must be derived from #G_TYPE_PARAM
+<parameter_description> the #GType for the property; must be derived from %G_TYPE_PARAM
 </parameter_description>
 </parameter>
 <parameter name="name">
@@ -36593,7 +37168,7 @@ use as the default value, or %NULL
 <function name="g_param_type_register_static">
 <description>
 Registers @name as the name of a new static type derived
-from #G_TYPE_PARAM.
+from %G_TYPE_PARAM.
 
 The type system uses the information contained in the #GParamSpecTypeInfo
 structure pointed to by @info to manage the #GParamSpec type and its
@@ -36795,8 +37370,8 @@ separator is returned. If @file_name is empty, it gets &quot;.&quot;.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated string containing the last
-component of the filename
+<return> a newly allocated string
+containing the last component of the filename
 </return>
 </function>
 
@@ -38762,7 +39337,7 @@ contains @data, or -1 if no element in @queue contains @data
 <description>
 A statically-allocated #GQueue must be initialized with this function
 before it can be used. Alternatively you can initialize it with
-#G_QUEUE_INIT. It is not necessary to initialize queues created with
+%G_QUEUE_INIT. It is not necessary to initialize queues created with
 g_queue_new().
 
 Since: 2.14
@@ -40798,7 +41373,7 @@ Note that the DFA algorithm is slower than the standard one and it
 is not able to capture substrings, so backreferences do not work.
 
 Setting @start_position differs from just passing over a shortened
-string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern
+string and setting %G_REGEX_MATCH_NOTBOL in the case of a pattern
 that begins with any kind of lookbehind assertion, such as &quot;\b&quot;.
 
 Unless %G_REGEX_RAW is specified in the options, @string must be valid UTF-8.
@@ -40860,7 +41435,7 @@ when the @regex structure was created, letting you have more
 flexibility in reusing #GRegex structures.
 
 Setting @start_position differs from just passing over a shortened
-string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern
+string and setting %G_REGEX_MATCH_NOTBOL in the case of a pattern
 that begins with any kind of lookbehind assertion, such as &quot;\b&quot;.
 
 Unless %G_REGEX_RAW is specified in the options, @string must be valid UTF-8.
@@ -41055,12 +41630,12 @@ There are also escapes that changes the case of the following text:
 
 If you do not need to use backreferences use g_regex_replace_literal().
 
-The @replacement string must be UTF-8 encoded even if #G_REGEX_RAW was
+The @replacement string must be UTF-8 encoded even if %G_REGEX_RAW was
 passed to g_regex_new(). If you want to use not UTF-8 encoded strings
 you can use g_regex_replace_literal().
 
 Setting @start_position differs from just passing over a shortened
-string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern that
+string and setting %G_REGEX_MATCH_NOTBOL in the case of a pattern that
 begins with any kind of lookbehind assertion, such as &quot;\b&quot;.
 
 Since: 2.14
@@ -41107,7 +41682,7 @@ Replaces occurrences of the pattern in regex with the output of
 @eval for that occurrence.
 
 Setting @start_position differs from just passing over a shortened
-string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern
+string and setting %G_REGEX_MATCH_NOTBOL in the case of a pattern
 that begins with any kind of lookbehind assertion, such as &quot;\b&quot;.
 
 The following example uses g_regex_replace_eval() to replace multiple
@@ -41198,7 +41773,7 @@ replacement text. @replacement is replaced literally, to
 include backreferences use g_regex_replace().
 
 Setting @start_position differs from just passing over a
-shortened string and setting #G_REGEX_MATCH_NOTBOL in the
+shortened string and setting %G_REGEX_MATCH_NOTBOL in the
 case of a pattern that begins with any kind of lookbehind
 assertion, such as &quot;\b&quot;.
 
@@ -41304,7 +41879,7 @@ For example splitting &quot;ab c&quot; using as a separator &quot;\s*&quot;, you
 &quot;a&quot;, &quot;b&quot; and &quot;c&quot;.
 
 Setting @start_position differs from just passing over a shortened
-string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern
+string and setting %G_REGEX_MATCH_NOTBOL in the case of a pattern
 that begins with any kind of lookbehind assertion, such as &quot;\b&quot;.
 
 Since: 2.14
@@ -43931,7 +44506,9 @@ gdk_init(), which is called by gtk_init() and the
 #GtkApplication::startup handler. The program name is found by
 taking the last component of @argv[0].
 
-Note that for thread-safety reasons this function can only be called once.
+Since GLib 2.72, this function can be called multiple times
+and is fully thread safe. Prior to GLib 2.72, this function
+could only be called once per process.
 
 </description>
 <parameters>
@@ -44094,6 +44671,11 @@ unsupported shell expansions. If the input does contain such expansions,
 they are passed through literally.
 
 Possible errors are those from the %G_SHELL_ERROR domain.
+
+In particular, if @command_line is an empty string (or a string containing
+only whitespace), %G_SHELL_ERROR_EMPTY_STRING will be returned. It’s
+guaranteed that @argvp will be a non-empty array if this function returns
+successfully.
 
 Free the returned vector with g_strfreev().
 
@@ -44272,7 +44854,7 @@ Since: 2.4
 <description>
 Adds an emission hook for a signal, which will get called for any emission
 of that signal, independent of the instance. This is possible only
-for signals which don't have #G_SIGNAL_NO_HOOKS flag set.
+for signals which don't have %G_SIGNAL_NO_HOOKS flag set.
 
 
 </description>
@@ -44344,7 +44926,7 @@ emitted on.
 <parameter name="Varargs">
 <parameter_description> parameters to be passed to the parent class closure, followed by a
 location for the return value. If the return type of the signal
-is #G_TYPE_NONE, the return value location can be omitted.
+is %G_TYPE_NONE, the return value location can be omitted.
 </parameter_description>
 </parameter>
 </parameters>
@@ -44355,7 +44937,7 @@ is #G_TYPE_NONE, the return value location can be omitted.
 <description>
 Connects a #GCallback function to a signal for a particular object.
 
-The handler will be called before the default handler of the signal.
+The handler will be called synchronously, before the default handler of the signal. g_signal_emit() will not return control until all handlers are called.
 
 See [memory management of signal handlers][signal-memory-management] for
 details on how to handle the return value and memory management of @data.
@@ -44388,7 +44970,7 @@ details on how to handle the return value and memory management of @data.
 <description>
 Connects a #GCallback function to a signal for a particular object.
 
-The handler will be called after the default handler of the signal.
+The handler will be called synchronously, after the default handler of the signal.
 
 
 </description>
@@ -44611,7 +45193,8 @@ g_signal_connect (button, &quot;clicked&quot;,
 
 <function name="g_signal_emit">
 <description>
-Emits a signal.
+Emits a signal. Signal emission is done synchronously.
+The method will only return control after all handlers are called or signal emission was stopped.
 
 Note that g_signal_emit() resets the return value to the default
 if no handlers are connected, in contrast to g_signal_emitv().
@@ -44633,7 +45216,7 @@ if no handlers are connected, in contrast to g_signal_emitv().
 <parameter name="Varargs">
 <parameter_description> parameters to be passed to the signal, followed by a
 location for the return value. If the return type of the signal
-is #G_TYPE_NONE, the return value location can be omitted.
+is %G_TYPE_NONE, the return value location can be omitted.
 </parameter_description>
 </parameter>
 </parameters>
@@ -44642,7 +45225,8 @@ is #G_TYPE_NONE, the return value location can be omitted.
 
 <function name="g_signal_emit_by_name">
 <description>
-Emits a signal.
+Emits a signal. Signal emission is done synchronously.
+The method will only return control after all handlers are called or signal emission was stopped.
 
 Note that g_signal_emit_by_name() resets the return value to the default
 if no handlers are connected, in contrast to g_signal_emitv().
@@ -44670,7 +45254,8 @@ number of parameters to pass to this function is defined when creating the signa
 
 <function name="g_signal_emit_valist">
 <description>
-Emits a signal.
+Emits a signal. Signal emission is done synchronously.
+The method will only return control after all handlers are called or signal emission was stopped.
 
 Note that g_signal_emit_valist() resets the return value to the default
 if no handlers are connected, in contrast to g_signal_emitv().
@@ -44693,7 +45278,7 @@ emitted on.
 <parameter name="var_args">
 <parameter_description> a list of parameters to be passed to the signal, followed by a
 location for the return value. If the return type of the signal
-is #G_TYPE_NONE, the return value location can be omitted.
+is %G_TYPE_NONE, the return value location can be omitted.
 </parameter_description>
 </parameter>
 </parameters>
@@ -44702,7 +45287,8 @@ is #G_TYPE_NONE, the return value location can be omitted.
 
 <function name="g_signal_emitv">
 <description>
-Emits a signal.
+Emits a signal. Signal emission is done synchronously.
+The method will only return control after all handlers are called or signal emission was stopped.
 
 Note that g_signal_emitv() doesn't change @return_value if no handlers are
 connected, in contrast to g_signal_emit() and g_signal_emit_valist().
@@ -44748,6 +45334,282 @@ Returns the invocation hint of the innermost signal emission of instance.
 <return> the invocation hint of the innermost
 signal emission, or %NULL if not found.
 </return>
+</function>
+
+<function name="g_signal_group_block">
+<description>
+Blocks all signal handlers managed by @self so they will not
+be called during any signal emissions. Must be unblocked exactly
+the same number of times it has been blocked to become active again.
+
+This blocked state will be kept across changes of the target instance.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GSignalGroup
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_signal_group_connect">
+<description>
+Connects @c_handler to the signal @detailed_signal
+on the target instance of @self.
+
+You cannot connect a signal handler after #GSignalGroup:target has been set.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GSignalGroup
+</parameter_description>
+</parameter>
+<parameter name="detailed_signal">
+<parameter_description> a string of the form &quot;signal-name::detail&quot;
+</parameter_description>
+</parameter>
+<parameter name="c_handler">
+<parameter_description> the #GCallback to connect
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the data to pass to @c_handler calls
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_signal_group_connect_after">
+<description>
+Connects @c_handler to the signal @detailed_signal
+on the target instance of @self.
+
+The @c_handler will be called after the default handler of the signal.
+
+You cannot connect a signal handler after #GSignalGroup:target has been set.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GSignalGroup
+</parameter_description>
+</parameter>
+<parameter name="detailed_signal">
+<parameter_description> a string of the form &quot;signal-name::detail&quot;
+</parameter_description>
+</parameter>
+<parameter name="c_handler">
+<parameter_description> the #GCallback to connect
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the data to pass to @c_handler calls
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_signal_group_connect_data">
+<description>
+Connects @c_handler to the signal @detailed_signal
+on the target instance of @self.
+
+You cannot connect a signal handler after #GSignalGroup:target has been set.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GSignalGroup
+</parameter_description>
+</parameter>
+<parameter name="detailed_signal">
+<parameter_description> a string of the form &quot;signal-name::detail&quot;
+</parameter_description>
+</parameter>
+<parameter name="c_handler">
+<parameter_description> the #GCallback to connect
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the data to pass to @c_handler calls
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> function to be called when disposing of @self
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> the flags used to create the signal connection
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_signal_group_connect_object">
+<description>
+Connects @c_handler to the signal @detailed_signal on #GSignalGroup:target.
+
+Ensures that the @object stays alive during the call to @c_handler
+by temporarily adding a reference count. When the @object is destroyed
+the signal handler will automatically be removed.
+
+You cannot connect a signal handler after #GSignalGroup:target has been set.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GSignalGroup
+</parameter_description>
+</parameter>
+<parameter name="detailed_signal">
+<parameter_description> a string of the form `signal-name` with optional `::signal-detail`
+</parameter_description>
+</parameter>
+<parameter name="c_handler">
+<parameter_description> the #GCallback to connect
+</parameter_description>
+</parameter>
+<parameter name="object">
+<parameter_description> the #GObject to pass as data to @c_handler calls
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> #GConnectFlags for the signal connection
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_signal_group_connect_swapped">
+<description>
+Connects @c_handler to the signal @detailed_signal
+on the target instance of @self.
+
+The instance on which the signal is emitted and @data
+will be swapped when calling @c_handler.
+
+You cannot connect a signal handler after #GSignalGroup:target has been set.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GSignalGroup
+</parameter_description>
+</parameter>
+<parameter name="detailed_signal">
+<parameter_description> a string of the form &quot;signal-name::detail&quot;
+</parameter_description>
+</parameter>
+<parameter name="c_handler">
+<parameter_description> the #GCallback to connect
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the data to pass to @c_handler calls
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_signal_group_dup_target">
+<description>
+Gets the target instance used when connecting signals.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GSignalGroup
+</parameter_description>
+</parameter>
+</parameters>
+<return> The target instance
+
+</return>
+</function>
+
+<function name="g_signal_group_new">
+<description>
+Creates a new #GSignalGroup for target instances of @target_type.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="target_type">
+<parameter_description> the #GType of the target instance.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GSignalGroup
+
+</return>
+</function>
+
+<function name="g_signal_group_set_target">
+<description>
+Sets the target instance used when connecting signals. Any signal
+that has been registered with g_signal_group_connect_object() or
+similar functions will be connected to this object.
+
+If the target instance was previously set, signals will be
+disconnected from that object prior to connecting to @target.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GSignalGroup.
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description> The target instance used
+when connecting signals.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_signal_group_unblock">
+<description>
+Unblocks all signal handlers managed by @self so they will be
+called again during any signal emissions unless it is blocked
+again. Must be unblocked exactly the same number of times it
+has been blocked to become active again.
+
+Since: 2.72
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GSignalGroup
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_signal_handler_block">
@@ -45347,7 +46209,7 @@ values to signal emissions into C language callback invocations or %NULL.
 </parameter_description>
 </parameter>
 <parameter name="return_type">
-<parameter_description> the type of return value, or #G_TYPE_NONE for a signal
+<parameter_description> the type of return value, or %G_TYPE_NONE for a signal
 without a return value.
 </parameter_description>
 </parameter>
@@ -45422,7 +46284,7 @@ values to signal emissions into C language callback invocations or %NULL.
 </parameter_description>
 </parameter>
 <parameter name="return_type">
-<parameter_description> the type of return value, or #G_TYPE_NONE for a signal
+<parameter_description> the type of return value, or %G_TYPE_NONE for a signal
 without a return value.
 </parameter_description>
 </parameter>
@@ -45485,7 +46347,7 @@ values to signal emissions into C language callback invocations or %NULL.
 </parameter_description>
 </parameter>
 <parameter name="return_type">
-<parameter_description> the type of return value, or #G_TYPE_NONE for a signal
+<parameter_description> the type of return value, or %G_TYPE_NONE for a signal
 without a return value.
 </parameter_description>
 </parameter>
@@ -45549,7 +46411,7 @@ invocations or %NULL
 </parameter_description>
 </parameter>
 <parameter name="return_type">
-<parameter_description> the type of return value, or #G_TYPE_NONE for a signal
+<parameter_description> the type of return value, or %G_TYPE_NONE for a signal
 without a return value
 </parameter_description>
 </parameter>
@@ -47517,7 +48379,7 @@ wrong source.
 </parameter_description>
 </parameter>
 </parameters>
-<return> For historical reasons, this function always returns %TRUE
+<return> %TRUE if the source was found and removed.
 </return>
 </function>
 
@@ -48112,7 +48974,8 @@ Since: 2.58
 </parameter_description>
 </parameter>
 <parameter name="argv">
-<parameter_description> child's argument vector, in the GLib file name encoding
+<parameter_description> child's argument vector, in the GLib file name encoding;
+it must be non-empty and %NULL-terminated
 </parameter_description>
 </parameter>
 <parameter name="envp">
@@ -48172,7 +49035,7 @@ directory, or %NULL to inherit parent's, in the GLib file name encoding
 </parameter>
 <parameter name="argv">
 <parameter_description> child's argument
-vector, in the GLib file name encoding
+vector, in the GLib file name encoding; it must be non-empty and %NULL-terminated
 </parameter_description>
 </parameter>
 <parameter name="envp">
@@ -48325,6 +49188,8 @@ to the spawned process. FD remappings are processed after standard FDs, so
 any target FDs which equal @stdin_fd, @stdout_fd or @stderr_fd will overwrite
 them in the spawned process.
 
+@source_fds is supported on Windows since 2.72.
+
 %G_SPAWN_FILE_AND_ARGV_ZERO means that the first element of @argv is
 the file to execute, while the remaining elements are the actual
 argument vector to pass to the file. Normally g_spawn_async_with_pipes()
@@ -48377,7 +49242,7 @@ If an error is set, the function returns %FALSE. Errors are reported
 even if they occur in the child (for example if the executable in
 `@argv[0]` is not found). Typically the `message` field of returned
 errors should be displayed to users. Possible errors are those from
-the #G_SPAWN_ERROR domain.
+the %G_SPAWN_ERROR domain.
 
 If an error occurs, @child_pid, @stdin_pipe_out, @stdout_pipe_out,
 and @stderr_pipe_out will not be filled with valid values.
@@ -48418,7 +49283,7 @@ directory, or %NULL to inherit parent's, in the GLib file name encoding
 </parameter>
 <parameter name="argv">
 <parameter_description> child's argument
-vector, in the GLib file name encoding
+vector, in the GLib file name encoding; it must be non-empty and %NULL-terminated
 </parameter_description>
 </parameter>
 <parameter name="envp">
@@ -48726,7 +49591,7 @@ directory, or %NULL to inherit parent's
 </parameter>
 <parameter name="argv">
 <parameter_description>
-child's argument vector
+child's argument vector, which must be non-empty and %NULL-terminated
 </parameter_description>
 </parameter>
 <parameter name="envp">
@@ -48895,7 +49760,7 @@ Deprecated: 2.32: Just use a #GMutex
 <function name="g_static_mutex_init">
 <description>
 Initializes @mutex.
-Alternatively you can initialize it with #G_STATIC_MUTEX_INIT.
+Alternatively you can initialize it with %G_STATIC_MUTEX_INIT.
 
 Deprecated: 2.32: Use g_mutex_init()
 
@@ -48999,7 +49864,7 @@ This function works even if g_thread_init() has not yet been called.
 <function name="g_static_private_init">
 <description>
 Initializes @private_key. Alternatively you can initialize it with
-#G_STATIC_PRIVATE_INIT.
+%G_STATIC_PRIVATE_INIT.
 
 </description>
 <parameters>
@@ -49069,7 +49934,7 @@ Deprecated: 2.32: Use g_rec_mutex_clear()
 <description>
 A #GStaticRecMutex must be initialized with this function before it
 can be used. Alternatively you can initialize it with
-#G_STATIC_REC_MUTEX_INIT.
+%G_STATIC_REC_MUTEX_INIT.
 
 Deprecated: 2.32: Use g_rec_mutex_init()
 
@@ -49215,7 +50080,7 @@ Deprecated: 2.32: Use a #GRWLock instead
 <description>
 A #GStaticRWLock must be initialized with this function before it
 can be used. Alternatively you can initialize it with
-#G_STATIC_RW_LOCK_INIT.
+%G_STATIC_RW_LOCK_INIT.
 
 Deprecated: 2.32: Use g_rw_lock_init() instead
 
@@ -49935,7 +50800,7 @@ g_free (reformatted);
 </parameter>
 <parameter name="delimiters">
 <parameter_description> a string containing the current delimiters,
-or %NULL to use the standard delimiters defined in #G_STR_DELIMITERS
+or %NULL to use the standard delimiters defined in %G_STR_DELIMITERS
 </parameter_description>
 </parameter>
 <parameter name="new_delimiter">
@@ -52448,9 +53313,9 @@ Since: 2.38
 Gets the pathname to a data file that is required for a test.
 
 This is the same as g_test_build_filename() with two differences.
-The first difference is that must only use this function from within
+The first difference is that you must only use this function from within
 a testcase function.  The second difference is that you need not free
-the return value -- it will be automatically freed when the testcase
+the return value — it will be automatically freed when the testcase
 finishes running.
 
 It is safe to use this function from a thread inside of a testcase
@@ -53297,14 +54162,15 @@ can be used to change this.
 
 <function name="g_test_timer_elapsed">
 <description>
-Get the time since the last start of the timer with g_test_timer_start().
+Get the number of seconds since the last start of the timer with
+g_test_timer_start().
 
 Since: 2.16
 
 </description>
 <parameters>
 </parameters>
-<return> the time since the last start of the timer, as a double
+<return> the time since the last start of the timer in seconds, as a double
 
 </return>
 </function>
@@ -54935,6 +55801,11 @@ in seconds.
 This is equivalent to calling g_time_zone_new() with a string in the form
 `[+|-]hh[:mm[:ss]]`.
 
+It is possible for this function to fail if @seconds is too big (greater than
+24 hours), in which case this function will return the UTC timezone for
+backwards compatibility. To detect failures like this, use
+g_time_zone_new_identifier() directly.
+
 Since: 2.58
 
 </description>
@@ -54944,7 +55815,8 @@ Since: 2.58
 </parameter_description>
 </parameter>
 </parameters>
-<return> a timezone at the given offset from UTC
+<return> a timezone at the given offset from UTC, or UTC on
+failure
 </return>
 </function>
 
@@ -57879,7 +58751,7 @@ instances (if not abstract).  The value of @flags determines the nature
 </parameter_description>
 </parameter>
 </parameters>
-<return> the new type identifier or #G_TYPE_INVALID if registration failed
+<return> the new type identifier or %G_TYPE_INVALID if registration failed
 </return>
 </function>
 
@@ -59341,7 +60213,7 @@ Since: 2.30
 <parameters>
 <parameter name="priority">
 <parameter_description> the priority of the signal source. Typically this will be in
-the range between #G_PRIORITY_DEFAULT and #G_PRIORITY_HIGH.
+the range between %G_PRIORITY_DEFAULT and %G_PRIORITY_HIGH.
 </parameter_description>
 </parameter>
 <parameter name="signum">
@@ -60793,7 +61665,7 @@ Since: 2.66
 Pauses the current thread for the given number of microseconds.
 
 There are 1 million microseconds per second (represented by the
-#G_USEC_PER_SEC macro). g_usleep() may have limited precision,
+%G_USEC_PER_SEC macro). g_usleep() may have limited precision,
 depending on hardware and operating system; don't rely on the exact
 length of the sleep.
 
@@ -60883,12 +61755,13 @@ If @len &lt; 0, then the string is nul-terminated.
 words read, or %NULL. If %NULL, then %G_CONVERT_ERROR_PARTIAL_INPUT will
 be returned in case @str contains a trailing partial character. If
 an error occurs then the index of the invalid input is stored here.
+It’s guaranteed to be non-negative.
 </parameter_description>
 </parameter>
 <parameter name="items_written">
 <parameter_description> location to store number
 of bytes written, or %NULL. The value stored here does not include the
-trailing 0 byte.
+trailing 0 byte. It’s guaranteed to be non-negative.
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -60943,6 +61816,10 @@ When sorting a large number of strings, it will be significantly
 faster to obtain collation keys with g_utf8_collate_key() and 
 compare the keys with strcmp() when sorting instead of sorting 
 the original strings.
+
+If the two strings are not comparable due to being in different collation
+sequences, the result is undefined. This can happen if the strings are in
+different language scripts, for example.
 
 
 </description>
@@ -61515,6 +62392,9 @@ converted to uppercase.
 Copies a substring out of a UTF-8 encoded string.
 The substring will contain @end_pos - @start_pos characters.
 
+Since GLib 2.72, `-1` can be passed to @end_pos to indicate the
+end of the string.
+
 Since: 2.30
 
 </description>
@@ -61528,7 +62408,8 @@ Since: 2.30
 </parameter_description>
 </parameter>
 <parameter name="end_pos">
-<parameter_description> another character offset within @str
+<parameter_description> another character offset within @str,
+or `-1` to indicate the end of the string
 </parameter_description>
 </parameter>
 </parameters>
@@ -67749,7 +68630,8 @@ Since: 2.4
 </description>
 <parameters>
 <parameter name="string">
-<parameter_description> the return location for the newly-allocated string.
+<parameter_description> the return location for the newly-allocated string,
+which will be %NULL if (and only if) this function fails
 </parameter_description>
 </parameter>
 <parameter name="format">
@@ -67762,7 +68644,7 @@ Since: 2.4
 </parameter_description>
 </parameter>
 </parameters>
-<return> the number of bytes printed.
+<return> the number of bytes printed, or `-1` on failure
 
 </return>
 </function>
@@ -68295,6 +69177,59 @@ deallocated with g_free().
 </return>
 </function>
 
+<function name="g_win32_find_helper_executable_path">
+<description>
+Find an external executable path and name starting in the same folder
+as a specified DLL or current process executable path. Helper executables
+(like gspawn-win64-helper.exe, gspawn-win64-helper-console.exe or
+gdbus.exe for example) are generally installed in the same folder as the
+corresponding DLL file.
+
+So, if package has been correctly installed, with a dynamic build of GLib,
+the helper executable should be in the same directory as the corresponding
+DLL file and searching should be straightforward.
+
+But if built statically, DLL handle is not available and we have to start
+searching from the directory holding current executable. It may be very
+different from the directory containing the helper program. In order to
+find the right helper program automatically in all common situations, we
+use this pattern:
+
+current directory
+|-- ???
+|-- bin
+|    |-- ???
+|-- lib
+|    |-- ???
+|-- glib
+|    |-- ???
+|-- gio
+|-- ???
+
+starting at base searching path (DLL or current executable directory) and
+getting up until the root path. If we cannot still find the helper program,
+we'll rely on PATH as the last resort.
+
+
+</description>
+<parameters>
+<parameter name="executable_name">
+<parameter_description> name of the helper executable to find
+(something like gspawn-win64-helper.exe or gdbus.exe for example).
+</parameter_description>
+</parameter>
+<parameter name="dll_handle">
+<parameter_description> handle of the DLL to use as searching base path. Pass NULL
+to take current process executable as searching base path.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the helper executable
+path and name in the GLib filename encoding or NULL in case of error. It
+should be deallocated with g_free().
+</return>
+</function>
+
 <function name="g_win32_get_command_line">
 <description>
 Gets the command line arguments, on Windows, in the GLib filename
@@ -68661,7 +69596,7 @@ Corresponds to the standard C char type.
 
 <function name="gchararray">
 <description>
-A C representable type name for #G_TYPE_STRING.
+A C representable type name for %G_TYPE_STRING.
 
 </description>
 <parameters>
@@ -68686,7 +69621,7 @@ that the data pointed to will not be altered by the function.
 <function name="gdouble">
 <description>
 Corresponds to the standard C double type.
-Values of this type can range from -#G_MAXDOUBLE to #G_MAXDOUBLE.
+Values of this type can range from -%G_MAXDOUBLE to %G_MAXDOUBLE.
 
 </description>
 <parameters>
@@ -68697,7 +69632,7 @@ Values of this type can range from -#G_MAXDOUBLE to #G_MAXDOUBLE.
 <function name="gfloat">
 <description>
 Corresponds to the standard C float type.
-Values of this type can range from -#G_MAXFLOAT to #G_MAXFLOAT.
+Values of this type can range from -%G_MAXFLOAT to %G_MAXFLOAT.
 
 </description>
 <parameters>
@@ -68708,7 +69643,7 @@ Values of this type can range from -#G_MAXFLOAT to #G_MAXFLOAT.
 <function name="gint">
 <description>
 Corresponds to the standard C int type.
-Values of this type can range from #G_MININT to #G_MAXINT.
+Values of this type can range from %G_MININT to %G_MAXINT.
 
 </description>
 <parameters>
@@ -68719,8 +69654,8 @@ Values of this type can range from #G_MININT to #G_MAXINT.
 <function name="gint16">
 <description>
 A signed integer guaranteed to be 16 bits on all platforms.
-Values of this type can range from #G_MININT16 (= -32,768) to
-#G_MAXINT16 (= 32,767).
+Values of this type can range from %G_MININT16 (= -32,768) to
+%G_MAXINT16 (= 32,767).
 
 To print or scan values of this type, use
 %G_GINT16_MODIFIER and/or %G_GINT16_FORMAT.
@@ -68734,8 +69669,8 @@ To print or scan values of this type, use
 <function name="gint32">
 <description>
 A signed integer guaranteed to be 32 bits on all platforms.
-Values of this type can range from #G_MININT32 (= -2,147,483,648)
-to #G_MAXINT32 (= 2,147,483,647).
+Values of this type can range from %G_MININT32 (= -2,147,483,648)
+to %G_MAXINT32 (= 2,147,483,647).
 
 To print or scan values of this type, use
 %G_GINT32_MODIFIER and/or %G_GINT32_FORMAT.
@@ -68749,8 +69684,8 @@ To print or scan values of this type, use
 <function name="gint64">
 <description>
 A signed integer guaranteed to be 64 bits on all platforms.
-Values of this type can range from #G_MININT64
-(= -9,223,372,036,854,775,808) to #G_MAXINT64
+Values of this type can range from %G_MININT64
+(= -9,223,372,036,854,775,808) to %G_MAXINT64
 (= 9,223,372,036,854,775,807).
 
 To print or scan values of this type, use
@@ -68765,8 +69700,8 @@ To print or scan values of this type, use
 <function name="gint8">
 <description>
 A signed integer guaranteed to be 8 bits on all platforms.
-Values of this type can range from #G_MININT8 (= -128) to
-#G_MAXINT8 (= 127).
+Values of this type can range from %G_MININT8 (= -128) to
+%G_MAXINT8 (= 127).
 
 </description>
 <parameters>
@@ -68975,7 +69910,7 @@ by a \004 character
 <function name="glong">
 <description>
 Corresponds to the standard C long type.
-Values of this type can range from #G_MINLONG to #G_MAXLONG.
+Values of this type can range from %G_MINLONG to %G_MAXLONG.
 
 </description>
 <parameters>
@@ -68989,8 +69924,8 @@ A signed integer type that is used for file offsets,
 corresponding to the POSIX type `off_t` as if compiling with
 `_FILE_OFFSET_BITS` set to 64. #goffset is always 64 bits wide, even on
 32-bit architectures.
-Values of this type can range from #G_MINOFFSET to
-#G_MAXOFFSET.
+Values of this type can range from %G_MINOFFSET to
+%G_MAXOFFSET.
 
 To print or scan values of this type, use
 %G_GOFFSET_MODIFIER and/or %G_GOFFSET_FORMAT.
@@ -69039,7 +69974,7 @@ Since: 2.58
 <function name="gshort">
 <description>
 Corresponds to the standard C short type.
-Values of this type can range from #G_MINSHORT to #G_MAXSHORT.
+Values of this type can range from %G_MINSHORT to %G_MAXSHORT.
 
 </description>
 <parameters>
@@ -69054,7 +69989,7 @@ corresponding to the size_t type defined in C99.
 This type is wide enough to hold the numeric value of a pointer,
 so it is usually 32 bit wide on a 32-bit platform and 64 bit wide
 on a 64-bit platform. Values of this type can range from 0 to
-#G_MAXSIZE.
+%G_MAXSIZE.
 
 To print or scan values of this type, use
 %G_GSIZE_MODIFIER and/or %G_GSIZE_FORMAT.
@@ -69069,8 +70004,8 @@ To print or scan values of this type, use
 <description>
 A signed variant of #gsize, corresponding to the
 ssize_t defined on most platforms.
-Values of this type can range from #G_MINSSIZE
-to #G_MAXSSIZE.
+Values of this type can range from %G_MINSSIZE
+to %G_MAXSSIZE.
 
 To print or scan values of this type, use
 %G_GSSIZE_MODIFIER and/or %G_GSSIZE_FORMAT.
@@ -69094,7 +70029,7 @@ Corresponds to the standard C unsigned char type.
 <function name="guint">
 <description>
 Corresponds to the standard C unsigned int type.
-Values of this type can range from 0 to #G_MAXUINT.
+Values of this type can range from 0 to %G_MAXUINT.
 
 </description>
 <parameters>
@@ -69105,7 +70040,7 @@ Values of this type can range from 0 to #G_MAXUINT.
 <function name="guint16">
 <description>
 An unsigned integer guaranteed to be 16 bits on all platforms.
-Values of this type can range from 0 to #G_MAXUINT16 (= 65,535).
+Values of this type can range from 0 to %G_MAXUINT16 (= 65,535).
 
 To print or scan values of this type, use
 %G_GINT16_MODIFIER and/or %G_GUINT16_FORMAT.
@@ -69119,7 +70054,7 @@ To print or scan values of this type, use
 <function name="guint32">
 <description>
 An unsigned integer guaranteed to be 32 bits on all platforms.
-Values of this type can range from 0 to #G_MAXUINT32 (= 4,294,967,295).
+Values of this type can range from 0 to %G_MAXUINT32 (= 4,294,967,295).
 
 To print or scan values of this type, use
 %G_GINT32_MODIFIER and/or %G_GUINT32_FORMAT.
@@ -69133,7 +70068,7 @@ To print or scan values of this type, use
 <function name="guint64">
 <description>
 An unsigned integer guaranteed to be 64-bits on all platforms.
-Values of this type can range from 0 to #G_MAXUINT64
+Values of this type can range from 0 to %G_MAXUINT64
 (= 18,446,744,073,709,551,615).
 
 To print or scan values of this type, use
@@ -69148,7 +70083,7 @@ To print or scan values of this type, use
 <function name="guint8">
 <description>
 An unsigned integer guaranteed to be 8 bits on all platforms.
-Values of this type can range from 0 to #G_MAXUINT8 (= 255).
+Values of this type can range from 0 to %G_MAXUINT8 (= 255).
 
 </description>
 <parameters>
@@ -69175,7 +70110,7 @@ Since: 2.18
 <function name="gulong">
 <description>
 Corresponds to the standard C unsigned long type.
-Values of this type can range from 0 to #G_MAXULONG.
+Values of this type can range from 0 to %G_MAXULONG.
 
 </description>
 <parameters>
@@ -69239,7 +70174,7 @@ To print/scan values of this type as integer, use
 <function name="gushort">
 <description>
 Corresponds to the standard C unsigned short type.
-Values of this type can range from 0 to #G_MAXUSHORT.
+Values of this type can range from 0 to %G_MAXUSHORT.
 
 </description>
 <parameters>
