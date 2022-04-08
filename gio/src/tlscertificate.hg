@@ -47,20 +47,22 @@ class GIOMM_API TlsCertificate : public Glib::Object
   _CLASS_GOBJECT(TlsCertificate, GTlsCertificate, G_TLS_CERTIFICATE, Glib::Object, GObject, , , GIOMM_API)
 
 protected:
+  //TODO: These constructors don't work. Delete them when we can break ABI and API.
+  // There are no properties with the same names as the parameters.
+  // _WRAP_CTOR() is not useful here anyway. See the next comment.
   _WRAP_CTOR(TlsCertificate(const std::string& data, gssize length), g_tls_certificate_new_from_pem, errthrow)
   _WRAP_CTOR(TlsCertificate(const std::string& file), g_tls_certificate_new_from_file, errthrow)
   _WRAP_CTOR(TlsCertificate(const std::string& cert_file, const std::string& key_file), g_tls_certificate_new_from_files, errthrow)
 
 public:
-  _WRAP_METHOD_DOCS_ONLY(g_tls_certificate_new_from_pem)
-  static Glib::RefPtr<TlsCertificate>
-    create_from_pem(const std::string& data, gssize length = -1);
-
-  _WRAP_METHOD_DOCS_ONLY(g_tls_certificate_new_from_file)
-  _WRAP_CREATE(const std::string& file)
-
-  _WRAP_METHOD_DOCS_ONLY(g_tls_certificate_new_from_files)
-  _WRAP_CREATE(const std::string& cert_file, const std::string& key_file)
+  // We can't use _WRAP_CTOR() and _WRAP_CREATE() because all the
+  // g_tls_certificate_new_*() functions do more than just call g_object_new().
+  _WRAP_METHOD(static Glib::RefPtr<TlsCertificate> create_from_pem(const std::string& data, gssize length = -1),
+    g_tls_certificate_new_from_pem, errthrow)
+  _WRAP_METHOD(static Glib::RefPtr<TlsCertificate> create(const std::string& file),
+    g_tls_certificate_new_from_file, errthrow)
+  _WRAP_METHOD(static Glib::RefPtr<TlsCertificate> create(const std::string& cert_file, const std::string& key_file),
+    g_tls_certificate_new_from_files, errthrow)
 
 #m4 _CONVERSION(`GList*', `std::vector< Glib::RefPtr<TlsCertificate> >', `Glib::ListHandler< Glib::RefPtr<TlsCertificate> >::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
   _WRAP_METHOD(static std::vector< Glib::RefPtr<TlsCertificate> > create_list_from_file(const std::string& file), g_tls_certificate_list_new_from_file, errthrow)
