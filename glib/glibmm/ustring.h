@@ -198,14 +198,7 @@ public:
   using pointer = void;
 
   inline ustring_Iterator();
-  // A std::string::iterator can be copied to a std::string::const_iterator.
-  template <typename T2, typename = typename std::enable_if<
-    std::is_same<std::string::const_iterator, T>::value &&
-    std::is_same<std::string::iterator, T2>::value, T2>::type>
-  inline ustring_Iterator(const ustring_Iterator<T2>& other)
-  : pos_(other.base())
-  { }
-  ustring_Iterator(const ustring_Iterator& other) = default;
+  inline ustring_Iterator(const ustring_Iterator<std::string::iterator>& other);
   ustring_Iterator& operator=(const ustring_Iterator& other) = default;
 
   inline value_type operator*() const;
@@ -1070,6 +1063,12 @@ ustring_Iterator<T>::base() const
 
 template <class T>
 inline ustring_Iterator<T>::ustring_Iterator() : pos_()
+{
+}
+
+template <class T>
+inline ustring_Iterator<T>::ustring_Iterator(const ustring_Iterator<std::string::iterator>& other)
+: pos_(other.base())
 {
 }
 
