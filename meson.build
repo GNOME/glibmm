@@ -233,10 +233,20 @@ msvc14x_toolset_ver = ''
 # MSVC: Ignore warnings that aren't really harmful, but make those
 #       that should not be overlooked stand out.
 if is_msvc
-  disabled_warnings = cpp_compiler.get_supported_arguments([
-    '/FImsvc_recommended_pragmas.h', '/wd4146', '/wd4267', '/utf-8'
-  ])
-  add_project_arguments(disabled_warnings, language: 'cpp')
+  disable_warnings_list = [
+    '/FImsvc_recommended_pragmas.h', # Turn off harmless warnings but make potentially
+                                     # dangerous ones glaring, distributed with GLib
+    '/utf-8', # Avoid C4819 unicode conversion warnings when building on CJK locales
+    '/wd4146', # unary minus operator applied to unsigned type, result still unsigned
+  ]
+  if host_machine.cpu_family() == 'x86_64' or host_machine.cpu_family() == 'aarch64'
+  # 'var' : conversion from 'size_t' to 'type', possible loss of data (applies on 64-bit builds)
+    disable_warnings_list += '/wd4267'
+  endif
+  add_project_arguments(
+    cpp_compiler.get_supported_arguments(disable_warnings_list),
+    language: 'cpp',
+  )
 
   if use_msvc14x_toolset_ver
     if cpp_compiler.version().version_compare('>=19.30')
