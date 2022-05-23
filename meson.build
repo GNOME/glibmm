@@ -238,6 +238,9 @@ if is_msvc
                                      # dangerous ones glaring, distributed with GLib
     '/utf-8', # Avoid C4819 unicode conversion warnings when building on CJK locales
     '/wd4146', # unary minus operator applied to unsigned type, result still unsigned
+    '/wd4589', # Constructor of abstract class 'bb' ignores
+               # initializer for virtual base class 'aa'
+    '/wd4702', # unreachable code
   ]
   if host_machine.cpu_family() == 'x86_64' or host_machine.cpu_family() == 'aarch64'
   # 'var' : conversion from 'size_t' to 'type', possible loss of data (applies on 64-bit builds)
