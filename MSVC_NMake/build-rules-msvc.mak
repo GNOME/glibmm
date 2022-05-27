@@ -19,17 +19,19 @@ $<
 <<
 
 {..\glib\glibmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj::
+	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\glibmm
 	$(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /c @<<
 $<
 <<
 
 {..\untracked\glib\glibmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj::
+	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\glibmm
 	$(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /c @<<
 $<
 <<
 
 {..\glib\src\}.cc.m4{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj:
-	@if not exist $(@D)\ $(MAKE) /f Makefile.vc CFG=$(CFG) $(@D)
+	@if not exist $(@D)\ md $(@D)
 	@for %%s in ($(<D)\*.cc.m4 $(<D)\*.h.m4) do @if not exist ..\glib\glibmm\%%~ns if not exist ..\untracked\glib\glibmm\%%~ns if not exist $(@D)\%%~ns $(M4) -I$(<D:\=/) %%s $(<D:\=/)/template.macros.m4 > $(@D)\%%~ns
 	@if exist $(@D)\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B)
 	@if exist ..\untracked\glib\glibmm\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\untracked\glib\glibmm\$(<B)
@@ -48,11 +50,13 @@ $<
 <<
 
 {..\gio\giomm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\giomm\}.obj::
+	if not exist vs$(VSVER)\$(CFG)\$(PLAT)\giomm\ md vs$(VSVER)\$(CFG)\$(PLAT)\giomm
 	$(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /c @<<
 $<
 <<
 
 {..\untracked\gio\giomm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\giomm\}.obj::
+	if not exist vs$(VSVER)\$(CFG)\$(PLAT)\giomm\ md vs$(VSVER)\$(CFG)\$(PLAT)\giomm
 	$(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /c @<<
 $<
 <<
@@ -65,15 +69,17 @@ $<
 	@if exist ..\gio\giomm\$(<B).cc $(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
 
 {..\tools\extra_defs_gen\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\}.obj::
-	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ $(MAKE) /f Makefile.vc CFG=$(CFG) vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen
+	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ md vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen
 	$(CXX) $(GLIBMM_BASE_CFLAGS) /DGLIBMM_GEN_EXTRA_DEFS_BUILD $(GLIBMM_EXTRA_INCLUDES) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ /c @<<
 $<
 <<
 
 {.\glibmm\}.rc{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.res:
+	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\glibmm
 	rc /fo$@ $<
 
 {.\giomm\}.rc{vs$(VSVER)\$(CFG)\$(PLAT)\giomm\}.res:
+	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\giomm\ md vs$(VSVER)\$(CFG)\$(PLAT)\giomm
 	rc /fo$@ $<
 
 vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\generate_extra_defs.obj:  ..\tools\extra_defs_gen\generate_extra_defs.cc  ..\tools\extra_defs_gen\generate_extra_defs.h
@@ -96,13 +102,13 @@ $**
 # $(dependent_objects)
 # <<
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
-$(GLIBMM_DLL): vs$(VSVER)\$(CFG)\$(PLAT)\glibmm $(glibmm_OBJS)
+$(GLIBMM_DLL): $(glibmm_OBJS)
 	link /DLL $(LDFLAGS_NOLTCG) $(GOBJECT_LIBS) $(LIBSIGC_LIB) /implib:$(GLIBMM_LIB) -out:$@ @<<
 $(glibmm_OBJS)
 <<
 
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
-$(GIOMM_DLL): vs$(VSVER)\$(CFG)\$(PLAT)\giomm $(GLIBMM_LIB) $(giomm_OBJS)
+$(GIOMM_DLL): $(GLIBMM_LIB) $(giomm_OBJS)
 	link /DLL $(LDFLAGS_NOLTCG) $(GLIBMM_LIB) $(GIO_LIBS) $(LIBSIGC_LIB) /implib:$(GIOMM_LIB) -out:$@ @<<
 $(giomm_OBJS)
 <<
