@@ -14,17 +14,20 @@
 # $<
 # <<
 {vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj::
+	@if not exist glibmm\glibmm.rc $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
 	$(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /c @<<
 $<
 <<
 
 {..\glib\glibmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj::
+	@if not exist glibmm\glibmm.rc $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
 	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\glibmm
 	$(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /c @<<
 $<
 <<
 
 {..\untracked\glib\glibmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj::
+	@if not exist glibmm\glibmm.rc $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
 	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\glibmm
 	$(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /c @<<
 $<
@@ -32,6 +35,7 @@ $<
 
 {..\glib\src\}.cc.m4{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj:
 	@if not exist $(@D)\ md $(@D)
+	@if not exist glibmm\glibmm.rc $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
 	@for %%s in ($(<D)\*.cc.m4 $(<D)\*.h.m4) do @if not exist ..\glib\glibmm\%%~ns if not exist ..\untracked\glib\glibmm\%%~ns if not exist $(@D)\%%~ns $(M4) -I$(<D:\=/) %%s $(<D:\=/)/template.macros.m4 > $(@D)\%%~ns
 	@if exist $(@D)\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B)
 	@if exist ..\untracked\glib\glibmm\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\untracked\glib\glibmm\$(<B)
