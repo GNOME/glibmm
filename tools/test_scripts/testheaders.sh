@@ -10,7 +10,7 @@
 #   tools/test_scripts/testheaders.sh -I glib glibmm-2.68 glib/glibmm/ustring.h # compile glibmm/glib/glibmm/ustring.h
 
 # Usage: testheaders.sh [-I<dir>]... <pkg> [<dir> | <file>]...
-# -I<dir> is added to the g++ command.
+# -I<dir> is added to the compiler flags.
 # <pkg> is the name of the package, given to pkg-config.
 
 function usage() {
@@ -18,7 +18,17 @@ function usage() {
   exit 1
 }
 
-extra_gcc_args=-std=c++17
+# Compiler, default: CXX=g++
+if test "x$CXX" = x
+then
+  CXX=g++
+fi
+
+# Extra compiler flags, default: CXXFLAGS=-std=c++17
+if test "x$CXXFLAGS" = x
+then
+  CXXFLAGS=-std=c++17
+fi
 
 # Search for directories to include in CFLAGS.
 idirs=""
@@ -67,6 +77,7 @@ then
   echo "pkg-config failed"
   usage
 fi
+echo CXX=$CXX, CXXFLAGS=$CXXFLAGS
 echo CFLAGS=$CFLAGS
 
 # Compile the specified files
@@ -77,11 +88,10 @@ do
     for headerfile in $i/${i}mm/*.h
     do
       echo "=== $headerfile"
-      g++ -c -x c++ $extra_gcc_args -o /dev/null $headerfile $CFLAGS
+      $CXX -c -x c++ $CXXFLAGS -o /dev/null $headerfile $CFLAGS
     done
   else
     echo "=== $i"
-    g++ -c -x c++ $extra_gcc_args -o /dev/null $i $CFLAGS
+    $CXX -c -x c++ $CXXFLAGS -o /dev/null $i $CFLAGS
   fi
 done
-
