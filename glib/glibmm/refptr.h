@@ -48,8 +48,23 @@ void RefPtrDeleter(T_CppObject* object)
  * zero, the contained object is deleted, meaning  you don't need to remember
  * to delete the object.
  *
+ * RefPtr is a std::shared_ptr with a special deleter. To cast a RefPtr<SomeType>
+ * to a RefPtr<SomeOtherType>, use one of the standard library functions that
+ * apply a cast to the stored pointer, for instance std::dynamic_pointer_cast.
+ *
+ * Example:
+ * @code
+ * Glib::RefPtr<const Gio::ListModel> monitors = Gdk::Display::get_default()->get_monitors();
+ * Glib::RefPtr<const Glib::ObjectBase> first_object = monitors->get_object(0);
+ * Glib::RefPtr<const Gdk::Monitor> first_monitor =
+ *  std::dynamic_pointer_cast<const Gdk::Monitor>(first_object);
+ * @endcode
+ *
  * See the "Memory Management" section in the "Programming with gtkmm"
  * book for further information.
+ *
+ * @see Glib::make_refptr_for_instance()
+ * if you need to implement a create() method for a %Glib::ObjectBase-derived class.
  */
 template <class T_CppObject>
 using RefPtr = std::shared_ptr<T_CppObject>;
