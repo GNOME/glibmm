@@ -32,33 +32,34 @@ typedef struct _GActionInterface GActionInterface;
 namespace Gio
 {
 
-/** Action - An action.
- * Action represents a single named action.
+/** %Action - An action interface.
+ * %Action represents a single named action.
  *
  * The main interface to an action is that it can be activated with activate().
  * This results in the signal_activate() signal being emitted. An activation
- * has a Glib::VariantBase parameter (which may be <tt>0</tt>). The correct
- * type for the parameter is determined by a static parameter type (which is
- * given at construction time).
+ * may optionally have a parameter, activate(const T_Value& parameter).
+ * The correct type for the parameter is determined by a static parameter type
+ * (which is given at construction time).
  *
  * An action may optionally have a state, in which case the state may be set
- * with change_state(). This call takes a Glib::VariantBase. The correct type
- * for the state is determined by a static state type (which is given at
- * construction time).
+ * with change_state(). The correct type for the state is determined by a static
+ * state type (which is given at construction time).
+ *
+ * An %Action can have a state, but no parameter, or vice versa. If it has both,
+ * the parameter type can differ from the state type.
  *
  * The state may have a hint associated with it, specifying its valid range.
  *
- * Action is merely the interface to the concept of an action, as described
- * above. Various implementations of actions exist, including SimpleAction and
- * Gtk::Action.
+ * %Action is merely the interface to the concept of an action, as described
+ * above. Various implementations of actions exist, including SimpleAction.
  *
  * In all cases, the implementing class is responsible for storing the name of
  * the action, the parameter type, the enabled state, the optional state type
  * and the state and emitting the appropriate signals when these change. The
- * implementor responsible for filtering calls to activate() and change_state()
+ * implementor is responsible for filtering calls to activate() and change_state()
  * for type safety and for the state being enabled.
  *
- * Probably the only useful thing to do with a Action is to put it inside of a
+ * Probably the only useful thing to do with an %Action is to put it inside of a
  * SimpleActionGroup.
  *
  * @newin{2,32}
@@ -142,16 +143,16 @@ public:
 
   _WRAP_METHOD(Glib::VariantBase get_state_variant() const, g_action_get_state)
 
-  /** Activates the action.
+  /** Activates the action without a parameter.
    */
   void activate();
 
-  /** Activates the action.
+  /** Activates the action with a parameter.
    *
    * The @a parameter must be the correct type of parameter for the action (ie:
-   * the parameter type given at construction time), if any.
+   * the parameter type given at construction time).
    *
-   * @param parameter: The parameter to the activation
+   * @param parameter The parameter to the activation
    */
   template <typename T_Value>
   void activate(const T_Value& parameter);
