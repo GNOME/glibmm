@@ -42,6 +42,15 @@ Class::register_derived_type(GType base_type, GTypeModule* module)
   if (base_type == 0)
     return; // already initialized
 
+#if GLIB_CHECK_VERSION(2,70,0)
+  // Don't derive a type if the base type is a final type.
+  if (G_TYPE_IS_FINAL(base_type))
+  {
+    gtype_ = base_type;
+    return;
+  }
+#endif
+
   GTypeQuery base_query = {
     0, nullptr, 0, 0,
   };
