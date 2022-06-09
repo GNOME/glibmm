@@ -1,5 +1,5 @@
-dnl $Id$
-
+dnl If you change this file, check if there is a copy of it
+dnl at gtkmm/tools/m4/ that you shall also change.
 
 dnl This is just a hint to generate_wrap_init.pl.
 dnl It does not generate any code in the actual .h and .cc file.
@@ -57,7 +57,7 @@ ifelse(`$2',,,`
 _POP()
 ')
 
-dnl GVolumeMonitor can be broken/impeded by defining a sub-type.
+dnl Use if the C base type is declared G_DECLARE_FINAL_TYPE.
 define(`_DO_NOT_DERIVE_GTYPE',`dnl
 _PUSH()
 dnl Define this macro to be tested for later.
@@ -65,7 +65,14 @@ define(`__BOOL_DO_NOT_DERIVE_GTYPE__',`$1')
 _POP()
 ')
 
-dnl GVolumeMonitor can be broken/impeded by defining a sub-type.
+dnl If you add _DO_NOT_DERIVE_GTYPE to an existing class, and ABI must not be broken.
+define(`_ABI_AS_WITH_DERIVED_GTYPE',`dnl
+_PUSH()
+dnl Define this macro to be tested for later.
+define(`__BOOL_ABI_AS_WITH_DERIVED_GTYPE__',`$1')
+_POP()
+')
+
 define(`_DYNAMIC_GTYPE_REGISTRATION',`dnl
 _PUSH()
 dnl Define this macro to be tested for later.
@@ -113,8 +120,13 @@ public:
   using CppObjectType = __CPPNAME__;
   using BaseObjectType = __REAL_CNAME__;
 ifdef(`__BOOL_DO_NOT_DERIVE_GTYPE__',`dnl
+ifdef(`__BOOL_ABI_AS_WITH_DERIVED_GTYPE__',`dnl
+  using BaseClassType = __REAL_CNAME__`'Class;
   using CppClassParent = __CPPPARENT__`'_Class;
+  using BaseClassParent = __REAL_CPARENT__`'Class;
 ',`dnl
+  using CppClassParent = __CPPPARENT__`'_Class;
+')',`dnl
   using BaseClassType = __REAL_CNAME__`'Class;
   using CppClassParent = __CPPPARENT__`'_Class;
   using BaseClassParent = __REAL_CPARENT__`'Class;
@@ -130,7 +142,10 @@ ifdef(`__BOOL_DYNAMIC_GTYPE_REGISTRATION__',`
 ',`')
 
 ifdef(`__BOOL_DO_NOT_DERIVE_GTYPE__',`dnl
+ifdef(`__BOOL_ABI_AS_WITH_DERIVED_GTYPE__',`dnl
+  static void class_init_function(void* g_class, void* class_data);
 ',`dnl
+')',`dnl
   static void class_init_function(void* g_class, void* class_data);
 ')dnl
 
@@ -158,9 +173,16 @@ const Glib::Class& __CPPNAME__`'_Class::init()
   if(!gtype_) // create the GType if necessary
   {
 ifdef(`__BOOL_DO_NOT_DERIVE_GTYPE__',`dnl
-    // Do not derive a GType, or use a derived klass:
-    gtype_ = CppClassParent::CppObjectType::get_type();
+ifdef(`__BOOL_ABI_AS_WITH_DERIVED_GTYPE__',`dnl
+    // Glib::Class has to know the class init function to clone custom types.
+    class_init_func_ = &__CPPNAME__`'_Class::class_init_function;
+
+    // Do not derive a GType, or use a derived class:
+    gtype_ = _LOWER(__CCAST__)_get_type();
 ',`dnl
+    // Do not derive a GType, or use a derived class:
+    gtype_ = _LOWER(__CCAST__)_get_type();
+')',`dnl not __BOOL_DO_NOT_DERIVE_GTYPE__
     // Glib::Class has to know the class init function to clone custom types.
     class_init_func_ = &__CPPNAME__`'_Class::class_init_function;
 
@@ -185,9 +207,16 @@ const Glib::Class& __CPPNAME__`'_Class::init(GTypeModule* module)
   if(!gtype_) // create the GType if necessary
   {
 ifdef(`__BOOL_DO_NOT_DERIVE_GTYPE__',`dnl
-    // Do not derive a GType, or use a derived klass:
-    gtype_ = CppClassParent::CppObjectType::get_type();
+ifdef(`__BOOL_ABI_AS_WITH_DERIVED_GTYPE__',`dnl
+    // Glib::Class has to know the class init function to clone custom types.
+    class_init_func_ = &__CPPNAME__`'_Class::class_init_function;
+
+    // Do not derive a GType, or use a derived class:
+    gtype_ = _LOWER(__CCAST__)_get_type();
 ',`dnl
+    // Do not derive a GType, or use a derived class:
+    gtype_ = _LOWER(__CCAST__)_get_type();
+')',`dnl
     // Glib::Class has to know the class init function to clone custom types.
     class_init_func_ = &__CPPNAME__`'_Class::class_init_function;
 
@@ -207,7 +236,19 @@ _IMPORT(SECTION_CC_IMPLEMENTS_INTERFACES)
 ',`')
 
 ifdef(`__BOOL_DO_NOT_DERIVE_GTYPE__',`dnl
+ifdef(`__BOOL_ABI_AS_WITH_DERIVED_GTYPE__',`dnl
+
+void __CPPNAME__`'_Class::class_init_function(void* g_class, void* class_data)
+{
+  const auto klass = static_cast<BaseClassType*>(g_class);
+  CppClassParent::class_init_function(klass, class_data);
+
+_IMPORT(SECTION_PCC_CLASS_INIT_VFUNCS)
+
+_IMPORT(SECTION_PCC_CLASS_INIT_DEFAULT_SIGNAL_HANDLERS)
+}
 ',`dnl
+')',`dnl not __BOOL_DO_NOT_DERIVE_GTYPE__
 
 void __CPPNAME__`'_Class::class_init_function(void* g_class, void* class_data)
 {

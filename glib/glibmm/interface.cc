@@ -25,6 +25,13 @@ namespace Glib
 void
 Interface_Class::add_interface(GType instance_type) const
 {
+#if GLIB_CHECK_VERSION(2,70,0)
+  // If instance_type is a final type, it has not been registered by
+  // Glib::Class::register_derived_type(). Don't add an interface.
+  if (G_TYPE_IS_FINAL(instance_type))
+    return;
+#endif
+
   // This check is disabled, because it checks whether any of the types's bases implement the
   // interface, not just the specific type.
   // if( !g_type_is_a(instance_type, gtype_) ) //For convenience, don't complain about calling this
