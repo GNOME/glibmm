@@ -655,6 +655,9 @@ sub remove_c_memory_handling_info($)
   # Don't modify the text, if $mem_funcs is part of example code.
   # remove_c_memory_handling_info() is called before remove_example_code().
   return if ($$text =~ m"(?:<informalexample>|<programlisting>|\|\[).*?$mem_funcs.*?(?:</informalexample>|</programlisting>|]\|)"s);
+  # gi-docgen syntax.
+  # remove_c_memory_handling_info() is called before add_m4_quotes().
+  return if ($$text =~ m"\`\`\`[cC].*?$mem_funcs.*?\`\`\`"s);
 
   # First try to remove the sentence containing $mem_funcs.
   # For simplicity, assume that a sentence is any string ending with a period.
