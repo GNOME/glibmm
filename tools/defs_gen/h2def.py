@@ -324,6 +324,10 @@ def clean_func(buf):
     pat = re.compile(r"""GDK_DECLARE_INTERNAL_TYPE\s*\(.*?\)""", re.MULTILINE)
     buf = pat.sub('', buf)
 
+    #strip G_DEFINE_AUTOPTR_CLEANUP_FUNC (*)
+    pat = re.compile(r"""G_DEFINE_AUTOPTR_CLEANUP_FUNC\s*\(.*?\)""", re.MULTILINE)
+    buf = pat.sub('', buf)
+
     #we are not stripping G_GNUC_INTERNAL
 
     #extern "C"
