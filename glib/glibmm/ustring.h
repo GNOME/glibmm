@@ -22,6 +22,7 @@
 #include <glib.h>
 
 #include <cstddef> // for std::size_t and optionally std::ptrdiff_t
+#include <utility> // For std::move()
 #include <initializer_list>
 #include <iosfwd>
 #include <iterator>
@@ -677,6 +678,10 @@ public:
 
   GLIBMM_API inline operator std::string() const; // e.g. std::string str = ustring();
   GLIBMM_API inline const std::string& raw() const;
+  /*! Return the stored string, moved from the %ustring.
+   * @newin{2,74}
+   */
+  GLIBMM_API inline std::string release();
 
   // Not necessarily an ASCII char*. Use g_utf8_*() where necessary.
   GLIBMM_API const char* data() const;
@@ -1257,6 +1262,12 @@ inline const std::string&
 ustring::raw() const
 {
   return string_;
+}
+
+inline std::string
+ustring::release()
+{
+  return std::move(string_);
 }
 
 template <class... Ts>
