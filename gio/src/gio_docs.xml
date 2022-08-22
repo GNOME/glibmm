@@ -250,6 +250,11 @@ Since 2.72 the `pid` may be 0 if the process id wasn't known (for
 example if the process was launched via D-Bus). The `pid` may not be
 set at all in subsequent releases.
 
+On Windows, `pid` is guaranteed to be valid only for the duration of the
+#GAppLaunchContext::launched signal emission; after the signal is emitted,
+GLib will call g_spawn_close_pid(). If you need to keep the #GPid after the
+signal has been emitted, then you can duplicate `pid` using `DuplicateHandle()`.
+
 Since: 2.36
 
 </description>
@@ -472,7 +477,12 @@ Since: 2.28
 </description>
 <parameters>
 <parameter name="G_APPLICATION_FLAGS_NONE">
-<parameter_description> Default
+<parameter_description> Default. Deprecated in 2.74, use
+%G_APPLICATION_DEFAULT_FLAGS instead
+</parameter_description>
+</parameter>
+<parameter name="G_APPLICATION_DEFAULT_FLAGS">
+<parameter_description> Default flags. Since: 2.74
 </parameter_description>
 </parameter>
 <parameter name="G_APPLICATION_IS_SERVICE">
@@ -1128,6 +1138,15 @@ delayed until g_dbus_connection_start_message_processing() is called.
 <parameter name="G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER">
 <parameter_description> When authenticating
 as a server, require the UID of the peer to be the same as the UID of the server. (Since: 2.68)
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_CONNECTION_FLAGS_CROSS_NAMESPACE">
+<parameter_description> When authenticating, try to use
+protocols that work across a Linux user namespace boundary, even if this
+reduces interoperability with older D-Bus implementations. This currently
+affects client-side `EXTERNAL` authentication, for which this flag makes
+connections to a server in another user namespace succeed, but causes
+a deadlock when connecting to a GDBus server older than 2.73.3. Since: 2.74
 </parameter_description>
 </parameter>
 </parameters>
@@ -2760,7 +2779,21 @@ a server. Server certificates that fail to validate in any of the
 ways indicated here will be rejected unless the application
 overrides the default via #GDtlsConnection::accept-certificate.
 
+GLib guarantees that if certificate verification fails, at least one
+flag will be set, but it does not guarantee that all possible flags
+will be set. Accordingly, you may not safely decide to ignore any
+particular type of error. For example, it would be incorrect to mask
+%G_TLS_CERTIFICATE_EXPIRED if you want to allow expired certificates,
+because this could potentially be the only error flag set even if
+other problems exist with the certificate. Therefore, there is no
+safe way to use this property. This is not a horrible problem,
+though, because you should not be attempting to ignore validation
+errors anyway. If you really must ignore TLS certificate errors,
+connect to #GDtlsConnection::accept-certificate.
+
 Since: 2.48
+
+Deprecated: 2.74: Do not attempt to ignore validation errors.
 
 </description>
 </property>
@@ -3702,6 +3735,10 @@ value, which has this more logical name. Since 2.44.
 <parameter_description> Message too large. Since 2.48.
 </parameter_description>
 </parameter>
+<parameter name="G_IO_ERROR_NO_SUCH_DEVICE">
+<parameter_description> No such device found. Since 2.74
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -3943,6 +3980,15 @@ The type of items contained in this list store. Items must be
 subclasses of #GObject.
 
 Since: 2.44
+
+</description>
+</property>
+
+<property name="GListStore:n-items">
+<description>
+The number of items contained in this list store.
+
+Since: 2.74
 
 </description>
 </property>
@@ -6327,6 +6373,10 @@ Since: 2.28
 
 </description>
 <parameters>
+<parameter name="G_TLS_CERTIFICATE_NO_FLAGS">
+<parameter_description> No flags set. Since: 2.74
+</parameter_description>
+</parameter>
 <parameter name="G_TLS_CERTIFICATE_UNKNOWN_CA">
 <parameter_description> The signing certificate authority is
 not known.
@@ -6432,7 +6482,7 @@ preventing binding data retrieval.
 <enum name="GTlsChannelBindingType">
 <description>
 The type of TLS channel binding data to retrieve from #GTlsConnection
-or #GDtlsConnection, as documented by RFC 5929. The
+or #GDtlsConnection, as documented by RFC 5929 or RFC 9266. The
 [`tls-unique-for-telnet`](https://tools.ietf.org/html/rfc5929#section-5)
 binding type is not currently implemented.
 
@@ -6450,6 +6500,12 @@ type
 <parameter_description>
 [`tls-server-end-point`](https://tools.ietf.org/html/rfc5929#section-4)
 binding type
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_CHANNEL_BINDING_TLS_EXPORTER">
+<parameter_description>
+[`tls-exporter`](https://www.rfc-editor.org/rfc/rfc9266.html) binding
+type. Since: 2.74
 </parameter_description>
 </parameter>
 </parameters>
@@ -8722,6 +8778,65 @@ support URIs
 </return>
 </function>
 
+<function name="g_app_info_get_default_for_type_async">
+<description>
+Asynchronously gets the default #GAppInfo for a given content type.
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="content_type">
+<parameter_description> the content type to find a #GAppInfo for
+</parameter_description>
+</parameter>
+<parameter name="must_support_uris">
+<parameter_description> if %TRUE, the #GAppInfo is expected to
+support URIs
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback to call when the request is done
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data to pass to @callback
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_app_info_get_default_for_type_finish">
+<description>
+Finishes a default #GAppInfo lookup started by
+g_app_info_get_default_for_type_async().
+
+If no #GAppInfo is found, then @error will be set to %G_IO_ERROR_NOT_FOUND.
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GAppInfo for given @content_type or
+%NULL on error.
+
+</return>
+</function>
+
 <function name="g_app_info_get_default_for_uri_scheme">
 <description>
 Gets the default application for handling URIs with
@@ -8739,6 +8854,63 @@ of the URI, up to but not including the ':', e.g. &quot;http&quot;,
 </parameters>
 <return> #GAppInfo for given @uri_scheme or
 %NULL on error.
+</return>
+</function>
+
+<function name="g_app_info_get_default_for_uri_scheme_async">
+<description>
+Asynchronously gets the default application for handling URIs with
+the given URI scheme. A URI scheme is the initial part
+of the URI, up to but not including the ':', e.g. &quot;http&quot;,
+&quot;ftp&quot; or &quot;sip&quot;.
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="uri_scheme">
+<parameter_description> a string containing a URI scheme.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback to call when the request is done
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data to pass to @callback
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_app_info_get_default_for_uri_scheme_finish">
+<description>
+Finishes a default #GAppInfo lookup started by
+g_app_info_get_default_for_uri_scheme_async().
+
+If no #GAppInfo is found, then @error will be set to %G_IO_ERROR_NOT_FOUND.
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GAppInfo for given @uri_scheme or
+%NULL on error.
+
 </return>
 </function>
 
@@ -23927,7 +24099,13 @@ known.
 <description>
 Gets @conn's validation flags
 
+This function does not work as originally designed and is impossible
+to use correctly. See #GDtlsClientConnection:validation-flags for more
+information.
+
 Since: 2.48
+
+Deprecated: 2.74: Do not attempt to ignore validation errors.
 
 </description>
 <parameters>
@@ -23998,7 +24176,13 @@ Sets @conn's validation flags, to override the default set of
 checks performed when validating a server certificate. By default,
 %G_TLS_CERTIFICATE_VALIDATE_ALL is used.
 
+This function does not work as originally designed and is impossible
+to use correctly. See #GDtlsClientConnection:validation-flags for more
+information.
+
 Since: 2.48
+
+Deprecated: 2.74: Do not attempt to ignore validation errors.
 
 </description>
 <parameters>
@@ -27353,6 +27537,9 @@ This requires the %G_FILE_ATTRIBUTE_TIME_ACCESS attribute. If
 %G_FILE_ATTRIBUTE_TIME_ACCESS_USEC is provided, the resulting #GDateTime
 will have microsecond precision.
 
+If nanosecond precision is needed, %G_FILE_ATTRIBUTE_TIME_ACCESS_NSEC must
+be queried separately using g_file_info_get_attribute_uint32().
+
 Since: 2.70
 
 </description>
@@ -27692,6 +27879,9 @@ This requires the %G_FILE_ATTRIBUTE_TIME_CREATED attribute. If
 %G_FILE_ATTRIBUTE_TIME_CREATED_USEC is provided, the resulting #GDateTime
 will have microsecond precision.
 
+If nanosecond precision is needed, %G_FILE_ATTRIBUTE_TIME_CREATED_NSEC must
+be queried separately using g_file_info_get_attribute_uint32().
+
 Since: 2.70
 
 </description>
@@ -27863,6 +28053,9 @@ Gets the modification time of the current @info and returns it as a
 This requires the %G_FILE_ATTRIBUTE_TIME_MODIFIED attribute. If
 %G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC is provided, the resulting #GDateTime
 will have microsecond precision.
+
+If nanosecond precision is needed, %G_FILE_ATTRIBUTE_TIME_MODIFIED_NSEC must
+be queried separately using g_file_info_get_attribute_uint32().
 
 Since: 2.62
 
@@ -28087,6 +28280,8 @@ Removes all cases of @attribute from @info if it exists.
 Sets the %G_FILE_ATTRIBUTE_TIME_ACCESS and
 %G_FILE_ATTRIBUTE_TIME_ACCESS_USEC attributes in the file info to the
 given date/time value.
+
+%G_FILE_ATTRIBUTE_TIME_ACCESS_NSEC will be cleared.
 
 Since: 2.70
 
@@ -28416,6 +28611,8 @@ Sets the %G_FILE_ATTRIBUTE_TIME_CREATED and
 %G_FILE_ATTRIBUTE_TIME_CREATED_USEC attributes in the file info to the
 given date/time value.
 
+%G_FILE_ATTRIBUTE_TIME_CREATED_NSEC will be cleared.
+
 Since: 2.70
 
 </description>
@@ -28552,6 +28749,8 @@ Sets the %G_FILE_ATTRIBUTE_TIME_MODIFIED and
 %G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC attributes in the file info to the
 given date/time value.
 
+%G_FILE_ATTRIBUTE_TIME_MODIFIED_NSEC will be cleared.
+
 Since: 2.62
 
 </description>
@@ -28573,6 +28772,8 @@ Since: 2.62
 Sets the %G_FILE_ATTRIBUTE_TIME_MODIFIED and
 %G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC attributes in the file info to the
 given time value.
+
+%G_FILE_ATTRIBUTE_TIME_MODIFIED_NSEC will be cleared.
 
 Deprecated: 2.62: Use g_file_info_set_modification_date_time() instead, as
 #GTimeVal is deprecated due to the year 2038 problem.
@@ -29472,6 +29673,74 @@ of the new symlink
 </return>
 </function>
 
+<function name="g_file_make_symbolic_link_async">
+<description>
+Asynchronously creates a symbolic link named @file which contains the
+string @symlink_value.
+
+Virtual: make_symbolic_link_async
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> a #GFile with the name of the symlink to create
+</parameter_description>
+</parameter>
+<parameter name="symlink_value">
+<parameter_description> a string with the path for the target
+of the new symlink
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the [I/O priority][io-priority] of the request
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_file_make_symbolic_link_finish">
+<description>
+Finishes an asynchronous symbolic link creation, started with
+g_file_make_symbolic_link_async().
+
+Virtual: make_symbolic_link_finish
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> input #GFile
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on successful directory creation, %FALSE otherwise.
+</return>
+</function>
+
 <function name="g_file_measure_disk_usage">
 <description>
 Recursively measures the disk usage of @file.
@@ -30294,6 +30563,133 @@ Since: 2.32
 <parameter name="tmpl">
 <parameter_description> Template for the file
 name, as in g_file_open_tmp(), or %NULL for a default template
+</parameter_description>
+</parameter>
+<parameter name="iostream">
+<parameter_description> on return, a #GFileIOStream for the created file
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GFile.
+Free the returned object with g_object_unref().
+
+</return>
+</function>
+
+<function name="g_file_new_tmp_async">
+<description>
+Asynchronously opens a file in the preferred directory for temporary files
+(as returned by g_get_tmp_dir()) as g_file_new_tmp().
+
+@tmpl should be a string in the GLib file name encoding
+containing a sequence of six 'X' characters, and containing no
+directory components. If it is %NULL, a default template is used.
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="tmpl">
+<parameter_description> Template for the file
+name, as in g_file_open_tmp(), or %NULL for a default template
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the [I/O priority][io-priority] of the request
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback to call when the request is done
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data to pass to @callback
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_file_new_tmp_dir_async">
+<description>
+Asynchronously creates a directory in the preferred directory for
+temporary files (as returned by g_get_tmp_dir()) as g_dir_make_tmp().
+
+@tmpl should be a string in the GLib file name encoding
+containing a sequence of six 'X' characters, and containing no
+directory components. If it is %NULL, a default template is used.
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="tmpl">
+<parameter_description> Template for the file
+name, as in g_dir_make_tmp(), or %NULL for a default template
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the [I/O priority][io-priority] of the request
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback to call when the request is done
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data to pass to @callback
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_file_new_tmp_dir_finish">
+<description>
+Finishes a temporary directory creation started by
+g_file_new_tmp_dir_async().
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GFile.
+Free the returned object with g_object_unref().
+
+</return>
+</function>
+
+<function name="g_file_new_tmp_finish">
+<description>
+Finishes a temporary file creation started by g_file_new_tmp_async().
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="iostream">
@@ -34645,6 +35041,24 @@ calls, you should save its value as soon as the call which sets it
 </return>
 </function>
 
+<function name="g_io_error_from_file_error">
+<description>
+Converts #GFileError error codes into GIO error codes.
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="file_error">
+<parameter_description> a #GFileError.
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GIOErrorEnum value for the given #GFileError error value.
+
+</return>
+</function>
+
 <function name="g_io_error_from_win32_error">
 <description>
 Converts some common error codes (as returned from GetLastError()
@@ -35912,7 +36326,7 @@ set to the position where @item occurred for the first time.
 <function name="g_list_store_find_with_equal_func">
 <description>
 Looks up the given @item in the list store by looping over the items and
-comparing them with @compare_func until the first occurrence of @item which
+comparing them with @equal_func until the first occurrence of @item which
 matches. If @item was not found, then @position will not be set, and this
 method will return %FALSE.
 
@@ -35930,6 +36344,42 @@ Since: 2.64
 </parameter>
 <parameter name="equal_func">
 <parameter_description> A custom equality check function
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> the first position of @item, if it was found.
+</parameter_description>
+</parameter>
+</parameters>
+<return> Whether @store contains @item. If it was found, @position will be
+set to the position where @item occurred for the first time.
+
+</return>
+</function>
+
+<function name="g_list_store_find_with_equal_func_full">
+<description>
+Like g_list_store_find_with_equal_func() but with an additional @user_data
+that is passed to @equal_func.
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="store">
+<parameter_description> a #GListStore
+</parameter_description>
+</parameter>
+<parameter name="item">
+<parameter_description> an item
+</parameter_description>
+</parameter>
+<parameter name="equal_func">
+<parameter_description> A custom equality check function
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data for @equal_func
 </parameter_description>
 </parameter>
 <parameter name="position">
@@ -55481,6 +55931,8 @@ indicating any problems found with it. This can be used to verify a
 certificate outside the context of making a connection, or to
 check a certificate against a CA that is not part of the system
 CA database.
+
+If @cert is valid, %G_TLS_CERTIFICATE_NO_FLAGS is returned.
 
 If @identity is not %NULL, @cert's name(s) will be compared against
 it, and %G_TLS_CERTIFICATE_BAD_IDENTITY will be set in the return

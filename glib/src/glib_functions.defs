@@ -231,6 +231,7 @@
   (c-name "GIOFlags")
   (gtype-id "G_TYPE_IO_FLAGS")
   (values
+    '("none" "G_IO_FLAG_NONE")
     '("append" "G_IO_FLAG_APPEND")
     '("nonblock" "G_IO_FLAG_NONBLOCK")
     '("is-readable" "G_IO_FLAG_IS_READABLE")
@@ -312,6 +313,7 @@
   (c-name "GMarkupParseFlags")
   (gtype-id "G_TYPE_MARKUP_PARSE_FLAGS")
   (values
+    '("default-flags" "G_MARKUP_DEFAULT_FLAGS")
     '("do-not-use-this-unsupported-flag" "G_MARKUP_DO_NOT_USE_THIS_UNSUPPORTED_FLAG")
     '("treat-cdata-as-text" "G_MARKUP_TREAT_CDATA_AS_TEXT")
     '("prefix-error-position" "G_MARKUP_PREFIX_ERROR_POSITION")
@@ -500,6 +502,7 @@
   (c-name "GRegexCompileFlags")
   (gtype-id "G_TYPE_REGEX_COMPILE_FLAGS")
   (values
+    '("default" "G_REGEX_DEFAULT")
     '("caseless" "G_REGEX_CASELESS")
     '("multiline" "G_REGEX_MULTILINE")
     '("dotall" "G_REGEX_DOTALL")
@@ -526,6 +529,7 @@
   (c-name "GRegexMatchFlags")
   (gtype-id "G_TYPE_REGEX_MATCH_FLAGS")
   (values
+    '("default" "G_REGEX_MATCH_DEFAULT")
     '("anchored" "G_REGEX_MATCH_ANCHORED")
     '("notbol" "G_REGEX_MATCH_NOTBOL")
     '("noteol" "G_REGEX_MATCH_NOTEOL")
@@ -629,6 +633,9 @@
     '("file-and-argv-zero" "G_SPAWN_FILE_AND_ARGV_ZERO")
     '("search-path-from-envp" "G_SPAWN_SEARCH_PATH_FROM_ENVP")
     '("cloexec-pipes" "G_SPAWN_CLOEXEC_PIPES")
+    '("child-inherits-stdout" "G_SPAWN_CHILD_INHERITS_STDOUT")
+    '("child-inherits-stderr" "G_SPAWN_CHILD_INHERITS_STDERR")
+    '("stdin-from-dev-null" "G_SPAWN_STDIN_FROM_DEV_NULL")
   )
 )
 
@@ -666,6 +673,7 @@
   (c-name "GTestTrapFlags")
   (gtype-id "G_TYPE_TEST_TRAP_FLAGS")
   (values
+    '("default" "G_TEST_TRAP_DEFAULT")
     '("silence-stdout" "G_TEST_TRAP_SILENCE_STDOUT")
     '("silence-stderr" "G_TEST_TRAP_SILENCE_STDERR")
     '("inherit-stdin" "G_TEST_TRAP_INHERIT_STDIN")
@@ -677,9 +685,10 @@
   (c-name "GTestSubprocessFlags")
   (gtype-id "G_TYPE_TEST_SUBPROCESS_FLAGS")
   (values
-    '("stdin" "G_TEST_SUBPROCESS_INHERIT_STDIN")
-    '("stdout" "G_TEST_SUBPROCESS_INHERIT_STDOUT")
-    '("stderr" "G_TEST_SUBPROCESS_INHERIT_STDERR")
+    '("default" "G_TEST_SUBPROCESS_DEFAULT")
+    '("inherit-stdin" "G_TEST_SUBPROCESS_INHERIT_STDIN")
+    '("inherit-stdout" "G_TEST_SUBPROCESS_INHERIT_STDOUT")
+    '("inherit-stderr" "G_TEST_SUBPROCESS_INHERIT_STDERR")
   )
 )
 
@@ -1122,6 +1131,8 @@
     '("long-format" "G_FORMAT_SIZE_LONG_FORMAT")
     '("iec-units" "G_FORMAT_SIZE_IEC_UNITS")
     '("bits" "G_FORMAT_SIZE_BITS")
+    '("only-value" "G_FORMAT_SIZE_ONLY_VALUE")
+    '("only-unit" "G_FORMAT_SIZE_ONLY_UNIT")
   )
 )
 
@@ -1427,6 +1438,16 @@
   )
 )
 
+(define-function g_ptr_array_new_null_terminated
+  (c-name "g_ptr_array_new_null_terminated")
+  (return-type "GPtrArray*")
+  (parameters
+    '("guint" "reserved_size")
+    '("GDestroyNotify" "element_free_func")
+    '("gboolean" "null_terminated")
+  )
+)
+
 (define-method free
   (of-object "GPtrArray")
   (c-name "g_ptr_array_free")
@@ -1617,6 +1638,12 @@
     '("GEqualFunc" "equal_func")
     '("guint*" "index_")
   )
+)
+
+(define-method is_null_terminated
+  (of-object "GPtrArray")
+  (c-name "g_ptr_array_is_null_terminated")
+  (return-type "gboolean")
 )
 
 (define-function g_byte_array_new
@@ -2024,6 +2051,26 @@
   )
 )
 
+(define-function g_atomic_int_compare_and_exchange_full
+  (c-name "g_atomic_int_compare_and_exchange_full")
+  (return-type "gboolean")
+  (parameters
+    '("gint*" "atomic")
+    '("gint" "oldval")
+    '("gint" "newval")
+    '("gint*" "preval")
+  )
+)
+
+(define-function g_atomic_int_exchange
+  (c-name "g_atomic_int_exchange")
+  (return-type "gint")
+  (parameters
+    '("gint*" "atomic")
+    '("gint" "newval")
+  )
+)
+
 (define-function g_atomic_int_add
   (c-name "g_atomic_int_add")
   (return-type "gint")
@@ -2083,6 +2130,26 @@
   (parameters
     '("volatile-void*" "atomic")
     '("gpointer" "oldval")
+    '("gpointer" "newval")
+  )
+)
+
+(define-function g_atomic_pointer_compare_and_exchange_full
+  (c-name "g_atomic_pointer_compare_and_exchange_full")
+  (return-type "gboolean")
+  (parameters
+    '("void*" "atomic")
+    '("gpointer" "oldval")
+    '("gpointer" "newval")
+    '("void*" "preval")
+  )
+)
+
+(define-function g_atomic_pointer_exchange
+  (c-name "g_atomic_pointer_exchange")
+  (return-type "gpointer")
+  (parameters
+    '("void*" "atomic")
     '("gpointer" "newval")
   )
 )
@@ -3353,6 +3420,16 @@
     '("GQuark" "key_id")
     '("gpointer" "data")
     '("GDestroyNotify" "destroy_func")
+  )
+)
+
+(define-function g_datalist_id_remove_multiple
+  (c-name "g_datalist_id_remove_multiple")
+  (return-type "none")
+  (parameters
+    '("GData**" "datalist")
+    '("GQuark*" "keys")
+    '("gsize" "n_keys")
   )
 )
 
@@ -6562,6 +6639,24 @@
   )
 )
 
+(define-function g_win32_reopen_noninherited
+  (c-name "g_win32_reopen_noninherited")
+  (return-type "int")
+  (parameters
+    '("int" "fd")
+    '("int" "mode")
+    '("GError**" "err")
+  )
+)
+
+(define-function g_win32_handle_is_socket
+  (c-name "g_win32_handle_is_socket")
+  (return-type "gboolean")
+  (parameters
+    '("void*" "h")
+  )
+)
+
 
 
 ;; From glibintl.h
@@ -7608,6 +7703,16 @@
   )
 )
 
+(define-function g_timeout_add_once
+  (c-name "g_timeout_add_once")
+  (return-type "guint")
+  (parameters
+    '("guint" "interval")
+    '("GSourceOnceFunc" "function")
+    '("gpointer" "data")
+  )
+)
+
 (define-function g_timeout_add_seconds_full
   (c-name "g_timeout_add_seconds_full")
   (return-type "guint")
@@ -7669,6 +7774,15 @@
     '("GSourceFunc" "function")
     '("gpointer" "data")
     '("GDestroyNotify" "notify")
+  )
+)
+
+(define-function g_idle_add_once
+  (c-name "g_idle_add_once")
+  (return-type "guint")
+  (parameters
+    '("GSourceOnceFunc" "function")
+    '("gpointer" "data")
   )
 )
 

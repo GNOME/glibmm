@@ -462,7 +462,8 @@
 ;;   G_IO_ERROR_BROKEN_PIPE,
 ;;   G_IO_ERROR_CONNECTION_CLOSED = G_IO_ERROR_BROKEN_PIPE,
 ;;   G_IO_ERROR_NOT_CONNECTED,
-;;   G_IO_ERROR_MESSAGE_TOO_LARGE
+;;   G_IO_ERROR_MESSAGE_TOO_LARGE,
+;;   G_IO_ERROR_NO_SUCH_DEVICE GLIB_AVAILABLE_ENUMERATOR_IN_2_74,
 ;; } GIOErrorEnum;
 
 (define-enum-extended IOErrorEnum
@@ -518,6 +519,7 @@
     '("connection-closed" "G_IO_ERROR_CONNECTION_CLOSED" "44")
     '("not-connected" "G_IO_ERROR_NOT_CONNECTED" "45")
     '("message-too-large" "G_IO_ERROR_MESSAGE_TOO_LARGE" "46")
+    '("no-such-device" "G_IO_ERROR_NO_SUCH_DEVICE" "47")
   )
 )
 
@@ -1025,7 +1027,8 @@
 ;;   G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS = (1<<2),
 ;;   G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION = (1<<3),
 ;;   G_DBUS_CONNECTION_FLAGS_DELAY_MESSAGE_PROCESSING = (1<<4),
-;;   G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER GLIB_AVAILABLE_ENUMERATOR_IN_2_68 = (1<<5)
+;;   G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER GLIB_AVAILABLE_ENUMERATOR_IN_2_68 = (1<<5),
+;;   G_DBUS_CONNECTION_FLAGS_CROSS_NAMESPACE GLIB_AVAILABLE_ENUMERATOR_IN_2_74 = (1<<6)
 ;; } GDBusConnectionFlags;
 
 (define-flags-extended DBusConnectionFlags
@@ -1039,6 +1042,7 @@
     '("message-bus-connection" "G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION" "(1<<3)")
     '("delay-message-processing" "G_DBUS_CONNECTION_FLAGS_DELAY_MESSAGE_PROCESSING" "(1<<4)")
     '("authentication-require-same-user" "G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER" "(1<<5)")
+    '("cross-namespace" "G_DBUS_CONNECTION_FLAGS_CROSS_NAMESPACE" "(1<<6)")
   )
 )
 
@@ -1280,9 +1284,10 @@
 )
 
 ;; Original typedef:
-;; typedef enum
+;; typedef enum /*< prefix=G_APPLICATION >*/
 ;; {
-;;   G_APPLICATION_FLAGS_NONE,
+;;   G_APPLICATION_FLAGS_NONE GLIB_DEPRECATED_ENUMERATOR_IN_2_74_FOR(G_APPLICATION_DEFAULT_FLAGS),
+;;   G_APPLICATION_DEFAULT_FLAGS GLIB_AVAILABLE_ENUMERATOR_IN_2_74 = 0,
 ;;   G_APPLICATION_IS_SERVICE  =          (1 << 0),
 ;;   G_APPLICATION_IS_LAUNCHER =          (1 << 1),
 ;; 
@@ -1302,6 +1307,7 @@
   (c-name "GApplicationFlags")
   (values
     '("flags-none" "G_APPLICATION_FLAGS_NONE" "0x0")
+    '("default-flags" "G_APPLICATION_DEFAULT_FLAGS" "0x0")
     '("is-service" "G_APPLICATION_IS_SERVICE" "(1 << 0)")
     '("is-launcher" "G_APPLICATION_IS_LAUNCHER" "(1 << 1)")
     '("handles-open" "G_APPLICATION_HANDLES_OPEN" "(1 << 2)")
@@ -1345,6 +1351,7 @@
 
 ;; Original typedef:
 ;; typedef enum {
+;;   G_TLS_CERTIFICATE_NO_FLAGS GLIB_AVAILABLE_ENUMERATOR_IN_2_74 = 0,
 ;;   G_TLS_CERTIFICATE_UNKNOWN_CA    = (1 << 0),
 ;;   G_TLS_CERTIFICATE_BAD_IDENTITY  = (1 << 1),
 ;;   G_TLS_CERTIFICATE_NOT_ACTIVATED = (1 << 2),
@@ -1360,6 +1367,7 @@
   (in-module "G")
   (c-name "GTlsCertificateFlags")
   (values
+    '("no-flags" "G_TLS_CERTIFICATE_NO_FLAGS" "0x0")
     '("unknown-ca" "G_TLS_CERTIFICATE_UNKNOWN_CA" "(1 << 0)")
     '("bad-identity" "G_TLS_CERTIFICATE_BAD_IDENTITY" "(1 << 1)")
     '("not-activated" "G_TLS_CERTIFICATE_NOT_ACTIVATED" "(1 << 2)")
@@ -1391,7 +1399,8 @@
 ;; Original typedef:
 ;; typedef enum {
 ;;   G_TLS_CHANNEL_BINDING_TLS_UNIQUE,
-;;   G_TLS_CHANNEL_BINDING_TLS_SERVER_END_POINT
+;;   G_TLS_CHANNEL_BINDING_TLS_SERVER_END_POINT,
+;;   G_TLS_CHANNEL_BINDING_TLS_EXPORTER GLIB_AVAILABLE_ENUMERATOR_IN_2_74,
 ;; } GTlsChannelBindingType;
 
 (define-enum-extended TlsChannelBindingType
@@ -1400,6 +1409,7 @@
   (values
     '("unique" "G_TLS_CHANNEL_BINDING_TLS_UNIQUE" "0")
     '("server-end-point" "G_TLS_CHANNEL_BINDING_TLS_SERVER_END_POINT" "1")
+    '("exporter" "G_TLS_CHANNEL_BINDING_TLS_EXPORTER" "2")
   )
 )
 

@@ -1093,6 +1093,7 @@
     '("connection-closed" "G_IO_ERROR_CONNECTION_CLOSED")
     '("not-connected" "G_IO_ERROR_NOT_CONNECTED")
     '("message-too-large" "G_IO_ERROR_MESSAGE_TOO_LARGE")
+    '("no-such-device" "G_IO_ERROR_NO_SUCH_DEVICE")
   )
 )
 
@@ -1407,6 +1408,7 @@
     '("message-bus-connection" "G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION")
     '("delay-message-processing" "G_DBUS_CONNECTION_FLAGS_DELAY_MESSAGE_PROCESSING")
     '("authentication-require-same-user" "G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER")
+    '("cross-namespace" "G_DBUS_CONNECTION_FLAGS_CROSS_NAMESPACE")
   )
 )
 
@@ -1561,6 +1563,7 @@
   (gtype-id "G_TYPE_APPLICATION_FLAGS")
   (values
     '("flags-none" "G_APPLICATION_FLAGS_NONE")
+    '("default-flags" "G_APPLICATION_DEFAULT_FLAGS")
     '("is-service" "G_APPLICATION_IS_SERVICE")
     '("is-launcher" "G_APPLICATION_IS_LAUNCHER")
     '("handles-open" "G_APPLICATION_HANDLES_OPEN")
@@ -1595,6 +1598,7 @@
   (c-name "GTlsCertificateFlags")
   (gtype-id "G_TYPE_TLS_CERTIFICATE_FLAGS")
   (values
+    '("no-flags" "G_TLS_CERTIFICATE_NO_FLAGS")
     '("unknown-ca" "G_TLS_CERTIFICATE_UNKNOWN_CA")
     '("bad-identity" "G_TLS_CERTIFICATE_BAD_IDENTITY")
     '("not-activated" "G_TLS_CERTIFICATE_NOT_ACTIVATED")
@@ -1624,6 +1628,7 @@
   (values
     '("unique" "G_TLS_CHANNEL_BINDING_TLS_UNIQUE")
     '("server-end-point" "G_TLS_CHANNEL_BINDING_TLS_SERVER_END_POINT")
+    '("exporter" "G_TLS_CHANNEL_BINDING_TLS_EXPORTER")
   )
 )
 
@@ -2465,11 +2470,52 @@
   )
 )
 
+(define-function g_app_info_get_default_for_type_async
+  (c-name "g_app_info_get_default_for_type_async")
+  (return-type "none")
+  (parameters
+    '("const-char*" "content_type")
+    '("gboolean" "must_support_uris")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function g_app_info_get_default_for_type_finish
+  (c-name "g_app_info_get_default_for_type_finish")
+  (return-type "GAppInfo*")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
 (define-function g_app_info_get_default_for_uri_scheme
   (c-name "g_app_info_get_default_for_uri_scheme")
   (return-type "GAppInfo*")
   (parameters
     '("const-char*" "uri_scheme")
+  )
+)
+
+(define-function g_app_info_get_default_for_uri_scheme_async
+  (c-name "g_app_info_get_default_for_uri_scheme_async")
+  (return-type "none")
+  (parameters
+    '("const-char*" "uri_scheme")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function g_app_info_get_default_for_uri_scheme_finish
+  (c-name "g_app_info_get_default_for_uri_scheme_finish")
+  (return-type "GAppInfo*")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
   )
 )
 
@@ -8080,6 +8126,49 @@
   )
 )
 
+(define-function g_file_new_tmp_async
+  (c-name "g_file_new_tmp_async")
+  (return-type "none")
+  (parameters
+    '("const-char*" "tmpl")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function g_file_new_tmp_finish
+  (c-name "g_file_new_tmp_finish")
+  (return-type "GFile*")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GFileIOStream**" "iostream")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_file_new_tmp_dir_async
+  (c-name "g_file_new_tmp_dir_async")
+  (return-type "none")
+  (parameters
+    '("const-char*" "tmpl")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function g_file_new_tmp_dir_finish
+  (c-name "g_file_new_tmp_dir_finish")
+  (return-type "GFile*")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
 (define-function g_file_parse_name
   (c-name "g_file_parse_name")
   (return-type "GFile*")
@@ -8858,6 +8947,29 @@
   (parameters
     '("const-char*" "symlink_value")
     '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method make_symbolic_link_async
+  (of-object "GFile")
+  (c-name "g_file_make_symbolic_link_async")
+  (return-type "none")
+  (parameters
+    '("const-char*" "symlink_value")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method make_symbolic_link_finish
+  (of-object "GFile")
+  (c-name "g_file_make_symbolic_link_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
     '("GError**" "error")
   )
 )
@@ -11073,6 +11185,14 @@
   )
 )
 
+(define-function g_io_error_from_file_error
+  (c-name "g_io_error_from_file_error")
+  (return-type "GIOErrorEnum")
+  (parameters
+    '("GFileError" "file_error")
+  )
+)
+
 (define-function g_io_error_from_win32_error
   (c-name "g_io_error_from_win32_error")
   (return-type "GIOErrorEnum")
@@ -11825,6 +11945,18 @@
   (parameters
     '("gpointer" "item")
     '("GEqualFunc" "equal_func")
+    '("guint*" "position")
+  )
+)
+
+(define-method find_with_equal_func_full
+  (of-object "GListStore")
+  (c-name "g_list_store_find_with_equal_func_full")
+  (return-type "gboolean")
+  (parameters
+    '("gpointer" "item")
+    '("GEqualFuncFull" "equal_func")
+    '("gpointer" "user_data")
     '("guint*" "position")
   )
 )
@@ -19918,6 +20050,14 @@
   (return-type "GType")
 )
 
+(define-function g_unix_mount_free
+  (c-name "g_unix_mount_free")
+  (return-type "none")
+  (parameters
+    '("GUnixMountEntry*" "mount_entry")
+  )
+)
+
 (define-function g_unix_mount_copy
   (c-name "g_unix_mount_copy")
   (return-type "GUnixMountEntry*")
@@ -20040,6 +20180,15 @@
   (return-type "GIcon*")
   (parameters
     '("GUnixMountEntry*" "mount_entry")
+  )
+)
+
+(define-method compare
+  (of-object "GUnixMountPoint")
+  (c-name "g_unix_mount_point_compare")
+  (return-type "gint")
+  (parameters
+    '("GUnixMountPoint*" "mount2")
   )
 )
 

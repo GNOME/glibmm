@@ -185,13 +185,18 @@ connection.
 
 </description>
 <parameters>
+<parameter name="G_CONNECT_DEFAULT">
+<parameter_description> Default behaviour (no special flags). Since: 2.74
+</parameter_description>
+</parameter>
 <parameter name="G_CONNECT_AFTER">
-<parameter_description> whether the handler should be called before or after the
-default handler of the signal.
+<parameter_description> If set, the handler should be called after the
+default handler of the signal. Normally, the handler is called before
+the default handler.
 </parameter_description>
 </parameter>
 <parameter name="G_CONNECT_SWAPPED">
-<parameter_description> whether the instance and data should be swapped when
+<parameter_description> If set, the instance and data should be swapped when
 calling the handler; see g_signal_connect_swapped() for an example.
 </parameter_description>
 </parameter>
@@ -673,6 +678,18 @@ Network and storage sizes should be reported in the normal SI units.
 bytes, and return units in bits. For example, ‘Mb’ rather than ‘MB’.
 </parameter_description>
 </parameter>
+<parameter name="G_FORMAT_SIZE_ONLY_VALUE">
+<parameter_description> return only value, without unit; this should
+not be used together with @G_FORMAT_SIZE_LONG_FORMAT
+nor @G_FORMAT_SIZE_ONLY_UNIT. Since: 2.74
+</parameter_description>
+</parameter>
+<parameter name="G_FORMAT_SIZE_ONLY_UNIT">
+<parameter_description> return only unit, without value; this should
+not be used together with @G_FORMAT_SIZE_LONG_FORMAT
+nor @G_FORMAT_SIZE_ONLY_VALUE. Since: 2.74
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -812,6 +829,10 @@ g_io_channel_set_flags().
 
 </description>
 <parameters>
+<parameter name="G_IO_FLAG_NONE">
+<parameter_description> no special flags set. Since: 2.74
+</parameter_description>
+</parameter>
 <parameter name="G_IO_FLAG_APPEND">
 <parameter_description> turns on append mode, corresponds to %O_APPEND
 (see the documentation of the UNIX open() syscall)
@@ -1147,6 +1168,10 @@ Flags that affect the behaviour of the parser.
 
 </description>
 <parameters>
+<parameter name="G_MARKUP_DEFAULT_FLAGS">
+<parameter_description> No special behaviour. Since: 2.74
+</parameter_description>
+</parameter>
 <parameter name="G_MARKUP_DO_NOT_USE_THIS_UNSUPPORTED_FLAG">
 <parameter_description> flag you should not use
 </parameter_description>
@@ -1370,7 +1395,7 @@ option: `--name arg` or combined in a single argument: `--name=arg`.
 </description>
 <parameters>
 <parameter name="G_OPTION_ARG_NONE">
-<parameter_description> No extra argument. This is useful for simple flags.
+<parameter_description> No extra argument. This is useful for simple flags or booleans.
 </parameter_description>
 </parameter>
 <parameter name="G_OPTION_ARG_STRING">
@@ -1461,7 +1486,8 @@ Flags which modify individual options.
 </parameter>
 <parameter name="G_OPTION_FLAG_REVERSE">
 <parameter_description> For options of the %G_OPTION_ARG_NONE kind, this
-flag indicates that the sense of the option is reversed.
+flag indicates that the sense of the option is reversed. i.e. %FALSE will
+be stored into the argument rather than %TRUE.
 </parameter_description>
 </parameter>
 <parameter name="G_OPTION_FLAG_NO_ARG">
@@ -1579,6 +1605,10 @@ Since: 2.14
 
 </description>
 <parameters>
+<parameter name="G_REGEX_DEFAULT">
+<parameter_description> No special options set. Since: 2.74
+</parameter_description>
+</parameter>
 <parameter name="G_REGEX_CASELESS">
 <parameter_description> Letters in the pattern match both upper- and
 lowercase letters. This option can be changed within a pattern
@@ -1650,9 +1680,13 @@ in the usual way).
 </parameter_description>
 </parameter>
 <parameter name="G_REGEX_OPTIMIZE">
-<parameter_description> Optimize the regular expression. If the pattern will
-be used many times, then it may be worth the effort to optimize it
-to improve the speed of matches.
+<parameter_description> Since 2.74 and the port to pcre2, requests JIT
+compilation, which, if the just-in-time compiler is available, further
+processes a compiled pattern into machine code that executes much
+faster. However, it comes at the cost of extra processing before the
+match is performed, so it is most beneficial to use this when the same
+compiled pattern is used for matching many times. Before 2.74 this
+option used the built-in non-JIT optimizations in pcre1.
 </parameter_description>
 </parameter>
 <parameter name="G_REGEX_FIRSTLINE">
@@ -1699,7 +1733,8 @@ characters '\r', '\n' and '\r\n'. Since: 2.34
 </parameter>
 <parameter name="G_REGEX_JAVASCRIPT_COMPAT">
 <parameter_description> Changes behaviour so that it is compatible with
-JavaScript rather than PCRE. Since: 2.34
+JavaScript rather than PCRE. Since GLib 2.74 this is no longer supported,
+as libpcre2 does not support it. Since: 2.34 Deprecated: 2.74
 </parameter_description>
 </parameter>
 </parameters>
@@ -1995,6 +2030,10 @@ Since: 2.14
 
 </description>
 <parameters>
+<parameter name="G_REGEX_MATCH_DEFAULT">
+<parameter_description> No special options set. Since: 2.74
+</parameter_description>
+</parameter>
 <parameter name="G_REGEX_MATCH_ANCHORED">
 <parameter_description> The pattern is forced to be &quot;anchored&quot;, that is,
 it is constrained to match only at the first matching point in the
@@ -2456,6 +2495,21 @@ Since: 2.34
 Since: 2.40
 </parameter_description>
 </parameter>
+<parameter name="G_SPAWN_CHILD_INHERITS_STDOUT">
+<parameter_description> the child will inherit the parent's standard output.
+Since: 2.74
+</parameter_description>
+</parameter>
+<parameter name="G_SPAWN_CHILD_INHERITS_STDERR">
+<parameter_description> the child will inherit the parent's standard error.
+Since: 2.74
+</parameter_description>
+</parameter>
+<parameter name="G_SPAWN_STDIN_FROM_DEV_NULL">
+<parameter_description> the child's standard input is attached to `/dev/null`.
+Since: 2.74
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -2502,6 +2556,10 @@ not show stdout and stderr.
 
 </description>
 <parameters>
+<parameter name="G_TEST_SUBPROCESS_DEFAULT">
+<parameter_description> Default behaviour. Since: 2.74
+</parameter_description>
+</parameter>
 <parameter name="G_TEST_SUBPROCESS_INHERIT_STDIN">
 <parameter_description> If this flag is given, the child
 process will inherit the parent's stdin. Otherwise, the child's
@@ -2536,6 +2594,10 @@ which is deprecated. g_test_trap_subprocess() uses
 
 </description>
 <parameters>
+<parameter name="G_TEST_TRAP_DEFAULT">
+<parameter_description> Default behaviour. Since: 2.74
+</parameter_description>
+</parameter>
 <parameter name="G_TEST_TRAP_SILENCE_STDOUT">
 <parameter_description> Redirect stdout of the test child to
 `/dev/null` so it cannot be observed on the console during test
@@ -2852,6 +2914,10 @@ Bit masks used to check or determine characteristics of a type.
 
 </description>
 <parameters>
+<parameter name="G_TYPE_FLAG_NONE">
+<parameter_description> No special flags. Since: 2.74
+</parameter_description>
+</parameter>
 <parameter name="G_TYPE_FLAG_ABSTRACT">
 <parameter_description> Indicates an abstract type. No instances can be
 created for an abstract type
@@ -7377,6 +7443,47 @@ Since: 2.4
 </return>
 </function>
 
+<function name="g_atomic_int_compare_and_exchange_full">
+<description>
+Compares @atomic to @oldval and, if equal, sets it to @newval.
+If @atomic was not equal to @oldval then no change occurs.
+In any case the value of @atomic before this operation is stored in @preval.
+
+This compare and exchange is done atomically.
+
+Think of this operation as an atomic version of
+`{ *preval = *atomic; if (*atomic == oldval) { *atomic = newval; return TRUE; } else return FALSE; }`.
+
+This call acts as a full compiler and hardware memory barrier.
+
+See also g_atomic_int_compare_and_exchange()
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="atomic">
+<parameter_description> a pointer to a #gint or #guint
+</parameter_description>
+</parameter>
+<parameter name="oldval">
+<parameter_description> the value to compare with
+</parameter_description>
+</parameter>
+<parameter name="newval">
+<parameter_description> the value to conditionally replace with
+</parameter_description>
+</parameter>
+<parameter name="preval">
+<parameter_description> the contents of @atomic before this operation
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the exchange took place
+
+</return>
+</function>
+
 <function name="g_atomic_int_dec_and_test">
 <description>
 Decrements the value of @atomic by 1.
@@ -7399,6 +7506,35 @@ Since: 2.4
 </parameter>
 </parameters>
 <return> %TRUE if the resultant value is zero
+
+</return>
+</function>
+
+<function name="g_atomic_int_exchange">
+<description>
+Sets the @atomic to @newval and returns the old value from @atomic.
+
+This exchange is done atomically.
+
+Think of this operation as an atomic version of
+`{ tmp = *atomic; *atomic = val; return tmp; }`.
+
+This call acts as a full compiler and hardware memory barrier.
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="atomic">
+<parameter_description> a pointer to a #gint or #guint
+</parameter_description>
+</parameter>
+<parameter name="newval">
+<parameter_description> the value to replace with
+</parameter_description>
+</parameter>
+</parameters>
+<return> the value of @atomic before the exchange, signed
 
 </return>
 </function>
@@ -7656,6 +7792,76 @@ Since: 2.4
 </parameter>
 </parameters>
 <return> %TRUE if the exchange took place
+
+</return>
+</function>
+
+<function name="g_atomic_pointer_compare_and_exchange_full">
+<description>
+Compares @atomic to @oldval and, if equal, sets it to @newval.
+If @atomic was not equal to @oldval then no change occurs.
+In any case the value of @atomic before this operation is stored in @preval.
+
+This compare and exchange is done atomically.
+
+Think of this operation as an atomic version of
+`{ *preval = *atomic; if (*atomic == oldval) { *atomic = newval; return TRUE; } else return FALSE; }`.
+
+This call acts as a full compiler and hardware memory barrier.
+
+See also g_atomic_pointer_compare_and_exchange()
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="atomic">
+<parameter_description> a pointer to a #gpointer-sized value
+</parameter_description>
+</parameter>
+<parameter name="oldval">
+<parameter_description> the value to compare with
+</parameter_description>
+</parameter>
+<parameter name="newval">
+<parameter_description> the value to conditionally replace with
+</parameter_description>
+</parameter>
+<parameter name="preval">
+<parameter_description> the contents of @atomic before this operation
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the exchange took place
+
+</return>
+</function>
+
+<function name="g_atomic_pointer_exchange">
+<description>
+Sets the @atomic to @newval and returns the old value from @atomic.
+
+This exchange is done atomically.
+
+Think of this operation as an atomic version of
+`{ tmp = *atomic; *atomic = val; return tmp; }`.
+
+This call acts as a full compiler and hardware memory barrier.
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="atomic">
+<parameter_description> a pointer to a #gpointer-sized value
+</parameter_description>
+</parameter>
+<parameter name="newval">
+<parameter_description> the value to replace with
+</parameter_description>
+</parameter>
+</parameters>
+<return> the value of @atomic before the exchange
 
 </return>
 </function>
@@ -16119,6 +16325,33 @@ Removes an element, using its #GQuark identifier.
 <return></return>
 </function>
 
+<function name="g_datalist_id_remove_multiple">
+<description>
+Removes multiple keys from a datalist.
+
+This is more efficient than calling g_datalist_id_remove_data()
+multiple times in a row.
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="datalist">
+<parameter_description> a datalist
+</parameter_description>
+</parameter>
+<parameter name="keys">
+<parameter_description> keys to remove
+</parameter_description>
+</parameter>
+<parameter name="n_keys">
+<parameter_description> length of @keys, must be &lt;= 16
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_datalist_id_remove_no_notify">
 <description>
 Removes an element, without calling its destroy notification
@@ -17881,7 +18114,8 @@ The following format specifiers are supported:
 - \%c: the preferred date and time representation for the current locale
 - \%C: the century number (year/100) as a 2-digit integer (00-99)
 - \%d: the day of the month as a decimal number (range 01 to 31)
-- \%e: the day of the month as a decimal number (range  1 to 31)
+- \%e: the day of the month as a decimal number (range 1 to 31);
+single digits are preceded by a figure space
 - \%F: equivalent to `%Y-%m-%d` (the ISO 8601 date format)
 - \%g: the last two digits of the ISO 8601 week-based year as a
 decimal number (00-99). This works well with \%V and \%u.
@@ -17892,9 +18126,9 @@ well with \%V and \%u.
 - \%I: the hour as a decimal number using a 12-hour clock (range 01 to 12)
 - \%j: the day of the year as a decimal number (range 001 to 366)
 - \%k: the hour (24-hour clock) as a decimal number (range 0 to 23);
-single digits are preceded by a blank
+single digits are preceded by a figure space
 - \%l: the hour (12-hour clock) as a decimal number (range 1 to 12);
-single digits are preceded by a blank
+single digits are preceded by a figure space
 - \%m: the month as a decimal number (range 01 to 12)
 - \%M: the minute as a decimal number (range 00 to 59)
 - \%f: the microsecond as a decimal number (range 000000 to 999999)
@@ -23797,6 +24031,35 @@ range between %G_PRIORITY_DEFAULT_IDLE and %G_PRIORITY_HIGH_IDLE.
 </parameter>
 </parameters>
 <return> the ID (greater than 0) of the event source.
+</return>
+</function>
+
+<function name="g_idle_add_once">
+<description>
+Adds a function to be called whenever there are no higher priority
+events pending to the default main loop. The function is given the
+default idle priority, %G_PRIORITY_DEFAULT_IDLE.
+
+The function will only be called once and then the source will be
+automatically removed from the main context.
+
+This function otherwise behaves like g_idle_add().
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="function">
+<parameter_description> function to call
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> data to pass to @function
+</parameter_description>
+</parameter>
+</parameters>
+<return> the ID (greater than 0) of the event source
+
 </return>
 </function>
 
@@ -31715,7 +31978,7 @@ statically allocated.
 Calling g_mutex_clear() on a locked mutex leads to undefined
 behaviour.
 
-Sine: 2.32
+Since: 2.32
 
 </description>
 <parameters>
@@ -33139,9 +33402,11 @@ This function should be used if you plan to use a static array of
 class initialization:
 
 |[&lt;!-- language=&quot;C&quot; --&gt; 
-enum {
-PROP_0, PROP_FOO, PROP_BAR, N_PROPERTIES
-};
+typedef enum {
+PROP_FOO = 1,
+PROP_BAR,
+N_PROPERTIES
+} MyObjectProperty;
 
 static GParamSpec *obj_properties[N_PROPERTIES] = { NULL, };
 
@@ -33154,17 +33419,17 @@ obj_properties[PROP_FOO] =
 g_param_spec_int (&quot;foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;,
 -1, G_MAXINT,
 0,
-G_PARAM_READWRITE);
+G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
 obj_properties[PROP_BAR] =
 g_param_spec_string (&quot;bar&quot;, &quot;Bar&quot;, &quot;Bar&quot;,
 NULL,
-G_PARAM_READWRITE);
+G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
 gobject_class-&gt;set_property = my_object_set_property;
 gobject_class-&gt;get_property = my_object_get_property;
 g_object_class_install_properties (gobject_class,
-N_PROPERTIES,
+G_N_ELEMENTS (obj_properties),
 obj_properties);
 }
 ]|
@@ -33302,8 +33567,8 @@ A convenience function to connect multiple signals at once.
 
 The signal specs expected by this function have the form
 &quot;modifier::signal_name&quot;, where modifier can be one of the following:
-- signal: equivalent to g_signal_connect_data (..., NULL, 0)
-- object-signal, object_signal: equivalent to g_signal_connect_object (..., 0)
+- signal: equivalent to g_signal_connect_data (..., NULL, G_CONNECT_DEFAULT)
+- object-signal, object_signal: equivalent to g_signal_connect_object (..., G_CONNECT_DEFAULT)
 - swapped-signal, swapped_signal: equivalent to g_signal_connect_data (..., NULL, G_CONNECT_SWAPPED)
 - swapped_object_signal, swapped-object-signal: equivalent to g_signal_connect_object (..., G_CONNECT_SWAPPED)
 - signal_after, signal-after: equivalent to g_signal_connect_data (..., NULL, G_CONNECT_AFTER)
@@ -33993,12 +34258,11 @@ instead, is to store the GParamSpec used with
 g_object_class_install_property() inside a static array, e.g.:
 
 |[&lt;!-- language=&quot;C&quot; --&gt; 
-enum
+typedef enum
 {
-PROP_0,
-PROP_FOO,
+PROP_FOO = 1,
 PROP_LAST
-};
+} MyObjectProperty;
 
 static GParamSpec *properties[PROP_LAST];
 
@@ -34008,7 +34272,7 @@ my_object_class_init (MyObjectClass *klass)
 properties[PROP_FOO] = g_param_spec_int (&quot;foo&quot;, &quot;Foo&quot;, &quot;The foo&quot;,
 0, 100,
 50,
-G_PARAM_READWRITE);
+G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 g_object_class_install_property (gobject_class,
 PROP_FOO,
 properties[PROP_FOO]);
@@ -37246,6 +37510,30 @@ Checks whether @value contains the default value as specified in @pspec.
 </return>
 </function>
 
+<function name="g_param_value_is_valid">
+<description>
+Return whether the contents of @value comply with the specifications
+set out by @pspec.
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="pspec">
+<parameter_description> a valid #GParamSpec
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> a #GValue of correct type for @pspec
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether the contents of @value comply with the specifications
+set out by @pspec.
+
+</return>
+</function>
+
 <function name="g_param_value_set_default">
 <description>
 Sets @value to its default value as specified in @pspec.
@@ -38157,7 +38445,8 @@ If @func is %NULL, then only the pointers (and not what they are
 pointing to) are copied to the new #GPtrArray.
 
 The copy of @array will have the same #GDestroyNotify for its elements as
-@array.
+@array. The copy will also be %NULL terminated if (and only if) the source
+array is.
 
 Since: 2.62
 
@@ -38195,6 +38484,8 @@ may get compiler warnings from this though if compiling with GCC’s
 
 If @func is %NULL, then only the pointers (and not what they are
 pointing to) are copied to the new #GPtrArray.
+
+Whether @array_to_extend is %NULL terminated stays unchanged by this function.
 
 Since: 2.62
 
@@ -38357,6 +38648,10 @@ If array contents point to dynamically-allocated memory, they should
 be freed separately if @free_seg is %TRUE and no #GDestroyNotify
 function has been set for @array.
 
+Note that if the array is %NULL terminated and @free_seg is %FALSE
+then this will always return an allocated %NULL terminated buffer.
+If pdata is previously %NULL, a new buffer will be allocated.
+
 This function is not thread-safe. If using a #GPtrArray from multiple
 threads, use only the atomic g_ptr_array_ref() and g_ptr_array_unref()
 functions.
@@ -38426,6 +38721,29 @@ Since: 2.40
 <return></return>
 </function>
 
+<function name="g_ptr_array_is_null_terminated">
+<description>
+Gets whether the @array was constructed as %NULL-terminated.
+
+This will only return %TRUE for arrays constructed by passing %TRUE to the
+`null_terminated` argument of g_ptr_array_new_null_terminated(). It will not
+return %TRUE for normal arrays which have had a %NULL element appended to
+them.
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="array">
+<parameter_description> the #GPtrArray
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the array is made to be %NULL terminated.
+
+</return>
+</function>
+
 <function name="g_ptr_array_new">
 <description>
 Creates a new #GPtrArray with a reference count of 1.
@@ -38459,6 +38777,50 @@ Since: 2.30
 <parameter name="element_free_func">
 <parameter_description> A function to free elements with
 destroy @array or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new #GPtrArray
+
+</return>
+</function>
+
+<function name="g_ptr_array_new_null_terminated">
+<description>
+Like g_ptr_array_new_full() but also allows to set the array to
+be %NULL terminated. A %NULL terminated pointer array has an
+additional %NULL pointer after the last element, beyond the
+current length.
+
+#GPtrArray created by other constructors are not automatically %NULL
+terminated.
+
+Note that if the @array's length is zero and currently no
+data array is allocated, then pdata will still be %NULL.
+%GPtrArray will only %NULL terminate pdata, if an actual
+array is allocated. It does not guarantee that an array
+is always allocated. In other words, if the length is zero,
+then pdata may either point to a %NULL terminated array of length
+zero or be %NULL.
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="reserved_size">
+<parameter_description> number of pointers preallocated.
+If @null_terminated is %TRUE, the actually allocated
+buffer size is @reserved_size plus 1, unless @reserved_size
+is zero, in which case no initial buffer gets allocated.
+</parameter_description>
+</parameter>
+<parameter name="element_free_func">
+<parameter_description> A function to free elements with
+destroy @array or %NULL
+</parameter_description>
+</parameter>
+<parameter name="null_terminated">
+<parameter_description> whether to make the array as %NULL terminated.
 </parameter_description>
 </parameter>
 </parameters>
@@ -38836,6 +39198,10 @@ Frees the data in the array and resets the size to zero, while
 the underlying array is preserved for use elsewhere and returned
 to the caller.
 
+Note that if the array is %NULL terminated this may still return
+%NULL if the length of the array was zero and pdata was not yet
+allocated.
+
 Even if set, the #GDestroyNotify function will never be called
 on the current contents of the array and the caller is
 responsible for freeing the array elements.
@@ -38888,7 +39254,8 @@ elements of the original array
 </parameter>
 </parameters>
 <return> the element data, which should be
-freed using g_free().
+freed using g_free(). This may be %NULL if the array doesn’t have any
+elements (i.e. if `*len` is zero).
 
 </return>
 </function>
@@ -40604,7 +40971,7 @@ statically allocated.
 Calling g_rec_mutex_clear() on a locked recursive mutex leads
 to undefined behaviour.
 
-Sine: 2.32
+Since: 2.32
 
 </description>
 <parameters>
@@ -41258,7 +41625,7 @@ print_uppercase_words (const gchar *string)
 GRegex *regex;
 GMatchInfo *match_info;
 
-regex = g_regex_new (&quot;[A-Z]+&quot;, 0, 0, NULL);
+regex = g_regex_new (&quot;[A-Z]+&quot;, G_REGEX_DEFAULT, G_REGEX_MATCH_DEFAULT, NULL);
 g_regex_match (regex, string, 0, &amp;match_info);
 while (g_match_info_matches (match_info))
 {
@@ -41462,7 +41829,7 @@ GRegex *regex;
 GMatchInfo *match_info;
 GError *error = NULL;
 
-regex = g_regex_new (&quot;[A-Z]+&quot;, 0, 0, NULL);
+regex = g_regex_new (&quot;[A-Z]+&quot;, G_REGEX_DEFAULT, G_REGEX_MATCH_DEFAULT, NULL);
 g_regex_match_full (regex, string, -1, 0, 0, &amp;match_info, &amp;error);
 while (g_match_info_matches (match_info))
 {
@@ -41717,7 +42084,7 @@ g_hash_table_insert (h, &quot;2&quot;, &quot;TWO&quot;);
 g_hash_table_insert (h, &quot;3&quot;, &quot;THREE&quot;);
 g_hash_table_insert (h, &quot;4&quot;, &quot;FOUR&quot;);
 
-reg = g_regex_new (&quot;1|2|3|4&quot;, 0, 0, NULL);
+reg = g_regex_new (&quot;1|2|3|4&quot;, G_REGEX_DEFAULT, G_REGEX_MATCH_DEFAULT, NULL);
 res = g_regex_replace_eval (reg, text, -1, 0, 0, eval_cb, h, NULL);
 g_hash_table_destroy (h);
 
@@ -42477,7 +42844,7 @@ statically allocated.
 Calling g_rw_lock_clear() when any thread holds the lock
 leads to undefined behaviour.
 
-Sine: 2.32
+Since: 2.32
 
 </description>
 <parameters>
@@ -45414,6 +45781,37 @@ Since: 2.72
 </parameter>
 <parameter name="data">
 <parameter_description> the data to pass to @c_handler calls
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_signal_group_connect_closure">
+<description>
+Connects @closure to the signal @detailed_signal on #GSignalGroup:target.
+
+You cannot connect a signal handler after #GSignalGroup:target has been set.
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GSignalGroup
+</parameter_description>
+</parameter>
+<parameter name="detailed_signal">
+<parameter_description> a string of the form `signal-name` with optional `::signal-detail`
+</parameter_description>
+</parameter>
+<parameter name="closure">
+<parameter_description> the closure to connect.
+</parameter_description>
+</parameter>
+<parameter name="after">
+<parameter_description> whether the handler should be called before or after the
+default handler of the signal.
 </parameter_description>
 </parameter>
 </parameters>
@@ -49163,17 +49561,23 @@ absolute path, it will be looked for in the `PATH` variable from
 @envp. If both %G_SPAWN_SEARCH_PATH and %G_SPAWN_SEARCH_PATH_FROM_ENVP
 are used, the value from @envp takes precedence over the environment.
 
-%G_SPAWN_STDOUT_TO_DEV_NULL means that the child's standard output
-will be discarded, instead of going to the same location as the parent's
-standard output. If you use this flag, @stdout_pipe_out must be %NULL.
-
-%G_SPAWN_STDERR_TO_DEV_NULL means that the child's standard error
-will be discarded, instead of going to the same location as the parent's
-standard error. If you use this flag, @stderr_pipe_out must be %NULL.
-
 %G_SPAWN_CHILD_INHERITS_STDIN means that the child will inherit the parent's
 standard input (by default, the child's standard input is attached to
-`/dev/null`). If you use this flag, @stdin_pipe_out must be %NULL.
+`/dev/null`). %G_SPAWN_STDIN_FROM_DEV_NULL explicitly imposes the default
+behavior. Both flags cannot be enabled at the same time and, in both cases,
+the @stdin_pipe_out argument is ignored.
+
+%G_SPAWN_STDOUT_TO_DEV_NULL means that the child's standard output
+will be discarded (by default, it goes to the same location as the parent's
+standard output). %G_SPAWN_CHILD_INHERITS_STDOUT explicitly imposes the
+default behavior. Both flags cannot be enabled at the same time and, in
+both cases, the @stdout_pipe_out argument is ignored.
+
+%G_SPAWN_STDERR_TO_DEV_NULL means that the child's standard error
+will be discarded (by default, it goes to the same location as the parent's
+standard error). %G_SPAWN_CHILD_INHERITS_STDERR explicitly imposes the
+default behavior. Both flags cannot be enabled at the same time and, in
+both cases, the @stderr_pipe_out argument is ignored.
 
 It is valid to pass the same FD in multiple parameters (e.g. you can pass
 a single FD for both @stdout_fd and @stderr_fd, and include it in
@@ -50978,7 +51382,7 @@ documentation
 </parameter>
 </parameters>
 <return> a UTF-8 string describing the error code. If the error code
-is unknown, it returns a string like &quot;unknown error (&lt;code&gt;)&quot;.
+is unknown, it returns a string like &quot;Unknown error: &lt;code&gt;&quot;.
 </return>
 </function>
 
@@ -54438,7 +54842,7 @@ return;
 }
 
 // Reruns this same test in a subprocess
-g_test_trap_subprocess (NULL, 0, 0);
+g_test_trap_subprocess (NULL, 0, G_TEST_SUBPROCESS_DEFAULT);
 g_test_trap_assert_failed ();
 g_test_trap_assert_stderr (&quot;*ERROR*too large*&quot;);
 }
@@ -55984,6 +56388,39 @@ the range between %G_PRIORITY_DEFAULT and %G_PRIORITY_HIGH.
 </parameter>
 </parameters>
 <return> the ID (greater than 0) of the event source.
+</return>
+</function>
+
+<function name="g_timeout_add_once">
+<description>
+Sets a function to be called after @interval milliseconds have elapsed,
+with the default priority, %G_PRIORITY_DEFAULT.
+
+The given @function is called once and then the source will be automatically
+removed from the main context.
+
+This function otherwise behaves like g_timeout_add().
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="interval">
+<parameter_description> the time after which the function will be called, in
+milliseconds (1/1000ths of a second)
+</parameter_description>
+</parameter>
+<parameter name="function">
+<parameter_description> function to call
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> data to pass to @function
+</parameter_description>
+</parameter>
+</parameters>
+<return> the ID (greater than 0) of the event source
+
 </return>
 </function>
 
@@ -62276,7 +62713,7 @@ of characters instead of a given number of bytes. The @src string
 must be valid UTF-8 encoded text. (Use g_utf8_validate() on all
 text before trying to use UTF-8 utility functions with it.)
 
-Note you must ensure @dest is at least 4 * @n to fit the
+Note you must ensure @dest is at least 4 * @n + 1 to fit the
 largest possible UTF-8 characters
 
 

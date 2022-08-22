@@ -407,6 +407,7 @@
 ;; Original typedef:
 ;; typedef enum
 ;; {
+;;   G_IO_FLAG_NONE GLIB_AVAILABLE_ENUMERATOR_IN_2_74 = 0,
 ;;   G_IO_FLAG_APPEND = 1 << 0,
 ;;   G_IO_FLAG_NONBLOCK = 1 << 1,
 ;;   G_IO_FLAG_IS_READABLE = 1 << 2,	/* Read only flag */
@@ -422,6 +423,7 @@
   (in-module "G")
   (c-name "GIOFlags")
   (values
+    '("none" "G_IO_FLAG_NONE" "0x0")
     '("append" "G_IO_FLAG_APPEND" "1 << 0")
     '("nonblock" "G_IO_FLAG_NONBLOCK" "1 << 1")
     '("is-readable" "G_IO_FLAG_IS_READABLE" "1 << 2")
@@ -562,6 +564,7 @@
 ;; Original typedef:
 ;; typedef enum
 ;; {
+;;   G_MARKUP_DEFAULT_FLAGS GLIB_AVAILABLE_ENUMERATOR_IN_2_74 = 0,
 ;;   G_MARKUP_DO_NOT_USE_THIS_UNSUPPORTED_FLAG = 1 << 0,
 ;;   G_MARKUP_TREAT_CDATA_AS_TEXT              = 1 << 1,
 ;;   G_MARKUP_PREFIX_ERROR_POSITION            = 1 << 2,
@@ -572,6 +575,7 @@
   (in-module "G")
   (c-name "GMarkupParseFlags")
   (values
+    '("default-flags" "G_MARKUP_DEFAULT_FLAGS" "0x0")
     '("do-not-use-this-unsupported-flag" "G_MARKUP_DO_NOT_USE_THIS_UNSUPPORTED_FLAG" "1 << 0")
     '("treat-cdata-as-text" "G_MARKUP_TREAT_CDATA_AS_TEXT" "1 << 1")
     '("prefix-error-position" "G_MARKUP_PREFIX_ERROR_POSITION" "1 << 2")
@@ -913,6 +917,7 @@
 ;; Original typedef:
 ;; typedef enum
 ;; {
+;;   G_REGEX_DEFAULT GLIB_AVAILABLE_ENUMERATOR_IN_2_74 = 0,
 ;;   G_REGEX_CASELESS          = 1 << 0,
 ;;   G_REGEX_MULTILINE         = 1 << 1,
 ;;   G_REGEX_DOTALL            = 1 << 2,
@@ -930,13 +935,14 @@
 ;;   G_REGEX_NEWLINE_CRLF      = G_REGEX_NEWLINE_CR | G_REGEX_NEWLINE_LF,
 ;;   G_REGEX_NEWLINE_ANYCRLF   = G_REGEX_NEWLINE_CR | 1 << 22,
 ;;   G_REGEX_BSR_ANYCRLF       = 1 << 23,
-;;   G_REGEX_JAVASCRIPT_COMPAT = 1 << 25
+;;   G_REGEX_JAVASCRIPT_COMPAT GLIB_DEPRECATED_ENUMERATOR_IN_2_74 = 1 << 25
 ;; } GRegexCompileFlags;
 
 (define-flags-extended RegexCompileFlags
   (in-module "G")
   (c-name "GRegexCompileFlags")
   (values
+    '("default" "G_REGEX_DEFAULT" "0x0")
     '("caseless" "G_REGEX_CASELESS" "1 << 0")
     '("multiline" "G_REGEX_MULTILINE" "1 << 1")
     '("dotall" "G_REGEX_DOTALL" "1 << 2")
@@ -961,6 +967,7 @@
 ;; Original typedef:
 ;; typedef enum
 ;; {
+;;   G_REGEX_MATCH_DEFAULT GLIB_AVAILABLE_ENUMERATOR_IN_2_74 = 0,
 ;;   G_REGEX_MATCH_ANCHORED         = 1 << 4,
 ;;   G_REGEX_MATCH_NOTBOL           = 1 << 7,
 ;;   G_REGEX_MATCH_NOTEOL           = 1 << 8,
@@ -982,6 +989,7 @@
   (in-module "G")
   (c-name "GRegexMatchFlags")
   (values
+    '("default" "G_REGEX_MATCH_DEFAULT" "0x0")
     '("anchored" "G_REGEX_MATCH_ANCHORED" "1 << 4")
     '("notbol" "G_REGEX_MATCH_NOTBOL" "1 << 7")
     '("noteol" "G_REGEX_MATCH_NOTEOL" "1 << 8")
@@ -1217,7 +1225,34 @@
 ;;   G_SPAWN_CHILD_INHERITS_STDIN   = 1 << 5,
 ;;   G_SPAWN_FILE_AND_ARGV_ZERO     = 1 << 6,
 ;;   G_SPAWN_SEARCH_PATH_FROM_ENVP  = 1 << 7,
-;;   G_SPAWN_CLOEXEC_PIPES          = 1 << 8
+;;   G_SPAWN_CLOEXEC_PIPES          = 1 << 8,
+;; 
+;;   /**
+;;    * G_SPAWN_CHILD_INHERITS_STDOUT:
+;;    *
+;;    * The child will inherit the parent's standard output.
+;;    *
+;;    * Since: 2.74
+;;    */
+;;   G_SPAWN_CHILD_INHERITS_STDOUT  = 1 << 9,
+;; 
+;;   /**
+;;    * G_SPAWN_CHILD_INHERITS_STDERR:
+;;    *
+;;    * The child will inherit the parent's standard error.
+;;    *
+;;    * Since: 2.74
+;;    */
+;;   G_SPAWN_CHILD_INHERITS_STDERR  = 1 << 10,
+;; 
+;;   /**
+;;    * G_SPAWN_STDIN_FROM_DEV_NULL:
+;;    *
+;;    * The child's standard input is attached to `/dev/null`.
+;;    *
+;;    * Since: 2.74
+;;    */
+;;   G_SPAWN_STDIN_FROM_DEV_NULL    = 1 << 11
 ;; } GSpawnFlags;
 
 (define-flags-extended SpawnFlags
@@ -1234,6 +1269,9 @@
     '("file-and-argv-zero" "G_SPAWN_FILE_AND_ARGV_ZERO" "1 << 6")
     '("search-path-from-envp" "G_SPAWN_SEARCH_PATH_FROM_ENVP" "1 << 7")
     '("cloexec-pipes" "G_SPAWN_CLOEXEC_PIPES" "1 << 8")
+    '("child-inherits-stdout" "G_SPAWN_CHILD_INHERITS_STDOUT" "1 << 9")
+    '("child-inherits-stderr" "G_SPAWN_CHILD_INHERITS_STDERR" "1 << 10")
+    '("stdin-from-dev-null" "G_SPAWN_STDIN_FROM_DEV_NULL" "1 << 11")
   )
 )
 
@@ -1292,6 +1330,7 @@
 
 ;; Original typedef:
 ;; typedef enum {
+;;   G_TEST_TRAP_DEFAULT GLIB_AVAILABLE_ENUMERATOR_IN_2_74 = 0,
 ;;   G_TEST_TRAP_SILENCE_STDOUT    = 1 << 7,
 ;;   G_TEST_TRAP_SILENCE_STDERR    = 1 << 8,
 ;;   G_TEST_TRAP_INHERIT_STDIN     = 1 << 9
@@ -1301,6 +1340,7 @@
   (in-module "G")
   (c-name "GTestTrapFlags")
   (values
+    '("default" "G_TEST_TRAP_DEFAULT" "0x0")
     '("silence-stdout" "G_TEST_TRAP_SILENCE_STDOUT" "1 << 7")
     '("silence-stderr" "G_TEST_TRAP_SILENCE_STDERR" "1 << 8")
     '("inherit-stdin" "G_TEST_TRAP_INHERIT_STDIN" "1 << 9")
@@ -1309,6 +1349,7 @@
 
 ;; Original typedef:
 ;; typedef enum {
+;;   G_TEST_SUBPROCESS_DEFAULT GLIB_AVAILABLE_ENUMERATOR_IN_2_74 = 0,
 ;;   G_TEST_SUBPROCESS_INHERIT_STDIN  = 1 << 0,
 ;;   G_TEST_SUBPROCESS_INHERIT_STDOUT = 1 << 1,
 ;;   G_TEST_SUBPROCESS_INHERIT_STDERR = 1 << 2
@@ -1318,9 +1359,10 @@
   (in-module "G")
   (c-name "GTestSubprocessFlags")
   (values
-    '("stdin" "G_TEST_SUBPROCESS_INHERIT_STDIN" "1 << 0")
-    '("stdout" "G_TEST_SUBPROCESS_INHERIT_STDOUT" "1 << 1")
-    '("stderr" "G_TEST_SUBPROCESS_INHERIT_STDERR" "1 << 2")
+    '("default" "G_TEST_SUBPROCESS_DEFAULT" "0x0")
+    '("inherit-stdin" "G_TEST_SUBPROCESS_INHERIT_STDIN" "1 << 0")
+    '("inherit-stdout" "G_TEST_SUBPROCESS_INHERIT_STDOUT" "1 << 1")
+    '("inherit-stderr" "G_TEST_SUBPROCESS_INHERIT_STDERR" "1 << 2")
   )
 )
 
@@ -2165,7 +2207,9 @@
 ;;   G_FORMAT_SIZE_DEFAULT     = 0,
 ;;   G_FORMAT_SIZE_LONG_FORMAT = 1 << 0,
 ;;   G_FORMAT_SIZE_IEC_UNITS   = 1 << 1,
-;;   G_FORMAT_SIZE_BITS        = 1 << 2
+;;   G_FORMAT_SIZE_BITS        = 1 << 2,
+;;   G_FORMAT_SIZE_ONLY_VALUE GLIB_AVAILABLE_ENUMERATOR_IN_2_74 = 1 << 3,
+;;   G_FORMAT_SIZE_ONLY_UNIT GLIB_AVAILABLE_ENUMERATOR_IN_2_74 = 1 << 4
 ;; } GFormatSizeFlags;
 
 (define-flags-extended FormatSizeFlags
@@ -2176,6 +2220,8 @@
     '("long-format" "G_FORMAT_SIZE_LONG_FORMAT" "1 << 0")
     '("iec-units" "G_FORMAT_SIZE_IEC_UNITS" "1 << 1")
     '("bits" "G_FORMAT_SIZE_BITS" "1 << 2")
+    '("only-value" "G_FORMAT_SIZE_ONLY_VALUE" "1 << 3")
+    '("only-unit" "G_FORMAT_SIZE_ONLY_UNIT" "1 << 4")
   )
 )
 
