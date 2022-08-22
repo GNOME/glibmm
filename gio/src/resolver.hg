@@ -57,6 +57,7 @@ protected:
 
 public:
   _WRAP_ENUM(RecordType, GResolverRecordType, decl_prefix GIOMM_API)
+  _WRAP_ENUM(NameLookupFlags, GResolverNameLookupFlags, decl_prefix GIOMM_API, newin "2,74")
 
   static Glib::RefPtr<Resolver> get_default();
   _IGNORE(g_resolver_get_default)
@@ -87,7 +88,21 @@ public:
   void lookup_by_name_async(const Glib::ustring& hostname, const SlotAsyncReady& slot);
   _IGNORE(g_resolver_lookup_by_name_async)
 
-  _WRAP_METHOD(std::vector<Glib::RefPtr<InetAddress>> lookup_by_name_finish(const Glib::RefPtr<AsyncResult>& result), g_resolver_lookup_by_name_finish, errthrow)
+  _WRAP_METHOD(std::vector<Glib::RefPtr<InetAddress>> lookup_by_name_finish(
+    const Glib::RefPtr<AsyncResult>& result), g_resolver_lookup_by_name_finish, errthrow)
+
+  _WRAP_METHOD(std::vector<Glib::RefPtr<InetAddress>> lookup_by_name_with_flags(const Glib::ustring& hostname,
+    NameLookupFlags flags, const Glib::RefPtr<Cancellable>& cancellable = {}), g_resolver_lookup_by_name_with_flags,
+    errthrow, newin "2,74")
+
+  _WRAP_METHOD(void lookup_by_name_with_flags_async(const Glib::ustring& hostname,
+    NameLookupFlags flags, const SlotAsyncReady& slot{callback},
+    const Glib::RefPtr<Cancellable>& cancellable{.} = {}), g_resolver_lookup_by_name_with_flags_async,
+    slot_name slot, slot_callback SignalProxy_async_callback, newin "2,74")
+
+  _WRAP_METHOD(std::vector<Glib::RefPtr<InetAddress>> lookup_by_name_with_flags_finish(
+    const Glib::RefPtr<AsyncResult>& result), g_resolver_lookup_by_name_with_flags_finish,
+    errthrow, newin "2,74")
 
   _WRAP_METHOD(Glib::ustring lookup_by_address(const Glib::RefPtr<InetAddress>& address, const Glib::RefPtr<Cancellable>& cancellable{?}), g_resolver_lookup_by_address, errthrow)
 

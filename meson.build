@@ -104,7 +104,7 @@ install_pkgconfigdir = install_libdir / 'pkgconfig'
 #   Dependencies when using the <pkg>mm library.
 
 sigcxx_req = '>= 3.0.0'
-glib_req = '>= 2.71.2'
+glib_req = '>= 2.73.2'
 
 # There are pkg-config files for sigc++ and glib on MSVC, so just use that.
 sigcxx_dep = dependency('sigc++-3.0', version: sigcxx_req)
