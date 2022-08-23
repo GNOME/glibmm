@@ -1,7 +1,6 @@
-# Currently we track two versions of gcc: gcc-10 and gcc-11.
-# 2022-05-19: ubuntu:latest = 22.04, ubuntu:rolling = 22.04, ubuntu:devel = 22.10
+# 2022-08-23: ubuntu:latest = 22.04, ubuntu:rolling = 22.04, ubuntu:devel = 22.10
 # See https://hub.docker.com/_/ubuntu
-image: ubuntu:rolling
+image: ubuntu:devel
 
 stages:
   - deps
@@ -88,7 +87,7 @@ autotools_build:
     - make install
   allow_failure: true
 
-debug_build:
+debug_gcc_build:
   extends: .build_default
   stage: build
   variables:
@@ -97,7 +96,9 @@ debug_build:
     - cp -r installdir/usr /
     - mkdir _build && cd _build
     # -Ddebug=true + -Doptimization=0 correspond to -Dbuildtype=debug
-    - meson --prefix=/usr --libdir=lib -Ddebug=true -Doptimization=0 -Dwarnings=fatal -Dwarning_level=3 -Dwerror=true
+    # Don't use warning_level and werror. They are applied also to subprojects.
+    # meson --prefix=/usr --libdir=lib -Ddebug=true -Doptimization=0 -Dwarnings=fatal -Dwarning_level=3 -Dwerror=true
+    - meson --prefix=/usr --libdir=lib -Ddebug=true -Doptimization=0 -Dwarnings=fatal
     - meson compile
     # Must wrap the command in single quotes because of the colon.
     # See https://gitlab.gnome.org/help/ci/yaml/script.md#use-special-characters-with-script
@@ -111,16 +112,18 @@ debug_build:
       - _build/meson-logs/meson-log.txt
     expire_in: 1 week
 
-release_gcc_10_build:
+release_gcc_build:
   extends: .build_default
   stage: build
   variables:
-    DEPENDENCIES: $MESON_DEPS g++-10
+    DEPENDENCIES: $MESON_DEPS
   script:
     - cp -r installdir/usr /
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
-    - CC=gcc-10 CXX=g++-10 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal -Dwarning_level=3 -Dwerror=true
+    # Don't use warning_level and werror. They are applied also to subprojects.
+    # meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal -Dwarning_level=3 -Dwerror=true
+    - meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
     - meson compile
     - 'meson test --suite glibmm:'
     - meson install
@@ -128,27 +131,6 @@ release_gcc_10_build:
     when: always
     paths:
       - _build/docs/reference
-
-release_gcc_11_build:
-  extends: .build_default
-  stage: build
-  variables:
-    DEPENDENCIES: $MESON_DEPS g++-11
-  script:
-    - cp -r installdir/usr /
-    - mkdir _build && cd _build
-    # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
-    - CC=gcc-11 CXX=g++-11 meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal -Dwarning_level=3 -Dwerror=true
-    - meson compile
-    - 'meson test --suite glibmm:'
-    - meson install
-  allow_failure: true
-  artifacts:
-    when: on_failure
-    paths:
-      - _build/meson-logs/testlog.txt
-      - _build/meson-logs/meson-log.txt
-    expire_in: 1 week
 
 release_clang_build:
   extends: .build_default
@@ -160,7 +142,9 @@ release_clang_build:
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     # Accept warnings. See https://gitlab.gnome.org/GNOME/glibmm/-/issues/98
-    - CC=clang CXX=clang++ meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max -Dwarning_level=3
+    # Don't use warning_level and werror. They are applied also to subprojects.
+    # CC=clang CXX=clang++ meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max -Dwarning_level=3
+    - CC=clang CXX=clang++ meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max
     - meson compile
     - 'meson test --suite glibmm:'
     - meson install
@@ -175,7 +159,7 @@ release_clang_build:
 # Publish reference documentation at gnome.pages.gitlab.gnome.org/glibmm
 pages:
   stage: deploy
-  needs: [release_gcc_10_build]
+  needs: [release_gcc_build]
   script:
     - mkdir public
     - mv _build/docs/reference/html/* public
