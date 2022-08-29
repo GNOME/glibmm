@@ -32,6 +32,19 @@ int ListStoreBase_CompareDataFunc(gconstpointer a, gconstpointer b, gpointer use
 
   return (*slot)(item_a, item_b);
 }
+
+// gboolean is int
+gboolean ListStoreBase_EqualFuncFull(gconstpointer a, gconstpointer b, gpointer user_data)
+{
+  auto slot = static_cast<Gio::ListStoreBase::SlotEqual*>(user_data);
+
+  const Glib::RefPtr<const Glib::ObjectBase> item_a =
+    Glib::wrap(static_cast<Glib::Object::BaseObjectType*>(const_cast<gpointer>(a)), true);
+  const Glib::RefPtr<const Glib::ObjectBase> item_b =
+    Glib::wrap(static_cast<Glib::Object::BaseObjectType*>(const_cast<gpointer>(b)), true);
+
+  return (*slot)(item_a, item_b);
+}
 }
 } // anonymous namespace
 
@@ -47,6 +60,27 @@ void ListStoreBase::splice(guint position, guint n_removals,
     g_additions[i] = additions[i]->gobj();
   }
   g_list_store_splice(gobj(), position, n_removals, g_additions.get(), n_additions);
+}
+
+std::pair<bool, unsigned int> ListStoreBase::find(const Glib::RefPtr<const Glib::ObjectBase>& item) const
+{
+  unsigned int position = std::numeric_limits<unsigned int>::max();
+  bool result = g_list_store_find(const_cast<GListStore*>(gobj()),
+    const_cast<GObject*>(item->gobj()), &position);
+  return {result, position};
+}
+
+std::pair<bool, unsigned int> ListStoreBase::find(
+  const Glib::RefPtr<const Glib::ObjectBase>& item, const SlotEqual& slot) const
+{
+  // Use the original slot (not a copy).
+  auto slot_ptr = const_cast<SlotEqual*>(&slot);
+
+  unsigned int position = std::numeric_limits<unsigned int>::max();
+  bool result = g_list_store_find_with_equal_func_full(
+    const_cast<GListStore*>(gobj()), const_cast<GObject*>(item->gobj()),
+    &ListStoreBase_EqualFuncFull, slot_ptr, &position);
+  return {result, position};
 }
 
 } // namespace Gio

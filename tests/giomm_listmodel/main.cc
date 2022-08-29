@@ -19,6 +19,7 @@
 #include <giomm.h>
 #include <cstdlib>
 #include <iostream>
+#include <tuple>
 
 namespace
 {
@@ -324,6 +325,76 @@ void test_store_sorted2()
   }
 } // end test_store_sorted2()
 
+void check_found_item_position(int icall, bool found_item, unsigned int position,
+  bool expected_found_item, unsigned int expected_position)
+{
+  if (found_item != expected_found_item || position != expected_position)
+  {
+    result = EXIT_FAILURE;
+    std::cerr << "test_store_find(), " << icall << ": found_item="
+      << found_item << ", position=" << position << std::endl;
+  }
+}
+
+bool casecmp_action_by_name(const Glib::RefPtr<const Gio::SimpleAction>& a,
+  const Glib::RefPtr<const Gio::SimpleAction>& b, const Glib::ustring& suffix)
+{
+  const auto a_name = a->get_name();
+  const auto b_name = b->get_name() + suffix;
+  if (suffix.empty())
+    return a_name.casefold() == b_name.casefold();
+  else
+    return a_name == b_name;
+}
+
+void test_store_find()
+{
+  const std::vector<Glib::ustring> item_strings{ "aaa", "bbb", "xxx", "ccc" };
+  std::vector<Glib::RefPtr<Gio::SimpleAction>> items;
+
+  for (auto& item_string : item_strings)
+    items.push_back(Gio::SimpleAction::create(item_string));
+  auto store = Gio::ListStore<Gio::SimpleAction>::create();
+
+  // Shouldn't crash on an empty list, or change the position pointer.
+  auto [found_item, position] = store->find(items[0]);
+  check_found_item_position(1, found_item, position,
+    false, std::numeric_limits<unsigned int>::max());
+
+  for (auto& item : items)
+    store->append(item);
+
+  // Check whether it could still find the the elements.
+  for (unsigned int i = 0; i < item_strings.size(); ++i)
+  {
+    std::tie(found_item, position) = store->find(items[i]);
+    check_found_item_position(1+i, found_item, position, true, i);
+  }
+
+  // Try to find element not part of the list.
+  auto other_item = Gio::SimpleAction::create("111");
+  std::tie(found_item, position) = store->find(other_item);
+  check_found_item_position(6, found_item, position,
+    false, std::numeric_limits<unsigned int>::max());
+
+  // Re-add item; find() should only return the first position.
+  store->append(items[0]);
+  std::tie(found_item, position) = store->find(items[0]);
+  check_found_item_position(7, found_item, position, true, 0);
+
+  // Try to find element which should only work with custom equality check.
+  other_item = Gio::SimpleAction::create("XXX");
+  std::tie(found_item, position) = store->find(other_item,
+    sigc::bind(sigc::ptr_fun(casecmp_action_by_name), ""));
+  check_found_item_position(8, found_item, position, true, 2);
+
+  other_item = Gio::SimpleAction::create("c");
+  std::tie(found_item, position) = store->find(other_item,
+    sigc::bind(sigc::ptr_fun(casecmp_action_by_name), "cc"));
+  check_found_item_position(8, found_item, position, true, 3);
+
+} // end test_store_find()
+
 } // anonymous namespace
 
 int main(int, char**)
@@ -334,6 +405,7 @@ int main(int, char**)
   test_store_refcounts();
   test_store_sorted1();
   test_store_sorted2();
+  test_store_find();
 
   return result;
 }

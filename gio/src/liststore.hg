@@ -18,6 +18,8 @@
 #include <giomm/listmodel.h>
 #include <vector>
 #include <type_traits>
+#include <limits>
+#include <utility>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -97,6 +99,51 @@ public:
   void splice(guint position, guint n_removals,
     const std::vector<Glib::RefPtr<Glib::ObjectBase>>& additions);
   _IGNORE(g_list_store_splice)
+
+  /** Looks up the given @a item in the list store by looping over the items until
+   * the first occurrence of @a item.
+   *
+   * If you need to compare the two items with a custom comparison function, use
+   * find(const Glib::RefPtr<const Glib::ObjectBase>& item, const SlotEqual& slot) const instead.
+   *
+   * @newin{2,74}
+   *
+   * @param item An item.
+   * @return std::pair{item_found, position} Whether the %ListStoreBase contains @a item.
+   * If it was found, @a position will be set to the position where @a item
+   * occurred for the first time, else @a position = std::numeric_limits<unsigned int>::max().
+   */
+  std::pair<bool, unsigned int> find(const Glib::RefPtr<const Glib::ObjectBase>& item) const;
+  _IGNORE(g_list_store_find)
+
+  /** A slot that will be called to compare two items.
+   * The slot should return <tt>true</tt> if the items are equal,
+   * <tt>false</tt> if they are not equal.
+   * For instance,
+   * @code
+   * bool on_equal_item(const Glib::RefPtr<const Glib::ObjectBase>& item1, const Glib::RefPtr<const Glib::ObjectBase>& item2);
+   * @endcode
+   *
+   * @newin{2,74}
+   */
+  using SlotEqual = sigc::slot<bool(const Glib::RefPtr<const Glib::ObjectBase>&, const Glib::RefPtr<const Glib::ObjectBase>&)>;
+
+  /** Looks up the given @a item in the list store by looping over the items until
+   * the first occurrence of @a item.
+   *
+   * If you don't need to compare the two items with a custom comparison function,
+   * use find(const Glib::RefPtr<const Glib::ObjectBase>& item) const instead.
+   *
+   * @newin{2,74}
+   *
+   * @param item An item.
+   * @param slot A comparison function.
+   * @return std::pair{item_found, position} Whether the %ListStoreBase contains @a item.
+   * If it was found, @a position will be set to the position where @a item
+   * occurred for the first time, else @a position = std::numeric_limits<unsigned int>::max().
+   */
+  std::pair<bool, unsigned int> find(const Glib::RefPtr<const Glib::ObjectBase>& item, const SlotEqual& slot) const;
+  _IGNORE(g_list_store_find_with_equal_func, g_list_store_find_with_equal_func_full)
 
   _WRAP_PROPERTY("item-type", GType, newin "2,50")
   _WRAP_PROPERTY("n-items", unsigned int)
@@ -232,8 +279,53 @@ public:
   void splice(guint position, guint n_removals,
     const std::vector<Glib::RefPtr<T_item>>& additions);
 
+  /** Looks up the given @a item in the list store by looping over the items until
+   * the first occurrence of @a item.
+   *
+   * If you need to compare the two items with a custom comparison function, use
+   * find(const Glib::RefPtr<const T_item>& item, const SlotEqual& slot) const instead.
+   *
+   * @newin{2,74}
+   *
+   * @param item An item.
+   * @return std::pair{item_found, position} Whether the %ListStore contains @a item.
+   * If it was found, @a position will be set to the position where @a item
+   * occurred for the first time, else @a position = std::numeric_limits<unsigned int>::max().
+   */
+  std::pair<bool, unsigned int> find(const Glib::RefPtr<const T_item>& item) const;
+
+  /** A slot that will be called to compare two items.
+   * The slot should return <tt>true</tt> if the items are equal,
+   * <tt>false</tt> if they are not equal.
+   * For instance,
+   * @code
+   * bool on_equal_item(const Glib::RefPtr<const T_item>& item1, const Glib::RefPtr<const T_item>& item2);
+   * @endcode
+   *
+   * @newin{2,74}
+   */
+  using SlotEqual = sigc::slot<bool(const Glib::RefPtr<const T_item>&, const Glib::RefPtr<const T_item>&)>;
+
+  /** Looks up the given @a item in the list store by looping over the items until
+   * the first occurrence of @a item.
+   *
+   * If you don't need to compare the two items with a custom comparison function,
+   * use find(const Glib::RefPtr<const T_item>& item) const instead.
+   *
+   * @newin{2,74}
+   *
+   * @param item An item.
+   * @param slot A comparison function.
+   * @return std::pair{item_found, position} Whether the %ListStore contains @a item.
+   * If it was found, @a position will be set to the position where @a item
+   * occurred for the first time, else @a position = std::numeric_limits<unsigned int>::max().
+   */
+  std::pair<bool, unsigned int> find(const Glib::RefPtr<const T_item>& item, const SlotEqual& slot) const;
+
 private:
   static int compare_data_func(gconstpointer a, gconstpointer b, gpointer user_data);
+  // gboolean is int
+  static gboolean equal_func_full(gconstpointer a, gconstpointer b, gpointer user_data);
 }; // end class ListStore
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -306,9 +398,45 @@ void ListStore<T_item>::splice(guint position, guint n_removals,
 }
 
 template <typename T_item>
+std::pair<bool, unsigned int> ListStore<T_item>::find(
+  const Glib::RefPtr<const T_item>& item) const
+{
+  return ListStoreBase::find(item);
+}
+
+template <typename T_item>
+std::pair<bool, unsigned int> ListStore<T_item>::find(
+  const Glib::RefPtr<const T_item>& item, const SlotEqual& slot) const
+{
+  // Use the original slot (not a copy).
+  auto slot_ptr = const_cast<SlotEqual*>(&slot);
+
+  unsigned int position = std::numeric_limits<unsigned int>::max();
+  bool result = g_list_store_find_with_equal_func_full(
+    const_cast<GListStore*>(gobj()), const_cast<typename T_item::BaseObjectType*>(item->gobj()),
+    &equal_func_full, slot_ptr, &position);
+  return {result, position};
+}
+
+template <typename T_item>
 int ListStore<T_item>::compare_data_func(gconstpointer a, gconstpointer b, gpointer user_data)
 {
   auto slot = static_cast<SlotCompare*>(user_data);
+
+  // cast_dynamic is necessary if T_item is a user-derived class, such as
+  // class MyObject : public Glib::Object
+  const Glib::RefPtr<const T_item> item_a = std::dynamic_pointer_cast<T_item>(
+    Glib::wrap(static_cast<typename T_item::BaseObjectType*>(const_cast<gpointer>(a)), true));
+  const Glib::RefPtr<const T_item> item_b = std::dynamic_pointer_cast<T_item>(
+    Glib::wrap(static_cast<typename T_item::BaseObjectType*>(const_cast<gpointer>(b)), true));
+
+  return (*slot)(item_a, item_b);
+}
+
+template <typename T_item>
+gboolean ListStore<T_item>::equal_func_full(gconstpointer a, gconstpointer b, gpointer user_data)
+{
+  auto slot = static_cast<SlotEqual*>(user_data);
 
   // cast_dynamic is necessary if T_item is a user-derived class, such as
   // class MyObject : public Glib::Object
