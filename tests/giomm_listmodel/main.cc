@@ -356,7 +356,7 @@ void test_store_find()
     items.push_back(Gio::SimpleAction::create(item_string));
   auto store = Gio::ListStore<Gio::SimpleAction>::create();
 
-  // Shouldn't crash on an empty list, or change the position pointer.
+  // Shouldn't crash on an empty list.
   auto [found_item, position] = store->find(items[0]);
   check_found_item_position(1, found_item, position,
     false, std::numeric_limits<unsigned int>::max());
@@ -364,11 +364,11 @@ void test_store_find()
   for (auto& item : items)
     store->append(item);
 
-  // Check whether it could still find the the elements.
+  // Check whether it can find the elements.
   for (unsigned int i = 0; i < item_strings.size(); ++i)
   {
     std::tie(found_item, position) = store->find(items[i]);
-    check_found_item_position(1+i, found_item, position, true, i);
+    check_found_item_position(2+i, found_item, position, true, i);
   }
 
   // Try to find element not part of the list.
