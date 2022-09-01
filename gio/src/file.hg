@@ -28,6 +28,7 @@
 #include <giomm/mountoperation.h>
 #include <giomm/drive.h>
 #include <giomm/error.h> //Because this is thrown by some of these methods.
+#include <utility>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/interface_p.h)
@@ -46,21 +47,21 @@ _WRAP_ENUM(FileQueryInfoFlags, GFileQueryInfoFlags, NO_GTYPE, decl_prefix GIOMM_
 _WRAP_ENUM(FileMonitorFlags, GFileMonitorFlags, NO_GTYPE, decl_prefix GIOMM_API)
 
 
-/** File and directory handling.
- * Gio::File is a high level abstraction for manipulating files on a virtual file system. Gio::Files are lightweight, immutable objects that do no
- * I/O upon creation. It is necessary to understand that a Gio::File object does not represent a file, merely a handle to a file. All file I/O is
+/** %File and directory handling.
+ * %Gio::File is a high level abstraction for manipulating files on a virtual file system. Gio::Files are lightweight, immutable objects that do no
+ * I/O upon creation. It is necessary to understand that a %Gio::File object does not represent a file, merely a handle to a file. All file I/O is
  * implemented as streaming operations (see Gio::InputStream and Gio::OutputStream).
  *
- * A GioFile can be constructed from a path, URI, or a command line argument.
+ * A %Gio::File can be constructed from a path, URI, or a command line argument.
  *
- * You can move through the filesystem with Gio::File handles with get_parent() to get a handle to the parent directory,
+ * You can move through the filesystem with %Gio::File handles with get_parent() to get a handle to the parent directory,
  * get_child() to get a handle to a child within a directory, and resolve_relative_path() to resolve a relative path between two Gio::Files.
  *
- * Many Gio::File operations have both synchronous and asynchronous versions to suit your application. Asynchronous versions of synchronous
+ * Many %Gio::File operations have both synchronous and asynchronous versions to suit your application. Asynchronous versions of synchronous
  * functions simply have _async() appended to their function names. The asynchronous I/O functions call a SlotAsyncReady callback slot which is
  * then used to finalize the operation, producing a AsyncResult which is then passed to the function's matching _finish() operation.
  *
- * Some Gio::File operations do not have synchronous analogs, as they may take a very long time to finish, and blocking may leave an application
+ * Some %Gio::File operations do not have synchronous analogs, as they may take a very long time to finish, and blocking may leave an application
  * unusable. Notable cases include: mount_mountable() to mount a mountable file, unmount_mountable() to unmount a mountable file,
  * and eject_mountable() to eject a mountable file.
  *
@@ -115,11 +116,43 @@ public:
   static Glib::RefPtr<File> create_for_commandline_arg(const std::string& arg);
   _IGNORE(g_file_new_for_commandline_arg)
 
+  /** Constructs a file in the preferred directory for temporary files.
+   *
+   * The file is created in the directory returned by Glib::get_tmp_dir().
+   * A FileIOStream pointing to the file is also created.
+   *
+   * @a tmpl should be a string in the GLib file name encoding
+   * containing a sequence of six 'X' characters, and containing no
+   * directory components. If it is an empty string, a default template is used.
+   *
+   * Unlike the other %File constructors, this will throw an exception if
+   * a temporary file could not be created.
+   *
+   * @newin{2,74}
+   *
+   * @param tmpl Template for the file name, as in Glib::file_open_tmp(),
+   *             or an empty string for a default template.
+   * @return {file, iostream} A new %File and a FileIOStream for the created file.
+   *
+   * @throws Glib::FileError
+   */
+  static std::pair<Glib::RefPtr<File>, Glib::RefPtr<FileIOStream>> create_tmp(const std::string& tmpl = {});
+  _IGNORE(g_file_new_tmp)
+
   // parse_name is a UTF8-guaranteed "nice" string that can both
   // be resolved to a GFile (via create_for_parse_name) and put in
   // e.g. a GtkEntry. In practice, it is either a UTF8-only absolute
   // filename (if it starts with a /), or an IRI (i.e. a URI that allows
   // UTF8-encoded unicode chars instead of escaping them).
+  /** Constructs a %File with the given @a parse_name.
+   *
+   * The @a parse_name is something given by get_parse_name().
+   * This operation never fails, but the returned object might not support any
+   * I/O operation if the @a parse_name cannot be parsed.
+   *
+   * @param parse_name A UTF-8 encoded file name or path to be parsed.
+   * @return A new %File.
+   */
   static Glib::RefPtr<File> create_for_parse_name(const Glib::ustring& parse_name);
   _IGNORE(g_file_parse_name)
 

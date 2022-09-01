@@ -1,6 +1,6 @@
 #include <giomm.h>
 #include <iostream>
-#include <string.h>
+#include <cstring>
 
 // Use this line if you want debug output:
 // std::ostream& ostr = std::cout;
@@ -37,9 +37,9 @@ main(int, char**)
       return EXIT_FAILURE;
     }
 
-    gchar buffer[1000]; // TODO: This is unpleasant.
-    memset(buffer, 0, sizeof buffer);
-    const gsize bytes_read = stream->read(buffer, sizeof buffer - 1);
+    char buffer[1000]; // TODO: This is unpleasant.
+    std::memset(buffer, 0, sizeof buffer);
+    const gssize bytes_read = stream->read(buffer, sizeof buffer - 1);
 
     if (bytes_read)
       ostr << "File contents read: " << buffer << std::endl;
@@ -52,6 +52,56 @@ main(int, char**)
   catch (const Glib::Error& ex)
   {
     std::cerr << "Exception caught: " << ex.what() << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Test temporary file.
+  try
+  {
+    auto [file, iostream] = Gio::File::create_tmp();
+    if (!file || !iostream)
+    {
+      std::cerr << "Gio::File::create_tmp() returned an empty RefPtr." << std::endl;
+      return EXIT_FAILURE;
+    }
+    ostr << "Tmp file parse name: " << file->get_parse_name() << std::endl;
+
+    auto input_stream = iostream->get_input_stream();
+    auto output_stream = iostream->get_output_stream();
+
+    // Write to the temporary file.
+    const std::string tmp_string = "This is a temporary file.";
+    const gssize bytes_written = output_stream->write(tmp_string);
+    if (bytes_written != static_cast<int>(tmp_string.size()))
+    {
+      std::cerr << "Gio::OutputStream::write() wrote: " << bytes_written
+                << " bytes. Should write " << tmp_string.size() << " bytes."
+                << std::endl;
+      return EXIT_FAILURE;
+    }
+    output_stream->flush();
+    iostream->seek(0, Glib::SeekType::SET);
+
+    // Read what was written.
+    char buffer[100];
+    std::memset(buffer, 0, sizeof buffer);
+    const gssize bytes_read = input_stream->read(buffer, sizeof buffer - 1);
+    ostr << "Tmp file contents read: " << buffer << std::endl;
+    if (bytes_read != bytes_written || buffer != tmp_string)
+    {
+      std::cerr << "Gio::InputStream::read() read: " << buffer << std::endl;
+      return EXIT_FAILURE;
+    }
+    file->remove();
+  }
+  catch (const Glib::FileError& ex)
+  {
+    std::cerr << "Glib::FileError exception caught: " << ex.what() << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const Glib::Error& ex)
+  {
+    std::cerr << "Glib::Error exception caught: " << ex.what() << std::endl;
     return EXIT_FAILURE;
   }
 

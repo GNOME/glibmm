@@ -189,6 +189,18 @@ File::create_for_commandline_arg(const std::string& arg)
   return Glib::wrap(G_FILE(cfile));
 }
 
+std::pair<Glib::RefPtr<File>, Glib::RefPtr<FileIOStream>>
+File::create_tmp(const std::string& tmpl)
+{
+  GError* gerror = nullptr;
+  GFileIOStream* ciostream = nullptr;
+  GFile* cfile = g_file_new_tmp(tmpl.empty() ? nullptr : tmpl.c_str(), &ciostream, &gerror);
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return {Glib::wrap(cfile), Glib::wrap(ciostream)};
+}
+
 Glib::RefPtr<File>
 File::create_for_parse_name(const Glib::ustring& parse_name)
 {
