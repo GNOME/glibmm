@@ -4470,6 +4470,9 @@ bytes, but care is taken to align the allocated memory to with the given
 alignment value. Additionally, it will detect possible overflow during
 multiplication.
 
+If the allocation fails (because the system is out of memory),
+the program is terminated.
+
 Aligned memory allocations returned by this function can only be
 freed using g_aligned_free().
 
@@ -30120,6 +30123,9 @@ Deprecated: 2.2: Use g_main_context_set_poll_func() again
 Allocates @n_bytes bytes of memory.
 If @n_bytes is 0 it returns %NULL.
 
+If the allocation fails (because the system is out of memory),
+the program is terminated.
+
 
 </description>
 <parameters>
@@ -30137,6 +30143,9 @@ If @n_bytes is 0 it returns %NULL.
 Allocates @n_bytes bytes of memory, initialized to 0's.
 If @n_bytes is 0 it returns %NULL.
 
+If the allocation fails (because the system is out of memory),
+the program is terminated.
+
 
 </description>
 <parameters>
@@ -30153,6 +30162,9 @@ If @n_bytes is 0 it returns %NULL.
 <description>
 This function is similar to g_malloc0(), allocating (@n_blocks * @n_block_bytes) bytes,
 but care is taken to detect possible overflow during multiplication.
+
+If the allocation fails (because the system is out of memory),
+the program is terminated.
 
 Since: 2.24
 
@@ -30175,6 +30187,9 @@ Since: 2.24
 <description>
 This function is similar to g_malloc(), allocating (@n_blocks * @n_block_bytes) bytes,
 but care is taken to detect possible overflow during multiplication.
+
+If the allocation fails (because the system is out of memory),
+the program is terminated.
 
 Since: 2.24
 
@@ -36595,11 +36610,12 @@ See [canonical parameter names][canonical-parameter-names] for details of
 the rules for @name. Names which violate these rules lead to undefined
 behaviour.
 
-Beyond the name, #GParamSpecs have two more descriptive
-strings associated with them, the @nick, which should be suitable
-for use as a label for the property in a property editor, and the
-@blurb, which should be a somewhat longer description, suitable for
-e.g. a tooltip. The @nick and @blurb should ideally be localized.
+Beyond the name, #GParamSpecs have two more descriptive strings, the
+@nick and @blurb, which may be used as a localized label and description.
+For GTK and related libraries these are considered deprecated and may be
+omitted, while for other libraries such as GStreamer and its plugins they
+are essential. When in doubt, follow the conventions used in the
+surrounding code and supporting libraries.
 
 
 </description>
@@ -40918,6 +40934,9 @@ have been moved. @mem may be %NULL, in which case it's considered to
 have zero-length. @n_bytes may be 0, in which case %NULL will be returned
 and @mem will be freed unless it is %NULL.
 
+If the allocation fails (because the system is out of memory),
+the program is terminated.
+
 
 </description>
 <parameters>
@@ -40938,6 +40957,9 @@ and @mem will be freed unless it is %NULL.
 <description>
 This function is similar to g_realloc(), allocating (@n_blocks * @n_block_bytes) bytes,
 but care is taken to detect possible overflow during multiplication.
+
+If the allocation fails (because the system is out of memory),
+the program is terminated.
 
 Since: 2.24
 
@@ -46634,7 +46656,7 @@ doesn't need a function pointer exposed in the class structure of
 an object definition, instead the function pointer is passed
 directly and can be overridden by derived classes with
 g_signal_override_class_closure() or
-g_signal_override_class_handler()and chained to with
+g_signal_override_class_handler() and chained to with
 g_signal_chain_from_overridden() or
 g_signal_chain_from_overridden_handler().
 
@@ -60688,11 +60710,11 @@ invoked g_unix_signal_source_new().
 
 For example, an effective use of this function is to handle `SIGTERM`
 cleanly; flushing any outstanding files, and then calling
-g_main_loop_quit ().  It is not safe to do any of this a regular
-UNIX signal handler; your handler may be invoked while malloc() or
-another library function is running, causing reentrancy if you
-attempt to use it from the handler.  None of the GLib/GObject API
-is safe against this kind of reentrancy.
+g_main_loop_quit().  It is not safe to do any of this from a regular
+UNIX signal handler; such a handler may be invoked while malloc() or
+another library function is running, causing reentrancy issues if the
+handler attempts to use those functions.  None of the GLib/GObject
+API is safe against this kind of reentrancy.
 
 The interaction of this source when combined with native UNIX
 functions like sigprocmask() is not defined.
