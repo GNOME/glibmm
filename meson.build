@@ -59,7 +59,7 @@ endif
 # Do we build from a git repository?
 # Suppose we do if and only if the meson.build file is tracked by git.
 cmd_py = '''
-import os, sys, subprocess, shutil
+import shutil, subprocess, sys
 if not shutil.which('git'):
   sys.exit(1)
 cmd = [ 'git', 'ls-files', '--error-unmatch', 'meson.build' ]
