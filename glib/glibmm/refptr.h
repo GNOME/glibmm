@@ -35,6 +35,15 @@ void RefPtrDeleter(T_CppObject* object)
 }
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
+// RefPtr is put in a group, because a group (but not a 'using' alias)
+// gets its own html file, which can be referred to from outside glibmm,
+// for instance from the gtkmm tutorial.
+// Without a group, Doxygen generates links to the 'using' alias such as
+// .../html/namespaceGlib.html#afa2fecfa732e9ec1107ace03a2911d63
+/** @defgroup RefPtr RefPtr
+ * A reference-counting shared smartpointer
+ */
+
 /** RefPtr<> is a reference-counting shared smartpointer.
  *
  * Some objects in gtkmm are obtained from a shared
@@ -65,6 +74,8 @@ void RefPtrDeleter(T_CppObject* object)
  *
  * @see Glib::make_refptr_for_instance()
  * if you need to implement a create() method for a %Glib::ObjectBase-derived class.
+ *
+ * @ingroup RefPtr
  */
 template <class T_CppObject>
 using RefPtr = std::shared_ptr<T_CppObject>;
