@@ -33,6 +33,7 @@
 #include <giomm/asyncresult.h>
 #include <giomm/bufferedinputstream.h>
 #include <giomm/bufferedoutputstream.h>
+#include <giomm/bytesicon.h>
 #include <giomm/cancellable.h>
 #include <giomm/charsetconverter.h>
 #include <giomm/contenttype.h>

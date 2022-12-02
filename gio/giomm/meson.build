@@ -38,6 +38,7 @@ giomm_any_hg_ccg_basenames = [
   'asyncresult',
   'bufferedinputstream',
   'bufferedoutputstream',
+  'bytesicon',
   'cancellable',
   'charsetconverter',
   'converter',

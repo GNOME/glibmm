@@ -1,4 +1,4 @@
-/* Copyright (C) 2012 The glibmm Development Team
+/* Copyright (C) 2022 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -14,29 +14,4 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Glib
-{
-
-Glib::RefPtr<Glib::Bytes>
-Bytes::create(gconstpointer data, gsize size)
-{
-  GBytes* bytes = g_bytes_new(data, size);
-  return Glib::wrap(bytes);
-}
-
-GType Value<RefPtr<Glib::Bytes> >::value_type()
-{
-  return g_bytes_get_type();
-}
-
-void Value<RefPtr<Glib::Bytes> >::set(const CppType& data)
-{
-  set_boxed(Glib::unwrap(data));
-}
-
-Value<RefPtr<Glib::Bytes>>::CppType Value<RefPtr<Glib::Bytes>>::get() const
-{
-  return Glib::wrap(static_cast<CType>(get_boxed()), true);
-}
-
-} // namespace Glib
+#include <gio/gio.h>

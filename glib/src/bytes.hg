@@ -20,6 +20,7 @@ _DEFS(glibmm,glib)
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 #include <glibmm/error.h>
+#include <glibmm/value.h>
 #include <glib.h>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -64,6 +65,21 @@ public:
   _WRAP_METHOD(static guint hash(gconstpointer bytes), g_bytes_hash)
   _WRAP_METHOD(static bool equal(gconstpointer bytes1, gconstpointer bytes2), g_bytes_equal)
   _WRAP_METHOD(static gint compare(gconstpointer bytes1, gconstpointer   bytes2), g_bytes_compare)
+};
+
+// This is needed so Glib::RefPtr<Glib::Bytes> can be used with
+// Glib::Value and _WRAP_PROPERTY in Gio::BytesIcon.
+template <>
+class GLIBMM_API Value<Glib::RefPtr<Glib::Bytes>> : public ValueBase_Boxed
+{
+public:
+  using CppType = Glib::RefPtr<Glib::Bytes>;
+  using CType = GBytes*;
+
+  static GType value_type();
+
+  void set(const CppType& data);
+  CppType get() const;
 };
 
 } // namespace Glib
