@@ -29,9 +29,10 @@ namespace Glib
 //TODO: Replace get_last_error() with exceptions?
 //Provide operator()?
 
-/** Dynamic Loading of Modules
+/** Dynamic loading of modules.
+ *
  * These functions provide a portable way to dynamically load object
- *  files (commonly known as 'plug-ins'). The current implementation
+ * files (commonly known as 'plug-ins'). The current implementation
  * supports all systems that provide an implementation of dlopen()
  * (e.g. Linux/Sun), as well as HP-UX via its shl_load() mechanism,
  * and Windows platforms via DLLs.
@@ -47,14 +48,22 @@ public:
 
   /** Opens a module.
    *
-   * First of all it tries to open file_name as a module. If that
-   * fails and file_name has the ".la"-suffix (and is a libtool
-   * archive) it tries to open the corresponding module. If that fails
-   * and it doesn't have the proper module suffix for the platform
-   * (G_MODULE_SUFFIX), this suffix will be appended and the
-   * corresponding module will be opended. If that fails and file_name
-   * doesn't have the ".la"-suffix, this suffix is appended and
-   * it tries to open the corresponding module.
+   * If the module has already been opened, its reference count
+   * is incremented. If not, the module is searched in the following order:
+   *
+   * 1. If @a file_name exists as a regular file, it is used as-is; else
+   * 2. If @a file_name doesn't have the correct suffix and/or prefix for the
+   *    platform, then possible suffixes and prefixes will be added to the
+   *    basename till a file is found and whatever is found will be used; else
+   * 3. If @a file_name doesn't have the ".la"-suffix, ".la" is appended. Either
+   *    way, if a matching .la file exists (and is a libtool archive) the
+   *    libtool archive is parsed to find the actual file name, and that is
+   *    used.
+   *
+   * At the end of all this, we would have a file path that we can access on
+   * disk, and it is opened as a module. If not, @a file_name is opened as
+   * a module verbatim in the hopes that the system implementation will somehow
+   * be able to access it.
    *
    * Use operator bool() to see whether the operation succeeded. For instance,
    * @code
@@ -66,8 +75,10 @@ public:
    * }
    * @endcode
    *
-   * @param file_name The library filename to open
-   * @param flags Flags to configure the load process
+   * @param file_name The name or path to the file containing the module,
+   *                  or an empty string to obtain a module representing
+   *                  the main program itself.
+   * @param flags The flags used for opening the module.
    */
   explicit Module(const std::string& file_name, Flags flags = Flags(0));
 
@@ -132,8 +143,13 @@ public:
    * @param directory The directory the module is in
    * @param module_name The name of the module
    * @returns The system-specific filename of the module
+   *
+   * @deprecated 2.76: You will get the wrong results most of the time.
+   *   Use the constructor instead with @a module_name as the
+   *   basename of the file_name argument.
    */
-  _WRAP_METHOD(static std::string build_path(const std::string& directory, const std::string& module_name), g_module_build_path)
+  _WRAP_METHOD(static std::string build_path(const std::string& directory, const std::string& module_name),
+    g_module_build_path, deprecated)
 
   GModule*       gobj()       { return gobject_; }
   const GModule* gobj() const { return gobject_; }
