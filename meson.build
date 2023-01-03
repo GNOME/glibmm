@@ -58,13 +58,14 @@ endif
 
 # Do we build from a git repository?
 # Suppose we do if and only if the meson.build file is tracked by git.
+fs = import('fs')
 cmd_py = '''
 import shutil, subprocess, sys
 if not shutil.which('git'):
   sys.exit(1)
 cmd = [ 'git', 'ls-files', '--error-unmatch', 'meson.build' ]
 sys.exit(subprocess.run(cmd, cwd="@0@", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode)
-'''.format(project_source_root)
+'''.format(fs.as_posix(project_source_root))
 is_git_build = run_command(python3, '-c', cmd_py, check: false).returncode() == 0
 
 # Are we testing a dist tarball while it's being built?
