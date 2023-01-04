@@ -230,6 +230,10 @@ foreach my $filename_header (sort keys %deprecated)
 
 # Declarations of glib functions.
 
+print "\n#ifdef _MSC_VER\n";
+print "#pragma warning( push )\n";
+print "#pragma warning( disable : 4273 ) // Disable MSVC warning C4273 in wrap_init.cc momentarily\n";
+print "#endif // _MSC_VER\n";
 print "\nextern \"C\"\n";
 print "{\n";
 print "//Declarations of the *_get_type() functions:\n\n";
@@ -265,6 +269,9 @@ foreach my $filename_header (sort keys %exceptions)
 }
 
 print "} // extern \"C\"\n";
+print "\n#ifdef _MSC_VER\n";
+print "#pragma warning( pop )\n";
+print "#endif // _MSC_VER\n";
 print "\n";
 
 my $namespace_whole_declarations = "";
