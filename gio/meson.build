@@ -20,9 +20,10 @@ configure_file(
   configuration: giomm_pkg_uninst_conf_data,
 )
 
+giommconfig_h_meson = files('giommconfig.h.meson')
 install_giommconfigdir = install_libdir / giomm_pcname / 'include'
-giommconfig_h = configure_file(
-  input: 'giommconfig.h.meson',
+configure_file(
+  input: giommconfig_h_meson,
   output: 'giommconfig.h',
   configuration: pkg_conf_data,
   install_dir: install_giommconfigdir,
