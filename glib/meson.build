@@ -5,7 +5,8 @@
 #        giomm_requires, build_deprecated_api, install_pkgconfigdir,
 #        is_os_cocoa, cpp_compiler, glibmm_major_version, glibmm_minor_version,
 #        glibmm_micro_version, msvc14x_toolset_ver
-# Output: pkg_conf_data, install_glibmmconfigdir, glibmmconfig_h
+# Output: pkg_conf_data, glibmm_config_conf_data, install_glibmmconfigdir,
+#         glibmmconfig_h_meson
 
 pkg_conf_data = configuration_data()
 pkg_conf_data.set('prefix', install_prefix)
@@ -122,9 +123,10 @@ foreach conf_test : conf_tests
   endif
 endforeach
 
+glibmmconfig_h_meson = files('glibmmconfig.h.meson')
 install_glibmmconfigdir = install_libdir / glibmm_pcname / 'include'
-glibmmconfig_h = configure_file(
-  input: 'glibmmconfig.h.meson',
+configure_file(
+  input: glibmmconfig_h_meson,
   output: 'glibmmconfig.h',
   configuration: glibmm_config_conf_data,
   install_dir: install_glibmmconfigdir,

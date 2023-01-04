@@ -1,6 +1,6 @@
 # MSVC_NMake/giomm
 
-# Input: pkg_conf_data, giommconfig_h
+# Input: pkg_conf_data, giommconfig_h_meson
 # Output: giomm_rc
 
 giomm_rc = configure_file(
@@ -9,9 +9,9 @@ giomm_rc = configure_file(
   configuration: pkg_conf_data,
 )
 
-# Copy the generated configuration header into the MSVC project directory.
+# Make a copy of the generated configuration header in the MSVC project directory.
 configure_file(
-  input: giommconfig_h,
+  input: giommconfig_h_meson,
   output: 'giommconfig.h',
-  copy: true,
+  configuration: pkg_conf_data,
 )
