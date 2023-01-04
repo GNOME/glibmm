@@ -1,6 +1,6 @@
 # MSVC_NMake/glibmm
 
-# Input: pkg_conf_data, glibmmconfig_h
+# Input: pkg_conf_data, glibmm_config_conf_data, glibmmconfig_h_meson
 # Output: glibmm_rc
 
 glibmm_rc = configure_file(
@@ -9,9 +9,9 @@ glibmm_rc = configure_file(
   configuration: pkg_conf_data,
 )
 
-# Copy the generated configuration header into the MSVC project directory.
+# Make a copy of the generated configuration header in the MSVC project directory.
 configure_file(
-  input: glibmmconfig_h,
+  input: glibmmconfig_h_meson,
   output: 'glibmmconfig.h',
-  copy: true,
+  configuration: glibmm_config_conf_data,
 )
