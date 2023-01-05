@@ -92,6 +92,7 @@ main(int, char**)
       std::cerr << "Gio::InputStream::read() read: " << buffer << std::endl;
       return EXIT_FAILURE;
     }
+    iostream->close();
     file->remove();
   }
   catch (const Glib::FileError& ex)
