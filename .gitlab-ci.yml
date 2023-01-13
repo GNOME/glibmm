@@ -1,9 +1,8 @@
-# 2022-09-02: ubuntu:latest = 22.04, ubuntu:rolling = 22.04, ubuntu:devel = 22.10
+# 2023-01-09: ubuntu:latest = 22.04, ubuntu:rolling = 22.10, ubuntu:devel = 23.04
 # See https://hub.docker.com/_/ubuntu
 image: ubuntu:rolling
 
 stages:
-  - deps
   - build
   - deploy
 
@@ -17,6 +16,7 @@ variables:
               python3-setuptools
               libglib2.0-dev
               mm-common
+              libsigc++-3.0-dev
               libxml-libxml-perl
               meson
               ninja-build
@@ -28,51 +28,6 @@ variables:
   before_script:
     - export DEBIAN_FRONTEND=noninteractive
     - apt update && apt -y upgrade && apt -y install $DEPENDENCIES
-
-# Clear the cache manually.
-clear_cache:
-  stage: deps
-  when: manual
-  script:
-    - echo Clearing the build-deps cache
-  cache:
-    key: build-deps
-    paths:
-      - libsigc/
-    policy: push
-
-build_deps:
-  extends: .build_default
-  stage: deps
-  variables:
-    DEPENDENCIES: $MESON_DEPS docbook5-xml docbook-xsl
-  script:
-    # Build and cache dependencies that can't be installed with apt.
-    # Install to ./installdir, with the contents of the installed files
-    # (notably .pc files) suited for installation to /usr.
-    - export DESTDIR=`pwd`/installdir
-    # Build libsigc++3
-    - if test ! -d libsigc; then
-    - git clone --branch 3.2.0 --depth 1 https://github.com/libsigcplusplus/libsigcplusplus.git libsigc
-    - cd libsigc
-    - mkdir _build && cd _build
-    - meson --prefix=/usr --libdir=lib -Dvalidation=false -Dbuild-examples=false -Dbuildtype=release
-    - meson compile
-    - cd ../..
-    - fi
-    - ninja -C libsigc/_build install
-  cache:
-    key: build-deps
-    paths:
-      - libsigc/
-    policy: pull-push
-  # Transfer the installed part of the built dependencies to later stages
-  # as artifacts. The cache does not always work.
-  # https://gitlab.gnome.org/Infrastructure/Infrastructure/-/issues/775
-  artifacts:
-    paths:
-      - installdir/
-    expire_in: 1 day
 
 autotools_build:
   extends: .build_default
@@ -87,7 +42,6 @@ autotools_build:
     - if test $glib_required '>' $glib_exists; then
     - echo GLib $glib_exists exists, $glib_required required. Skip building with Autotools.
     - else
-    - cp -r installdir/usr /
     - ./autogen.sh --enable-warnings=fatal --prefix=/usr
     - make
     - make check
@@ -101,7 +55,6 @@ debug_gcc_build:
   variables:
     DEPENDENCIES: $MESON_DEPS
   script:
-    - cp -r installdir/usr /
     - mkdir _build && cd _build
     # -Ddebug=true + -Doptimization=0 correspond to -Dbuildtype=debug
     # Don't use warning_level and werror. They are applied also to subprojects.
@@ -126,7 +79,6 @@ release_gcc_build:
   variables:
     DEPENDENCIES: $MESON_DEPS
   script:
-    - cp -r installdir/usr /
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     # Don't use warning_level and werror. They are applied also to subprojects.
@@ -146,7 +98,6 @@ release_clang_build:
   variables:
     DEPENDENCIES: $MESON_DEPS clang
   script:
-    - cp -r installdir/usr /
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     # Accept warnings. See https://gitlab.gnome.org/GNOME/glibmm/-/issues/98
