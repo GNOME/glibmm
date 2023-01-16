@@ -176,17 +176,190 @@ public:
   _WRAP_METHOD(std::vector<Glib::ustring> list_children() const, g_settings_list_children)
   _IGNORE(g_settings_list_keys)
 
-  _IGNORE(g_settings_get_range, g_settings_list_relocatable_schemas) // deprecated
+  _IGNORE(g_settings_get_range, g_settings_list_relocatable_schemas) dnl// deprecated
 
   _IGNORE(g_settings_range_check)
 
 #m4 _CONVERSION(`Glib::ObjectBase*',`gpointer',(gpointer)$3->gobj())
   _WRAP_METHOD(void bind(const Glib::ustring& key, Glib::ObjectBase* object, const Glib::ustring& property, BindFlags flags = BindFlags::DEFAULT), g_settings_bind)
+
+  /** Create a binding between the @a key in the @a settings object
+   * and the @a property_proxy.
+   *
+   * The binding uses the default GIO mapping functions to map
+   * between the settings and property values. These functions
+   * handle booleans, numeric types and string types in a
+   * straightforward way. Use g_settings_bind_with_mapping() if
+   * you need a custom mapping, or map between types that are not
+   * supported by the default mapping functions.
+   *
+   * Unless the @a flags include Gio::Settings::BindFlags::NO_SENSITIVITY, this
+   * function also establishes a binding between the writability of
+   * @a key and the "sensitive" property of @a object (if @a object has
+   * a boolean property by that name). See bind_writable()
+   * for more details about writable bindings.
+   *
+   * Note that the lifecycle of the binding is tied to @a object,
+   * and that you can have only one binding per object property.
+   * If you bind the same property twice on the same object, the second
+   * binding overrides the first one.
+   *
+   * @param key The key to bind.
+   * @param property_proxy The property to bind.
+   * @param flags Flags for the binding.
+   */
   void bind(const Glib::ustring& key, const Glib::PropertyProxy_Base& property_proxy, BindFlags flags = BindFlags::DEFAULT);
-  // TODO: implement bind_with_mapping
+
+  /** A slot to be called to map values in a binding.
+   *
+   * For instance:
+   * @code
+   *   std::optional<int> map_ustring_to_int(const Glib::ustring& from_string);
+   * @endcode
+   *
+   * @return A value of type <tt>T_to</tt> if the mapping was successful,
+   * and an empty optional with no value (i.e. <tt>std::nullopt</tt>) otherwise.
+   */
+  template <typename T_from, typename T_to>
+  using SlotTypedMapping = sigc::slot<std::optional<T_to>(const T_from&)>;
+
+  // Gio::Settings::bind() is similar to Glib::Binding::bind_property().
+  /** Create a binding between the @a key in the @a settings object
+   * and the property @a property of @a object.
+   *
+   * The binding uses the provided mapping functions to map between
+   * settings and property values.
+   *
+   * Note that the lifecycle of the binding is tied to @a object,
+   * and that you can have only one binding per object property.
+   * If you bind the same property twice on the same object, the second
+   * binding overrides the first one.
+   *
+   * The template parameters <tt>T_setting</tt> and <tt>T_property</tt> must be
+   * explicitly specified in each call. The compiler can't deduce them.
+   * For instance:
+   * @code
+   *  m_settings->bind<Glib::ustring, unsigned int>("transition",
+   *    m_transition, "selected", Gio::Settings::BindFlags::DEFAULT,
+   *    sigc::mem_fun(*this, &ExampleAppPrefs::map_from_ustring_to_int),
+   *    sigc::mem_fun(*this, &ExampleAppPrefs::map_from_int_to_ustring));
+   * @endcode
+   *
+   * @newin{2,76}
+   *
+   * @param key The key to bind.
+   * @param object A Glib::ObjectBase.
+   * @param property The name of the property to bind.
+   * @param flags Flags for the binding.
+   * @param slot_get_mapping A function that gets called to convert values from
+   *        setting to parameter, or an empty slot to use the default GIO mapping.
+   * @param slot_set_mapping A function that gets called to convert values from
+   *        parameter to setting, or an empty slot to use the default GIO mapping.
+   *
+   * @tparam T_setting Type of the setting. Must be a type that can be
+   *         stored in a Glib::Variant<T_setting> object.
+   * @tparam T_property Type of the property. Must be a type that can be
+   *         stored in a Glib::Value<T_property> object.
+   */
+  template <typename T_setting, typename T_property>
+  void bind(const Glib::ustring& key,
+    Glib::ObjectBase* object, const Glib::ustring& property, BindFlags flags,
+    const SlotTypedMapping<T_setting, T_property>& slot_get_mapping,
+    const SlotTypedMapping<T_property, T_setting>& slot_set_mapping)
+  {
+    return bind_value(key, object, property, flags,
+      slot_get_mapping.empty() ? SlotGetMapping() : GetMappingProp<T_setting, T_property>(slot_get_mapping),
+      slot_set_mapping.empty() ? SlotSetMapping() : SetMappingProp<T_property, T_setting>(slot_set_mapping));
+  }
+
+  /** Create a binding between the @a key in the @a settings object
+   * and the @a property_proxy.
+   *
+   * The binding uses the provided mapping functions to map between
+   * settings and property values.
+   *
+   * Note that the lifecycle of the binding is tied to @a property_proxy's
+   * object, and that you can have only one binding per object property.
+   * If you bind the same property twice on the same object, the second
+   * binding overrides the first one.
+   *
+   * The template parameters <tt>T_setting</tt> and <tt>T_property</tt> must be
+   * explicitly specified in each call. The compiler can't deduce them.
+   * For instance:
+   * @code
+   *  m_settings->bind<Glib::ustring, unsigned int>("transition",
+   *    m_transition->property_selected(), Gio::Settings::BindFlags::DEFAULT,
+   *    sigc::mem_fun(*this, &ExampleAppPrefs::map_from_ustring_to_int),
+   *    sigc::mem_fun(*this, &ExampleAppPrefs::map_from_int_to_ustring));
+   * @endcode
+   *
+   * @newin{2,76}
+   *
+   * @param key The key to bind.
+   * @param property_proxy The property to bind.
+   * @param flags Flags for the binding.
+   * @param slot_get_mapping A function that gets called to convert values from
+   *        setting to parameter, or an empty slot to use the default GIO mapping.
+   * @param slot_set_mapping A function that gets called to convert values from
+   *        parameter to setting, or an empty slot to use the default GIO mapping.
+   *
+   * @tparam T_setting Type of the setting. Must be a type that can be
+   *         stored in a Glib::Variant<T_setting> object.
+   * @tparam T_property Type of the property. Must be a type that can be
+   *         stored in a Glib::Value<T_property> object.
+   */
+  template <typename T_setting, typename T_property>
+  void bind(const Glib::ustring& key,
+    const Glib::PropertyProxy_Base& property_proxy, BindFlags flags,
+    const SlotTypedMapping<T_setting, T_property>& slot_get_mapping,
+    const SlotTypedMapping<T_property, T_setting>& slot_set_mapping)
+  {
+    bind<T_setting, T_property>(key, property_proxy.get_object(),
+      property_proxy.get_name(), flags, slot_get_mapping, slot_set_mapping);
+  }
+  _IGNORE(g_settings_bind_with_mapping)
+
   _WRAP_METHOD(void bind_writable(const Glib::ustring& key, Glib::ObjectBase* object, const Glib::ustring& property, bool inverted=false), g_settings_bind_writable)
+
+  /** Create a binding between the writability of @a key in the
+   * @a settings object and the @a property_proxy.
+   *
+   * The property must be boolean; "sensitive" or "visible"
+   * properties of widgets are the most likely candidates.
+   *
+   * Writable bindings are always uni-directional; changes of the
+   * writability of the setting will be propagated to the object
+   * property, not the other way.
+   *
+   * When the @a inverted argument is <tt>true</tt>, the binding inverts the
+   * value as it passes from the setting to the object, i.e. the property
+   * will be set to <tt>true</tt> if the key is not writable.
+   *
+   * Note that the lifecycle of the binding is tied to @a object,
+   * and that you can have only one binding per object property.
+   * If you bind the same property twice on the same object, the second
+   * binding overrides the first one.
+   *
+   * @param key The key to bind.
+   * @param property_proxy The boolean property to bind.
+   * @param inverted Whether to 'invert' the value.
+   */
   void bind_writable(const Glib::ustring& key, const Glib::PropertyProxy_Base& property_proxy, bool inverted=false);
-  // TODO: unbind is not actually a class method
+
+  _WRAP_METHOD(static void unbind(Glib::ObjectBase* object, const Glib::ustring& property),
+    g_settings_unbind, newin "2,76")
+
+  /** Removes an existing binding for @a property_proxy.
+   *
+   * Note that bindings are automatically removed when the
+   * object is finalized, so it is rarely necessary to call this
+   * function.
+   *
+   * @newin{2,76}
+   *
+   * @param property_proxy The property whose binding is removed.
+   */
+  static void unbind(const Glib::PropertyProxy_Base& property_proxy);
 
   _WRAP_METHOD(Glib::RefPtr<Action> create_action(const Glib::ustring& key), g_settings_create_action)
 
@@ -207,6 +380,91 @@ public:
 
   _WRAP_SIGNAL(bool writable_change_event(GQuark key), "writable-change-event")
   _WRAP_SIGNAL(void writable_changed(const Glib::ustring& key), writable_changed, detail_name key)
-};
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  // SlotGetMapping and SlotSetMapping must be public. They are used in
+  // the anonymous namespace in settings.ccg.
+  /* A slot to be called to map values in a binding created by bind_value().
+   *
+   * For instance:
+   * @code
+   *   bool map_from_setting_to_property(GValue* to_value, GVariant* from_variant);
+   * @endcode
+   *
+   * @return <tt>true</tt> if the mapping was successful, and <tt>false</tt> otherwise.
+   */
+  using SlotGetMapping = sigc::slot<bool(GValue*, GVariant*)>;
+
+  /* A slot to be called to map values in a binding created by bind_value().
+   *
+   * For instance:
+   * @code
+   *   GVariant* map_from_property_to_setting(
+   *     const GValue* from_value, const GVariantType* expected_type);
+   * @endcode
+   *
+   * @return A new <tt>GVariant</tt> if the mapping was successful,
+   *         and <tt>nullptr</tt> otherwise.
+   */
+  using SlotSetMapping = sigc::slot<GVariant*(const GValue*, const GVariantType*)>;
+#endif // DOXYGEN_SHOULD_SKIP_THIS
+
+private:
+  void bind_value(const Glib::ustring& key,
+    Glib::ObjectBase* object, const Glib::ustring& property, BindFlags flags,
+    const SlotGetMapping& get_mapping, const SlotSetMapping& set_mapping);
+
+  // The functor GetMappingProp can be implicitly converted to a SlotGetMapping
+  // and used in a call to bind_value().
+  template <typename T_from, typename T_to>
+  class GetMappingProp
+  {
+  public:
+    explicit GetMappingProp(const SlotTypedMapping<T_from, T_to>& slot) : typed_mapping(slot) {}
+
+    bool operator()(GValue* to_value, GVariant* from_variant)
+    {
+      Glib::Variant<T_from> from_glib_variant(from_variant, true);
+      const auto to = typed_mapping(from_glib_variant.get());
+
+      if (!to.has_value())
+        return false;
+
+      Glib::Value<T_to> to_glib_value;
+      to_glib_value.init(to_value);
+      to_glib_value.set(*to);
+      g_value_copy(to_glib_value.gobj(), to_value);
+      return true;
+    }
+
+  private:
+    SlotTypedMapping<T_from, T_to> typed_mapping;
+  }; // Settings::GetMappingProp
+
+  // The functor SetMappingProp can be implicitly converted to a SlotGetMapping
+  // and used in a call to bind_value().
+  template <typename T_from, typename T_to>
+  class SetMappingProp
+  {
+  public:
+    explicit SetMappingProp(const SlotTypedMapping<T_from, T_to>& slot) : typed_mapping(slot) {}
+
+    GVariant* operator()(const GValue* from_value, const GVariantType* /* expected_type */)
+    {
+      Glib::Value<T_from> from_glib_value;
+      from_glib_value.init(from_value);
+      const auto to = typed_mapping(from_glib_value.get());
+
+      if (!to.has_value())
+        return nullptr;
+
+      auto to_glib_variant = Glib::Variant<T_to>::create(*to);
+      return to_glib_variant.gobj_copy();
+    }
+
+  private:
+    SlotTypedMapping<T_from, T_to> typed_mapping;
+  }; // Settings::SetMappingProp
+}; // Settings
 
 } // namespace Gio

@@ -19,8 +19,93 @@
 #include <glibmm/vectorutils.h>
 #include <giomm/settingsschema.h>
 
+namespace
+{
+struct SettingsMapSlots
+{
+  SettingsMapSlots(const Gio::Settings::SlotGetMapping& get_mapping,
+    const Gio::Settings::SlotSetMapping& set_mapping)
+  : from_setting_to_property(get_mapping), from_property_to_setting(set_mapping)
+  {
+  }
+
+  Gio::Settings::SlotGetMapping from_setting_to_property;
+  Gio::Settings::SlotSetMapping from_property_to_setting;
+};
+
+gboolean
+Settings_get_mapping_callback(
+  GValue* to_value, GVariant* from_variant, gpointer user_data)
+{
+  Gio::Settings::SlotGetMapping& the_slot =
+    static_cast<SettingsMapSlots*>(user_data)->from_setting_to_property;
+
+  bool result = false;
+  try
+  {
+    result = the_slot(to_value, from_variant);
+  }
+  catch (...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  return result;
+}
+
+GVariant*
+Settings_set_mapping_callback(
+  const GValue* from_value, const GVariantType* expected_type, gpointer user_data)
+{
+  Gio::Settings::SlotSetMapping& the_slot =
+    static_cast<SettingsMapSlots*>(user_data)->from_property_to_setting;
+
+  GVariant* result = nullptr;
+  try
+  {
+    result = the_slot(from_value, expected_type);
+  }
+  catch (...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  return result;
+}
+
+void
+Settings_map_callback_destroy(gpointer user_data)
+{
+  delete static_cast<SettingsMapSlots*>(user_data);
+}
+
+} // anonymous namespace
+
 namespace Gio
 {
+
+void Settings::bind_value(const Glib::ustring& key,
+  Glib::ObjectBase* object, const Glib::ustring& property, BindFlags flags,
+  const SlotGetMapping& get_mapping, const SlotSetMapping& set_mapping)
+{
+  if (get_mapping.empty() && set_mapping.empty())
+  {
+    // No user-supplied mappings.
+    g_settings_bind(gobj(), key.c_str(), object->gobj(),
+      property.c_str(), (GSettingsBindFlags)flags);
+  }
+  else
+  {
+    // Create copies of the slots. A pointer to this will be passed
+    // through the callback's data parameter. It will be deleted
+    // when Settings_map_callback_destroy() is called.
+    SettingsMapSlots* slots_copy = new SettingsMapSlots(get_mapping, set_mapping);
+
+    g_settings_bind_with_mapping(gobj(), key.c_str(),
+      object->gobj(), property.c_str(), (GSettingsBindFlags)flags,
+      get_mapping.empty() ? nullptr : &Settings_get_mapping_callback,
+      set_mapping.empty() ? nullptr : &Settings_set_mapping_callback, slots_copy,
+      &Settings_map_callback_destroy);
+  }
+}
 
 void
 Settings::get_value(const Glib::ustring& key, Glib::VariantBase& value) const
@@ -64,6 +149,12 @@ Settings::bind_writable(
   const Glib::ustring& key, const Glib::PropertyProxy_Base& property_proxy, bool inverted)
 {
   bind_writable(key, property_proxy.get_object(), property_proxy.get_name(), inverted);
+}
+
+//static
+void Settings::unbind(const Glib::PropertyProxy_Base& property_proxy)
+{
+  unbind(property_proxy.get_object(), property_proxy.get_name());
 }
 
 }
