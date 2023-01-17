@@ -1894,6 +1894,17 @@
   )
 )
 
+(define-enum Type
+  (in-module "GSandbox")
+  (c-name "GSandboxType")
+  (gtype-id "G_TYPE_SANDBOX_TYPE")
+  (values
+    '("unknown" "G_SANDBOX_TYPE_UNKNOWN")
+    '("flatpak" "G_SANDBOX_TYPE_FLATPAK")
+    '("snap" "G_SANDBOX_TYPE_SNAP")
+  )
+)
+
 (define-flags BindFlags
   (in-module "GSettings")
   (c-name "GSettingsBindFlags")
@@ -11362,23 +11373,6 @@
   (return-type "GTypeClass*")
 )
 
-(define-method load
-  (of-object "GIOModule")
-  (c-name "g_io_module_load")
-  (return-type "none")
-)
-
-(define-method unload
-  (of-object "GIOModule")
-  (c-name "g_io_module_unload")
-  (return-type "none")
-)
-
-(define-function g_io_module_query
-  (c-name "g_io_module_query")
-  (return-type "char**")
-)
-
 
 
 ;; From giomodule-priv.h
@@ -14972,6 +14966,15 @@
 
 
 
+;; From gsandbox.h
+
+(define-function glib_get_sandbox_type
+  (c-name "glib_get_sandbox_type")
+  (return-type "GSandboxType")
+)
+
+
+
 ;; From gseekable.h
 
 (define-function g_seekable_get_type
@@ -18404,6 +18407,15 @@
   )
 )
 
+(define-method set_static_name
+  (of-object "GTask")
+  (c-name "g_task_set_static_name")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
 (define-method get_source_object
   (of-object "GTask")
   (c-name "g_task_get_source_object")
@@ -21725,6 +21737,10 @@
   (c-name "g_settings_bind_flags_get_type")
   (return-type "GType")
 )
+
+
+
+;; From gio-visibility.h
 
 
 

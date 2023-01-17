@@ -2934,6 +2934,12 @@ g_value_init()
 leaf node in a deep derivable type hierarchy tree. Since: 2.70
 </parameter_description>
 </parameter>
+<parameter name="G_TYPE_FLAG_DEPRECATED">
+<parameter_description> The type is deprecated and may be removed in a
+future version. A warning will be emitted if it is instantiated while
+running with `G_ENABLE_DIAGNOSTIC=1`. Since 2.76
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -3832,6 +3838,14 @@ Old South Arabian. Since 2.26
 </parameter>
 <parameter name="G_UNICODE_SCRIPT_MATH">
 <parameter_description>                 Mathematical notation. Since: 2.72
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_KAWI">
+<parameter_description>                 Kawi. Since 2.74
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_NAG_MUNDARI">
+<parameter_description>          Nag Mundari. Since 2.74
 </parameter_description>
 </parameter>
 </parameters>
@@ -4923,6 +4937,94 @@ to 0 when they are allocated
 </parameter>
 </parameters>
 <return> the new #GArray
+</return>
+</function>
+
+<function name="g_array_new_take">
+<description>
+Creates a new #GArray with @data as array data, @len as length and a
+reference count of 1.
+
+This avoids having to copy the data manually, when it can just be
+inherited. @data will eventually be freed using g_free(), so must
+have been allocated with a suitable allocator.
+
+In case the elements need to be cleared when the array is freed, use
+g_array_set_clear_func() to set a #GDestroyNotify function to perform
+such task.
+
+Do not use it if @len or @element_size are greater than %G_MAXUINT.
+#GArray stores the length of its data in #guint, which may be shorter
+than #gsize.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="data">
+<parameter_description> an array of
+elements of @element_size, or %NULL for an empty array
+</parameter_description>
+</parameter>
+<parameter name="len">
+<parameter_description> the number of elements in @data
+</parameter_description>
+</parameter>
+<parameter name="clear">
+<parameter_description> %TRUE if #GArray elements should be automatically cleared
+to 0 when they are allocated
+</parameter_description>
+</parameter>
+<parameter name="element_size">
+<parameter_description> the size of each element in bytes
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new #GArray
+
+</return>
+</function>
+
+<function name="g_array_new_take_zero_terminated">
+<description>
+Creates a new #GArray with @data as array data, computing the length of it
+and setting the reference count to 1.
+
+This avoids having to copy the data manually, when it can just be
+inherited. @data will eventually be freed using g_free(), so must
+have been allocated with a suitable allocator.
+
+The length is calculated by iterating through @data until the first %NULL
+element is found.
+
+In case the elements need to be cleared when the array is freed, use
+g_array_set_clear_func() to set a #GDestroyNotify function to perform
+such task.
+
+Do not use it if @data length or @element_size are greater than %G_MAXUINT.
+#GArray stores the length of its data in #guint, which may be shorter
+than #gsize.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="data">
+<parameter_description> an array of elements of @element_size
+</parameter_description>
+</parameter>
+<parameter name="clear">
+<parameter_description> %TRUE if #GArray elements should be automatically cleared
+to 0 when they are allocated
+</parameter_description>
+</parameter>
+<parameter name="element_size">
+<parameter_description> the size of each element in bytes
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new #GArray
+
 </return>
 </function>
 
@@ -6773,7 +6875,9 @@ This function must be called while holding the @queue's lock.
 
 <function name="g_async_queue_push">
 <description>
-Pushes the @data into the @queue. @data must not be %NULL.
+Pushes the @data into the @queue.
+
+The @data parameter must not be %NULL.
 
 </description>
 <parameters>
@@ -6782,7 +6886,7 @@ Pushes the @data into the @queue. @data must not be %NULL.
 </parameter_description>
 </parameter>
 <parameter name="data">
-<parameter_description> @data to push into the @queue
+<parameter_description> data to push onto the @queue
 </parameter_description>
 </parameter>
 </parameters>
@@ -6901,7 +7005,7 @@ Since: 2.10
 </parameter_description>
 </parameter>
 <parameter name="data">
-<parameter_description> the @data to push into the @queue
+<parameter_description> the data to push into the @queue
 </parameter_description>
 </parameter>
 <parameter name="func">
@@ -6918,7 +7022,9 @@ Since: 2.10
 
 <function name="g_async_queue_push_unlocked">
 <description>
-Pushes the @data into the @queue. @data must not be %NULL.
+Pushes the @data into the @queue.
+
+The @data parameter must not be %NULL.
 
 This function must be called while holding the @queue's lock.
 
@@ -6929,7 +7035,7 @@ This function must be called while holding the @queue's lock.
 </parameter_description>
 </parameter>
 <parameter name="data">
-<parameter_description> @data to push into the @queue
+<parameter_description> data to push onto the @queue
 </parameter_description>
 </parameter>
 </parameters>
@@ -8327,6 +8433,63 @@ Since: 2.44
 <return></return>
 </function>
 
+<function name="g_autofd">
+<description>
+Macro to add an attribute to a file descriptor variable to ensure
+automatic cleanup using g_clear_fd().
+
+This macro behaves like #g_autofree rather than g_autoptr(): it is
+an attribute supplied before the type name, rather than wrapping the
+type definition.
+
+Otherwise, this macro has similar constraints as g_autoptr(): it is
+only supported on GCC and clang, and the variable must be initialized
+(to either a valid file descriptor or a negative number).
+
+Using this macro is async-signal-safe if the constraints described above
+are met, so it can be used in a signal handler or after `fork()`.
+
+Any error from closing the file descriptor when it goes out of scope
+is ignored. Use g_clear_fd() if error-checking is required.
+
+|[
+gboolean
+operate_on_fds (GError **error)
+{
+g_autofd int fd1 = open_a_fd (..., error);
+g_autofd int fd2 = -1;
+
+// it is safe to return early here, nothing will be closed
+if (fd1 &lt; 0)
+return FALSE;
+
+fd2 = open_a_fd (..., error);
+
+// fd1 will be closed automatically if we return here
+if (fd2 &lt; 0)
+return FALSE;
+
+// fd1 and fd2 will be closed automatically if we return here
+if (!do_something_useful (fd1, fd2, error))
+return FALSE;
+
+// fd2 will be closed automatically if we return here
+if (!g_clear_fd (&amp;fd1, error))
+return FALSE;
+
+// fd2 will be automatically closed here if still open
+return TRUE;
+}
+]|
+
+Since: 2.76
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_autofree">
 <description>
 Macro to add an attribute to pointer variable to ensure automatic
@@ -9399,6 +9562,25 @@ Since: 2.12
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_bookmark_file_copy">
+<description>
+Deeply copies a @bookmark #GBookmarkFile object to a new one.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="bookmark">
+<parameter_description> A #GBookmarkFile
+</parameter_description>
+</parameter>
+</parameters>
+<return> the copy of @bookmark. Use
+g_bookmark_free() when finished using it.
+
+</return>
 </function>
 
 <function name="g_bookmark_file_free">
@@ -14547,6 +14729,73 @@ calls g_error_free() on *@err and sets *@err to %NULL.
 <return></return>
 </function>
 
+<function name="g_clear_fd">
+<description>
+If @fd_ptr points to a file descriptor, close it and return
+whether closing it was successful, like g_close().
+If @fd_ptr points to a negative number, return %TRUE without closing
+anything.
+In both cases, set @fd_ptr to `-1` before returning.
+
+Like g_close(), if closing the file descriptor fails, the error is
+stored in both %errno and @error. If this function succeeds,
+%errno is undefined.
+
+This function is async-signal-safe if @error is %NULL and @fd_ptr
+points to either a negative number or a valid file descriptor.
+
+It is a programming error for @fd_ptr to point to a non-negative
+number that is not a valid file descriptor.
+
+A typical use of this function is to clean up a file descriptor at
+the end of its scope, whether it has been set successfully or not:
+
+|[
+gboolean
+operate_on_fd (GError **error)
+{
+gboolean ret = FALSE;
+int fd = -1;
+
+fd = open_a_fd (error);
+
+if (fd &lt; 0)
+goto out;
+
+if (!do_something (fd, error))
+goto out;
+
+if (!g_clear_fd (&amp;fd, error))
+goto out;
+
+ret = TRUE;
+
+out:
+// OK to call even if fd was never opened or was already closed
+g_clear_fd (&amp;fd, NULL);
+return ret;
+}
+]|
+
+This function is also useful in conjunction with #g_autofd.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="fd_ptr">
+<parameter_description> a pointer to a file descriptor
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Used to return an error on failure
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success
+</return>
+</function>
+
 <function name="g_clear_handle_id">
 <description>
 Clears a numeric handler, such as a #GSource ID.
@@ -14645,8 +14894,8 @@ Since: 2.34
 </description>
 <parameters>
 <parameter name="pp">
-<parameter_description> a pointer to a variable, struct member etc. holding a
-pointer
+<parameter_description> a pointer to a
+variable, struct member etc. holding a pointer
 </parameter_description>
 </parameter>
 <parameter name="destroy">
@@ -14735,13 +14984,19 @@ Since: 2.56
 
 <function name="g_close">
 <description>
-This wraps the close() call; in case of error, %errno will be
+This wraps the close() call. In case of error, %errno will be
 preserved, but the error will also be stored as a #GError in @error.
+In case of success, %errno is undefined.
 
 Besides using #GError, there is another major reason to prefer this
 function over the call provided by the system; on Unix, it will
 attempt to correctly handle %EINTR, which has platform-specific
 semantics.
+
+It is a bug to call this function with an invalid file descriptor.
+
+Since 2.76, this function is guaranteed to be async-signal-safe if (and only
+if) @error is %NULL and @fd is a valid open file descriptor.
 
 Since: 2.36
 
@@ -20447,8 +20702,27 @@ close(). In case of errors, -1 is returned and @error will be set.
 <function name="g_file_read_link">
 <description>
 Reads the contents of the symbolic link @filename like the POSIX
-readlink() function.  The returned string is in the encoding used
+readlink() function.
+
+The returned string is in the encoding used
 for filenames. Use g_filename_to_utf8() to convert it to UTF-8.
+
+The returned string may also be a relative path. Use g_build_filename() to
+convert it to an absolute path:
+|[
+g_autoptr(GError) local_error = NULL;
+g_autofree gchar *link_target = g_file_read_link (&quot;/etc/localtime&quot;, &amp;local_error);
+
+if (local_error != NULL)
+g_error (&quot;Error reading link: %s&quot;, local_error-&gt;message);
+
+if (!g_path_is_absolute (link_target))
+{
+g_autofree gchar *absolute_link_target = g_build_filename (&quot;/etc&quot;, link_target, NULL);
+g_free (link_target);
+link_target = g_steal_pointer (&amp;absolute_link_target);
+}
+]|
 
 Since: 2.4
 
@@ -20887,6 +21161,46 @@ errors. Any of the errors in #GConvertError may occur.
 </parameter>
 </parameters>
 <return> The converted string, or %NULL on an error.
+</return>
+</function>
+
+<function name="g_find_program_for_path">
+<description>
+Locates the first executable named @program in @path, in the
+same way that execvp() would locate it. Returns an allocated string
+with the absolute path name (taking in account the @working_dir), or
+%NULL if the program is not found in @path. If @program is already an
+absolute path, returns a copy of @program if @program exists and is
+executable, and %NULL otherwise.
+
+On Windows, if @path is %NULL, it looks for the file in the same way as
+CreateProcess()  would. This means first in the directory where the
+executing program was loaded from, then in the current directory, then in
+the Windows 32-bit system directory, then in the Windows directory, and
+finally in the directories in the `PATH` environment variable. If
+the program is found, the return value contains the full name
+including the type suffix.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="program">
+<parameter_description> a program name in the GLib file name encoding
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> the current dir where to search program
+</parameter_description>
+</parameter>
+<parameter name="working_dir">
+<parameter_description> the working dir where to search
+program
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-allocated
+string with the absolute path, or %NULL
 </return>
 </function>
 
@@ -22393,6 +22707,32 @@ Since: 2.40
 </return>
 </function>
 
+<function name="g_hash_table_get_keys_as_ptr_array">
+<description>
+Retrieves every key inside @hash_table, as a #GPtrArray.
+The returned data is valid until changes to the hash release those keys.
+
+This iterates over every entry in the hash table to build its return value.
+To iterate over the entries in a #GHashTable more efficiently, use a
+#GHashTableIter.
+
+You should always unref the returned array with g_ptr_array_unref().
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="hash_table">
+<parameter_description> a #GHashTable
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GPtrArray containing each key from
+the table. Unref with with g_ptr_array_unref() when done.
+
+</return>
+</function>
+
 <function name="g_hash_table_get_values">
 <description>
 Retrieves every value inside @hash_table. The returned data
@@ -22415,6 +22755,32 @@ Since: 2.14
 inside the hash table. The content of the list is owned by the
 hash table and should not be modified or freed. Use g_list_free()
 when done using the list.
+
+</return>
+</function>
+
+<function name="g_hash_table_get_values_as_ptr_array">
+<description>
+Retrieves every value inside @hash_table, as a #GPtrArray.
+The returned data is valid until changes to the hash release those values.
+
+This iterates over every entry in the hash table to build its return value.
+To iterate over the entries in a #GHashTable more efficiently, use a
+#GHashTableIter.
+
+You should always unref the returned array with g_ptr_array_unref().
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="hash_table">
+<parameter_description> a #GHashTable
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GPtrArray containing each value from
+the table. Unref with with g_ptr_array_unref() when done.
 
 </return>
 </function>
@@ -22927,6 +23293,50 @@ Since: 2.12
 <return></return>
 </function>
 
+<function name="g_hash_table_steal_all_keys">
+<description>
+Removes all keys and their associated values from a #GHashTable
+without calling the key destroy functions, returning the keys
+as a #GPtrArray with the free func set to the @hash_table key
+destroy function.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="hash_table">
+<parameter_description> a #GHashTable
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GPtrArray containing each key of
+the table. Unref with with g_ptr_array_unref() when done.
+
+</return>
+</function>
+
+<function name="g_hash_table_steal_all_values">
+<description>
+Removes all keys and their associated values from a #GHashTable
+without calling the value destroy functions, returning the values
+as a #GPtrArray with the free func set to the @hash_table value
+destroy function.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="hash_table">
+<parameter_description> a #GHashTable
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GPtrArray containing each value of
+the table. Unref with with g_ptr_array_unref() when done.
+
+</return>
+</function>
+
 <function name="g_hash_table_steal_extended">
 <description>
 Looks up a key in the #GHashTable, stealing the original key and the
@@ -22935,10 +23345,16 @@ not found, %FALSE is returned.
 
 If found, the stolen key and value are removed from the hash table without
 calling the key and value destroy functions, and ownership is transferred to
-the caller of this method; as with g_hash_table_steal().
+the caller of this method, as with g_hash_table_steal(). That is the case
+regardless whether @stolen_key or @stolen_value output parameters are
+requested.
 
 You can pass %NULL for @lookup_key, provided the hash and equal functions
 of @hash_table are %NULL-safe.
+
+The dictionary implementation optimizes for having all values identical to
+their keys, for example by using g_hash_table_add(). When stealing both the
+key and the value from such a dictionary, the value will be %NULL.
 
 Since: 2.58
 
@@ -28394,6 +28810,12 @@ specification. It is suggested that custom keys are namespaced according to
 the code which sets them. For example, custom keys from GLib all have a
 `GLIB_` prefix.
 
+Note that keys that expect UTF-8 strings (specifically `&quot;MESSAGE&quot;` and
+`&quot;GLIB_DOMAIN&quot;`) must be passed as NUL-terminated UTF-8 strings until GLib
+version 2.74.1 because the default log handler did not consider the length of
+the `GLogField`. Starting with GLib 2.74.1 this is fixed and
+non-NUL-terminated UTF-8 strings can be passed with their correct length.
+
 The @log_domain will be converted into a `GLIB_DOMAIN` field. @log_level will
 be converted into a
 [`PRIORITY`](https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html#PRIORITY=)
@@ -31805,6 +32227,8 @@ For example, calling g_module_build_path() on a Linux system with a
 `/lib/libmylibrary.so`. On a Windows system, using `\Windows` as the
 directory it will return `\Windows\mylibrary.dll`.
 
+Deprecated: 2.76: Use g_module_open() instead with @module_name as the
+basename of the file_name argument. See %G_MODULE_SUFFIX for why.
 
 </description>
 <parameters>
@@ -31821,6 +32245,7 @@ directories will be used, though that is not recommended
 </parameters>
 <return> the complete path of the module, including the standard library
 prefix and suffix. This should be freed when no longer needed
+
 </return>
 </function>
 
@@ -31893,8 +32318,8 @@ A thin wrapper function around g_module_open_full()
 </description>
 <parameters>
 <parameter name="file_name">
-<parameter_description> the name of the file containing the module, or %NULL
-to obtain a #GModule representing the main program itself
+<parameter_description> the name or path to the file containing the module,
+or %NULL to obtain a #GModule representing the main program itself
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -31909,26 +32334,30 @@ logical OR of any of the #GModuleFlags.
 
 <function name="g_module_open_full">
 <description>
-Opens a module. If the module has already been opened,
-its reference count is incremented.
+Opens a module. If the module has already been opened, its reference count
+is incremented. If not, the module is searched in the following order:
 
-First of all g_module_open_full() tries to open @file_name as a module.
-If that fails and @file_name has the &quot;.la&quot;-suffix (and is a libtool
-archive) it tries to open the corresponding module. If that fails
-and it doesn't have the proper module suffix for the platform
-(%G_MODULE_SUFFIX), this suffix will be appended and the corresponding
-module will be opened. If that fails and @file_name doesn't have the
-&quot;.la&quot;-suffix, this suffix is appended and g_module_open_full() tries to open
-the corresponding module. If eventually that fails as well, %NULL is
-returned.
+1. If @file_name exists as a regular file, it is used as-is; else
+2. If @file_name doesn't have the correct suffix and/or prefix for the
+platform, then possible suffixes and prefixes will be added to the
+basename till a file is found and whatever is found will be used; else
+3. If @file_name doesn't have the &quot;.la&quot;-suffix, &quot;.la&quot; is appended. Either
+way, if a matching .la file exists (and is a libtool archive) the
+libtool archive is parsed to find the actual file name, and that is
+used.
+
+At the end of all this, we would have a file path that we can access on
+disk, and it is opened as a module. If not, @file_name is opened as
+a module verbatim in the hopes that the system implementation will somehow
+be able to access it.
 
 Since: 2.70
 
 </description>
 <parameters>
 <parameter name="file_name">
-<parameter_description> the name of the file containing the module, or %NULL
-to obtain a #GModule representing the main program itself
+<parameter_description> the name or path to the file containing the module,
+or %NULL to obtain a #GModule representing the main program itself
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -34097,22 +34526,22 @@ private data for the object is guaranteed to be initialized with zeros, as
 per g_type_create_instance().
 
 Note that in C, small integer types in variable argument lists are promoted
-up to #gint or #guint as appropriate, and read back accordingly. #gint is 32
-bits on every platform on which GLib is currently supported. This means that
-you can use C expressions of type #gint with g_object_new() and properties of
-type #gint or #guint or smaller. Specifically, you can use integer literals
+up to `gint` or `guint` as appropriate, and read back accordingly. `gint` is
+32 bits on every platform on which GLib is currently supported. This means that
+you can use C expressions of type `gint` with g_object_new() and properties of
+type `gint` or `guint` or smaller. Specifically, you can use integer literals
 with these property types.
 
-When using property types of #gint64 or #guint64, you must ensure that the
+When using property types of `gint64` or `guint64`, you must ensure that the
 value that you provide is 64 bit. This means that you should use a cast or
 make use of the %G_GINT64_CONSTANT or %G_GUINT64_CONSTANT macros.
 
-Similarly, #gfloat is promoted to #gdouble, so you must ensure that the value
-you provide is a #gdouble, even for a property of type #gfloat.
+Similarly, `gfloat` is promoted to `gdouble`, so you must ensure that the value
+you provide is a `gdouble`, even for a property of type `gfloat`.
 
 Since GLib 2.72, all #GObjects are guaranteed to be aligned to at least the
-alignment of the largest basic GLib type (typically this is #guint64 or
-#gdouble). If you need larger alignment for an element in a #GObject, you
+alignment of the largest basic GLib type (typically this is `guint64` or
+`gdouble`). If you need larger alignment for an element in a #GObject, you
 should allocate it on the heap (aligned), or arrange for your #GObject to be
 appropriately padded.
 
@@ -38772,6 +39201,102 @@ Creates a new #GPtrArray with a reference count of 1.
 </return>
 </function>
 
+<function name="g_ptr_array_new_from_array">
+<description>
+Creates a new #GPtrArray, copying @len pointers from @data, and setting
+the array’s reference count to 1.
+
+This avoids having to manually add each element one by one.
+
+If @copy_func is provided, then it is used to copy each element before
+adding them to the new array. If it is %NULL then the pointers are copied
+directly.
+
+It also sets @element_free_func for freeing each element when the array is
+destroyed either via g_ptr_array_unref(), when g_ptr_array_free() is called
+with @free_segment set to %TRUE or when removing elements.
+
+Do not use it if @len is greater than %G_MAXUINT. #GPtrArray
+stores the length of its data in #guint, which may be shorter than
+#gsize.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="data">
+<parameter_description> an array of pointers,
+or %NULL for an empty array
+</parameter_description>
+</parameter>
+<parameter name="len">
+<parameter_description> the number of pointers in @data
+</parameter_description>
+</parameter>
+<parameter name="copy_func">
+<parameter_description> a copy function used to copy every element in the
+array or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="copy_func_user_data">
+<parameter_description> user data passed to @copy_func, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="element_free_func">
+<parameter_description> a function to free elements on @array
+destruction or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new #GPtrArray
+
+</return>
+</function>
+
+<function name="g_ptr_array_new_from_null_terminated_array">
+<description>
+Creates a new #GPtrArray copying the pointers from @data after having
+computed the length of it and with a reference count of 1.
+This avoids having to manually add each element one by one.
+If @copy_func is provided, then it is used to copy the data in the new
+array.
+It also set @element_free_func for freeing each element when the array is
+destroyed either via g_ptr_array_unref(), when g_ptr_array_free() is called
+with @free_segment set to %TRUE or when removing elements.
+
+Do not use it if the @data has more than %G_MAXUINT elements. #GPtrArray
+stores the length of its data in #guint, which may be shorter than
+#gsize.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="data">
+<parameter_description> an array of
+pointers, %NULL terminated; or %NULL for an empty array
+</parameter_description>
+</parameter>
+<parameter name="copy_func">
+<parameter_description> a copy function used to copy every element in the
+array or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="copy_func_user_data">
+<parameter_description> user data passed to @copy_func, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="element_free_func">
+<parameter_description> a function to free elements on @array
+destruction or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new #GPtrArray
+
+</return>
+</function>
+
 <function name="g_ptr_array_new_full">
 <description>
 Creates a new #GPtrArray with @reserved_size pointers preallocated
@@ -38837,6 +39362,85 @@ destroy @array or %NULL
 </parameter>
 <parameter name="null_terminated">
 <parameter_description> whether to make the array as %NULL terminated.
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new #GPtrArray
+
+</return>
+</function>
+
+<function name="g_ptr_array_new_take">
+<description>
+Creates a new #GPtrArray with @data as pointers, @len as length and a
+reference count of 1.
+
+This avoids having to copy such data manually. @data will eventually be
+freed using g_free(), so must have been allocated with a suitable allocator.
+
+It also sets @element_free_func for freeing each element when the array is
+destroyed either via g_ptr_array_unref(), when g_ptr_array_free() is called
+with @free_segment set to %TRUE or when removing elements.
+
+Do not use it if @len is greater than %G_MAXUINT. #GPtrArray
+stores the length of its data in #guint, which may be shorter than
+#gsize.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="data">
+<parameter_description> an array of pointers,
+or %NULL for an empty array
+</parameter_description>
+</parameter>
+<parameter name="len">
+<parameter_description> the number of pointers in @data
+</parameter_description>
+</parameter>
+<parameter name="element_free_func">
+<parameter_description> A function to free elements on @array
+destruction or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new #GPtrArray
+
+</return>
+</function>
+
+<function name="g_ptr_array_new_take_null_terminated">
+<description>
+Creates a new #GPtrArray with @data as pointers, computing the length of it
+and setting the reference count to 1.
+
+This avoids having to copy such data manually. @data will eventually be
+freed using g_free(), so must have been allocated with a suitable allocator.
+
+The length is calculated by iterating through @data until the first %NULL
+element is found.
+
+It also sets @element_free_func for freeing each element when the array is
+destroyed either via g_ptr_array_unref(), when g_ptr_array_free() is called
+with @free_segment set to %TRUE or when removing elements.
+
+Do not use it if the @data length is greater than %G_MAXUINT. #GPtrArray
+stores the length of its data in #guint, which may be shorter than
+#gsize.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="data">
+<parameter_description> an array
+of pointers, %NULL terminated, or %NULL for an empty array
+</parameter_description>
+</parameter>
+<parameter name="element_free_func">
+<parameter_description> a function to free elements on @array
+destruction or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -39086,12 +39690,15 @@ the size of the array is still 0.
 <description>
 Sorts the array, using @compare_func which should be a qsort()-style
 comparison function (returns less than zero for first arg is less
-than second arg, zero for equal, greater than zero if irst arg is
+than second arg, zero for equal, greater than zero if first arg is
 greater than second arg).
 
 Note that the comparison function for g_ptr_array_sort() doesn't
 take the pointers from the array as arguments, it takes pointers to
-the pointers in the array. Here is a full example of usage:
+the pointers in the array.
+
+Use g_ptr_array_sort_with_data() if you want to use normal
+#GCompareFuncs, otherwise here is a full example of use:
 
 |[&lt;!-- language=&quot;C&quot; --&gt;
 typedef struct
@@ -39134,6 +39741,58 @@ This is guaranteed to be a stable sort since version 2.32.
 <return></return>
 </function>
 
+<function name="g_ptr_array_sort_values">
+<description>
+Sorts the array, using @compare_func which should be a qsort()-style
+comparison function (returns less than zero for first arg is less
+than second arg, zero for equal, greater than zero if first arg is
+greater than second arg).
+
+This is guaranteed to be a stable sort.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="array">
+<parameter_description> a #GPtrArray
+</parameter_description>
+</parameter>
+<parameter name="compare_func">
+<parameter_description> a #GCompareFunc comparison function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_ptr_array_sort_values_with_data">
+<description>
+Like g_ptr_array_sort_values(), but the comparison function has an extra
+user data argument.
+
+This is guaranteed to be a stable sort.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="array">
+<parameter_description> a #GPtrArray
+</parameter_description>
+</parameter>
+<parameter name="compare_func">
+<parameter_description> a #GCompareDataFunc comparison function
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data to pass to @compare_func
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_ptr_array_sort_with_data">
 <description>
 Like g_ptr_array_sort(), but the comparison function has an extra
@@ -39141,7 +39800,10 @@ user data argument.
 
 Note that the comparison function for g_ptr_array_sort_with_data()
 doesn't take the pointers from the array as arguments, it takes
-pointers to the pointers in the array. Here is a full example of use:
+pointers to the pointers in the array.
+
+Use g_ptr_array_sort_with_data() if you want to use normal
+#GCompareDataFuncs, otherwise here is a full example of use:
 
 |[&lt;!-- language=&quot;C&quot; --&gt;
 typedef enum { SORT_NAME, SORT_SIZE } SortMode;
@@ -44953,6 +45615,44 @@ example.
 </return>
 </function>
 
+<function name="g_set_str">
+<description>
+Updates a pointer to a string to a copy of @new_str. The previous string
+pointed to by @str_pointer will be freed with g_free().
+
+@str_pointer must not be %NULL, but can point to a %NULL value.
+
+One convenient usage of this function is in implementing property settings:
+|[
+void
+foo_set_bar (Foo        *foo,
+const char *new_bar)
+{
+g_return_if_fail (IS_FOO (foo));
+
+if (g_set_str (&amp;foo-&gt;bar, new_bar))
+g_object_notify (foo, &quot;bar&quot;);
+}
+]|
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="str_pointer">
+<parameter_description> a pointer to either a string or %NULL
+</parameter_description>
+</parameter>
+<parameter name="new_str">
+<parameter_description> a string to assign to @str_pointer, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value of @str_pointer changed, %FALSE otherwise
+
+</return>
+</function>
+
 <function name="g_set_weak_pointer">
 <description>
 Updates a pointer to weakly refer to @new_object.
@@ -45389,6 +46089,9 @@ The handler will be called synchronously, after the default handler of the signa
 <description>
 Connects a closure to a signal for a particular object.
 
+If @closure is a floating reference (see g_closure_sink()), this function
+takes ownership of @closure.
+
 
 </description>
 <parameters>
@@ -45417,6 +46120,9 @@ default handler of the signal.
 <function name="g_signal_connect_closure_by_id">
 <description>
 Connects a closure to a signal for a particular object.
+
+If @closure is a floating reference (see g_closure_sink()), this function
+takes ownership of @closure.
 
 
 </description>
@@ -50742,10 +51448,10 @@ Since: 2.44
 
 <function name="g_stpcpy">
 <description>
-Copies a nul-terminated string into the dest buffer, include the
-trailing nul, and return a pointer to the trailing nul byte.
-This is useful for concatenating multiple strings together
-without having to repeatedly scan for the end.
+Copies a nul-terminated string into the destination buffer, including
+the trailing nul byte, and returns a pointer to the trailing nul byte
+in `dest`.  The return value is useful for concatenating multiple
+strings without having to repeatedly scan for the end.
 
 
 </description>
@@ -50759,7 +51465,7 @@ without having to repeatedly scan for the end.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer to trailing nul byte.
+<return> a pointer to the trailing nul byte in `dest`.
 </return>
 </function>
 
@@ -53779,6 +54485,8 @@ In essence, it will be the same string passed as the first argument to
 e.g. g_test_add() when the test was added.
 
 This function returns a valid string only within a test function.
+
+Note that this is a test path, not a file system path.
 
 Since: 2.68
 
@@ -65102,7 +65810,13 @@ This function is an identity mapping on any value that does not
 contain multi-byte numeric data.  That include strings, booleans,
 bytes and containers containing only these things (recursively).
 
+While this function can safely handle untrusted, non-normal data, it is
+recommended to check whether the input is in normal form beforehand, using
+g_variant_is_normal_form(), and to reject non-normal inputs if your
+application can be strict about what inputs it rejects.
+
 The returned value is always in normal form and is marked as trusted.
+A full, not floating, reference is returned.
 
 Since: 2.24
 
@@ -66208,7 +66922,9 @@ is in normal form.  If it is found to be in normal form then it is
 marked as trusted and a new reference to it is returned.
 
 If @value is found not to be in normal form then a new trusted
-#GVariant is created with the same value as @value.
+#GVariant is created with the same value as @value. The non-normal parts of
+@value will be replaced with default values which are guaranteed to be in
+normal form.
 
 It makes sense to call this function if you've received #GVariant
 data from untrusted sources and you want to ensure your serialized
@@ -67112,6 +67828,41 @@ Since: 2.28
 </parameter>
 </parameters>
 <return> the value of the dictionary key, or %NULL
+
+</return>
+</function>
+
+<function name="g_variant_maybe_get_child_value">
+<description>
+Reads a child item out of a container #GVariant instance, if it is in normal
+form. If it is not in normal form, return %NULL.
+
+This function behaves the same as g_variant_get_child_value(), except that it
+returns %NULL if the child is not in normal form. g_variant_get_child_value()
+would instead return a new default value of the correct type.
+
+This is intended to be used internally to avoid unnecessary #GVariant
+allocations.
+
+The returned value is never floating.  You should free it with
+g_variant_unref() when you're done with it.
+
+This function is O(1).
+
+Since: 2.74
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> a container #GVariant
+</parameter_description>
+</parameter>
+<parameter name="index_">
+<parameter_description> the index of the child to fetch
+</parameter_description>
+</parameter>
+</parameters>
+<return> the child at the specified index
 
 </return>
 </function>
@@ -70045,7 +70796,10 @@ contain any value represented by a #gint. This is why the use of `if
 
 <function name="gchar">
 <description>
-Corresponds to the standard C char type.
+Equivalent to the standard C `char` type.
+
+This type only exists for symmetry with `guchar`.
+The standard C `char` type should be preferred in new code.
 
 </description>
 <parameters>
@@ -70065,11 +70819,16 @@ A C representable type name for %G_TYPE_STRING.
 
 <function name="gconstpointer">
 <description>
-An untyped pointer to constant data.
+An untyped pointer to constant data, exactly equivalent to `const void *`.
+
 The data pointed to should not be changed.
 
 This is typically used in function prototypes to indicate
 that the data pointed to will not be altered by the function.
+
+The standard C `const void *` type should usually be preferred in
+new code, but `gconstpointer` can be used in contexts where a type name
+must be a single word.
 
 </description>
 <parameters>
@@ -70079,8 +70838,10 @@ that the data pointed to will not be altered by the function.
 
 <function name="gdouble">
 <description>
-Corresponds to the standard C double type.
-Values of this type can range from -%G_MAXDOUBLE to %G_MAXDOUBLE.
+Equivalent to the standard C `double` type.
+
+Values of this type can range from `-DBL_MAX` to `DBL_MAX`,
+or equivalently from -%G_MAXDOUBLE to %G_MAXDOUBLE.
 
 </description>
 <parameters>
@@ -70090,8 +70851,10 @@ Values of this type can range from -%G_MAXDOUBLE to %G_MAXDOUBLE.
 
 <function name="gfloat">
 <description>
-Corresponds to the standard C float type.
-Values of this type can range from -%G_MAXFLOAT to %G_MAXFLOAT.
+Equivalent to the standard C `float` type.
+
+Values of this type can range from `-FLT_MAX` to `FLT_MAX`,
+or equivalently from -%G_MAXFLOAT to %G_MAXFLOAT.
 
 </description>
 <parameters>
@@ -70101,8 +70864,13 @@ Values of this type can range from -%G_MAXFLOAT to %G_MAXFLOAT.
 
 <function name="gint">
 <description>
-Corresponds to the standard C int type.
-Values of this type can range from %G_MININT to %G_MAXINT.
+Equivalent to the standard C `int` type.
+
+Values of this type can range from `INT_MIN` to `INT_MAX`,
+or equivalently from %G_MININT to %G_MAXINT.
+
+This type only exists for symmetry with `guint`.
+The standard C `int` type should be preferred in new code.
 
 </description>
 <parameters>
@@ -70112,7 +70880,13 @@ Values of this type can range from %G_MININT to %G_MAXINT.
 
 <function name="gint16">
 <description>
-A signed integer guaranteed to be 16 bits on all platforms.
+A signed integer guaranteed to be 16 bits on all platforms,
+similar to the standard C `int16_t`.
+
+The `int16_t` type should be preferred in new code, unless
+consistency with pre-existing APIs requires use of `gint16`
+(see #gsize for more details).
+
 Values of this type can range from %G_MININT16 (= -32,768) to
 %G_MAXINT16 (= 32,767).
 
@@ -70128,11 +70902,24 @@ To print or scan values of this type, use
 <function name="gint32">
 <description>
 A signed integer guaranteed to be 32 bits on all platforms.
+
+The `int32_t` type should be preferred in new code, unless
+consistency with pre-existing APIs requires use of `gint16`
+(see #gsize for more details).
+
 Values of this type can range from %G_MININT32 (= -2,147,483,648)
 to %G_MAXINT32 (= 2,147,483,647).
 
 To print or scan values of this type, use
 %G_GINT32_MODIFIER and/or %G_GINT32_FORMAT.
+
+Note that on platforms with more than one 32-bit standard integer type,
+`gint32` and `int32_t` are not necessarily implemented by the same
+32-bit integer type.
+For example, on an ILP32 platform where `int` and `long` are both 32-bit,
+it might be the case that one of these types is `int` and the other
+is `long`.
+See #gsize for more details of what this implies.
 
 </description>
 <parameters>
@@ -70142,13 +70929,27 @@ To print or scan values of this type, use
 
 <function name="gint64">
 <description>
-A signed integer guaranteed to be 64 bits on all platforms.
+A signed integer guaranteed to be 64 bits on all platforms,
+similar to the standard C `int64_t`.
+
+The `int64_t` type should be preferred in new code, unless
+consistency with pre-existing APIs requires use of `gint64`
+(see #gsize for more details).
+
 Values of this type can range from %G_MININT64
 (= -9,223,372,036,854,775,808) to %G_MAXINT64
 (= 9,223,372,036,854,775,807).
 
 To print or scan values of this type, use
 %G_GINT64_MODIFIER and/or %G_GINT64_FORMAT.
+
+Note that on platforms with more than one 64-bit standard integer type,
+`gint64` and `int64_t` are not necessarily implemented by the same
+64-bit integer type.
+For example, on a platform where both `long` and `long long` are 64-bit,
+it might be the case that one of those types is used for `gint64`
+and the other is used for `int64_t`.
+See #gsize for more details of what this implies.
 
 </description>
 <parameters>
@@ -70158,7 +70959,13 @@ To print or scan values of this type, use
 
 <function name="gint8">
 <description>
-A signed integer guaranteed to be 8 bits on all platforms.
+A signed integer guaranteed to be 8 bits on all platforms,
+similar to the standard C `int8_t`.
+
+The `int8_t` type should be preferred in new code, unless
+consistency with pre-existing APIs requires use of `gint8`
+(see #gsize for more details).
+
 Values of this type can range from %G_MININT8 (= -128) to
 %G_MAXINT8 (= 127).
 
@@ -70172,6 +70979,14 @@ Values of this type can range from %G_MININT8 (= -128) to
 <description>
 Corresponds to the C99 type intptr_t,
 a signed integer type that can hold any pointer.
+
+The standard `intptr_t` type should be preferred in new code, unless
+consistency with pre-existing APIs requires `gintptr`.
+Note that `intptr_t` and `gintptr` might be implemented by different
+standard integer types of the same size. See #gsize for more details.
+
+#gintptr is not guaranteed to be the same type or the same size as #gssize,
+even though they are the same on many CPU architectures.
 
 To print or scan values of this type, use
 %G_GINTPTR_MODIFIER and/or %G_GINTPTR_FORMAT.
@@ -70368,8 +71183,13 @@ by a \004 character
 
 <function name="glong">
 <description>
-Corresponds to the standard C long type.
-Values of this type can range from %G_MINLONG to %G_MAXLONG.
+Equivalent to the standard C `long` type.
+
+Values of this type can range from `LONG_MIN` to `LONG_MAX`,
+or equivalently %G_MINLONG to %G_MAXLONG.
+
+This type only exists for symmetry with `gulong`.
+The standard C `long` type should be preferred in new code.
 
 </description>
 <parameters>
@@ -70382,12 +71202,17 @@ Values of this type can range from %G_MINLONG to %G_MAXLONG.
 A signed integer type that is used for file offsets,
 corresponding to the POSIX type `off_t` as if compiling with
 `_FILE_OFFSET_BITS` set to 64. #goffset is always 64 bits wide, even on
-32-bit architectures.
+32-bit architectures, and even if `off_t` is only 32 bits.
 Values of this type can range from %G_MINOFFSET to
 %G_MAXOFFSET.
 
 To print or scan values of this type, use
 %G_GOFFSET_MODIFIER and/or %G_GOFFSET_FORMAT.
+
+On platforms with more than one 64-bit standard integer type,
+even if `off_t` is also 64 bits in size, `goffset` and `off_t` are not
+necessarily implemented by the same 64-bit integer type.
+See #gsize for more details of what this implies.
 
 Since: 2.14
 
@@ -70399,8 +71224,13 @@ Since: 2.14
 
 <function name="gpointer">
 <description>
-An untyped pointer.
-#gpointer looks better and is easier to use than void*.
+An untyped pointer, exactly equivalent to `void *`.
+
+The standard C `void *` type should usually be preferred in
+new code, but `gpointer` can be used in contexts where a type name
+must be a single word, such as in the g_type_name() of %G_TYPE_POINTER
+or when generating a family of function names for multiple types
+using macros.
 
 </description>
 <parameters>
@@ -70432,8 +71262,13 @@ Since: 2.58
 
 <function name="gshort">
 <description>
-Corresponds to the standard C short type.
-Values of this type can range from %G_MINSHORT to %G_MAXSHORT.
+Equivalent to the standard C `short` type.
+
+Values of this type can range from `SHRT_MIN` to `SHRT_MAX`,
+or equivalently %G_MINSHORT to %G_MAXSHORT.
+
+This type only exists for symmetry with `gushort`.
+The standard C `short` type should be preferred in new code.
 
 </description>
 <parameters>
@@ -70443,15 +71278,49 @@ Values of this type can range from %G_MINSHORT to %G_MAXSHORT.
 
 <function name="gsize">
 <description>
-An unsigned integer type of the result of the sizeof operator,
-corresponding to the size_t type defined in C99.
-This type is wide enough to hold the numeric value of a pointer,
-so it is usually 32 bit wide on a 32-bit platform and 64 bit wide
+An unsigned integer type of the result of the `sizeof` operator,
+corresponding to the `size_t` type defined in C99.
+
+The standard `size_t` type should be preferred in new code, unless
+consistency with pre-existing APIs requires `gsize`
+(see below for more details).
+
+`gsize` is usually 32 bit wide on a 32-bit platform and 64 bit wide
 on a 64-bit platform. Values of this type can range from 0 to
 %G_MAXSIZE.
 
+This type is wide enough to hold the size of the largest possible
+memory allocation, but is not guaranteed to be wide enough to hold
+the numeric value of a pointer: on platforms that use tagged pointers,
+such as [CHERI](https://cheri-cpu.org/), pointers can be numerically
+larger than the size of the address space.
+If the numeric value of a pointer needs to be stored in an integer
+without information loss, use the standard C types `intptr_t` or
+`uintptr_t`, or the similar GLib types #gintptr or #guintptr.
+
 To print or scan values of this type, use
 %G_GSIZE_MODIFIER and/or %G_GSIZE_FORMAT.
+
+Note that on platforms where more than one standard integer type is
+the same size, `size_t` and `gsize` are always the same size but are
+not necessarily implemented by the same standard integer type.
+For example, on an ILP32 platform where `int`, `long` and pointers
+are all 32-bit, `size_t` might be `unsigned long` while `gsize`
+might be `unsigned int`.
+This can result in compiler warnings or unexpected C++ name-mangling
+if the two types are used inconsistently.
+
+As a result, changing a type from `gsize` to `size_t` in existing APIs
+might be an incompatible API or ABI change, especially if C++
+is involved. The safe option is to leave existing APIs using the same type
+that they have historically used, and only use the standard C types in
+new APIs.
+
+Similar considerations apply to all the fixed-size types
+(#gint8, #guint8, #gint16, #guint16, #gint32, #guint32, #gint64,
+#guint64 and #goffset), as well as #gintptr and #guintptr.
+Types that are 32 bits or larger are particularly likely to be
+affected by this.
 
 </description>
 <parameters>
@@ -70462,9 +71331,22 @@ To print or scan values of this type, use
 <function name="gssize">
 <description>
 A signed variant of #gsize, corresponding to the
-ssize_t defined on most platforms.
+`ssize_t` defined in POSIX or the similar `SSIZE_T` in Windows.
+
+In new platform-specific code, consider using `ssize_t` or `SSIZE_T`
+directly.
+
 Values of this type can range from %G_MINSSIZE
 to %G_MAXSSIZE.
+
+Note that on platforms where `ssize_t` is implemented, `ssize_t` and
+`gssize` might be implemented by different standard integer types
+of the same size. Similarly, on Windows, `SSIZE_T` and `gssize`
+might be implemented by different standard integer types of the same
+size. See #gsize for more details.
+
+This type is also not guaranteed to be the same as standard C
+`ptrdiff_t`, although they are the same on many platforms.
 
 To print or scan values of this type, use
 %G_GSSIZE_MODIFIER and/or %G_GSSIZE_FORMAT.
@@ -70477,7 +71359,13 @@ To print or scan values of this type, use
 
 <function name="guchar">
 <description>
-Corresponds to the standard C unsigned char type.
+Equivalent to the standard C `unsigned char` type.
+
+The standard C `unsigned char` type should usually be preferred in
+new code, but `guchar` can be used in contexts where a type name
+must be a single word, such as in the g_type_name() of %G_TYPE_UCHAR
+or when generating a family of function names for multiple types
+using macros.
 
 </description>
 <parameters>
@@ -70487,8 +71375,16 @@ Corresponds to the standard C unsigned char type.
 
 <function name="guint">
 <description>
-Corresponds to the standard C unsigned int type.
-Values of this type can range from 0 to %G_MAXUINT.
+Equivalent to the standard C `unsigned int` type.
+
+Values of this type can range from 0 to `UINT_MAX`,
+or equivalently 0 to %G_MAXUINT.
+
+The standard C `unsigned int` type should usually be preferred in
+new code, but `guint` can be used in contexts where a type name
+must be a single word, such as in the g_type_name() of %G_TYPE_UINT
+or when generating a family of function names for multiple types
+using macros.
 
 </description>
 <parameters>
@@ -70498,7 +71394,13 @@ Values of this type can range from 0 to %G_MAXUINT.
 
 <function name="guint16">
 <description>
-An unsigned integer guaranteed to be 16 bits on all platforms.
+An unsigned integer guaranteed to be 16 bits on all platforms,
+similar to the standard C `uint16_t`.
+
+The `uint16_t` type should be preferred in new code, unless
+consistency with pre-existing APIs requires use of `guint16`
+(see #gsize for more details).
+
 Values of this type can range from 0 to %G_MAXUINT16 (= 65,535).
 
 To print or scan values of this type, use
@@ -70512,11 +71414,22 @@ To print or scan values of this type, use
 
 <function name="guint32">
 <description>
-An unsigned integer guaranteed to be 32 bits on all platforms.
+An unsigned integer guaranteed to be 32 bits on all platforms,
+similar to the standard C `uint32_t`.
+
+The `uint32_t` type should be preferred in new code, unless
+consistency with pre-existing APIs requires use of `guint32`
+(see #gsize for more details).
+
 Values of this type can range from 0 to %G_MAXUINT32 (= 4,294,967,295).
 
 To print or scan values of this type, use
 %G_GINT32_MODIFIER and/or %G_GUINT32_FORMAT.
+
+Note that on platforms with more than one 32-bit standard integer type,
+`guint32` and `uint32_t` are not necessarily implemented by the same
+32-bit integer type.
+See #gsize for more details of what this implies.
 
 </description>
 <parameters>
@@ -70526,12 +71439,23 @@ To print or scan values of this type, use
 
 <function name="guint64">
 <description>
-An unsigned integer guaranteed to be 64-bits on all platforms.
+An unsigned integer guaranteed to be 64-bits on all platforms,
+similar to the standard C `uint64_t` type.
+
+The `uint64_t` type should be preferred in new code, unless
+consistency with pre-existing APIs requires use of `guint64`
+(see #gsize for more details).
+
 Values of this type can range from 0 to %G_MAXUINT64
 (= 18,446,744,073,709,551,615).
 
 To print or scan values of this type, use
 %G_GINT64_MODIFIER and/or %G_GUINT64_FORMAT.
+
+Note that on platforms with more than one 64-bit standard integer type,
+`guint64` and `uint64_t` are not necessarily implemented by the same
+64-bit integer type.
+See #gsize for more details of what this implies.
 
 </description>
 <parameters>
@@ -70541,7 +71465,13 @@ To print or scan values of this type, use
 
 <function name="guint8">
 <description>
-An unsigned integer guaranteed to be 8 bits on all platforms.
+An unsigned integer guaranteed to be 8 bits on all platforms,
+similar to the standard C `uint8_t`.
+
+The `uint8_t` type should be preferred in new code, unless
+consistency with pre-existing APIs requires use of `guint8`
+(see #gsize for more details).
+
 Values of this type can range from 0 to %G_MAXUINT8 (= 255).
 
 </description>
@@ -70554,6 +71484,14 @@ Values of this type can range from 0 to %G_MAXUINT8 (= 255).
 <description>
 Corresponds to the C99 type uintptr_t,
 an unsigned integer type that can hold any pointer.
+
+The standard `uintptr_t` type should be preferred in new code, unless
+consistency with pre-existing APIs requires `guintptr`.
+Note that `uintptr_t` and `guintptr` might be implemented by different
+standard integer types of the same size. See #gsize for more details.
+
+#guintptr is not guaranteed to be the same type or the same size as #gsize,
+even though they are the same on many CPU architectures.
 
 To print or scan values of this type, use
 %G_GINTPTR_MODIFIER and/or %G_GUINTPTR_FORMAT.
@@ -70568,8 +71506,15 @@ Since: 2.18
 
 <function name="gulong">
 <description>
-Corresponds to the standard C unsigned long type.
+Equivalent to the standard C `unsigned long` type.
+
 Values of this type can range from 0 to %G_MAXULONG.
+
+The standard C `unsigned long` type should usually be preferred in
+new code, but `gulong` can be used in contexts where a type name
+must be a single word, such as in the g_type_name() of %G_TYPE_ULONG
+or when generating a family of function names for multiple types
+using macros.
 
 </description>
 <parameters>
@@ -70632,8 +71577,15 @@ To print/scan values of this type as integer, use
 
 <function name="gushort">
 <description>
-Corresponds to the standard C unsigned short type.
-Values of this type can range from 0 to %G_MAXUSHORT.
+Equivalent to the standard C `unsigned short` type.
+
+Values of this type can range from 0 to `USHRT_MAX`,
+or equivalently from 0 to %G_MAXUSHORT.
+
+The standard C `unsigned short` type should usually be preferred in
+new code, but `gushort` can be used in contexts where a type name
+must be a single word, such as when generating a family of function
+names for multiple types using macros.
 
 </description>
 <parameters>

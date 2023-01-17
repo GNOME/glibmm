@@ -8478,23 +8478,29 @@ Detailed action names can have three formats.
 
 The first format is used to represent an action name with no target
 value and consists of just an action name containing no whitespace
-nor the characters ':', '(' or ')'.  For example: &quot;app.action&quot;.
+nor the characters `:`, `(` or `)`.  For example: `app.action`.
 
 The second format is used to represent an action with a target value
-that is a non-empty string consisting only of alphanumerics, plus '-'
-and '.'.  In that case, the action name and target value are
-separated by a double colon (&quot;::&quot;).  For example:
-&quot;app.action::target&quot;.
+that is a non-empty string consisting only of alphanumerics, plus `-`
+and `.`.  In that case, the action name and target value are
+separated by a double colon (`::`).  For example:
+`app.action::target`.
 
 The third format is used to represent an action with any type of
 target value, including strings.  The target value follows the action
-name, surrounded in parens.  For example: &quot;app.action(42)&quot;.  The
+name, surrounded in parens.  For example: `app.action(42)`.  The
 target value is parsed using g_variant_parse().  If a tuple-typed
 value is desired, it must be specified in the same way, resulting in
-two sets of parens, for example: &quot;app.action((1,2,3))&quot;.  A string
-target can be specified this way as well: &quot;app.action('target')&quot;.
-For strings, this third format must be used if * target value is
-empty or contains characters other than alphanumerics, '-' and '.'.
+two sets of parens, for example: `app.action((1,2,3))`.  A string
+target can be specified this way as well: `app.action('target')`.
+For strings, this third format must be used if target value is
+empty or contains characters other than alphanumerics, `-` and `.`.
+
+If this function returns %TRUE, a non-%NULL value is guaranteed to be returned
+in @action_name (if a pointer is passed in). A %NULL value may still be
+returned in @target_value, as the @detailed_name may not contain a target.
+
+If returned, the #GVariant in @target_value is guaranteed to not be floating.
 
 Since: 2.38
 
@@ -8509,7 +8515,8 @@ Since: 2.38
 </parameter_description>
 </parameter>
 <parameter name="target_value">
-<parameter_description> the target value, or %NULL for no target
+<parameter_description> the target value,
+or %NULL for no target
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -9132,9 +9139,9 @@ On UNIX, this function sets the `GIO_LAUNCHED_DESKTOP_FILE`
 environment variable with the path of the launched desktop file and
 `GIO_LAUNCHED_DESKTOP_FILE_PID` to the process id of the launched
 process. This can be used to ignore `GIO_LAUNCHED_DESKTOP_FILE`,
-should it be inherited by further processes. The `DISPLAY` and
-`DESKTOP_STARTUP_ID` environment variables are also set, based
-on information provided in @context.
+should it be inherited by further processes. The `DISPLAY`,
+`XDG_ACTIVATION_TOKEN` and `DESKTOP_STARTUP_ID` environment
+variables are also set, based on information provided in @context.
 
 
 </description>
@@ -9602,10 +9609,18 @@ the child's environment
 <function name="g_app_launch_context_get_startup_notify_id">
 <description>
 Initiates startup notification for the application and returns the
-`DESKTOP_STARTUP_ID` for the launched operation, if supported.
+`XDG_ACTIVATION_TOKEN` or `DESKTOP_STARTUP_ID` for the launched operation,
+if supported.
 
-Startup notification IDs are defined in the 
-[FreeDesktop.Org Startup Notifications standard](http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt).
+The returned token may be referred to equivalently as an ‘activation token’
+(using Wayland terminology) or a ‘startup sequence ID’ (using X11 terminology).
+The two [are interoperable](https://gitlab.freedesktop.org/wayland/wayland-protocols/-/blob/main/staging/xdg-activation/x11-interoperation.rst).
+
+Activation tokens are defined in the [XDG Activation Protocol](https://wayland.app/protocols/xdg-activation-v1),
+and startup notification IDs are defined in the 
+[freedesktop.org Startup Notification Protocol](http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt).
+
+Support for the XDG Activation Protocol was added in GLib 2.76.
 
 
 </description>
@@ -9799,6 +9814,8 @@ passed to #GApplication::handle-local-options, where it can be
 inspected and modified.  If %G_APPLICATION_HANDLES_COMMAND_LINE is
 set, then the resulting dictionary is sent to the primary instance,
 where g_application_command_line_get_options_dict() will return it.
+As it has been passed outside the process at this point, the types of all
+values in the options dict must be checked before being used.
 This &quot;packing&quot; is done according to the type of the argument --
 booleans for normal flags, strings for strings, bytestrings for
 filenames, etc.  The packing only occurs if the flag is given (ie: we
@@ -10085,7 +10102,7 @@ Since: 2.28
 
 <function name="g_application_command_line_get_options_dict">
 <description>
-Gets the options there were passed to g_application_command_line().
+Gets the options that were passed to g_application_command_line().
 
 If you did not override local_command_line() then these are the same
 options that were parsed according to the #GOptionEntrys added to the
@@ -10094,6 +10111,9 @@ modified from your GApplication::handle-local-options handler.
 
 If no options were sent then an empty dictionary is returned so that
 you don't need to check for %NULL.
+
+The data has been passed via an untrusted external process, so the types of
+all values must be checked before being used.
 
 Since: 2.40
 
@@ -10117,6 +10137,9 @@ This is a #GVariant dictionary containing information about the
 context in which the invocation occurred.  It typically contains
 information like the current working directory and the startup
 notification ID.
+
+It comes from an untrusted external process and hence the types of all
+values must be validated before being used.
 
 For local invocation, it will be %NULL.
 
@@ -16308,6 +16331,10 @@ An object path can only have one menu model exported on it. If this
 constraint is violated, the export will fail and 0 will be
 returned (with @error set accordingly).
 
+Exporting menus with sections containing more than
+%G_MENU_EXPORTER_MAX_SECTION_SIZE items is not supported and results in
+undefined behavior.
+
 You can unexport the menu model using
 g_dbus_connection_unexport_menu_model() with the return value of
 this function.
@@ -17394,7 +17421,7 @@ when @connection is closed by the remote peer
 
 <function name="g_dbus_connection_signal_subscribe">
 <description>
-Subscribes to signals on @connection and invokes @callback with a whenever
+Subscribes to signals on @connection and invokes @callback whenever
 the signal is received. Note that @callback will be invoked in the 
 [thread-default main context][g-main-context-push-thread-default]
 of the thread you are calling this method from.
@@ -33455,7 +33482,6 @@ native, the returned string is the result of g_file_get_uri()
 - If @icon is a #GThemedIcon with exactly one name and no fallbacks,
 the encoding is simply the name (such as `network-server`).
 
-Virtual: to_tokens
 Since: 2.20
 
 </description>
@@ -40474,7 +40500,7 @@ activated when the notification is clicked on. It must be an
 application-wide action (start with &quot;app.&quot;).
 
 If @target is non-%NULL, @action will be activated with @target as
-its parameter.
+its parameter. If @target is floating, it will be consumed.
 
 When no default action is set, the application that the notification
 was sent on is activated.
@@ -43056,7 +43082,7 @@ Since: 2.26
 <description>
 Looks into the system proxy configuration to determine what proxy,
 if any, to use to connect to @uri. The returned proxy URIs are of
-the form `&lt;protocol&gt;://[user[:password]@]host:port` or
+the form `&lt;protocol&gt;://[user[:password]@]host[:port]` or
 `direct://`, where &lt;protocol&gt; could be http, rtsp, socks
 or other proxying protocol.
 
@@ -53921,7 +53947,8 @@ to wait for a #GSource to trigger. Attaches @source to @task's
 callback to @callback, with @task as the callback's `user_data`.
 
 It will set the @source’s name to the task’s name (as set with
-g_task_set_name()), if one has been set.
+g_task_set_name()), if one has been set on the task and the source doesn’t
+yet have a name.
 
 This takes a reference on @task until @source is destroyed.
 
@@ -54868,6 +54895,28 @@ Since: 2.36
 </parameter>
 <parameter name="source_tag">
 <parameter_description> an opaque pointer indicating the source of this task
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_task_set_static_name">
+<description>
+Sets @task’s name, used in debugging and profiling.
+
+This is a variant of g_task_set_name() that avoids copying @name.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="task">
+<parameter_description> a #GTask
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> a human readable name for the task. Must be a string literal
 </parameter_description>
 </parameter>
 </parameters>
