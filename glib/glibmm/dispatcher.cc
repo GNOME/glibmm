@@ -126,11 +126,6 @@ fd_close_and_invalidate(int& fd)
 }
 #endif /* !G_OS_WIN32 */
 
-void warn_dropped_dispatcher_message()
-{
-  g_warning("Dropped dispatcher message as the dispatcher no longer exists.");
-}
-
 } // anonymous namespace
 
 namespace Glib
@@ -337,8 +332,6 @@ void DispatchNotifier::unreference_instance(
     // Delete all slots connected to the Dispatcher. Then the signal emission
     // in pipe_io_handler() will do nothing.
     dispatcher_impl->signal_.clear();
-    // Add a slot that will warn that a message has been dropped.
-    dispatcher_impl->signal_.connect(sigc::ptr_fun(warn_dropped_dispatcher_message));
     instance->orphaned_dispatcher_impl_.push_front(UniqueImplPtr(dispatcher_impl));
   }
 
