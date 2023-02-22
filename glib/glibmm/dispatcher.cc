@@ -476,10 +476,7 @@ bool DispatchNotifier::pipe_io_handler(Glib::IOCondition)
     deleted_dispatchers_.clear();
 
   if (drop_message)
-  {
-    g_warning("Dropped dispatcher message as the dispatcher no longer exists");
     return true;
-  }
 
   // Actually, we wouldn't need the try/catch block because the Glib::Source
   // C callback already does it for us.  However, we do it anyway because the
