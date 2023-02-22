@@ -498,6 +498,7 @@ Dispatcher::~Dispatcher() noexcept
   DispatchNotifier::unreference_instance(impl_->notifier_, impl_);
 }
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
 void
 Dispatcher::emit()
 {
@@ -506,6 +507,19 @@ Dispatcher::emit()
 
 void
 Dispatcher::operator()()
+{
+  impl_->notifier_->send_notification(impl_);
+}
+#endif // GLIBMM_DISABLE_DEPRECATED
+
+void
+Dispatcher::emit() const
+{
+  impl_->notifier_->send_notification(impl_);
+}
+
+void
+Dispatcher::operator()() const
 {
   impl_->notifier_->send_notification(impl_);
 }

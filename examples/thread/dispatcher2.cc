@@ -47,7 +47,7 @@ public:
 private:
   unsigned int time_;
   Glib::Dispatcher signal_increment_;
-  Glib::Dispatcher* signal_finished_ptr_;
+  const Glib::Dispatcher* signal_finished_ptr_;
 
   std::mutex startup_mutex_;
   std::condition_variable startup_cond_;

@@ -80,8 +80,23 @@ public:
   explicit Dispatcher(const Glib::RefPtr<MainContext>& context);
   ~Dispatcher() noexcept;
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
+  /** Same as the const version.
+   * @deprecated 2.76: Use the const version instead.
+   */
   void emit();
+  /** Same as the const version.
+   * @deprecated 2.76: Use the const version instead.
+   */
   void operator()();
+#endif // GLIBMM_DISABLE_DEPRECATED
+
+  /** @newin{2,76}
+   */
+  void emit() const;
+  /** @newin{2,76}
+   */
+  void operator()() const;
 
   sigc::connection connect(const sigc::slot<void()>& slot);
   /** @newin{2,48}
