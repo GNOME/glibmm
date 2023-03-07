@@ -97,6 +97,54 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Glib::ObjectBase> get_object(guint position), g_list_model_get_object, newin "2,50")
   _WRAP_METHOD(Glib::RefPtr<const Glib::ObjectBase> get_object(guint position) const, g_list_model_get_object, constversion, newin "2,50")
 
+  /** Get the item at @a position.
+   *
+   * If @a position is greater than the number of items in @a list,
+   * an empty RefPtr is returned.
+   *
+   * @code
+   * Glib::RefPtr<T_item> item = list_model->get_typed_object<T_item>(position);
+   * @endcode
+   * is often equivalent to
+   * @code
+   * Glib::RefPtr<T_item> item = std::dynamic_pointer_cast<T_item>(list_model->get_object(position));
+   * @endcode
+   *
+   * If T_item is an interface, and the underlying C object is an instance of
+   * a C class that implements that interface, but there is no corresponding
+   * C++ class, %get_typed_object() may manage to fetch the item even if
+   * %get_object() fails and returns an empty RefPtr.
+   *
+   * @see get_n_items() and get_object()
+   *
+   * @newin{2,76}
+   *
+   * @tparam T_item The item to fetch must be of type T_item or a type derived
+   *                from T_item, otherwise an empty RefPtr is returned. T_item must
+   *                be Glib::ObjectBase or a type derived from Glib::ObjectBase.
+   *
+   * @param position The position of the item to fetch.
+   * @return The object at @a position.
+   */
+  template <typename T_item>
+  Glib::RefPtr<T_item> get_typed_object(guint position);
+
+  /** Get the item at @a position.
+   *
+   * See the non-const version.
+   *
+   * @newin{2,76}
+   *
+   * @tparam T_item The item to fetch must be of type T_item or a type derived
+   *                from T_item, otherwise an empty RefPtr is returned. T_item must
+   *                be Glib::ObjectBase or a type derived from Glib::ObjectBase.
+   *
+   * @param position The position of the item to fetch.
+   * @return The object at @a position.
+   */
+  template <typename T_item>
+  Glib::RefPtr<const T_item> get_typed_object(guint position) const;
+
   _WRAP_SIGNAL(void items_changed(guint position, guint removed, guint added), "items-changed", no_default_handler, newin "2,50")
 
 protected:
@@ -104,5 +152,53 @@ protected:
   _WRAP_VFUNC(guint get_n_items(), "get_n_items")
   _WRAP_VFUNC(gpointer get_item(guint position), "get_item")
 };
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+template <typename T_item>
+Glib::RefPtr<T_item> ListModel::get_typed_object(guint position)
+{
+  static_assert(std::is_base_of_v<Glib::ObjectBase, T_item>,
+    "T_item must be Glib::ObjectBase or derived from Glib::ObjectBase.");
+
+  // g_list_model_get_object() gives us a reference.
+  GObject* c_item = g_list_model_get_object(gobj(), position);
+  if (!c_item)
+    return {};
+  T_item* cpp_item = nullptr;
+
+  // If the C item is an object of a type that is not wrapped in C++ code,
+  // a call to Glib::wrap_auto() will fail. Glib::wrap_auto_interface<T_item>()
+  // succeeds, if T_item is an interface.
+  if constexpr (std::is_base_of_v<Glib::Interface, T_item> &&
+               !std::is_base_of_v<Glib::Object, T_item>)
+  {
+    // Call wrap_auto_interface() only if c_item implements T_item::get_base_type().
+    // wrap_auto_interface() can create a C++ wrapper of type T_item even if
+    // the object does not implement that interface.
+    if (g_type_is_a(G_OBJECT_TYPE(c_item), T_item::get_base_type()))
+      cpp_item = Glib::wrap_auto_interface<T_item>(c_item);
+    else
+      g_warning("Type %s does not implement the %s interface.",
+        G_OBJECT_TYPE_NAME(c_item), g_type_name(T_item::get_base_type()));
+  }
+  else
+    cpp_item = dynamic_cast<T_item*>(Glib::wrap_auto(c_item));
+
+  if (!cpp_item)
+    g_object_unref(c_item);
+  return Glib::make_refptr_for_instance<T_item>(cpp_item);
+}
+
+template <typename T_item>
+Glib::RefPtr<const T_item> ListModel::get_typed_object(guint position) const
+{
+  static_assert(std::is_base_of_v<Glib::ObjectBase, T_item>,
+    "T_item must be Glib::ObjectBase or derived from Glib::ObjectBase.");
+
+  return const_cast<ListModel*>(this)->get_typed_object<T_item>(position);
+}
+
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 } // namespace Gio
