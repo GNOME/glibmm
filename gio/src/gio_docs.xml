@@ -8976,6 +8976,10 @@ no display name is available.
 <description>
 Gets the executable's name for the installed application.
 
+This is intended to be used for debugging or labelling what program is going
+to be run. To launch the executable, use g_app_info_launch() and related
+functions, rather than spawning the return value from this function.
+
 
 </description>
 <parameters>
@@ -13559,8 +13563,8 @@ containing the data to convert.
 </parameter_description>
 </parameter>
 <parameter name="outbuf">
-<parameter_description> a buffer to write
-converted data in.
+<parameter_description> a
+buffer to write converted data in.
 </parameter_description>
 </parameter>
 <parameter name="outbuf_size">
@@ -13572,11 +13576,13 @@ converted data in.
 </parameter_description>
 </parameter>
 <parameter name="bytes_read">
-<parameter_description> will be set to the number of bytes read from @inbuf on success
+<parameter_description> will be set to the number of bytes read
+from @inbuf on success
 </parameter_description>
 </parameter>
 <parameter name="bytes_written">
-<parameter_description> will be set to the number of bytes written to @outbuf on success
+<parameter_description> will be set to the number of bytes
+written to @outbuf on success
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -25540,7 +25546,7 @@ will always return %TRUE.
 
 <function name="g_file_attribute_matcher_matches_only">
 <description>
-Checks if a attribute matcher only matches a given attribute. Always
+Checks if an attribute matcher only matches a given attribute. Always
 returns %FALSE if &quot;*&quot; was used when creating the matcher.
 
 
@@ -27576,9 +27582,10 @@ Duplicates a file info structure.
 Gets the access time of the current @info and returns it as a
 #GDateTime.
 
-This requires the %G_FILE_ATTRIBUTE_TIME_ACCESS attribute. If
-%G_FILE_ATTRIBUTE_TIME_ACCESS_USEC is provided, the resulting #GDateTime
-will have microsecond precision.
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_TIME_ACCESS. If %G_FILE_ATTRIBUTE_TIME_ACCESS_USEC is
+provided, the resulting #GDateTime will additionally have microsecond
+precision.
 
 If nanosecond precision is needed, %G_FILE_ATTRIBUTE_TIME_ACCESS_NSEC must
 be queried separately using g_file_info_get_attribute_uint32().
@@ -27598,7 +27605,7 @@ Since: 2.70
 
 <function name="g_file_info_get_attribute_as_string">
 <description>
-Gets the value of a attribute, formatted as a string.
+Gets the value of an attribute, formatted as a string.
 This escapes things as needed to make the string valid
 UTF-8.
 
@@ -27900,6 +27907,9 @@ attribute does not contain an unsigned 64-bit integer, or is invalid,
 <description>
 Gets the file's content type.
 
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE.
+
 
 </description>
 <parameters>
@@ -27918,9 +27928,10 @@ or %NULL if unknown.
 Gets the creation time of the current @info and returns it as a
 #GDateTime.
 
-This requires the %G_FILE_ATTRIBUTE_TIME_CREATED attribute. If
-%G_FILE_ATTRIBUTE_TIME_CREATED_USEC is provided, the resulting #GDateTime
-will have microsecond precision.
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_TIME_CREATED. If %G_FILE_ATTRIBUTE_TIME_CREATED_USEC is
+provided, the resulting #GDateTime will additionally have microsecond
+precision.
 
 If nanosecond precision is needed, %G_FILE_ATTRIBUTE_TIME_CREATED_NSEC must
 be queried separately using g_file_info_get_attribute_uint32().
@@ -27941,8 +27952,8 @@ Since: 2.70
 <function name="g_file_info_get_deletion_date">
 <description>
 Returns the #GDateTime representing the deletion date of the file, as
-available in G_FILE_ATTRIBUTE_TRASH_DELETION_DATE. If the
-G_FILE_ATTRIBUTE_TRASH_DELETION_DATE attribute is unset, %NULL is returned.
+available in %G_FILE_ATTRIBUTE_TRASH_DELETION_DATE. If the
+%G_FILE_ATTRIBUTE_TRASH_DELETION_DATE attribute is unset, %NULL is returned.
 
 Since: 2.36
 
@@ -27962,6 +27973,9 @@ Since: 2.36
 <description>
 Gets a display name for a file. This is guaranteed to always be set.
 
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME.
+
 
 </description>
 <parameters>
@@ -27977,6 +27991,9 @@ Gets a display name for a file. This is guaranteed to always be set.
 <function name="g_file_info_get_edit_name">
 <description>
 Gets the edit name for a file.
+
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME.
 
 
 </description>
@@ -27995,6 +28012,9 @@ Gets the edit name for a file.
 Gets the [entity tag][gfile-etag] for a given
 #GFileInfo. See %G_FILE_ATTRIBUTE_ETAG_VALUE.
 
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_ETAG_VALUE.
+
 
 </description>
 <parameters>
@@ -28012,6 +28032,9 @@ Gets the [entity tag][gfile-etag] for a given
 Gets a file's type (whether it is a regular file, symlink, etc).
 This is different from the file's content type, see g_file_info_get_content_type().
 
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_STANDARD_TYPE.
+
 
 </description>
 <parameters>
@@ -28027,6 +28050,9 @@ This is different from the file's content type, see g_file_info_get_content_type
 <function name="g_file_info_get_icon">
 <description>
 Gets the icon for a file.
+
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_STANDARD_ICON.
 
 
 </description>
@@ -28044,6 +28070,9 @@ Gets the icon for a file.
 <description>
 Checks if a file is a backup file.
 
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_STANDARD_IS_BACKUP.
+
 
 </description>
 <parameters>
@@ -28060,6 +28089,9 @@ Checks if a file is a backup file.
 <description>
 Checks if a file is hidden.
 
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_STANDARD_IS_HIDDEN.
+
 
 </description>
 <parameters>
@@ -28075,6 +28107,9 @@ Checks if a file is hidden.
 <function name="g_file_info_get_is_symlink">
 <description>
 Checks if a file is a symlink.
+
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK.
 
 
 </description>
@@ -28093,9 +28128,10 @@ Checks if a file is a symlink.
 Gets the modification time of the current @info and returns it as a
 #GDateTime.
 
-This requires the %G_FILE_ATTRIBUTE_TIME_MODIFIED attribute. If
-%G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC is provided, the resulting #GDateTime
-will have microsecond precision.
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_TIME_MODIFIED. If %G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC is
+provided, the resulting #GDateTime will additionally have microsecond
+precision.
 
 If nanosecond precision is needed, %G_FILE_ATTRIBUTE_TIME_MODIFIED_NSEC must
 be queried separately using g_file_info_get_attribute_uint32().
@@ -28118,6 +28154,10 @@ Since: 2.62
 Gets the modification time of the current @info and sets it
 in @result.
 
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_TIME_MODIFIED. If %G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC is
+provided it will be used too.
+
 Deprecated: 2.62: Use g_file_info_get_modification_date_time() instead, as
 #GTimeVal is deprecated due to the year 2038 problem.
 
@@ -28139,6 +28179,9 @@ Deprecated: 2.62: Use g_file_info_get_modification_date_time() instead, as
 <description>
 Gets the name for a file. This is guaranteed to always be set.
 
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_STANDARD_NAME.
+
 
 </description>
 <parameters>
@@ -28157,6 +28200,9 @@ Gets the file's size (in bytes). The size is retrieved through the value of
 the %G_FILE_ATTRIBUTE_STANDARD_SIZE attribute and is converted
 from #guint64 to #goffset before returning the result.
 
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_STANDARD_SIZE.
+
 
 </description>
 <parameters>
@@ -28174,6 +28220,9 @@ from #guint64 to #goffset before returning the result.
 Gets the value of the sort_order attribute from the #GFileInfo.
 See %G_FILE_ATTRIBUTE_STANDARD_SORT_ORDER.
 
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_STANDARD_SORT_ORDER.
+
 
 </description>
 <parameters>
@@ -28189,6 +28238,9 @@ See %G_FILE_ATTRIBUTE_STANDARD_SORT_ORDER.
 <function name="g_file_info_get_symbolic_icon">
 <description>
 Gets the symbolic icon for a file.
+
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_STANDARD_SYMBOLIC_ICON.
 
 Since: 2.34
 
@@ -28207,6 +28259,9 @@ Since: 2.34
 <function name="g_file_info_get_symlink_target">
 <description>
 Gets the symlink target for a given #GFileInfo.
+
+It is an error to call this if the #GFileInfo does not contain
+%G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET.
 
 
 </description>
@@ -36372,6 +36427,10 @@ comparing them with @equal_func until the first occurrence of @item which
 matches. If @item was not found, then @position will not be set, and this
 method will return %FALSE.
 
+@item is always passed as second parameter to @equal_func.
+
+Since GLib 2.76 it is possible to pass `NULL` for @item.
+
 Since: 2.64
 
 </description>
@@ -36403,6 +36462,10 @@ set to the position where @item occurred for the first time.
 <description>
 Like g_list_store_find_with_equal_func() but with an additional @user_data
 that is passed to @equal_func.
+
+@item is always passed as second parameter to @equal_func.
+
+Since GLib 2.76 it is possible to pass `NULL` for @item.
 
 Since: 2.74
 

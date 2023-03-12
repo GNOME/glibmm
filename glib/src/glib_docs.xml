@@ -4488,7 +4488,7 @@ If the allocation fails (because the system is out of memory),
 the program is terminated.
 
 Aligned memory allocations returned by this function can only be
-freed using g_aligned_free().
+freed using g_aligned_free_sized() or g_aligned_free().
 
 Since: 2.72
 
@@ -4551,6 +4551,38 @@ Since: 2.72
 <parameters>
 <parameter name="mem">
 <parameter_description> the memory to deallocate
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_aligned_free_sized">
+<description>
+Frees the memory pointed to by @mem, assuming it is has the given @size and
+@alignment.
+
+If @mem is %NULL this is a no-op (and @size is ignored).
+
+It is an error if @size doesn’t match the size, or @alignment doesn’t match
+the alignment, passed when @mem was allocated. @size and @alignment are
+passed to this function to allow optimizations in the allocator. If you
+don’t know either of them, use g_aligned_free() instead.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="mem">
+<parameter_description> the memory to free
+</parameter_description>
+</parameter>
+<parameter name="alignment">
+<parameter_description> alignment of @mem
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> size of @mem, in bytes
 </parameter_description>
 </parameter>
 </parameters>
@@ -4685,7 +4717,7 @@ result (if not, the function may produce false-negative).
 
 This example defines a comparison function and search an element in a #GArray:
 |[&lt;!-- language=&quot;C&quot; --&gt;
-static gint*
+static gint
 cmpint (gconstpointer a, gconstpointer b)
 {
 const gint *_a = a;
@@ -11133,7 +11165,7 @@ will create the appropriate `*_get_type()` function for the boxed type.
 <function name="g_build_filename">
 <description>
 Creates a filename from a series of elements using the correct
-separator for filenames.
+separator for the current platform.
 
 On Unix, this function behaves identically to `g_build_path
 (G_DIR_SEPARATOR_S, first_element, ....)`.
@@ -11148,6 +11180,9 @@ No attempt is made to force the resulting filename to be an absolute
 path. If the first element is a relative path, the result will
 be a relative path.
 
+If you are building a path programmatically you may want to use
+#GPathBuf instead.
+
 
 </description>
 <parameters>
@@ -11160,15 +11195,20 @@ be a relative path.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string that
-must be freed with g_free().
+<return> the newly allocated path
 </return>
 </function>
 
 <function name="g_build_filename_valist">
 <description>
+Creates a filename from a list of elements using the correct
+separator for the current platform.
+
 Behaves exactly like g_build_filename(), but takes the path elements
-as a va_list. This function is mainly meant for language bindings.
+as a va_list.
+
+This function is mainly meant for implementing other variadic arguments
+functions.
 
 Since: 2.56
 
@@ -11183,17 +11223,22 @@ Since: 2.56
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string that
-must be freed with g_free().
+<return> the newly allocated path
 
 </return>
 </function>
 
 <function name="g_build_filenamev">
 <description>
-Behaves exactly like g_build_filename(), but takes the path elements 
-as a string array, instead of varargs. This function is mainly
+Creates a filename from a vector of elements using the correct
+separator for the current platform.
+
+This function behaves exactly like g_build_filename(), but takes the path
+elements as a string array, instead of varargs. This function is mainly
 meant for language bindings.
+
+If you are building a path programmatically you may want to use
+#GPathBuf instead.
 
 Since: 2.8
 
@@ -11205,8 +11250,7 @@ array of strings containing the path elements.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string that
-must be freed with g_free().
+<return> the newly allocated path
 
 </return>
 </function>
@@ -11214,10 +11258,12 @@ must be freed with g_free().
 <function name="g_build_path">
 <description>
 Creates a path from a series of elements using @separator as the
-separator between elements. At the boundary between two elements,
-any trailing occurrences of separator in the first element, or
-leading occurrences of separator in the second element are removed
-and exactly one copy of the separator is inserted.
+separator between elements.
+
+At the boundary between two elements, any trailing occurrences of
+separator in the first element, or leading occurrences of separator
+in the second element are removed and exactly one copy of the
+separator is inserted.
 
 Empty elements are ignored.
 
@@ -11256,16 +11302,16 @@ of the separator are ignored.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string that
-must be freed with g_free().
+<return> the newly allocated path
 </return>
 </function>
 
 <function name="g_build_pathv">
 <description>
-Behaves exactly like g_build_path(), but takes the path elements 
-as a string array, instead of varargs. This function is mainly
-meant for language bindings.
+Behaves exactly like g_build_path(), but takes the path elements
+as a string array, instead of variadic arguments.
+
+This function is mainly meant for language bindings.
 
 Since: 2.8
 
@@ -12290,6 +12336,7 @@ to use the current working directory
 </parameters>
 <return> a newly allocated string with the
 canonical file path
+
 </return>
 </function>
 
@@ -20702,14 +20749,15 @@ close(). In case of errors, -1 is returned and @error will be set.
 <function name="g_file_read_link">
 <description>
 Reads the contents of the symbolic link @filename like the POSIX
-readlink() function.
+`readlink()` function.
 
-The returned string is in the encoding used
-for filenames. Use g_filename_to_utf8() to convert it to UTF-8.
+The returned string is in the encoding used for filenames. Use
+g_filename_to_utf8() to convert it to UTF-8.
 
-The returned string may also be a relative path. Use g_build_filename() to
-convert it to an absolute path:
-|[
+The returned string may also be a relative path. Use g_build_filename()
+to convert it to an absolute path:
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
 g_autoptr(GError) local_error = NULL;
 g_autofree gchar *link_target = g_file_read_link (&quot;/etc/localtime&quot;, &amp;local_error);
 
@@ -20887,15 +20935,33 @@ Note, that for a dangling symbolic link g_file_test() will return
 
 You should never use g_file_test() to test whether it is safe
 to perform an operation, because there is always the possibility
-of the condition changing before you actually perform the operation.
+of the condition changing before you actually perform the operation,
+see [TOCTOU](https://en.wikipedia.org/wiki/Time-of-check_to_time-of-use).
+
 For example, you might think you could use %G_FILE_TEST_IS_SYMLINK
 to know whether it is safe to write to a file without being
 tricked into writing into a different location. It doesn't work!
+
 |[&lt;!-- language=&quot;C&quot; --&gt;
 // DON'T DO THIS
 if (!g_file_test (filename, G_FILE_TEST_IS_SYMLINK)) 
 {
 fd = g_open (filename, O_WRONLY);
+// write to fd
+}
+
+// DO THIS INSTEAD
+fd = g_open (filename, O_WRONLY | O_NOFOLLOW | O_CLOEXEC);
+if (fd == -1)
+{
+// check error
+if (errno == ELOOP)
+// file is a symlink and can be ignored
+else
+// handle errors as before
+}
+else
+{
 // write to fd
 }
 ]|
@@ -21538,6 +21604,9 @@ Since: 2.2
 <description>
 Frees the memory pointed to by @mem.
 
+If you know the allocated size of @mem, calling g_free_sized() may be faster,
+depending on the libc implementation in use.
+
 If @mem is %NULL it simply returns, so there is no need to check @mem
 against %NULL before calling this function.
 
@@ -21545,6 +21614,32 @@ against %NULL before calling this function.
 <parameters>
 <parameter name="mem">
 <parameter_description> the memory to free
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_free_sized">
+<description>
+Frees the memory pointed to by @mem, assuming it is has the given @size.
+
+If @mem is %NULL this is a no-op (and @size is ignored).
+
+It is an error if @size doesn’t match the size passed when @mem was
+allocated. @size is passed to this function to allow optimizations in the
+allocator. If you don’t know the allocation size, use g_free() instead.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="mem">
+<parameter_description> the memory to free
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> size of @mem, in bytes
 </parameter_description>
 </parameter>
 </parameters>
@@ -21644,7 +21739,8 @@ used by the C library's current locale.
 
 On Linux, the character set is found by consulting nl_langinfo() if
 available. If not, the environment variables `LC_ALL`, `LC_CTYPE`, `LANG`
-and `CHARSET` are queried in order.
+and `CHARSET` are queried in order. nl_langinfo() returns the C locale if
+no locale has been loaded by setlocale().
 
 The return value is %TRUE if the locale's encoding is UTF-8, in that
 case you can perhaps avoid calling g_convert().
@@ -29352,11 +29448,15 @@ You must be the owner of a context before you
 can call g_main_context_prepare(), g_main_context_query(),
 g_main_context_check(), g_main_context_dispatch().
 
+Since 2.76 @context can be %NULL to use the global-default
+main context.
+
 
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 </parameters>
@@ -29374,7 +29474,8 @@ a typical event source will use g_source_add_unix_fd() instead.
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext (or %NULL for the default context)
+<parameter_description> a #GMainContext (or %NULL for the global-default
+main context)
 </parameter_description>
 </parameter>
 <parameter name="fd">
@@ -29402,11 +29503,15 @@ on how @fds is filled.
 You must have successfully acquired the context with
 g_main_context_acquire() before you may call this function.
 
+Since 2.76 @context can be %NULL to use the global-default
+main context.
+
 
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 <parameter name="max_priority">
@@ -29429,7 +29534,7 @@ the last call to g_main_context_query()
 
 <function name="g_main_context_default">
 <description>
-Returns the global default main context. This is the main context
+Returns the global-default main context. This is the main context
 used for main loop functions when a main loop is not explicitly
 specified, and corresponds to the &quot;main&quot; main loop. See also
 g_main_context_get_thread_default().
@@ -29438,7 +29543,7 @@ g_main_context_get_thread_default().
 </description>
 <parameters>
 </parameters>
-<return> the global default main context.
+<return> the global-default main context.
 </return>
 </function>
 
@@ -29449,10 +29554,14 @@ Dispatches all pending sources.
 You must have successfully acquired the context with
 g_main_context_acquire() before you may call this function.
 
+Since 2.76 @context can be %NULL to use the global-default
+main context.
+
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 </parameters>
@@ -29469,7 +29578,8 @@ the first one found will be returned.
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext (if %NULL, the default context will be used).
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used).
 </parameter_description>
 </parameter>
 <parameter name="funcs">
@@ -29504,7 +29614,8 @@ wrong source.
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext (if %NULL, the default context will be used)
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 <parameter name="source_id">
@@ -29526,7 +29637,8 @@ one found will be returned.
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -29546,7 +29658,8 @@ Gets the poll function set by g_main_context_set_poll_func().
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 </parameters>
@@ -29574,7 +29687,7 @@ Since: 2.22
 <parameters>
 </parameters>
 <return> the thread-default #GMainContext, or
-%NULL if the thread-default context is the global default context.
+%NULL if the thread-default context is the global-default main context.
 
 </return>
 </function>
@@ -29584,7 +29697,7 @@ Since: 2.22
 Invokes a function in such a way that @context is owned during the
 invocation of @function.
 
-If @context is %NULL then the global default main context — as
+If @context is %NULL then the global-default main context — as
 returned by g_main_context_default() — is used.
 
 If @context is owned by the current thread, @function is called
@@ -29608,7 +29721,8 @@ Since: 2.28
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext, or %NULL
+<parameter_description> a #GMainContext, or %NULL for the global-default
+main context
 </parameter_description>
 </parameter>
 <parameter name="function">
@@ -29640,7 +29754,8 @@ Since: 2.28
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext, or %NULL
+<parameter_description> a #GMainContext, or %NULL for the global-default
+main context
 </parameter_description>
 </parameter>
 <parameter name="priority">
@@ -29675,7 +29790,8 @@ Since: 2.10
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 </parameters>
@@ -29703,7 +29819,8 @@ be interrupted for other reasons than an event source becoming ready.
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext (if %NULL, the default context will be used) 
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 <parameter name="may_block">
@@ -29754,7 +29871,8 @@ Checks if any sources have pending events for the given context.
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext (if %NULL, the default context will be used)
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 </parameters>
@@ -29772,7 +29890,8 @@ Since: 2.22
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext object, or %NULL
+<parameter_description> a #GMainContext, or %NULL for the global-default
+main context
 </parameter_description>
 </parameter>
 </parameters>
@@ -29791,7 +29910,8 @@ g_main_context_acquire() before you may call this function.
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 <parameter name="priority">
@@ -29812,7 +29932,7 @@ current thread. This will cause certain asynchronous operations
 (such as most [gio][gio]-based I/O) which are
 started in this thread to run under @context and deliver their
 results to its main loop, rather than running under the global
-default context in the main thread. Note that calling this function
+default main context in the main thread. Note that calling this function
 changes the context returned by g_main_context_get_thread_default(),
 not the one returned by g_main_context_default(), so it does not affect
 the context used by functions like g_idle_add().
@@ -29851,7 +29971,8 @@ Since: 2.22
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext, or %NULL for the global default context
+<parameter_description> a #GMainContext, or %NULL for the global-default
+main context
 </parameter_description>
 </parameter>
 </parameters>
@@ -29945,7 +30066,8 @@ g_main_context_acquire() before you may call this function.
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 <parameter name="max_priority">
@@ -29994,7 +30116,7 @@ Gets the thread-default #GMainContext for this thread, as with
 g_main_context_get_thread_default(), but also adds a reference to
 it with g_main_context_ref(). In addition, unlike
 g_main_context_get_thread_default(), if the thread-default context
-is the global default context, this will return that #GMainContext
+is the global-default context, this will return that #GMainContext
 (with a ref added to it) rather than returning %NULL.
 
 Since: 2.32
@@ -30018,7 +30140,8 @@ is called as many times as it was acquired.
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 </parameters>
@@ -30033,7 +30156,8 @@ polled for a particular context.
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description>a #GMainContext 
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 <parameter name="fd">
@@ -30057,7 +30181,8 @@ loop with an external event loop.
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 <parameter name="func">
@@ -30096,7 +30221,8 @@ Deprecated: 2.58: Use g_main_context_is_owner() and separate locking instead.
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 <parameter name="cond">
@@ -30147,7 +30273,8 @@ g_main_context_wakeup (NULL);
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 </parameters>
@@ -30375,7 +30502,8 @@ Creates a new #GMainLoop structure.
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GMainContext  (if %NULL, the default context will be used).
+<parameter_description> a #GMainContext  (if %NULL, the global-default
+main context will be used).
 </parameter_description>
 </parameter>
 <parameter name="is_running">
@@ -38086,6 +38214,397 @@ strings with bit flags.
 </return>
 </function>
 
+<function name="g_path_buf_clear">
+<description>
+Clears the contents of the path buffer.
+
+This function should be use to free the resources in a stack-allocated
+`GPathBuf` initialized using g_path_buf_init() or
+g_path_buf_init_from_path().
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="buf">
+<parameter_description> a path buffer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_path_buf_clear_to_path">
+<description>
+Clears the contents of the path buffer and returns the built path.
+
+This function returns `NULL` if the `GPathBuf` is empty.
+
+See also: g_path_buf_to_path()
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="buf">
+<parameter_description> a path buffer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the built path
+
+</return>
+</function>
+
+<function name="g_path_buf_copy">
+<description>
+Copies the contents of a path buffer into a new `GPathBuf`.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="buf">
+<parameter_description> a path buffer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the newly allocated path buffer
+
+</return>
+</function>
+
+<function name="g_path_buf_equal">
+<description>
+Compares two path buffers for equality and returns `TRUE`
+if they are equal.
+
+The path inside the paths buffers are not going to be normalized,
+so `X/Y/Z/A/..`, `X/./Y/Z` and `X/Y/Z` are not going to be considered
+equal.
+
+This function can be passed to g_hash_table_new() as the
+`key_equal_func` parameter.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="v1">
+<parameter_description> a path buffer to compare
+</parameter_description>
+</parameter>
+<parameter name="v2">
+<parameter_description> a path buffer to compare
+</parameter_description>
+</parameter>
+</parameters>
+<return> `TRUE` if the two path buffers are equal,
+and `FALSE` otherwise
+
+</return>
+</function>
+
+<function name="g_path_buf_free">
+<description>
+Frees a `GPathBuf` allocated by g_path_buf_new().
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="buf">
+<parameter_description> a path buffer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_path_buf_free_to_path">
+<description>
+Frees a `GPathBuf` allocated by g_path_buf_new(), and
+returns the path inside the buffer.
+
+This function returns `NULL` if the `GPathBuf` is empty.
+
+See also: g_path_buf_to_path()
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="buf">
+<parameter_description> a path buffer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the path
+
+</return>
+</function>
+
+<function name="g_path_buf_init">
+<description>
+Initializes a `GPathBuf` instance.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="buf">
+<parameter_description> a path buffer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the initialized path builder
+
+</return>
+</function>
+
+<function name="g_path_buf_init_from_path">
+<description>
+Initializes a `GPathBuf` instance with the given path.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="buf">
+<parameter_description> a path buffer
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> a file system path
+</parameter_description>
+</parameter>
+</parameters>
+<return> the initialized path builder
+
+</return>
+</function>
+
+<function name="g_path_buf_new">
+<description>
+Allocates a new `GPathBuf`.
+
+Since: 2.76
+
+</description>
+<parameters>
+</parameters>
+<return> the newly allocated path buffer
+
+</return>
+</function>
+
+<function name="g_path_buf_new_from_path">
+<description>
+Allocates a new `GPathBuf` with the given @path.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="path">
+<parameter_description> the path used to initialize the buffer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the newly allocated path buffer
+
+</return>
+</function>
+
+<function name="g_path_buf_pop">
+<description>
+Removes the last element of the path buffer.
+
+If there is only one element in the path buffer (for example, `/` on
+Unix-like operating systems or the drive on Windows systems), it will
+not be removed and %FALSE will be returned instead.
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
+GPathBuf buf, cmp;
+
+g_path_buf_init_from_path (&amp;buf, &quot;/bin/sh&quot;);
+
+g_path_buf_pop (&amp;buf);
+g_path_buf_init_from_path (&amp;cmp, &quot;/bin&quot;);
+g_assert_true (g_path_buf_equal (&amp;buf, &amp;cmp));
+g_path_buf_clear (&amp;cmp);
+
+g_path_buf_pop (&amp;buf);
+g_path_buf_init_from_path (&amp;cmp, &quot;/&quot;);
+g_assert_true (g_path_buf_equal (&amp;buf, &amp;cmp));
+g_path_buf_clear (&amp;cmp);
+
+g_path_buf_clear (&amp;buf);
+]|
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="buf">
+<parameter_description> a path buffer
+</parameter_description>
+</parameter>
+</parameters>
+<return> `TRUE` if the buffer was modified and `FALSE` otherwise
+
+</return>
+</function>
+
+<function name="g_path_buf_push">
+<description>
+Extends the given path buffer with @path.
+
+If @path is absolute, it replaces the current path.
+
+If @path contains a directory separator, the buffer is extended by
+as many elements the path provides.
+
+On Windows, both forward slashes and backslashes are treated as
+directory separators. On other platforms, %G_DIR_SEPARATOR_S is the
+only directory separator.
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
+GPathBuf buf, cmp;
+
+g_path_buf_init_from_path (&amp;buf, &quot;/tmp&quot;);
+g_path_buf_push (&amp;buf, &quot;.X11-unix/X0&quot;);
+g_path_buf_init_from_path (&amp;cmp, &quot;/tmp/.X11-unix/X0&quot;);
+g_assert_true (g_path_buf_equal (&amp;buf, &amp;cmp));
+g_path_buf_clear (&amp;cmp);
+
+g_path_buf_push (&amp;buf, &quot;/etc/locale.conf&quot;);
+g_path_buf_init_from_path (&amp;cmp, &quot;/etc/locale.conf&quot;);
+g_assert_true (g_path_buf_equal (&amp;buf, &amp;cmp));
+g_path_buf_clear (&amp;cmp);
+
+g_path_buf_clear (&amp;buf);
+]|
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="buf">
+<parameter_description> a path buffer
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> a path
+</parameter_description>
+</parameter>
+</parameters>
+<return> the same pointer to @buf, for convenience
+
+</return>
+</function>
+
+<function name="g_path_buf_set_extension">
+<description>
+Adds an extension to the file name in the path buffer.
+
+If @extension is `NULL`, the extension will be unset.
+
+If the path buffer does not have a file name set, this function returns
+`FALSE` and leaves the path buffer unmodified.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="buf">
+<parameter_description> a path buffer
+</parameter_description>
+</parameter>
+<parameter name="extension">
+<parameter_description> the file extension
+</parameter_description>
+</parameter>
+</parameters>
+<return> `TRUE` if the extension was replaced, and `FALSE` otherwise
+
+</return>
+</function>
+
+<function name="g_path_buf_set_filename">
+<description>
+Sets the file name of the path.
+
+If the path buffer is empty, the filename is left unset and this
+function returns `FALSE`.
+
+If the path buffer only contains the root element (on Unix-like operating
+systems) or the drive (on Windows), this is the equivalent of pushing
+the new @file_name.
+
+If the path buffer contains a path, this is the equivalent of
+popping the path buffer and pushing @file_name, creating a
+sibling of the original path.
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
+GPathBuf buf, cmp;
+
+g_path_buf_init_from_path (&amp;buf, &quot;/&quot;);
+
+g_path_buf_set_filename (&amp;buf, &quot;bar&quot;);
+g_path_buf_init_from_path (&amp;cmp, &quot;/bar&quot;);
+g_assert_true (g_path_buf_equal (&amp;buf, &amp;cmp));
+g_path_buf_clear (&amp;cmp);
+
+g_path_buf_set_filename (&amp;buf, &quot;baz.txt&quot;);
+g_path_buf_init_from_path (&amp;cmp, &quot;/baz.txt&quot;);
+g_assert_true (g_path_buf_equal (&amp;buf, &amp;cmp);
+g_path_buf_clear (&amp;cmp);
+
+g_path_buf_clear (&amp;buf);
+]|
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="buf">
+<parameter_description> a path buffer
+</parameter_description>
+</parameter>
+<parameter name="file_name">
+<parameter_description> the file name in the path
+</parameter_description>
+</parameter>
+</parameters>
+<return> `TRUE` if the file name was replaced, and `FALSE` otherwise
+
+</return>
+</function>
+
+<function name="g_path_buf_to_path">
+<description>
+Retrieves the built path from the path buffer.
+
+On Windows, the result contains backslashes as directory separators,
+even if forward slashes were used in input.
+
+If the path buffer is empty, this function returns `NULL`.
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="buf">
+<parameter_description> a path buffer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the path
+
+</return>
+</function>
+
 <function name="g_path_get_basename">
 <description>
 Gets the last component of the filename.
@@ -38616,7 +39135,7 @@ Since: 2.70
 <function name="g_print">
 <description>
 Outputs a formatted message via the print handler.
-The default print handler simply outputs the message to stdout, without
+The default print handler outputs the encoded message to stdout, without
 appending a trailing new-line character. Typically, @format should end with
 its own new-line character.
 
@@ -38643,7 +39162,7 @@ g_warning() and g_error().
 <function name="g_printerr">
 <description>
 Outputs a formatted message via the error message handler.
-The default handler simply outputs the message to stderr, without appending
+The default handler outputs the encoded message to stderr, without appending
 a trailing new-line character. Typically, @format should end with its own
 new-line character.
 
@@ -45573,19 +46092,28 @@ could only be called once per process.
 
 <function name="g_set_print_handler">
 <description>
-Sets the print handler.
+Sets the print handler to @func, or resets it to the
+default GLib handler if %NULL.
 
 Any messages passed to g_print() will be output via
-the new handler. The default handler simply outputs
-the message to stdout. By providing your own handler
+the new handler. The default handler outputs
+the encoded message to stdout. By providing your own handler
 you can redirect the output, to a GTK+ widget or a
 log file for example.
+
+Since 2.76 this functions always returns a valid
+#GPrintFunc, and never returns %NULL. If no custom
+print handler was set, it will return the GLib
+default print handler and that can be re-used to
+decorate its output and/or to write to stderr
+in all platforms. Before GLib 2.76, this was %NULL.
 
 
 </description>
 <parameters>
 <parameter name="func">
-<parameter_description> the new print handler
+<parameter_description> the new print handler or %NULL to
+reset to the default
 </parameter_description>
 </parameter>
 </parameters>
@@ -45595,19 +46123,28 @@ log file for example.
 
 <function name="g_set_printerr_handler">
 <description>
-Sets the handler for printing error messages.
+Sets the handler for printing error messages to @func,
+or resets it to the default GLib handler if %NULL.
 
 Any messages passed to g_printerr() will be output via
-the new handler. The default handler simply outputs the
+the new handler. The default handler outputs the encoded
 message to stderr. By providing your own handler you can
 redirect the output, to a GTK+ widget or a log file for
 example.
+
+Since 2.76 this functions always returns a valid
+#GPrintFunc, and never returns %NULL. If no custom error
+print handler was set, it will return the GLib default
+error print handler and that can be re-used to decorate
+its output and/or to write to stderr in all platforms.
+Before GLib 2.76, this was %NULL.
 
 
 </description>
 <parameters>
 <parameter name="func">
-<parameter_description> the new error message handler
+<parameter_description> he new error message handler or %NULL
+to reset to the default
 </parameter_description>
 </parameter>
 </parameters>
@@ -47853,17 +48390,13 @@ Since: 2.48
 
 <function name="g_slice_alloc">
 <description>
-Allocates a block of memory from the slice allocator.
+Allocates a block of memory from the libc allocator.
 
 The block address handed out can be expected to be aligned
-to at least `1 * sizeof (void*)`, though in general slices
-are `2 * sizeof (void*)` bytes aligned; if a `malloc()`
-fallback implementation is used instead, the alignment may
-be reduced in a libc dependent fashion.
+to at least `1 * sizeof (void*)`.
 
-Note that the underlying slice allocation mechanism can
-be changed with the [`G_SLICE=always-malloc`][G_SLICE]
-environment variable.
+Since GLib 2.76 this always uses the system malloc() implementation
+internally.
 
 Since: 2.10
 
@@ -47883,9 +48416,10 @@ be %NULL if and only if @mem_size is 0
 <function name="g_slice_alloc0">
 <description>
 Allocates a block of memory via g_slice_alloc() and initializes
-the returned memory to 0. Note that the underlying slice allocation
-mechanism can be changed with the [`G_SLICE=always-malloc`][G_SLICE]
-environment variable.
+the returned memory to 0.
+
+Since GLib 2.76 this always uses the system malloc() implementation
+internally.
 
 Since: 2.10
 
@@ -47896,8 +48430,8 @@ Since: 2.10
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer to the allocated block, which will be %NULL if and only
-if @mem_size is 0
+<return> a pointer to the allocated block, which will be %NULL
+if and only if @mem_size is 0
 
 </return>
 </function>
@@ -47908,6 +48442,9 @@ Allocates a block of memory from the slice allocator
 and copies @block_size bytes into it from @mem_block.
 
 @mem_block must be non-%NULL if @block_size is non-zero.
+
+Since GLib 2.76 this always uses the system malloc() implementation
+internally.
 
 Since: 2.14
 
@@ -47922,8 +48459,8 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer to the allocated memory block, which will be %NULL if and
-only if @mem_size is 0
+<return> a pointer to the allocated memory block,
+which will be %NULL if and only if @mem_size is 0
 
 </return>
 </function>
@@ -47936,11 +48473,11 @@ the slice allocator.
 It calls g_slice_copy() with `sizeof (@type)`
 and casts the returned pointer to a pointer of the given type,
 avoiding a type cast in the source code.
-Note that the underlying slice allocation mechanism can
-be changed with the [`G_SLICE=always-malloc`][G_SLICE]
-environment variable.
 
 This can never return %NULL.
+
+Since GLib 2.76 this always uses the system malloc() implementation
+internally.
 
 Since: 2.14
 
@@ -47969,10 +48506,11 @@ been allocated from the slice allocator.
 It calls g_slice_free1() using `sizeof (type)`
 as the block size.
 Note that the exact release behaviour can be changed with the
-[`G_DEBUG=gc-friendly`][G_DEBUG] environment variable, also see
-[`G_SLICE`][G_SLICE] for related debugging options.
+[`G_DEBUG=gc-friendly`][G_DEBUG] environment variable.
 
 If @mem is %NULL, this macro does nothing.
+
+Since GLib 2.76 this always uses the system free() implementation internally.
 
 Since: 2.10
 
@@ -47998,9 +48536,12 @@ The memory must have been allocated via g_slice_alloc() or
 g_slice_alloc0() and the @block_size has to match the size
 specified upon allocation. Note that the exact release behaviour
 can be changed with the [`G_DEBUG=gc-friendly`][G_DEBUG] environment
-variable, also see [`G_SLICE`][G_SLICE] for related debugging options.
+variable.
 
 If @mem_block is %NULL, this function does nothing.
+
+Since GLib 2.76 this always uses the system free_sized() implementation
+internally.
 
 Since: 2.10
 
@@ -48027,10 +48568,11 @@ g_slice_alloc() or g_slice_alloc0() and linked together by
 a @next pointer (similar to #GSList). The name of the
 @next field in @type is passed as third argument.
 Note that the exact release behaviour can be changed with the
-[`G_DEBUG=gc-friendly`][G_DEBUG] environment variable, also see
-[`G_SLICE`][G_SLICE] for related debugging options.
+[`G_DEBUG=gc-friendly`][G_DEBUG] environment variable.
 
 If @mem_chain is %NULL, this function does nothing.
+
+Since GLib 2.76 this always uses the system free() implementation internally.
 
 Since: 2.10
 
@@ -48061,10 +48603,12 @@ g_slice_alloc() or g_slice_alloc0() and linked together by a
 @next pointer (similar to #GSList). The offset of the @next
 field in each block is passed as third argument.
 Note that the exact release behaviour can be changed with the
-[`G_DEBUG=gc-friendly`][G_DEBUG] environment variable, also see
-[`G_SLICE`][G_SLICE] for related debugging options.
+[`G_DEBUG=gc-friendly`][G_DEBUG] environment variable.
 
 If @mem_chain is %NULL, this function does nothing.
+
+Since GLib 2.76 this always uses the system free_sized() implementation
+internally.
 
 Since: 2.10
 
@@ -48093,12 +48637,13 @@ slice allocator.
 
 It calls g_slice_alloc() with `sizeof (@type)` and casts the
 returned pointer to a pointer of the given type, avoiding a type
-cast in the source code. Note that the underlying slice allocation
-mechanism can be changed with the [`G_SLICE=always-malloc`][G_SLICE]
-environment variable.
+cast in the source code.
 
 This can never return %NULL as the minimum allocation size from
 `sizeof (@type)` is 1 byte.
+
+Since GLib 2.76 this always uses the system malloc() implementation
+internally.
 
 Since: 2.10
 
@@ -48123,12 +48668,12 @@ slice allocator and set the memory to 0.
 It calls g_slice_alloc0() with `sizeof (@type)`
 and casts the returned pointer to a pointer of the given type,
 avoiding a type cast in the source code.
-Note that the underlying slice allocation mechanism can
-be changed with the [`G_SLICE=always-malloc`][G_SLICE]
-environment variable.
 
 This can never return %NULL as the minimum allocation size from
 `sizeof (@type)` is 1 byte.
+
+Since GLib 2.76 this always uses the system malloc() implementation
+internally.
 
 Since: 2.10
 
@@ -49069,7 +49614,8 @@ the @context is running in.
 </parameter_description>
 </parameter>
 <parameter name="context">
-<parameter_description> a #GMainContext (if %NULL, the default context will be used)
+<parameter_description> a #GMainContext (if %NULL, the global-default
+main context will be used)
 </parameter_description>
 </parameter>
 </parameters>
@@ -52624,6 +53170,9 @@ If @free_segment is %TRUE it also frees the character data.  If
 it's %FALSE, the caller gains ownership of the buffer and must
 free it after use with g_free().
 
+Instead of passing %FALSE to this function, consider using
+g_string_free_and_steal().
+
 
 </description>
 <parameters>
@@ -52638,6 +53187,27 @@ free it after use with g_free().
 </parameters>
 <return> the character data of @string
 (i.e. %NULL if @free_segment is %TRUE)
+</return>
+</function>
+
+<function name="g_string_free_and_steal">
+<description>
+Frees the memory allocated for the #GString.
+
+The caller gains ownership of the buffer and
+must free it after use with g_free().
+
+Since: 2.76
+
+</description>
+<parameters>
+<parameter name="string">
+<parameter_description> a #GString
+</parameter_description>
+</parameter>
+</parameters>
+<return> the character data of @string
+
 </return>
 </function>
 
@@ -55477,8 +56047,9 @@ g_test_trap_assert_stderr (&quot;*semagic43*&quot;);
 Since: 2.16
 
 Deprecated: This function is implemented only on Unix platforms,
-and is not always reliable due to problems inherent in
-fork-without-exec. Use g_test_trap_subprocess() instead.
+is not always reliable due to problems inherent in fork-without-exec
+and doesn't set close-on-exec flag on its file descriptors.
+Use g_test_trap_subprocess() instead.
 
 </description>
 <parameters>
@@ -56084,6 +56655,11 @@ not be -1 for exclusive thread pools. Besides, exclusive thread
 pools are not affected by g_thread_pool_set_max_idle_time()
 since their threads are never considered idle and returned to the
 global pool.
+
+Note that the threads used by exclusive threadpools will all inherit the
+scheduler settings of the current thread while the threads used by
+non-exclusive threadpools will inherit the scheduler settings from the
+first thread that created such a threadpool.
 
 @error can be %NULL to ignore errors, or non-%NULL to report
 errors. An error can only occur when @exclusive is set to %TRUE

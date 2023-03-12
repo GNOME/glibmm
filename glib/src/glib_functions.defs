@@ -8151,6 +8151,15 @@
   )
 )
 
+(define-function g_free_sized
+  (c-name "g_free_sized")
+  (return-type "none")
+  (parameters
+    '("gpointer" "mem")
+    '("size_t" "size")
+  )
+)
+
 (define-function g_clear_pointer
   (c-name "g_clear_pointer")
   (return-type "none")
@@ -8291,6 +8300,16 @@
   (return-type "none")
   (parameters
     '("gpointer" "mem")
+  )
+)
+
+(define-function g_aligned_free_sized
+  (c-name "g_aligned_free_sized")
+  (return-type "none")
+  (parameters
+    '("gpointer" "mem")
+    '("size_t" "alignment")
+    '("size_t" "size")
   )
 )
 
@@ -9152,6 +9171,117 @@
   (return-type "none")
   (parameters
     '("const-gchar*" "domain")
+  )
+)
+
+
+
+;; From gpathbuf.h
+
+(define-function g_path_buf_new
+  (c-name "g_path_buf_new")
+  (is-constructor-of "GPathBuf")
+  (return-type "GPathBuf*")
+)
+
+(define-function g_path_buf_new_from_path
+  (c-name "g_path_buf_new_from_path")
+  (return-type "GPathBuf*")
+  (parameters
+    '("const-char*" "path")
+  )
+)
+
+(define-method init
+  (of-object "GPathBuf")
+  (c-name "g_path_buf_init")
+  (return-type "GPathBuf*")
+)
+
+(define-method init_from_path
+  (of-object "GPathBuf")
+  (c-name "g_path_buf_init_from_path")
+  (return-type "GPathBuf*")
+  (parameters
+    '("const-char*" "path")
+  )
+)
+
+(define-method clear
+  (of-object "GPathBuf")
+  (c-name "g_path_buf_clear")
+  (return-type "none")
+)
+
+(define-method clear_to_path
+  (of-object "GPathBuf")
+  (c-name "g_path_buf_clear_to_path")
+  (return-type "char*")
+)
+
+(define-method free
+  (of-object "GPathBuf")
+  (c-name "g_path_buf_free")
+  (return-type "none")
+)
+
+(define-method free_to_path
+  (of-object "GPathBuf")
+  (c-name "g_path_buf_free_to_path")
+  (return-type "char*")
+)
+
+(define-method copy
+  (of-object "GPathBuf")
+  (c-name "g_path_buf_copy")
+  (return-type "GPathBuf*")
+)
+
+(define-method push
+  (of-object "GPathBuf")
+  (c-name "g_path_buf_push")
+  (return-type "GPathBuf*")
+  (parameters
+    '("const-char*" "path")
+  )
+)
+
+(define-method pop
+  (of-object "GPathBuf")
+  (c-name "g_path_buf_pop")
+  (return-type "gboolean")
+)
+
+(define-method set_filename
+  (of-object "GPathBuf")
+  (c-name "g_path_buf_set_filename")
+  (return-type "gboolean")
+  (parameters
+    '("const-char*" "file_name")
+  )
+)
+
+(define-method set_extension
+  (of-object "GPathBuf")
+  (c-name "g_path_buf_set_extension")
+  (return-type "gboolean")
+  (parameters
+    '("const-char*" "extension")
+  )
+)
+
+(define-method to_path
+  (of-object "GPathBuf")
+  (c-name "g_path_buf_to_path")
+  (return-type "char*")
+)
+
+(define-function g_path_buf_equal
+  (c-name "g_path_buf_equal")
+  (return-type "gboolean")
+  (parameters
+    '("gconstpointer" "v1")
+    '("gconstpointer" "v2")
   )
 )
 
@@ -11966,14 +12096,6 @@
   )
 )
 
-(define-function g_strdup
-  (c-name "g_strdup")
-  (return-type "gchar*")
-  (parameters
-    '("const-gchar*" "str")
-  )
-)
-
 (define-function g_strdup_printf
   (c-name "g_strdup_printf")
   (return-type "gchar*")
@@ -12278,13 +12400,10 @@
   )
 )
 
-(define-method free
+(define-method free_and_steal
   (of-object "GString")
-  (c-name "g_string_free")
+  (c-name "g_string_free_and_steal")
   (return-type "gchar*")
-  (parameters
-    '("gboolean" "free_segment")
-  )
 )
 
 (define-method free_to_bytes
@@ -12552,15 +12671,6 @@
     '("const-gchar*" "unescaped")
     '("const-gchar*" "reserved_chars_allowed")
     '("gboolean" "allow_utf8")
-  )
-)
-
-(define-method append_c_inline
-  (of-object "GString")
-  (c-name "g_string_append_c_inline")
-  (return-type "GString*")
-  (parameters
-    '("gchar" "c")
   )
 )
 
