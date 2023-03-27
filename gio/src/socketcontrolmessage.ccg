@@ -17,6 +17,23 @@
 #include <gio/gio.h>
 #include <glibmm/exceptionhandler.h>
 
+namespace // anonymous
+{
+using SocketControlMessage_deserialize_vfunc_functype = GSocketControlMessage* (*)
+  (int level, int type, gsize size, gpointer data);
+
+SocketControlMessage_deserialize_vfunc_functype SocketControlMessage_deserialize_vfunc_funcptr;
+
+extern "C"
+{
+static GSocketControlMessage*
+SocketControlMessage_deserialize_vfunc_c_callback(int level, int type, gsize size, gpointer data)
+{
+  return SocketControlMessage_deserialize_vfunc_funcptr(level, type, size, data);
+}
+} // extern "C"
+} // anonymous namespace
+
 namespace Gio
 {
 // static

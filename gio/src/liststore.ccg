@@ -21,6 +21,9 @@ namespace
 {
 extern "C"
 {
+// Non-static functions with C linkage get external linkage, even if they are
+// defined in an anonymous namespace.
+//TODO: Declare 'static' when we can break ABI.
 int ListStoreBase_CompareDataFunc(gconstpointer a, gconstpointer b, gpointer user_data)
 {
   auto slot = static_cast<Gio::ListStoreBase::SlotCompare*>(user_data);
@@ -33,6 +36,7 @@ int ListStoreBase_CompareDataFunc(gconstpointer a, gconstpointer b, gpointer use
   return (*slot)(item_a, item_b);
 }
 
+//TODO: Declare 'static' when we can break ABI.
 // gboolean is int
 gboolean ListStoreBase_EqualFuncFull(gconstpointer a, gconstpointer b, gpointer user_data)
 {
@@ -45,7 +49,7 @@ gboolean ListStoreBase_EqualFuncFull(gconstpointer a, gconstpointer b, gpointer 
 
   return (*slot)(item_a, item_b);
 }
-}
+} // extern "C"
 } // anonymous namespace
 
 namespace Gio

@@ -33,7 +33,11 @@ struct SettingsMapSlots
   Gio::Settings::SlotSetMapping from_property_to_setting;
 };
 
-gboolean
+extern "C"
+{
+// Shall be static. Non-static functions with C linkage get external linkage,
+// even if they are defined in an anonymous namespace.
+static gboolean
 Settings_get_mapping_callback(
   GValue* to_value, GVariant* from_variant, gpointer user_data)
 {
@@ -52,7 +56,7 @@ Settings_get_mapping_callback(
   return result;
 }
 
-GVariant*
+static GVariant*
 Settings_set_mapping_callback(
   const GValue* from_value, const GVariantType* expected_type, gpointer user_data)
 {
@@ -71,12 +75,12 @@ Settings_set_mapping_callback(
   return result;
 }
 
-void
+static void
 Settings_map_callback_destroy(gpointer user_data)
 {
   delete static_cast<SettingsMapSlots*>(user_data);
 }
-
+} // extern "C"
 } // anonymous namespace
 
 namespace Gio

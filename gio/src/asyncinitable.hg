@@ -105,13 +105,15 @@ protected:
 
   /** @throw Glib::Errror.
    */
-    virtual bool init_finish_vfunc(const Glib::RefPtr<AsyncResult>& res);
+  virtual bool init_finish_vfunc(const Glib::RefPtr<AsyncResult>& res);
 
 protected:
 #m4begin
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
-  klass->init_async = &init_async_vfunc_callback;
-  klass->init_finish = &init_finish_vfunc_callback;
+  klass->init_async = &AsyncInitable_init_async_vfunc_c_callback;
+  klass->init_finish = &AsyncInitable_init_finish_vfunc_c_callback;
+  AsyncInitable_init_async_vfunc_funcptr = &init_async_vfunc_callback;
+  AsyncInitable_init_finish_vfunc_funcptr = &init_finish_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
   static void init_async_vfunc_callback(GAsyncInitable* self,
     int io_priority, GCancellable* cancellable, GAsyncReadyCallback callback,

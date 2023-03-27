@@ -18,7 +18,9 @@
 
 namespace
 {
-GType get_proxy_type_callback(GDBusObjectManagerClient* manager,
+extern "C"
+{
+static GType get_proxy_type_callback(GDBusObjectManagerClient* manager,
   const gchar* object_path, const gchar* interface_name, gpointer user_data)
 {
   auto slot_proxy_type = static_cast<Gio::DBus::ObjectManagerClient::SlotProxyType*>(user_data);
@@ -35,6 +37,11 @@ GType get_proxy_type_callback(GDBusObjectManagerClient* manager,
   return 0;
 }
 
+static void proxy_type_callback_delete(void* data)
+{
+  delete static_cast<Gio::DBus::ObjectManagerClient::SlotProxyType*>(data);
+}
+} // extern "C"
 } // anonymous namespace
 
 namespace Gio
@@ -56,7 +63,7 @@ ObjectManagerClient::ObjectManagerClient(const Glib::RefPtr<Connection>& connect
   "object-path", Glib::c_str_or_nullptr(object_path),
   "get-proxy-type-func", slot_proxy_type ? get_proxy_type_callback : nullptr,
   "get-proxy-type-user-data",  slot_proxy_type ? new SlotProxyType(slot_proxy_type) : nullptr,
-  "get-proxy-type-destroy-notify", slot_proxy_type ? Glib::destroy_notify_delete<SlotProxyType> : nullptr
+  "get-proxy-type-destroy-notify", slot_proxy_type ? proxy_type_callback_delete : nullptr
 )
 {
   if (slot_async_ready)
@@ -88,7 +95,7 @@ ObjectManagerClient::ObjectManagerClient(BusType bus_type,
   "object-path", Glib::c_str_or_nullptr(object_path),
   "get-proxy-type-func", slot_proxy_type ? get_proxy_type_callback : nullptr,
   "get-proxy-type-user-data",  slot_proxy_type ? new SlotProxyType(slot_proxy_type) : nullptr,
-  "get-proxy-type-destroy-notify", slot_proxy_type ? Glib::destroy_notify_delete<SlotProxyType> : nullptr
+  "get-proxy-type-destroy-notify", slot_proxy_type ? proxy_type_callback_delete : nullptr
 )
 {
   if (slot_async_ready)

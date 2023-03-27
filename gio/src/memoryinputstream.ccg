@@ -39,7 +39,11 @@ private:
   void* m_data;
 };
 
-void
+extern "C"
+{
+// Shall be static. Non-static functions with C linkage get external linkage,
+// even if they are defined in an anonymous namespace.
+static void
 destroy_data_callback(void* user_data)
 {
   auto slot_with_data = static_cast<SlotWithData*>(user_data);
@@ -56,7 +60,7 @@ destroy_data_callback(void* user_data)
 
   delete slot_with_data;
 }
-
+} // extern "C"
 } // anonymous namespace
 
 namespace Gio

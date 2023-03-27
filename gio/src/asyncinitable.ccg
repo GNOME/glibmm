@@ -20,6 +20,35 @@
 #include <giomm/cancellable.h>
 #include <giomm/slot_async.h>
 
+namespace // anonymous
+{
+using AsyncInitable_init_async_vfunc_functype = void (*) (GAsyncInitable* self,
+  int io_priority, GCancellable* cancellable, GAsyncReadyCallback callback,
+  gpointer user_data);
+using AsyncInitable_init_finish_vfunc_functype = gboolean (*) (GAsyncInitable* self,
+  GAsyncResult* res, GError** error);
+
+AsyncInitable_init_async_vfunc_functype AsyncInitable_init_async_vfunc_funcptr;
+AsyncInitable_init_finish_vfunc_functype AsyncInitable_init_finish_vfunc_funcptr;
+
+extern "C"
+{
+static void
+AsyncInitable_init_async_vfunc_c_callback(GAsyncInitable* self, int io_priority,
+  GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data)
+{
+  AsyncInitable_init_async_vfunc_funcptr(self, io_priority, cancellable, callback, user_data);
+}
+
+static gboolean
+AsyncInitable_init_finish_vfunc_c_callback(GAsyncInitable* self,
+  GAsyncResult* res, GError** error)
+{
+  return AsyncInitable_init_finish_vfunc_funcptr(self, res, error);
+}
+} // extern "C"
+} // anonymous namespace
+
 namespace Gio
 {
 

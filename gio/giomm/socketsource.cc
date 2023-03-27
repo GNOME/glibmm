@@ -22,8 +22,9 @@
 
 namespace
 {
-
-gboolean
+extern "C"
+{
+static gboolean
 giomm_generic_socket_callback(sigc::slot_base* slot, GIOCondition condition)
 {
   g_return_val_if_fail(slot != nullptr, FALSE);
@@ -40,20 +41,20 @@ giomm_generic_socket_callback(sigc::slot_base* slot, GIOCondition condition)
   return 0;
 }
 
-gboolean
+static gboolean
 giomm_signalsocket_callback(GSocket*, GIOCondition condition, void* user_data)
 {
   sigc::slot_base* const slot = Glib::Source::get_slot_from_connection_node(user_data);
   return giomm_generic_socket_callback(slot, condition);
 }
 
-gboolean
+static gboolean
 giomm_socketsource_callback(GSocket*, GIOCondition condition, void* user_data)
 {
   sigc::slot_base* const slot = Glib::Source::get_slot_from_callback_data(user_data);
   return giomm_generic_socket_callback(slot, condition);
 }
-
+} // extern "C"
 } // anonymous namespace
 
 namespace Gio
