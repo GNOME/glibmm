@@ -87,6 +87,10 @@ void append_canonical_typename(std::string& dest, const char* type_name);
 // Instantiations can be used as destroy callbacks in glib functions
 // that take a GDestroyNotify parameter, such as g_object_set_qdata_full()
 // and g_option_group_set_translate_func().
+//
+// Callbacks from C functions shall have C linkage.
+// A template cannot have C linkage. Thus, this template function is not
+// as useful as was once thought.
 template <typename T>
 void
 destroy_notify_delete(void* data)

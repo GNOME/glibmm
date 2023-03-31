@@ -399,7 +399,7 @@ Connection::get(
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_bus_get(static_cast<GBusType>(bus_type), Glib::unwrap(cancellable), &SignalProxy_async_callback,
+  g_bus_get(static_cast<GBusType>(bus_type), Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback,
     slot_copy);
 }
 
@@ -409,7 +409,7 @@ Connection::get(BusType bus_type, const SlotAsyncReady& slot)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_bus_get(static_cast<GBusType>(bus_type), nullptr, &SignalProxy_async_callback, slot_copy);
+  g_bus_get(static_cast<GBusType>(bus_type), nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -424,7 +424,7 @@ Connection::close(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& c
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_dbus_connection_close(
-    gobj(), Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    gobj(), Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -432,7 +432,7 @@ Connection::close(const SlotAsyncReady& slot)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_dbus_connection_close(gobj(), nullptr, &SignalProxy_async_callback, slot_copy);
+  g_dbus_connection_close(gobj(), nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -447,7 +447,7 @@ Connection::flush(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& c
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_dbus_connection_flush(
-    gobj(), Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    gobj(), Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -455,7 +455,7 @@ Connection::flush(const SlotAsyncReady& slot)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_dbus_connection_flush(gobj(), nullptr, &SignalProxy_async_callback, slot_copy);
+  g_dbus_connection_flush(gobj(), nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 bool
@@ -480,7 +480,7 @@ Connection::send_message_with_reply(const Glib::RefPtr<Message>& message, int ti
   volatile guint32 out_serial = 0;
   g_dbus_connection_send_message_with_reply(gobj(), Glib::unwrap(message),
     static_cast<GDBusSendMessageFlags>(message->get_flags()), timeout_msec, &out_serial,
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
   message->set_serial(out_serial);
 }
 
@@ -492,7 +492,7 @@ Connection::send_message_with_reply(
   volatile guint32 out_serial = 0;
   g_dbus_connection_send_message_with_reply(gobj(), Glib::unwrap(message),
     static_cast<GDBusSendMessageFlags>(message->get_flags()), timeout_msec, &out_serial, nullptr,
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
   message->set_serial(out_serial);
 }
 
@@ -544,7 +544,7 @@ Connection::call(const Glib::ustring& object_path, const Glib::ustring& interfac
   g_dbus_connection_call(gobj(), Glib::c_str_or_nullptr(bus_name), object_path.c_str(),
     interface_name.c_str(), method_name.c_str(), const_cast<GVariant*>(parameters.gobj()),
     reply_type.gobj(), static_cast<GDBusCallFlags>(flags), timeout_msec, Glib::unwrap(cancellable),
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 // Non-cancellable version.
@@ -562,7 +562,7 @@ Connection::call(const Glib::ustring& object_path, const Glib::ustring& interfac
   g_dbus_connection_call(gobj(), Glib::c_str_or_nullptr(bus_name), object_path.c_str(),
     interface_name.c_str(), method_name.c_str(), const_cast<GVariant*>(parameters.gobj()),
     reply_type.gobj(), static_cast<GDBusCallFlags>(flags), timeout_msec, nullptr,
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 Glib::VariantContainerBase
@@ -621,7 +621,7 @@ Connection::call(const Glib::ustring& object_path, const Glib::ustring& interfac
   g_dbus_connection_call_with_unix_fd_list(gobj(), Glib::c_str_or_nullptr(bus_name),
     object_path.c_str(), interface_name.c_str(), method_name.c_str(),
     const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(), static_cast<GDBusCallFlags>(flags),
-    timeout_msec, Glib::unwrap(fd_list), Glib::unwrap(cancellable), &SignalProxy_async_callback,
+    timeout_msec, Glib::unwrap(fd_list), Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback,
     slot_copy);
 }
 
@@ -641,7 +641,7 @@ Connection::call(const Glib::ustring& object_path, const Glib::ustring& interfac
   g_dbus_connection_call_with_unix_fd_list(gobj(), Glib::c_str_or_nullptr(bus_name),
     object_path.c_str(), interface_name.c_str(), method_name.c_str(),
     const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(), static_cast<GDBusCallFlags>(flags),
-    timeout_msec, Glib::unwrap(fd_list), nullptr, &SignalProxy_async_callback, slot_copy);
+    timeout_msec, Glib::unwrap(fd_list), nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 #endif // G_OS_UNIX
 

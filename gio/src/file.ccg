@@ -47,7 +47,7 @@ SignalProxy_file_progress_callback(
   }
 }
 
-// Same as SignalProxy_async_callback, except that this one knows that
+// Same as giomm_SignalProxy_async_callback, except that this one knows that
 // the slot is packed in a pair. The operation is assumed to be finished
 // after the callback is triggered, so we delete that pair here.
 static void
@@ -74,7 +74,7 @@ SignalProxy_file_copy_async_callback(GObject*, GAsyncResult* res, void* data)
   delete slot_pair;
 }
 
-// Same as SignalProxy_async_callback, except that this one knows that
+// Same as giomm_SignalProxy_async_callback, except that this one knows that
 // the slot is packed in a pair. The operation is assumed to be finished
 // after the callback is triggered, so we delete that pair here.
 static void
@@ -123,7 +123,7 @@ SignalProxy_load_partial_contents_read_more_callback(
   return result;
 }
 
-// Same as SignalProxy_async_callback, except that this one knows that
+// Same as giomm_SignalProxy_async_callback, except that this one knows that
 // the slot is packed in a pair. The operation is assumed to be finished
 // after the callback is triggered, so we delete that pair here.
 static void
@@ -218,7 +218,7 @@ File::read_async(const SlotAsyncReady& slot, int io_priority)
   // and deleted in the callback.
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
-  g_file_read_async(gobj(), io_priority, nullptr, &SignalProxy_async_callback, slot_copy);
+  g_file_read_async(gobj(), io_priority, nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -231,7 +231,7 @@ File::read_async(
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_read_async(
-    gobj(), io_priority, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    gobj(), io_priority, Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -244,7 +244,7 @@ File::append_to_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_append_to_async(gobj(), static_cast<GFileCreateFlags>(flags), io_priority,
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -257,7 +257,7 @@ File::append_to_async(const SlotAsyncReady& slot, CreateFlags flags, int io_prio
 
   g_file_append_to_async(gobj(), static_cast<GFileCreateFlags>(flags), io_priority,
     nullptr, // cancellable
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -270,7 +270,7 @@ File::create_file_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellab
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_create_async(gobj(), static_cast<GFileCreateFlags>(flags), io_priority,
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -283,7 +283,7 @@ File::create_file_async(const SlotAsyncReady& slot, CreateFlags flags, int io_pr
 
   g_file_create_async(gobj(), static_cast<GFileCreateFlags>(flags), io_priority,
     nullptr, // cancellable
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -296,7 +296,7 @@ File::create_file_readwrite_async(const SlotAsyncReady& slot,
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_create_async(gobj(), static_cast<GFileCreateFlags>(flags), io_priority,
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -310,7 +310,7 @@ File::create_file_readwrite_async(
 
   g_file_create_readwrite_async(gobj(), static_cast<GFileCreateFlags>(flags), io_priority,
     nullptr, // cancellable
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -324,7 +324,7 @@ File::replace_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>&
 
   g_file_replace_async(gobj(), Glib::c_str_or_nullptr(etag), make_backup,
     static_cast<GFileCreateFlags>(flags), io_priority, Glib::unwrap(cancellable),
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -339,7 +339,7 @@ File::replace_async(const SlotAsyncReady& slot, const std::string& etag, bool ma
   g_file_replace_async(gobj(), Glib::c_str_or_nullptr(etag), make_backup,
     static_cast<GFileCreateFlags>(flags), io_priority,
     nullptr, // cancellable
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -350,7 +350,7 @@ File::open_readwrite_async(const SlotAsyncReady& slot, int io_priority)
   // and deleted in the callback.
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
-  g_file_open_readwrite_async(gobj(), io_priority, nullptr, &SignalProxy_async_callback, slot_copy);
+  g_file_open_readwrite_async(gobj(), io_priority, nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -363,7 +363,7 @@ File::open_readwrite_async(
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_open_readwrite_async(
-    gobj(), io_priority, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    gobj(), io_priority, Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -378,7 +378,7 @@ File::replace_readwrite_async(const SlotAsyncReady& slot,
 
   g_file_replace_readwrite_async(gobj(), Glib::c_str_or_nullptr(etag), make_backup,
     static_cast<GFileCreateFlags>(flags), io_priority, Glib::unwrap(cancellable),
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -393,7 +393,7 @@ File::replace_readwrite_async(const SlotAsyncReady& slot, const std::string& eta
   g_file_replace_readwrite_async(gobj(), Glib::c_str_or_nullptr(etag), make_backup,
     static_cast<GFileCreateFlags>(flags), io_priority,
     nullptr, // cancellable
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 FileType
@@ -440,7 +440,7 @@ File::query_info_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellabl
 
   g_file_query_info_async(const_cast<GFile*>(gobj()), attributes.c_str(),
     static_cast<GFileQueryInfoFlags>(flags), io_priority, Glib::unwrap(cancellable),
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -455,7 +455,7 @@ File::query_info_async(const SlotAsyncReady& slot, const std::string& attributes
   g_file_query_info_async(const_cast<GFile*>(gobj()), attributes.c_str(),
     static_cast<GFileQueryInfoFlags>(flags), io_priority,
     nullptr, // cancellable
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 Glib::RefPtr<FileInfo>
@@ -494,7 +494,7 @@ File::query_filesystem_info_async(const SlotAsyncReady& slot,
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_query_filesystem_info_async(const_cast<GFile*>(gobj()), attributes.c_str(), io_priority,
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -508,7 +508,7 @@ File::query_filesystem_info_async(
 
   g_file_query_filesystem_info_async(const_cast<GFile*>(gobj()), attributes.c_str(), io_priority,
     nullptr, // cancellable
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 Glib::RefPtr<FileEnumerator>
@@ -549,7 +549,7 @@ File::enumerate_children_async(const SlotAsyncReady& slot,
 
   g_file_enumerate_children_async(gobj(), attributes.c_str(),
     static_cast<GFileQueryInfoFlags>(flags), io_priority, Glib::unwrap(cancellable),
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -562,7 +562,7 @@ File::enumerate_children_async(const SlotAsyncReady& slot, const std::string& at
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_enumerate_children_async(gobj(), attributes.c_str(),
-    static_cast<GFileQueryInfoFlags>(flags), io_priority, nullptr, &SignalProxy_async_callback,
+    static_cast<GFileQueryInfoFlags>(flags), io_priority, nullptr, &giomm_SignalProxy_async_callback,
     slot_copy);
 }
 
@@ -576,7 +576,7 @@ File::set_display_name_async(const Glib::ustring& display_name, const SlotAsyncR
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_set_display_name_async(gobj(), display_name.c_str(), io_priority,
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -589,7 +589,7 @@ File::set_display_name_async(
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_set_display_name_async(
-    gobj(), display_name.c_str(), io_priority, nullptr, &SignalProxy_async_callback, slot_copy);
+    gobj(), display_name.c_str(), io_priority, nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 bool
@@ -677,7 +677,7 @@ File::copy_async(const Glib::RefPtr<File>& destination, const SlotAsyncReady& sl
   SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
 
   g_file_copy_async(gobj(), Glib::unwrap(destination), static_cast<GFileCopyFlags>(flags),
-    io_priority, Glib::unwrap(cancellable), nullptr, nullptr, &SignalProxy_async_callback,
+    io_priority, Glib::unwrap(cancellable), nullptr, nullptr, &giomm_SignalProxy_async_callback,
     slot_ready_copy);
 }
 
@@ -709,7 +709,7 @@ File::copy_async(const Glib::RefPtr<File>& destination, const SlotAsyncReady& sl
   SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
 
   g_file_copy_async(gobj(), Glib::unwrap(destination), static_cast<GFileCopyFlags>(flags),
-    io_priority, nullptr, nullptr, nullptr, &SignalProxy_async_callback, slot_ready_copy);
+    io_priority, nullptr, nullptr, nullptr, &giomm_SignalProxy_async_callback, slot_ready_copy);
 }
 
 bool
@@ -799,7 +799,7 @@ File::move_async(const Glib::RefPtr<File>& destination, const SlotAsyncReady& sl
   SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
 
   g_file_move_async(gobj(), Glib::unwrap(destination), static_cast<GFileCopyFlags>(flags),
-    io_priority, Glib::unwrap(cancellable), nullptr, nullptr, &SignalProxy_async_callback,
+    io_priority, Glib::unwrap(cancellable), nullptr, nullptr, &giomm_SignalProxy_async_callback,
     slot_ready_copy);
 }
 
@@ -831,7 +831,7 @@ File::move_async(const Glib::RefPtr<File>& destination, const SlotAsyncReady& sl
   SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
 
   g_file_move_async(gobj(), Glib::unwrap(destination), static_cast<GFileCopyFlags>(flags),
-    io_priority, nullptr, nullptr, nullptr, &SignalProxy_async_callback, slot_ready_copy);
+    io_priority, nullptr, nullptr, nullptr, &giomm_SignalProxy_async_callback, slot_ready_copy);
 }
 void
 File::set_attributes_async(const Glib::RefPtr<FileInfo>& info, const SlotAsyncReady& slot,
@@ -843,7 +843,7 @@ File::set_attributes_async(const Glib::RefPtr<FileInfo>& info, const SlotAsyncRe
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_set_attributes_async(gobj(), Glib::unwrap(info), static_cast<GFileQueryInfoFlags>(flags),
-    io_priority, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    io_priority, Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -856,7 +856,7 @@ File::set_attributes_async(const Glib::RefPtr<FileInfo>& info, const SlotAsyncRe
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_set_attributes_async(gobj(), Glib::unwrap(info), static_cast<GFileQueryInfoFlags>(flags),
-    io_priority, nullptr, &SignalProxy_async_callback, slot_copy);
+    io_priority, nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 bool
@@ -885,7 +885,7 @@ File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation,
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_mount_mountable(gobj(), static_cast<GMountMountFlags>(flags),
-    Glib::unwrap(mount_operation), Glib::unwrap(cancellable), &SignalProxy_async_callback,
+    Glib::unwrap(mount_operation), Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback,
     slot_copy);
 }
 
@@ -899,7 +899,7 @@ File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation,
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_mount_mountable(gobj(), static_cast<GMountMountFlags>(flags),
-    Glib::unwrap(mount_operation), nullptr, &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(mount_operation), nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -911,7 +911,7 @@ File::mount_mountable(const SlotAsyncReady& slot, Mount::MountFlags flags)
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_mount_mountable(gobj(), static_cast<GMountMountFlags>(flags), nullptr, nullptr,
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -931,7 +931,7 @@ File::unmount_mountable(
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_unmount_mountable_with_operation(gobj(), static_cast<GMountUnmountFlags>(flags), nullptr,
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -943,7 +943,7 @@ File::unmount_mountable(const SlotAsyncReady& slot, Mount::UnmountFlags flags)
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_unmount_mountable_with_operation(gobj(), static_cast<GMountUnmountFlags>(flags), nullptr,
-    nullptr, &SignalProxy_async_callback, slot_copy);
+    nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -963,7 +963,7 @@ File::unmount_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellab
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_unmount_mountable_with_operation(gobj(), static_cast<GMountUnmountFlags>(flags),
-    Glib::unwrap(mount_operation), Glib::unwrap(cancellable), &SignalProxy_async_callback,
+    Glib::unwrap(mount_operation), Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback,
     slot_copy);
 }
 
@@ -977,7 +977,7 @@ File::unmount_mountable(const SlotAsyncReady& slot,
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_unmount_mountable_with_operation(gobj(), static_cast<GMountUnmountFlags>(flags),
-    Glib::unwrap(mount_operation), nullptr, &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(mount_operation), nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -998,7 +998,7 @@ File::mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_mount_enclosing_volume(gobj(), static_cast<GMountMountFlags>(flags),
-    Glib::unwrap(mount_operation), Glib::unwrap(cancellable), &SignalProxy_async_callback,
+    Glib::unwrap(mount_operation), Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback,
     slot_copy);
 }
 
@@ -1012,7 +1012,7 @@ File::mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_mount_enclosing_volume(gobj(), static_cast<GMountMountFlags>(flags),
-    Glib::unwrap(mount_operation), nullptr, &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(mount_operation), nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1024,7 +1024,7 @@ File::mount_enclosing_volume(const SlotAsyncReady& slot, Mount::MountFlags flags
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_mount_enclosing_volume(gobj(), static_cast<GMountMountFlags>(flags), nullptr, nullptr,
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1044,7 +1044,7 @@ File::eject_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_eject_mountable_with_operation(gobj(), static_cast<GMountUnmountFlags>(flags),
-    Glib::unwrap(mount_operation), Glib::unwrap(cancellable), &SignalProxy_async_callback,
+    Glib::unwrap(mount_operation), Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback,
     slot_copy);
 }
 
@@ -1058,7 +1058,7 @@ File::eject_mountable(const SlotAsyncReady& slot,
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_eject_mountable_with_operation(gobj(), static_cast<GMountUnmountFlags>(flags),
-    Glib::unwrap(mount_operation), nullptr, &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(mount_operation), nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1078,7 +1078,7 @@ File::eject_mountable(
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_eject_mountable_with_operation(gobj(), static_cast<GMountUnmountFlags>(flags), nullptr,
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1090,7 +1090,7 @@ File::eject_mountable(const SlotAsyncReady& slot, Mount::UnmountFlags flags)
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_eject_mountable_with_operation(gobj(), static_cast<GMountUnmountFlags>(flags), nullptr,
-    nullptr, &SignalProxy_async_callback, slot_copy);
+    nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1109,7 +1109,7 @@ File::load_contents_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancell
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_load_contents_async(
-    gobj(), Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    gobj(), Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1120,7 +1120,7 @@ File::load_contents_async(const SlotAsyncReady& slot)
   // and deleted in the callback.
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
-  g_file_load_contents_async(gobj(), nullptr, &SignalProxy_async_callback, slot_copy);
+  g_file_load_contents_async(gobj(), nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1241,7 +1241,7 @@ File::replace_contents_async(const SlotAsyncReady& slot,
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_replace_contents_async(gobj(), contents, length, Glib::c_str_or_nullptr(etag), make_backup,
-    static_cast<GFileCreateFlags>(flags), Glib::unwrap(cancellable), &SignalProxy_async_callback,
+    static_cast<GFileCreateFlags>(flags), Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback,
     slot_copy);
 }
 
@@ -1255,7 +1255,7 @@ File::replace_contents_async(const SlotAsyncReady& slot, const char* contents, g
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_replace_contents_async(gobj(), contents, length, Glib::c_str_or_nullptr(etag), make_backup,
-    static_cast<GFileCreateFlags>(flags), nullptr, &SignalProxy_async_callback, slot_copy);
+    static_cast<GFileCreateFlags>(flags), nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1270,7 +1270,7 @@ File::replace_contents_async(const SlotAsyncReady& slot,
 
   g_file_replace_contents_async(gobj(), contents.c_str(), contents.size(),
     Glib::c_str_or_nullptr(etag), make_backup, static_cast<GFileCreateFlags>(flags),
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1284,7 +1284,7 @@ File::replace_contents_async(const SlotAsyncReady& slot, const std::string& cont
 
   g_file_replace_contents_async(gobj(), contents.c_str(), contents.size(),
     Glib::c_str_or_nullptr(etag), make_backup, static_cast<GFileCreateFlags>(flags), nullptr,
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1323,7 +1323,7 @@ File::replace_contents_bytes_async(const SlotAsyncReady& slot,
 
   g_file_replace_contents_bytes_async(gobj(), const_cast<GBytes*>(Glib::unwrap(contents)),
     Glib::c_str_or_nullptr(etag), make_backup, static_cast<GFileCreateFlags>(flags),
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1338,7 +1338,7 @@ File::replace_contents_bytes_async(const SlotAsyncReady& slot,
 
   g_file_replace_contents_bytes_async(gobj(), const_cast<GBytes*>(Glib::unwrap(contents)),
     Glib::c_str_or_nullptr(etag), make_backup, static_cast<GFileCreateFlags>(flags), nullptr,
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 Glib::RefPtr<FileOutputStream>
@@ -1511,7 +1511,7 @@ File::start_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_start_mountable(gobj(), ((GDriveStartFlags)(flags)), Glib::unwrap(start_operation),
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1524,7 +1524,7 @@ File::start_mountable(const SlotAsyncReady& slot,
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_start_mountable(gobj(), ((GDriveStartFlags)(flags)), Glib::unwrap(start_operation),
-    nullptr, &SignalProxy_async_callback, slot_copy);
+    nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1537,7 +1537,7 @@ File::stop_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_stop_mountable(gobj(), ((GMountUnmountFlags)(flags)), Glib::unwrap(start_operation),
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1550,7 +1550,7 @@ File::stop_mountable(const SlotAsyncReady& slot,
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_stop_mountable(gobj(), ((GMountUnmountFlags)(flags)), Glib::unwrap(start_operation),
-    nullptr, &SignalProxy_async_callback, slot_copy);
+    nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1561,7 +1561,7 @@ File::poll_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>
   // and deleted in the callback.
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
-  g_file_poll_mountable(gobj(), Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+  g_file_poll_mountable(gobj(), Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1572,7 +1572,7 @@ File::poll_mountable(const SlotAsyncReady& slot)
   // and deleted in the callback.
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
-  g_file_poll_mountable(gobj(), nullptr, &SignalProxy_async_callback, slot_copy);
+  g_file_poll_mountable(gobj(), nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1585,7 +1585,7 @@ File::find_enclosing_mount_async(
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_find_enclosing_mount_async(
-    gobj(), io_priority, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    gobj(), io_priority, Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -1597,7 +1597,7 @@ File::find_enclosing_mount_async(const SlotAsyncReady& slot, int io_priority)
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_find_enclosing_mount_async(
-    gobj(), io_priority, nullptr, &SignalProxy_async_callback, slot_copy);
+    gobj(), io_priority, nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 bool
@@ -1856,7 +1856,7 @@ File::remove_async(
   SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
 
   g_file_delete_async(
-    gobj(), io_priority, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_ready_copy);
+    gobj(), io_priority, Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_ready_copy);
 }
 
 void
@@ -1867,7 +1867,7 @@ File::remove_async(const SlotAsyncReady& slot_ready, int io_priority)
   // and deleted in the corresponding callback.
   SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
 
-  g_file_delete_async(gobj(), io_priority, nullptr, &SignalProxy_async_callback, slot_ready_copy);
+  g_file_delete_async(gobj(), io_priority, nullptr, &giomm_SignalProxy_async_callback, slot_ready_copy);
 }
 
 void
@@ -1880,7 +1880,7 @@ File::trash_async(
   SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
 
   g_file_trash_async(
-    gobj(), io_priority, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_ready_copy);
+    gobj(), io_priority, Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_ready_copy);
 }
 
 void
@@ -1891,7 +1891,7 @@ File::trash_async(const SlotAsyncReady& slot_ready, int io_priority)
   // and deleted in the corresponding callback.
   SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
 
-  g_file_trash_async(gobj(), io_priority, nullptr, &SignalProxy_async_callback, slot_ready_copy);
+  g_file_trash_async(gobj(), io_priority, nullptr, &giomm_SignalProxy_async_callback, slot_ready_copy);
 }
 
 void
@@ -1904,7 +1904,7 @@ File::make_directory_async(
   SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
 
   g_file_make_directory_async(
-    gobj(), io_priority, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_ready_copy);
+    gobj(), io_priority, Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_ready_copy);
 }
 
 void
@@ -1916,7 +1916,7 @@ File::make_directory_async(const SlotAsyncReady& slot_ready, int io_priority)
   SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
 
   g_file_make_directory_async(
-    gobj(), io_priority, nullptr, &SignalProxy_async_callback, slot_ready_copy);
+    gobj(), io_priority, nullptr, &giomm_SignalProxy_async_callback, slot_ready_copy);
 }
 
 } // namespace Gio

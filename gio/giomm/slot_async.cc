@@ -20,9 +20,14 @@
 
 namespace Gio
 {
-
+extern "C"
+{
+// A function with external linkage and C linkage does not get a mangled name.
+// Even though giomm_SignalProxy_async_callback is declared in a named namespace,
+// the linker does not see the namespace name, only 'giomm_SignalProxy_async_callback'.
+// Therefore the function name shall have a prefix, hopefully unique.
 void
-SignalProxy_async_callback(GObject*, GAsyncResult* res, void* data)
+giomm_SignalProxy_async_callback(GObject*, GAsyncResult* res, void* data)
 {
   Gio::SlotAsyncReady* the_slot = static_cast<Gio::SlotAsyncReady*>(data);
 
@@ -37,6 +42,14 @@ SignalProxy_async_callback(GObject*, GAsyncResult* res, void* data)
   }
 
   delete the_slot;
+}
+} // extern "C"
+
+//TODO: Remove SignalProxy_async_callback when we can break ABI and API.
+void
+SignalProxy_async_callback(GObject* source_object, GAsyncResult* res, void* data)
+{
+  giomm_SignalProxy_async_callback(source_object, res, data);
 }
 
 } // namespace Gio

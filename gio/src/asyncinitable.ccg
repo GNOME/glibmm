@@ -62,7 +62,7 @@ AsyncInitable::init_async(
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_async_initable_init_async(
-    gobj(), io_priority, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    gobj(), io_priority, Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -73,7 +73,7 @@ AsyncInitable::init_async(const SlotAsyncReady& slot, int io_priority)
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_async_initable_init_async(gobj(), io_priority, nullptr, &SignalProxy_async_callback, slot_copy);
+  g_async_initable_init_async(gobj(), io_priority, nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -134,7 +134,7 @@ Gio::AsyncInitable::init_async_vfunc(
   if (base && base->init_async)
   {
     (*base->init_async)(gobj(), io_priority, const_cast<GCancellable*>(Glib::unwrap(cancellable)),
-      &SignalProxy_async_callback, const_cast<SlotAsyncReady*>(&slot));
+      &giomm_SignalProxy_async_callback, const_cast<SlotAsyncReady*>(&slot));
   }
 }
 gboolean

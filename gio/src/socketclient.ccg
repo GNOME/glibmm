@@ -31,7 +31,7 @@ SocketClient::connect_async(const Glib::RefPtr<SocketConnectable>& connectable,
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_socket_client_connect_async(
-    gobj(), connectable->gobj(), Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    gobj(), connectable->gobj(), Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -40,11 +40,11 @@ SocketClient::connect_async(
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
-  // and deleted in the callback.
+  // and deleted in the callback.SignalProxy_async_callback
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_socket_client_connect_async(
-    gobj(), connectable->gobj(), nullptr, &SignalProxy_async_callback, slot_copy);
+    gobj(), connectable->gobj(), nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -57,7 +57,7 @@ SocketClient::connect_to_host_async(const Glib::ustring& host_and_port, guint16 
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_socket_client_connect_to_host_async(gobj(), host_and_port.c_str(), default_port,
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -70,7 +70,7 @@ SocketClient::connect_to_host_async(
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_socket_client_connect_to_host_async(
-    gobj(), host_and_port.c_str(), default_port, nullptr, &SignalProxy_async_callback, slot_copy);
+    gobj(), host_and_port.c_str(), default_port, nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -83,7 +83,7 @@ SocketClient::connect_to_service_async(const Glib::ustring& domain, const Glib::
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_socket_client_connect_to_service_async(gobj(), domain.c_str(), service.c_str(),
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    Glib::unwrap(cancellable), &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -96,7 +96,7 @@ SocketClient::connect_to_service_async(
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_socket_client_connect_to_service_async(
-    gobj(), domain.c_str(), service.c_str(), nullptr, &SignalProxy_async_callback, slot_copy);
+    gobj(), domain.c_str(), service.c_str(), nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -109,7 +109,7 @@ SocketClient::connect_to_uri_async(const Glib::ustring& uri, guint16 default_por
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_socket_client_connect_to_uri_async(gobj(), uri.c_str(), default_port, Glib::unwrap(cancellable),
-    &SignalProxy_async_callback, slot_copy);
+    &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -122,7 +122,7 @@ SocketClient::connect_to_uri_async(
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_socket_client_connect_to_uri_async(
-    gobj(), uri.c_str(), default_port, nullptr, &SignalProxy_async_callback, slot_copy);
+    gobj(), uri.c_str(), default_port, nullptr, &giomm_SignalProxy_async_callback, slot_copy);
 }
 
 } // namespace Gio

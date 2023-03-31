@@ -24,14 +24,34 @@
 
 namespace Gio
 {
-
+extern "C"
+{
 /** Callback function, used in combination with Gio::SlotAsyncReady.
  *
  * Example:
  * @code
- * _WRAP_METHOD(void acquire_async(const SlotAsyncReady& slot{callback},
- *   const Glib::RefPtr<Cancellable>& cancellable{.?}), g_permission_acquire_async,
- *   slot_name slot, slot_callback SignalProxy_async_callback)
+ * _WRAP_METHOD(void acquire_async(const Gio::SlotAsyncReady& slot{callback},
+ *   const Glib::RefPtr<Gio::Cancellable>& cancellable{.?}), g_permission_acquire_async,
+ *   slot_name slot, slot_callback Gio::giomm_SignalProxy_async_callback)
+ * @endcode
+ *
+ * @newin{2,78}
+ */
+GIOMM_API
+void giomm_SignalProxy_async_callback(GObject*, GAsyncResult* res, void* data);
+
+} // extern "C"
+
+//TODO: Remove SignalProxy_async_callback when we can break ABI and API.
+/** Callback function, used in combination with Gio::SlotAsyncReady.
+ *
+ * Prefer giomm_SignalProxy_async_callback() as a callback from a C function.
+ *
+ * Example:
+ * @code
+ * _WRAP_METHOD(void acquire_async(const Gio::SlotAsyncReady& slot{callback},
+ *   const Glib::RefPtr<Gio::Cancellable>& cancellable{.?}), g_permission_acquire_async,
+ *   slot_name slot, slot_callback Gio::SignalProxy_async_callback)
  * @endcode
  */
 GIOMM_API
