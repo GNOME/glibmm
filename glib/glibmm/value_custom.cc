@@ -17,16 +17,49 @@
 #include <glibmm/value.h>
 #include <glibmm/utility.h>
 #include <glib.h>
+#include <map>
 
 namespace
 {
+std::map<GType, Glib::ValueInitCppFuncType> custom_init_funcmap;
+std::map<GType, Glib::ValueFreeCppFuncType> custom_free_funcmap;
+std::map<GType, Glib::ValueCopyCppFuncType> custom_copy_funcmap;
+
+extern "C"
+{
+static void Value_custom_init_func(GValue* value)
+{
+  Glib::ValueInitCppFuncType init_func = custom_init_funcmap[G_VALUE_TYPE(value)];
+  if (init_func)
+    init_func(value);
+  else
+    g_critical("Value_custom_init_func(): No init_func for GValue %s\n", G_VALUE_TYPE_NAME(value));
+}
+static void Value_custom_free_func(GValue* value)
+{
+  Glib::ValueFreeCppFuncType free_func = custom_free_funcmap[G_VALUE_TYPE(value)];
+  if (free_func)
+    free_func(value);
+  else
+    g_critical("Value_custom_free_func(): No free_func for GValue %s\n", G_VALUE_TYPE_NAME(value));
+}
+static void Value_custom_copy_func(const GValue* src_value, GValue* dest_value)
+{
+  Glib::ValueCopyCppFuncType copy_func = custom_copy_funcmap[G_VALUE_TYPE(src_value)];
+  if (copy_func)
+    copy_func(src_value, dest_value);
+  else
+    g_critical("Value_custom_copy_func(): No copy_func for GValue %s\n", G_VALUE_TYPE_NAME(src_value));
+}
+} // extern "C"
 
 static void
 warn_already_registered(const char* location, const std::string& full_name)
 {
   g_warning("file %s: (%s): The type name `%s' has been registered already.\n"
-            "This is not supposed to happen -- please send a mail with detailed "
-            "information about your platform to gtkmm-list@gnome.org.  Thanks.\n",
+            "This is not supposed to happen -- please create an issue with "
+            "detailed information about your platform\n"
+            "at https://gitlab.gnome.org/GNOME/glibmm/-/issues. Thanks.\n",
     __FILE__, location, full_name.c_str());
 }
 
@@ -35,6 +68,22 @@ warn_already_registered(const char* location, const std::string& full_name)
 namespace Glib
 {
 
+GType
+custom_boxed_type_cpp_register(const char* type_name,
+  ValueInitCppFuncType init_func, ValueFreeCppFuncType free_func,
+  ValueCopyCppFuncType copy_func)
+{
+  const GType custom_gtype = custom_boxed_type_register(type_name,
+    &Value_custom_init_func, &Value_custom_free_func, &Value_custom_copy_func);
+  custom_init_funcmap[custom_gtype] = init_func;
+  custom_free_funcmap[custom_gtype] = free_func;
+  custom_copy_funcmap[custom_gtype] = copy_func;
+  return custom_gtype;
+}
+
+//TODO: When we can break ABI, move the contents of custom_boxed_type_register()
+// (with small modifications) to custom_boxed_type_cpp_register() and
+// remove custom_boxed_type_register().
 GType
 custom_boxed_type_register(
   const char* type_name, ValueInitFunc init_func, ValueFreeFunc free_func, ValueCopyFunc copy_func)
@@ -61,6 +110,8 @@ custom_boxed_type_register(
   // destroy, and copy arbitrary objects of the C++ type.
 
   const GTypeValueTable value_table = {
+    //TODO: When moved to custom_boxed_type_cpp_register():
+    // &Value_custom_init_func, &Value_custom_free_func, &Value_custom_copy_func,
     init_func, free_func, copy_func,
     nullptr, // value_peek_pointer
     nullptr, // collect_format

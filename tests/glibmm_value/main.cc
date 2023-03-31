@@ -28,6 +28,13 @@ test()
 
     const auto v = value.get();
     assert(v.bar == 1);
+
+    // Make a copy
+    Glib::Value<Foo> value2;
+    value2.init(Glib::Value<Foo>::value_type()); // TODO: Avoid this step?
+    value2 = value;
+    const auto v2 = value2.get();
+    assert(v2.bar == 1);
   }
 
   {

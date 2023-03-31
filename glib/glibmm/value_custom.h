@@ -33,11 +33,16 @@ namespace Glib
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
+//TODO: When we can break ABI, remove these extern "C" typedefs and
+// custom_boxed_type_register().
 extern "C" {
 typedef void (*ValueInitFunc)(GValue*);
 typedef void (*ValueFreeFunc)(GValue*);
 typedef void (*ValueCopyFunc)(const GValue*, GValue*);
 }
+using ValueInitCppFuncType = void (*) (GValue*);
+using ValueFreeCppFuncType = void (*) (GValue*);
+using ValueCopyCppFuncType = void (*) (const GValue*, GValue*);
 
 /* When using Glib::Value<T> with custom types, each T will be registered
  * as subtype of G_TYPE_BOXED, via this function.  The type_name argument
@@ -45,8 +50,14 @@ typedef void (*ValueCopyFunc)(const GValue*, GValue*);
  */
 
 GLIBMM_API
+GType custom_boxed_type_cpp_register(
+  const char* type_name, ValueInitCppFuncType init_func,
+  ValueFreeCppFuncType free_func, ValueCopyCppFuncType copy_func);
+
+GLIBMM_API
 GType custom_boxed_type_register(
-  const char* type_name, ValueInitFunc init_func, ValueFreeFunc free_func, ValueCopyFunc copy_func);
+  const char* type_name, ValueInitFunc init_func,
+  ValueFreeFunc free_func, ValueCopyFunc copy_func);
 
 /* When using Glib::Value<T*> or Glib::Value<const T*> with custom types,
  * each T* or const T* will be registered as a subtype of G_TYPE_POINTER,
@@ -267,7 +278,7 @@ Value<T, Enable>::value_type()
 {
   if (!custom_type_)
   {
-    custom_type_ = Glib::custom_boxed_type_register(typeid(CppType).name(),
+    custom_type_ = Glib::custom_boxed_type_cpp_register(typeid(CppType).name(),
       &Value<T>::value_init_func, &Value<T>::value_free_func, &Value<T>::value_copy_func);
   }
   return custom_type_;
