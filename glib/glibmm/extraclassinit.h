@@ -29,6 +29,30 @@ namespace Glib
  * @code
  * #include <glibmm/extraclassinit.h>
  *
+ * extern "C"
+ * {
+ * // Extra class init function.
+ * static void my_extra_class_init_function(void* g_class, void* class_data)
+ * {
+ *   g_return_if_fail(GTK_IS_WIDGET_CLASS(g_class));
+ *
+ *   const auto klass = static_cast<GtkWidgetClass*>(g_class);
+ *   const auto css_name = static_cast<Glib::ustring*>(class_data);
+ *
+ *   gtk_widget_class_set_css_name(klass, css_name->c_str());
+ * }
+ *
+ * // Extra instance init function.
+ * static void my_instance_init_function(GTypeInstance* instance, void* g_class)
+ * {
+ *   g_return_if_fail(GTK_IS_WIDGET(instance));
+ *
+ *   // Nothing to do here.
+ *   // This extra instance init function just shows how such a function can
+ *   // be added to a custom widget, if necessary.
+ * }
+ * } // extern "C"
+ *
  * class MyExtraInit : public Glib::ExtraClassInit
  * {
  * public:
@@ -39,17 +63,6 @@ namespace Glib
  *   { }
  *
  * private:
- *   static void my_extra_class_init_function(void* g_class, void* class_data)
- *   {
- *     const auto klass = static_cast<GtkWidgetClass*>(g_class);
- *     const auto css_name = static_cast<Glib::ustring*>(class_data);
- *     gtk_widget_class_set_css_name(klass, css_name->c_str());
- *   }
- *   static void my_instance_init_function(GTypeInstance* instance, void* g_class)
- *   {
- *     gtk_widget_set_has_surface(GTK_WIDGET(instance), true);
- *   }
- *
  *   Glib::ustring m_css_name;
  * };
  *
@@ -69,6 +82,16 @@ namespace Glib
  * };
  * @endcode
  *
+ * The callback functions (my_extra_class_init_function() and my_instance_init_function()
+ * in the example) are called from GLib (a C library). They shall have C linkage.
+ * (Many compilers accept callback functions with C++ linkage, but such a program
+ * has undefined behavior.)
+ *
+ * If you want the functions with C linkage to have internal linkage, they must
+ * be declared 'static', even if they are defined in an anonymous namespace.
+ * The compiler respects namespace declarations of functions with C linkage,
+ * but the linker does not.
+
  * @note Classes derived from %ExtraClassInit (MyExtraInit in the example)
  * must be listed before Glib::Object or a class derived from
  * %Glib::Object (Gtk::Widget in the example) in the list of base classes.

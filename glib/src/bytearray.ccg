@@ -16,9 +16,11 @@
 
 namespace
 {
-
-extern "C" {
-
+extern "C"
+{
+// Non-static functions with C linkage get external linkage, even if they are
+// defined in an anonymous namespace.
+//TODO: Declare 'static' when we can break ABI.
 int
 ByteArray_Compare_Data_Func(gconstpointer a, gconstpointer b, gpointer user_data)
 {
@@ -26,8 +28,8 @@ ByteArray_Compare_Data_Func(gconstpointer a, gconstpointer b, gpointer user_data
 
   return (*slot)(static_cast<const guint8*>(a), static_cast<const guint8*>(b));
 }
-}
-}
+} // extern "C"
+} // anonymous namespace
 
 namespace Glib
 {

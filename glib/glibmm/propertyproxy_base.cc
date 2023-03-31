@@ -23,6 +23,24 @@
 #include <glibmm/private/object_p.h>
 #include <utility> // For std::move()
 
+namespace
+{
+extern "C"
+{
+// From functions with C linkage to public static member functions with C++ linkage
+static void PropertyProxyConnectionNode_callback(GObject* object, GParamSpec* pspec, gpointer data)
+{
+  Glib::PropertyProxyConnectionNode::callback(object, pspec, data);
+}
+
+static void PropertyProxyConnectionNode_destroy_notify_handler(gpointer data, GClosure* closure)
+{
+  // It's actually in the base class SignalProxyConnectionNode
+  Glib::PropertyProxyConnectionNode::destroy_notify_handler(data, closure);
+}
+} // extern "C"
+} // anonymous namespace
+
 namespace Glib
 {
 
@@ -55,8 +73,8 @@ PropertyProxyConnectionNode::connect_changed(const Glib::ustring& property_name)
   // 'this' will be passed as the data argument to the callback.
   const Glib::ustring notify_signal_name = get_detailed_signal_name("notify", property_name);
   connection_id_ = g_signal_connect_data(object_, notify_signal_name.c_str(),
-    (GCallback)(&PropertyProxyConnectionNode::callback), this,
-    &PropertyProxyConnectionNode::destroy_notify_handler, G_CONNECT_AFTER);
+    (GCallback)(&PropertyProxyConnectionNode_callback), this,
+    &PropertyProxyConnectionNode_destroy_notify_handler, G_CONNECT_AFTER);
 
   return sigc::connection(slot_);
 }

@@ -45,6 +45,7 @@ AttributeKeyLess::operator()(const Glib::ustring& lhs, const Glib::ustring& rhs)
 class ParserCallbacks
 {
 public:
+  //TODO: When we can break ABI, remove vfunc_table.
   static const GMarkupParser vfunc_table;
 
   static void start_element(GMarkupParseContext* context, const char* element_name,
@@ -183,6 +184,72 @@ ParserCallbacks::error(GMarkupParseContext* context, GError* error, void* user_d
   }
 }
 
+} // namespace Markup
+} // namespace Glib
+
+/**** anonymous namespace *************************************************/
+
+namespace
+{
+using ParseContext_destroy_notify_callback_functype = void (*) (void* data);
+ParseContext_destroy_notify_callback_functype ParseContext_destroy_notify_callback_funcptr;
+
+extern "C"
+{
+static void ParseContext_destroy_notify_c_callback(void* data)
+{
+  ParseContext_destroy_notify_callback_funcptr(data);
+}
+
+static void ParserCallbacks_start_element(GMarkupParseContext* context,
+  const char* element_name, const char** attribute_names,
+  const char** attribute_values, void* user_data, GError** error)
+{
+  Glib::Markup::ParserCallbacks::start_element(context, element_name,
+    attribute_names, attribute_values, user_data, error);
+}
+
+static void ParserCallbacks_end_element(GMarkupParseContext* context,
+  const char* element_name, void* user_data, GError** error)
+{
+  Glib::Markup::ParserCallbacks::end_element(context, element_name, user_data, error);
+}
+
+static void ParserCallbacks_text(GMarkupParseContext* context, const char* text,
+  gsize text_len, void* user_data, GError** error)
+{
+  Glib::Markup::ParserCallbacks::text(context, text, text_len, user_data, error);
+}
+
+static void ParserCallbacks_passthrough(GMarkupParseContext* context,
+  const char* passthrough_text, gsize text_len, void* user_data, GError** error)
+{
+  Glib::Markup::ParserCallbacks::passthrough(context, passthrough_text,
+    text_len, user_data, error);
+}
+
+static void ParserCallbacks_error(GMarkupParseContext* context, GError* error,
+  void* user_data)
+{
+  Glib::Markup::ParserCallbacks::error(context, error, user_data);
+}
+
+static const GMarkupParser ParserCallbacks_vfunc_table = {
+  &ParserCallbacks_start_element,
+  &ParserCallbacks_end_element,
+  &ParserCallbacks_text,
+  &ParserCallbacks_passthrough,
+  &ParserCallbacks_error
+};
+
+} // extern "C"
+} // anonymous namespace
+
+namespace Glib
+{
+namespace Markup
+{
+
 /**** Glib::Markup::Parser *************************************************/
 
 Parser::Parser()
@@ -233,9 +300,10 @@ Parser::on_error(ParseContext&, const MarkupError&)
 
 ParseContext::ParseContext(Parser& parser, ParseFlags flags)
 : parser_(&parser),
-  gobject_(g_markup_parse_context_new(&ParserCallbacks::vfunc_table, (GMarkupParseFlags)flags, this,
-    &ParseContext::destroy_notify_callback))
+  gobject_(g_markup_parse_context_new(&ParserCallbacks_vfunc_table, (GMarkupParseFlags)flags, this,
+    &ParseContext_destroy_notify_c_callback))
 {
+  ParseContext_destroy_notify_callback_funcptr = &destroy_notify_callback;
 }
 
 ParseContext::ParseContext(ParseContext&& other) noexcept : sigc::trackable(std::move(other)),

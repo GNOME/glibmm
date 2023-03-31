@@ -49,7 +49,9 @@ Binding_transform_callback_common(
   return result;
 }
 
-gboolean
+extern "C"
+{
+static gboolean
 Binding_transform_to_callback(
   GBinding*, const GValue* from_value, GValue* to_value, gpointer user_data)
 {
@@ -59,7 +61,7 @@ Binding_transform_to_callback(
   return Binding_transform_callback_common(from_value, to_value, the_slot);
 }
 
-gboolean
+static gboolean
 Binding_transform_from_callback(
   GBinding*, const GValue* from_value, GValue* to_value, gpointer user_data)
 {
@@ -69,12 +71,12 @@ Binding_transform_from_callback(
   return Binding_transform_callback_common(from_value, to_value, the_slot);
 }
 
-void
+static void
 Binding_transform_callback_destroy(gpointer user_data)
 {
   delete static_cast<BindingTransformSlots*>(user_data);
 }
-
+} // extern "C"
 } // anonymous namespace
 
 namespace Glib

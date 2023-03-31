@@ -64,7 +64,29 @@ private:
   OptionArgCallback& operator=(const OptionArgCallback&);
 };
 
-extern "C" {
+using OptionGroupPostParseFuncType = gboolean (*)(GOptionContext* context,
+  GOptionGroup* group, gpointer data, GError** error);
+using OptionGroupOptionArgFuncType = gboolean (*)(const gchar* option_name,
+  const gchar* value, gpointer data, GError** error);
+OptionGroupPostParseFuncType OptionGroup_post_parse_callback_funcptr;
+OptionGroupOptionArgFuncType OptionGroup_option_arg_callback_funcptr;
+
+extern "C"
+{
+// From functions with C linkage, to protected static member functions with C++ linkage
+static gboolean
+OptionGroup_post_parse_callback(GOptionContext* context, GOptionGroup* group,
+  gpointer data, GError** error)
+{
+  return OptionGroup_post_parse_callback_funcptr(context, group, data, error);
+}
+
+static gboolean
+OptionGroup_option_arg_callback(const gchar* option_name, const gchar* value,
+  gpointer data, GError** error)
+{
+  return OptionGroup_option_arg_callback_funcptr(option_name, value, data, error);
+}
 
 static gboolean
 g_callback_pre_parse(
@@ -119,6 +141,9 @@ g_callback_error(
   }
 }
 
+// Non-static functions with C linkage get external linkage, even if they are
+// defined in an anonymous namespace.
+//TODO: Declare 'static' when we can break ABI.
 const gchar*
 OptionGroup_Translate_glibmm_callback(const gchar* string, gpointer data)
 {
@@ -284,7 +309,8 @@ OptionGroup::OptionGroup(const Glib::ustring& name, const Glib::ustring& descrip
   // original OptionGroup instance.
 
   // Connect callbacks, so that derived classes can override the virtual methods:
-  g_option_group_set_parse_hooks(gobj(), &g_callback_pre_parse, &post_parse_callback);
+  OptionGroup_post_parse_callback_funcptr = &post_parse_callback;
+  g_option_group_set_parse_hooks(gobj(), &g_callback_pre_parse, &OptionGroup_post_parse_callback);
   g_option_group_set_error_hook(gobj(), &g_callback_error);
 }
 
@@ -553,19 +579,20 @@ OptionGroup::CppOptionEntry::allocate_c_arg()
   {
     // The C arg pointer is a function pointer, cast to void*.
     //
-    //   carg_ = reinterpret_cast<void*>(&OptionGroup::option_arg_callback);
+    //   carg_ = reinterpret_cast<void*>(&OptionGroup_option_arg_callback);
     // or
     //   union {
     //     void* dp;
     //     GOptionArgFunc fp;
     //   } u;
-    //   u.fp = &OptionGroup::option_arg_callback;
+    //   u.fp = &OptionGroup_option_arg_callback;
     //   carg_ = u.dp;
     // ? See
     // https://bugzilla.gnome.org/show_bug.cgi?id=589197
     // https://github.com/libsigcplusplus/libsigcplusplus/issues/1
     // https://github.com/libsigcplusplus/libsigcplusplus/issues/8
-    carg_ = reinterpret_cast<void*>(&OptionGroup::option_arg_callback);
+    carg_ = reinterpret_cast<void*>(&OptionGroup_option_arg_callback);
+    OptionGroup_option_arg_callback_funcptr = &OptionGroup::option_arg_callback;
 
     break;
   }

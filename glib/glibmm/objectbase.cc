@@ -32,6 +32,18 @@ namespace
 
 static const char anonymous_custom_type_name[] = "gtkmm__anonymous_custom_type";
 
+using ObjectBaseDestroyNotifyFuncType = void (*)(void* data);
+ObjectBaseDestroyNotifyFuncType ObjectBase_destroy_notify_funcptr;
+
+// From function with C linkage, to protected static member function with C++ linkage
+extern "C"
+{
+static void ObjectBase_destroy_notify_callback(void* data)
+{
+  ObjectBase_destroy_notify_funcptr(data);
+}
+} // extern "C"
+
 } // anonymous namespace
 
 namespace Glib
@@ -219,7 +231,8 @@ ObjectBase::_set_current_wrapper(GObject* object)
   {
     if (!g_object_get_qdata(object, Glib::quark_))
     {
-      g_object_set_qdata_full(object, Glib::quark_, this, &destroy_notify_callback_);
+      ObjectBase_destroy_notify_funcptr = &destroy_notify_callback_;
+      g_object_set_qdata_full(object, Glib::quark_, this, &ObjectBase_destroy_notify_callback);
     }
     else
     {
@@ -247,7 +260,7 @@ ObjectBase::_move_current_wrapper(GObject* object, Glib::ObjectBase* previous_wr
   g_object_steal_qdata(object, Glib::quark_);
 
   // Set the new wrapper:
-  g_object_set_qdata_full(object, Glib::quark_, this, &destroy_notify_callback_);
+  g_object_set_qdata_full(object, Glib::quark_, this, &ObjectBase_destroy_notify_callback);
 
   // Clear the previous wrapper:
   previous_wrapper->gobject_ = nullptr;

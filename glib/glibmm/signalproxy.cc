@@ -21,6 +21,23 @@
 #include <glibmm/object.h>
 #include <glibmm/signalproxy.h>
 
+namespace
+{
+extern "C"
+{
+// From functions with C linkage to public static member functions with C++ linkage
+static void SignalProxyNormal_slot0_void_callback(GObject* self, void* data)
+{
+  Glib::SignalProxyNormal::slot0_void_callback(self, data);
+}
+
+static void SignalProxyConnectionNode_destroy_notify_handler(gpointer data, GClosure* closure)
+{
+  Glib::SignalProxyConnectionNode::destroy_notify_handler(data, closure);
+}
+} // extern "C"
+} // anonymous namespace
+
 namespace Glib
 {
 
@@ -44,14 +61,18 @@ SignalProxyNormal::~SignalProxyNormal() noexcept
 sigc::slot_base&
 SignalProxyNormal::connect_impl_(bool notify, const sigc::slot_base& slot, bool after)
 {
+  GCallback c_handler = notify ? info_->notify_callback : info_->callback;
+  if (c_handler == (GCallback)&slot0_void_callback)
+    // Callback via a function with C linkage.
+    c_handler = (GCallback)&SignalProxyNormal_slot0_void_callback;
+
   // create a proxy to hold our connection info
   auto pConnectionNode = new SignalProxyConnectionNode(slot, obj_->gobj());
 
   // connect it to glib
   // pConnectionNode will be passed in the data argument to the callback.
   pConnectionNode->connection_id_ = g_signal_connect_data(obj_->gobj(), info_->signal_name,
-    notify ? info_->notify_callback : info_->callback, pConnectionNode,
-    &SignalProxyConnectionNode::destroy_notify_handler,
+    c_handler, pConnectionNode, &SignalProxyConnectionNode_destroy_notify_handler,
     static_cast<GConnectFlags>(after ? G_CONNECT_AFTER : 0));
 
   return pConnectionNode->slot_;
@@ -60,14 +81,18 @@ SignalProxyNormal::connect_impl_(bool notify, const sigc::slot_base& slot, bool 
 sigc::slot_base&
 SignalProxyNormal::connect_impl_(bool notify, sigc::slot_base&& slot, bool after)
 {
+  GCallback c_handler = notify ? info_->notify_callback : info_->callback;
+  if (c_handler == (GCallback)&slot0_void_callback)
+    // Callback via a function with C linkage.
+    c_handler = (GCallback)&SignalProxyNormal_slot0_void_callback;
+
   // create a proxy to hold our connection info
   auto pConnectionNode = new SignalProxyConnectionNode(std::move(slot), obj_->gobj());
 
   // connect it to glib
   // pConnectionNode will be passed in the data argument to the callback.
   pConnectionNode->connection_id_ = g_signal_connect_data(obj_->gobj(), info_->signal_name,
-    notify ? info_->notify_callback : info_->callback, pConnectionNode,
-    &SignalProxyConnectionNode::destroy_notify_handler,
+    c_handler, pConnectionNode, &SignalProxyConnectionNode_destroy_notify_handler,
     static_cast<GConnectFlags>(after ? G_CONNECT_AFTER : 0));
 
   return pConnectionNode->slot_;
@@ -116,14 +141,18 @@ SignalProxyDetailedBase::~SignalProxyDetailedBase() noexcept
 sigc::slot_base&
 SignalProxyDetailedBase::connect_impl_(bool notify, const sigc::slot_base& slot, bool after)
 {
+  GCallback c_handler = notify ? info_->notify_callback : info_->callback;
+  if (c_handler == (GCallback)&SignalProxyNormal::slot0_void_callback)
+    // Callback via a function with C linkage.
+    c_handler = (GCallback)&SignalProxyNormal_slot0_void_callback;
+
   // create a proxy to hold our connection info
   auto pConnectionNode = new SignalProxyConnectionNode(slot, obj_->gobj());
 
   // connect it to glib
   // pConnectionNode will be passed in the data argument to the callback.
   pConnectionNode->connection_id_ = g_signal_connect_data(obj_->gobj(), detailed_name_.c_str(),
-    notify ? info_->notify_callback : info_->callback, pConnectionNode,
-    &SignalProxyConnectionNode::destroy_notify_handler,
+    c_handler, pConnectionNode, &SignalProxyConnectionNode_destroy_notify_handler,
     static_cast<GConnectFlags>(after ? G_CONNECT_AFTER : 0));
 
   return pConnectionNode->slot_;
@@ -132,14 +161,18 @@ SignalProxyDetailedBase::connect_impl_(bool notify, const sigc::slot_base& slot,
 sigc::slot_base&
 SignalProxyDetailedBase::connect_impl_(bool notify, sigc::slot_base&& slot, bool after)
 {
+  GCallback c_handler = notify ? info_->notify_callback : info_->callback;
+  if (c_handler == (GCallback)&SignalProxyNormal::slot0_void_callback)
+    // Callback via a function with C linkage.
+    c_handler = (GCallback)&SignalProxyNormal_slot0_void_callback;
+
   // create a proxy to hold our connection info
   auto pConnectionNode = new SignalProxyConnectionNode(std::move(slot), obj_->gobj());
 
   // connect it to glib
   // pConnectionNode will be passed in the data argument to the callback.
   pConnectionNode->connection_id_ = g_signal_connect_data(obj_->gobj(), detailed_name_.c_str(),
-    notify ? info_->notify_callback : info_->callback, pConnectionNode,
-    &SignalProxyConnectionNode::destroy_notify_handler,
+    c_handler, pConnectionNode, &SignalProxyConnectionNode_destroy_notify_handler,
     static_cast<GConnectFlags>(after ? G_CONNECT_AFTER : 0));
 
   return pConnectionNode->slot_;

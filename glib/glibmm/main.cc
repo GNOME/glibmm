@@ -170,6 +170,37 @@ glibmm_source_get_callback_data(GSource* source)
   return static_cast<SourceCallbackData*>(user_data);
 }
 
+// The function pointers, glibmm_source_*_vfuncptr, are set in the Source ctor
+// that calls g_source_new(const_cast<GSourceFuncs*>(&vfunc_table_), sizeof(GSource)),
+// making it possible to indirectly call the Source::*_vfunc() member functions
+// from the glibmm_source_*_callback() functions with C linkage.
+using SourcePrepareVFuncType = gboolean (*)(GSource* source, int* timeout);
+using SourceCheckVFuncType = gboolean (*)(GSource* source);
+using SourceDispatchVFuncType = gboolean (*)(GSource* source, GSourceFunc callback, void* user_data);
+SourcePrepareVFuncType glibmm_source_prepare_vfuncptr;
+SourceCheckVFuncType glibmm_source_check_vfuncptr;
+SourceDispatchVFuncType glibmm_source_dispatch_vfuncptr;
+
+extern "C"
+{
+static gboolean
+glibmm_source_prepare_callback(GSource* source, int* timeout)
+{
+  return glibmm_source_prepare_vfuncptr(source, timeout);
+}
+
+static gboolean
+glibmm_source_check_callback(GSource* source)
+{
+  return glibmm_source_check_vfuncptr(source);
+}
+
+static gboolean
+glibmm_source_dispatch_callback(GSource* source, GSourceFunc callback, void* user_data)
+{
+  return glibmm_source_dispatch_vfuncptr(source, callback, user_data);
+}
+
 /* Glib::Source doesn't use the callback function installed with
  * g_source_set_callback().  Instead, it invokes the sigc++ slot
  * directly from dispatch_vfunc(), which is both simpler and more
@@ -273,6 +304,7 @@ glibmm_child_watch_callback(GPid pid, gint child_status, void* data)
   }
   return 0;
 }
+} // extern "C"
 
 static void
 glibmm_signal_connect_once(
@@ -291,7 +323,9 @@ glibmm_signal_connect_once(
   g_source_unref(source); // GMainContext holds a reference
 }
 
-gboolean
+extern "C"
+{
+static gboolean
 glibmm_main_context_invoke_callback(void* data)
 {
   sigc::slot_base* const slot = reinterpret_cast<sigc::slot_base*>(data);
@@ -308,12 +342,19 @@ glibmm_main_context_invoke_callback(void* data)
   return 0;
 }
 
-void
+static void
 glibmm_main_context_invoke_destroy_notify_callback(void* data)
 {
   sigc::slot_base* const slot = reinterpret_cast<sigc::slot_base*>(data);
   delete slot;
 }
+
+static void
+glibmm_source_callback_data_destroy_notify_callback(void* data)
+{
+  SourceCallbackData::destroy_notify_callback(data);
+}
+} // extern "C"
 
 } // anonymous namespace
 
@@ -844,7 +885,9 @@ wrap(GMainLoop* gobject, bool take_copy)
 
 // static
 const GSourceFuncs Source::vfunc_table_ = {
-  &Source::prepare_vfunc, &Source::check_vfunc, &Source::dispatch_vfunc,
+  &glibmm_source_prepare_callback,
+  &glibmm_source_check_callback,
+  &glibmm_source_dispatch_callback,
   // We can't use finalize_vfunc because there is no way
   // to store a pointer to our wrapper anywhere in GSource so
   // that it persists until finalize_vfunc would be called from here.
@@ -937,16 +980,20 @@ Source::unreference() const
 
 Source::Source() : gobject_(g_source_new(const_cast<GSourceFuncs*>(&vfunc_table_), sizeof(GSource)))
 {
+  glibmm_source_prepare_vfuncptr = &prepare_vfunc;
+  glibmm_source_check_vfuncptr = &check_vfunc;
+  glibmm_source_dispatch_vfuncptr = &dispatch_vfunc;
+
   g_source_set_callback(gobject_, &glibmm_dummy_source_callback,
     new SourceCallbackData(this), // our persistent callback data object
-    &SourceCallbackData::destroy_notify_callback);
+    &glibmm_source_callback_data_destroy_notify_callback);
 }
 
 Source::Source(GSource* cast_item, GSourceFunc callback_func) : gobject_(cast_item)
 {
   g_source_set_callback(gobject_, callback_func,
     new SourceCallbackData(this), // our persistent callback data object
-    &SourceCallbackData::destroy_notify_callback);
+    &glibmm_source_callback_data_destroy_notify_callback);
 }
 
 Source::~Source() noexcept

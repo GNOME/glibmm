@@ -494,6 +494,8 @@ public:
    * This function could possibly be used to integrate the GLib event loop with an external event
    * loop.
    * @param poll_func The function to call to poll all file descriptors.
+   *        This function shall have C linkage. (Many compilers also accept
+   *        a function with C++ linkage.)
    */
   void set_poll_func(GPollFunc poll_func);
 
@@ -800,9 +802,11 @@ protected:
   /** Wrap an existing GSource object and install the given callback function.
    * The constructed object doesn't use the virtual functions prepare(), check() and dispatch().
    * This constructor is for use by derived types that need to wrap a GSource object.
-   * The callback function can be a static member function. But beware -
-   * depending on the actual implementation of the GSource's virtual functions
-   * the expected type of the callback function can differ from GSourceFunc.
+   * The callback function is called from GLib (a C library). It shall have C
+   * linkage. (Many compilers accept a function with C++ linkage. If you use
+   * only such compilers, the callback function can be a static member function.)
+   * But beware - depending on the actual implementation of the GSource's virtual
+   * functions the expected type of the callback function can differ from GSourceFunc.
    */
   GLIBMM_API Source(GSource* cast_item, GSourceFunc callback_func);
 
@@ -927,6 +931,9 @@ protected:
 
   /** Wrap an existing GSource object and install the given callback function.
    * This constructor is for use by derived types that need to wrap a GSource object.
+   * The callback function is called from GLib (a C library). It shall have C
+   * linkage. (Many compilers accept a function with C++ linkage. If you use
+   * only such compilers, the callback function can be a static member function.)
    * @see Source::Source(GSource*, GSourceFunc).
    * @newin{2,42}
    */

@@ -20,8 +20,11 @@
 namespace Gio
 {
 
-extern "C" {
-
+extern "C"
+{
+// Non-static functions with C linkage get external linkage, even if they are
+// defined in an anonymous namespace.
+//TODO: Declare 'static' when we can break ABI.
 void
 delete_slot(gpointer data)
 {
@@ -30,6 +33,7 @@ delete_slot(gpointer data)
   delete callback;
 }
 
+//TODO: Declare 'static' when we can break ABI.
 void
 slot_cancelled_proxy(GCancellable* /*cancellable*/, gpointer data)
 {

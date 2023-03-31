@@ -21,6 +21,30 @@
 #include <glibmm/interface.h>
 #include <glibmm/private/interface_p.h>
 
+namespace
+{
+// C++ linkage
+using BaseFinalizeFuncType = void (*)(void*);
+using ClassInitFuncType = void (*)(void*, void*);
+
+BaseFinalizeFuncType p_custom_class_base_finalize_function;
+ClassInitFuncType p_custom_class_init_function;
+
+extern "C"
+{
+// From functions with C linkage, to private static member functions with C++ linkage
+static void Class_custom_class_base_finalize_function(void* g_class)
+{
+  p_custom_class_base_finalize_function(g_class);
+}
+
+static void Class_custom_class_init_function(void* g_class, void* class_data)
+{
+  p_custom_class_init_function(g_class, class_data);
+}
+} // extern "C"
+} // anonymous namespace
+
 namespace Glib
 {
 
@@ -128,11 +152,14 @@ Class::clone_custom_type(
       all_class_init_funcs->insert(all_class_init_funcs->end(),
         class_init_funcs->begin(), class_init_funcs->end());
 
+    p_custom_class_base_finalize_function = &Class::custom_class_base_finalize_function;
+    p_custom_class_init_function = &Class::custom_class_init_function;
+
     const GTypeInfo derived_info = {
       class_size,
       nullptr, // base_init
-      &Class::custom_class_base_finalize_function, // base_finalize
-      &Class::custom_class_init_function,
+      &Class_custom_class_base_finalize_function, // base_finalize
+      &Class_custom_class_init_function,
       nullptr, // class_finalize
       all_class_init_funcs, // class_data
       instance_size,
