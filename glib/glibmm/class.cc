@@ -233,8 +233,8 @@ Class::custom_class_init_function(void* g_class, void* class_data)
   (*init_func)(g_class, nullptr);
 
   GObjectClass* const gobject_class = static_cast<GObjectClass*>(g_class);
-  gobject_class->get_property = &Glib::custom_get_property_callback;
-  gobject_class->set_property = &Glib::custom_set_property_callback;
+  gobject_class->get_property = &Glib::glibmm_custom_get_property_callback;
+  gobject_class->set_property = &Glib::glibmm_custom_set_property_callback;
 
   // Call extra class init functions, if any.
   for (std::size_t i = 1; i < class_init_funcs.size(); ++i)
@@ -277,7 +277,8 @@ Class::custom_class_init_function(void* g_class, void* class_data)
 
       // Override only properties which have not been overridden in a base class.
       // Store the default values belonging to the class.
-      // They are copied to an object in custom_set_property_callback() in property.cc.
+      // They are copied to an object in glibmm_custom_set_property_callback()
+      // in property.cc.
       if (!g_object_class_find_property(gobject_class, prop_name))
       {
         GValue* g_value = g_new0(GValue, 1);

@@ -26,6 +26,7 @@ namespace Glib
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
+// TODO: When we can break ABI, remove custom_[get|set]_property_callback().
 #ifdef GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC
 // For the AIX xlC compiler, I can not find a way to do this without putting the functions in the
 // global namespace. murrayc
@@ -43,6 +44,18 @@ void custom_set_property_callback(
 #ifdef GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC
 } // extern "C"
 #endif // GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC
+
+extern "C"
+{
+GLIBMM_API
+void glibmm_custom_get_property_callback(
+  GObject* object, unsigned int property_id, GValue* value, GParamSpec* param_spec);
+
+GLIBMM_API
+void glibmm_custom_set_property_callback(
+  GObject* object, unsigned int property_id, const GValue* value, GParamSpec* param_spec);
+
+} // extern "C"
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
@@ -109,10 +122,10 @@ protected:
 private:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-  friend void Glib::custom_get_property_callback(
+  friend void Glib::glibmm_custom_get_property_callback(
     GObject* object, unsigned int property_id, GValue* value, GParamSpec* param_spec);
 
-  friend void Glib::custom_set_property_callback(
+  friend void Glib::glibmm_custom_set_property_callback(
     GObject* object, unsigned int property_id, const GValue* value, GParamSpec* param_spec);
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */

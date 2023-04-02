@@ -33,7 +33,7 @@
 #include <glibmm/utility.h> /* Could be private, but that would be tedious. */
 #include <glibmm/containerhandle_shared.h> /* Because its specializations may be here. */
 #include <glibmm/value.h>
-#include <glib.h> /* for G_GNUC_NULL_TERMINATED */
+#include <glib.h> // for G_GNUC_NULL_TERMINATED and GDestroyNotify
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C" {
@@ -118,12 +118,14 @@ public:
 
   // GObject* gobj_copy(); //Give a ref-ed copy to someone. Use for direct struct access.
 
-  // Glib::Objects contain a list<Quark, pair<void*, DestroyNotify> >
-  // to store run time data added to the object at run time.
-  // TODO: Use slots instead:
+  // TODO: When we can break ABI and API, remove DestroyNotify and the
+  // set_data() that uses it. Rename set_data_with_c_callback() to set_data().
   void* get_data(const QueryQuark& key);
   void set_data(const Quark& key, void* data);
   using DestroyNotify = void (*)(gpointer data);
+  /** @newin{2,78} */
+  void set_data_with_c_callback(const Quark& key, void* data, GDestroyNotify notify);
+  /** Prefer set_data_with_c_callback() with a callback with C linkage. */
   void set_data(const Quark& key, void* data, DestroyNotify notify);
   void remove_data(const QueryQuark& quark);
   // same as remove without notifying

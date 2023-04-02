@@ -61,8 +61,10 @@ namespace
 // a) Almost all conceivable use-cases are supported by this approach.
 // b) It's comparatively efficient, and does not need a hash-table lookup.
 
+extern "C"
+{
 // Delete the interface property values when an object of a custom type is finalized.
-void
+static void
 destroy_notify_obj_iface_props(void* data)
 {
   auto obj_iface_props = static_cast<Glib::Class::iface_properties_type*>(data);
@@ -76,6 +78,7 @@ destroy_notify_obj_iface_props(void* data)
     delete obj_iface_props;
   }
 }
+} // extern "C"
 
 struct custom_properties_type
 {
@@ -92,8 +95,10 @@ struct custom_properties_type
 static const GQuark custom_properties_quark =
   g_quark_from_string("gtkmm_CustomObject_custom_properties");
 
+extern "C"
+{
 // Delete the custom properties data when an object of a custom type is finalized.
-void destroy_notify_obj_custom_props(void* data)
+static void destroy_notify_obj_custom_props(void* data)
 {
   auto obj_custom_props = static_cast<custom_properties_type*>(data);
   // prop_base_vector does not own the objects pointed to.
@@ -106,6 +111,7 @@ void destroy_notify_obj_custom_props(void* data)
   }
   delete obj_custom_props;
 }
+} // extern "C"
 
 custom_properties_type*
 get_obj_custom_props(GObject* obj)
@@ -125,9 +131,28 @@ get_obj_custom_props(GObject* obj)
 
 namespace Glib
 {
-
 void
 custom_get_property_callback(
+  GObject* object, unsigned int property_id, GValue* value, GParamSpec* param_spec)
+{
+  glibmm_custom_get_property_callback(object, property_id, value, param_spec);
+}
+
+void
+custom_set_property_callback(
+  GObject* object, unsigned int property_id, const GValue* value, GParamSpec* param_spec)
+{
+  glibmm_custom_set_property_callback(object, property_id, value, param_spec);
+}
+
+extern "C"
+{
+// A function with external linkage and C linkage does not get a mangled name.
+// Even though glibmm_custom_get_property_callback() and glibmm_custom_set_property_callback()
+// are declared in a named namespace, the linker does not see the namespace name.
+// Therefore the function names shall have a prefix, hopefully unique.
+void
+glibmm_custom_get_property_callback(
   GObject* object, unsigned int property_id, GValue* value, GParamSpec* param_spec)
 {
   // If the id is zero there is no property to get.
@@ -185,7 +210,7 @@ custom_get_property_callback(
 }
 
 void
-custom_set_property_callback(
+glibmm_custom_set_property_callback(
   GObject* object, unsigned int property_id, const GValue* value, GParamSpec* param_spec)
 {
   // If the id is zero there is no property to set.
@@ -262,6 +287,7 @@ custom_set_property_callback(
     }
   }
 }
+} // extern "C"
 
 /**** Glib::PropertyBase ***************************************************/
 

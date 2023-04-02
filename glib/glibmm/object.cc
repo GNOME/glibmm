@@ -283,10 +283,26 @@ Object::set_data(const Quark& id, void* data)
 }
 
 void
+Object::set_data_with_c_callback(const Quark& id, void* data, GDestroyNotify destroy)
+{
+  g_object_set_qdata_full(gobj(), id, data, destroy);
+}
+
+#ifdef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+void
 Object::set_data(const Quark& id, void* data, DestroyNotify destroy)
 {
   g_object_set_qdata_full(gobj(), id, data, destroy);
 }
+#else
+void
+Object::set_data(const Quark& id, void* data, DestroyNotify)
+{
+  g_object_set_qdata(gobj(), id, data);
+  g_critical("Can't assign a callback with C++ linkage to g_object_set_qdata_full().\n"
+             "Use Glib::Object::set_data_with_c_callback().\n");
+}
+#endif
 
 void
 Object::remove_data(const QueryQuark& id)

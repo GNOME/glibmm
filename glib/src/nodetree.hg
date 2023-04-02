@@ -29,6 +29,33 @@ _DEFS(glibmm,glib)
 
 namespace Glib
 {
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+extern "C"
+{
+/// Wrapper for invoking a TraverseFunc.
+gboolean glibmm_NodeTree_c_callback_traverse(GNode* node, gpointer data);
+
+/// Wrapper for invoking a ForeachFunc.
+void glibmm_NodeTree_c_callback_foreach(GNode* node, gpointer data);
+
+} // extern "C"
+
+// Like GNodeTraverseFunc and GNodeForeachFunc, but with C++ linkage.
+using NodeTreeCallbackTraverseFuncType = gboolean (*)(GNode *node, gpointer user_data);
+using NodeTreeCallbackForeachFuncType = void (*)(GNode *node, gpointer user_data);
+
+struct NodeTreeCallbackTraverseData
+{
+  NodeTreeCallbackTraverseFuncType func;
+  gpointer data;
+};
+
+struct NodeTreeCallbackForeachData
+{
+  NodeTreeCallbackForeachFuncType func;
+  gpointer data;
+};
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 /** N-ary Trees - trees of data with any number of branches
  * The NodeTree class and its associated functions provide an N-ary tree data structure, in which nodes in the tree can contain arbitrary data.
@@ -300,7 +327,8 @@ public:
   void traverse(const TraverseFunc& func, TraverseType order = TraverseType::IN_ORDER, TraverseFlags flags = TraverseFlags::ALL, int max_depth = -1)
   {
     TraverseFunc func_copy = func;
-    g_node_traverse(gobj(), (GTraverseType)order, (GTraverseFlags)flags, max_depth, c_callback_traverse, reinterpret_cast<gpointer>(&func_copy));
+    NodeTreeCallbackTraverseData traverse_data = { &c_callback_traverse, &func_copy };
+    g_node_traverse(gobj(), (GTraverseType)order, (GTraverseFlags)flags, max_depth, glibmm_NodeTree_c_callback_traverse, &traverse_data);
   }
   _IGNORE(g_node_traverse);
 
@@ -313,7 +341,8 @@ public:
   void foreach(const ForeachFunc& func, TraverseFlags flags = TraverseFlags::ALL)
   {
     ForeachFunc func_copy = func;
-    g_node_children_foreach(gobj(), (GTraverseFlags)flags, c_callback_foreach, reinterpret_cast<gpointer>(&func_copy));
+    NodeTreeCallbackForeachData foreach_data = { &c_callback_foreach, &func_copy };
+    g_node_children_foreach(gobj(), (GTraverseFlags)flags, glibmm_NodeTree_c_callback_foreach, &foreach_data);
   }
   _IGNORE(g_node_children_foreach)
 
@@ -331,7 +360,8 @@ public:
     using type_foreach_gnode_slot = sigc::slot<void(GNode*)>;
     type_foreach_gnode_slot bound_slot = sigc::bind(real_slot, the_data, &child);
 
-    g_node_children_foreach(gobj(), (GTraverseFlags)flags, c_callback_foreach_compare_child, reinterpret_cast<gpointer>(&bound_slot));
+    NodeTreeCallbackForeachData foreach_data = { &c_callback_foreach_compare_child, &bound_slot };
+    g_node_children_foreach(gobj(), (GTraverseFlags)flags, glibmm_NodeTree_c_callback_foreach, &foreach_data);
 
     return wrap(child);
   }
@@ -365,7 +395,8 @@ public:
     using type_traverse_gnode_slot = sigc::slot<gboolean(GNode*)>;
     type_traverse_gnode_slot bound_slot = sigc::bind(real_slot, the_data, &child);
 
-    g_node_traverse(const_cast<GNode*>(gobj()), (GTraverseType)order, (GTraverseFlags)flags, -1, c_callback_traverse_compare_node, reinterpret_cast<gpointer>(&bound_slot));
+    NodeTreeCallbackTraverseData traverse_data = { &c_callback_traverse_compare_node, &bound_slot };
+    g_node_traverse(const_cast<GNode*>(gobj()), (GTraverseType)order, (GTraverseFlags)flags, -1, glibmm_NodeTree_c_callback_traverse, &traverse_data);
 
     return wrap(child);
   }
