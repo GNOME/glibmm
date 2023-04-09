@@ -1,14 +1,37 @@
 dnl
-dnl _VFUNC_PH(gtkname, crettype, cargs and names)
+dnl              $1      $2            $3          $4     $5
+dnl _VFUNC_PH(gtkname, crettype, cargs and names, ifdef, cnames
 dnl Create a callback and set it in our derived G*Class.
+dnl $5 can be missing in handcoded calls to _VFUNC_PH. Without $5 it is not
+dnl possible to create a callback with C linkage.
 dnl
 define(`_VFUNC_PH',`dnl
 _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
 ifelse(`$4',,,`#ifdef $4'
 )dnl
+ifelse(`$5',,`dnl
   klass->$1 = `&'$1_vfunc_callback;
+',`dnl
+  klass->$1 = `&'__CPPNAME__`'_$1_vfunc_c_callback;
+  __CPPNAME__`'_$1_vfunc_funcptr = `&'$1_vfunc_callback;
+')dnl
 ifelse(`$4',,,`#endif // $4
 ')dnl
+ifelse(`$5',,,`dnl If cnames exist
+_SECTION(SECTION_ANONYMOUS_NAMESPACE)
+ifelse(`$4',,,`#ifdef $4'
+)dnl
+using __CPPNAME__`'_$1_vfunc_functype = $2 (*)($3);
+__CPPNAME__`'_$1_vfunc_functype __CPPNAME__`'_$1_vfunc_funcptr;
+extern "C" {
+static $2 __CPPNAME__`'_$1_vfunc_c_callback`'($3)
+{
+  ifelse($2,void,,`return ')`'__CPPNAME__`'_$1_vfunc_funcptr`'($5);
+}
+} // extern "C"
+ifelse(`$4',,,`#endif // $4
+')dnl
+')dnl end If cnames exist
 _SECTION(SECTION_PH_VFUNCS)
 ifelse(`$4',,,`#ifdef $4'
 )dnl

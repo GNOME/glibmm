@@ -50,7 +50,7 @@ ifelse(`$9',,,`_DEPRECATE_IFDEF_START
 dnl
 ifelse($2`'_NUM($3)`'$5`'_NUM($6)`'$8`'_NUM($12),`void0void000',`dnl
 dnl
-dnl Use predefined callback for SignalProxy0<void>, to reduce code size,
+dnl Use predefined callback for SignalProxy<void()>, to reduce code size,
 dnl if custom_c_callback or exception_handler is not specified.
 
 static const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
@@ -62,7 +62,8 @@ static const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
 ',`dnl else
 
 ifelse($8,`1',,`dnl Do not generate the implementation if it should be custom:
-static $2 __CPPNAME__`'_signal_$4_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3)`'void* data)
+extern "C" {
+static $2 __CPPNAME__`'_signal_$4_connect_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3)`'void* data)
 {
   using namespace __NAMESPACE__;
   using SlotType = sigc::slot<$5`'($6)>;
@@ -139,13 +140,22 @@ ifelse($12, `', `dnl
   return RType`'();
 }
 ')dnl endif
+} // extern "C"
 ')dnl endif
 
+dnl With signame_callback(), signame_notify_callback() and signame_default_callback()
+dnl there is a small risk of a nameclash, namely if there is also a signame_default or
+dnl signame_notify, e.g. signame_default_callback(), signame_default_notify_callback()
+dnl and signame_default_default_callback().
+dnl With signame_connect_callback(), signame_notify_callback() and signame_default_callback()
+dnl there is no such risk, but we cannot rename signame_callback() now (2023-04-07)
+dnl if it is handcoded (custom_c_callback).
+dnl
 static const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
 {
   "$1",
-  (GCallback) &__CPPNAME__`'_signal_$4_callback,
-  (GCallback) &__CPPNAME__`'_signal_$4_`'ifelse($2,void,,notify_)`'callback
+  (GCallback) &__CPPNAME__`'_signal_$4_`'ifelse($8,1,,connect_)`'callback,
+  (GCallback) &__CPPNAME__`'_signal_$4_`'ifelse($2,void,ifelse($8,1,,connect_),notify_)`'callback
 };
 ')dnl endif
 
@@ -190,9 +200,14 @@ ifelse(`$11',,,`#endif // $11
 _POP()')
 
 
-dnl              $1      $2            $3          $4       $5           $6
-dnl _SIGNAL_PH(gname, crettype, cargs and names, ifdef, deprecated, exceptionHandler)
+dnl              $1      $2            $3          $4       $5
+dnl _SIGNAL_PH(gname, crettype, cargs and names, ifdef, deprecated,
+dnl              $6             $7
+dnl         exceptionHandler, cnames)
 dnl Create a callback and set it in our derived G*Class.
+dnl $6 is not used.
+dnl $7 can be missing in handcoded calls to _SIGNAL_PH. Without $7 it is not
+dnl possible to create a callback with C linkage.
 dnl
 define(`_SIGNAL_PH',`dnl
 _PUSH(SECTION_PCC_CLASS_INIT_DEFAULT_SIGNAL_HANDLERS)
@@ -200,11 +215,35 @@ ifelse(`$4',,,`#ifdef $4'
 )dnl
 ifelse(`$5',,,`_DEPRECATE_IFDEF_START
 ')dnl
+ifelse(`$7',,`dnl
   klass->$1 = `&'$1_callback;
+',`dnl
+  klass->$1 = `&'__CPPNAME__`'_signal_$1_default_callback;
+  __CPPNAME__`'_signal_$1_funcptr = `&'$1_callback;
+')dnl
 ifelse(`$5',,,`_DEPRECATE_IFDEF_END
 ')dnl
 ifelse(`$4',,,`#endif // $4
 ')dnl
+_SECTION(SECTION_ANONYMOUS_NAMESPACE)
+ifelse(`$7',,,`dnl If cnames exist
+ifelse(`$4',,,`#ifdef $4'
+)dnl
+ifelse(`$5',,,`_DEPRECATE_IFDEF_START
+')dnl
+using __CPPNAME__`'_signal_$1_functype = $2 (*)($3);
+__CPPNAME__`'_signal_$1_functype __CPPNAME__`'_signal_$1_funcptr;
+extern "C" {
+static $2 __CPPNAME__`'_signal_$1_default_callback`'($3)
+{
+  ifelse($2,void,,`return ')`'__CPPNAME__`'_signal_$1_funcptr`'($7);
+}
+} // extern "C"
+ifelse(`$5',,,`_DEPRECATE_IFDEF_END
+')dnl
+ifelse(`$4',,,`#endif // $4
+')dnl
+')dnl end If cnames exist
 _SECTION(SECTION_PH_DEFAULT_SIGNAL_HANDLERS)
 ifelse(`$4',,,`#ifdef $4'
 )dnl

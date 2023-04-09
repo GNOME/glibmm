@@ -161,12 +161,14 @@ sub output_wrap_vfunc_h($$$$$$)
 
   #The default callback, which will call *_vfunc, which will then call the base default callback.
   #Declares the callback in the private *Class class and sets it in the class_init function.
-
-  my $str = sprintf("_VFUNC_PH(%s,%s,\`%s\',%s)dnl\n",
+  # The leading space in the 5th parameter makes it easy for _VFUNC_PH() to check
+  # if that parameter exists, even if args_names_only() is an empty string.
+  my $str = sprintf("_VFUNC_PH(%s,%s,\`%s\',%s,\` %s\')dnl\n",
     $$objCDefsFunc{name},
     $$objCDefsFunc{rettype},
     $objCDefsFunc->args_types_and_names(),
-    $ifdef
+    $ifdef,
+    $objCDefsFunc->args_names_only()
    );
   $self->append($str);
 }
@@ -284,13 +286,16 @@ sub output_wrap_default_signal_handler_h($$$$$$$$)
   #The default callback, which will call on_* or the base default callback.
   #Declares the callback in the private *Class class and sets it in the class_init function.
   #This is hidden by deprecation.
-  $str = sprintf("_SIGNAL_PH(%s,%s,\`%s\',%s,%s,%s)dnl\n",
+  # The leading space in the 7th parameter makes it easy for _SIGNAL_PH() to check
+  # if that parameter exists, even if args_names_only() is an empty string.
+  $str = sprintf("_SIGNAL_PH(%s,%s,\`%s\',%s,%s,%s,\` %s\')dnl\n",
     $$objCDefsFunc{name},
     $$objCDefsFunc{rettype},
     $objCDefsFunc->args_types_and_names(),
     $ifdef,
     $deprecated,
-    $exceptionHandler
+    $exceptionHandler,
+    $objCDefsFunc->args_names_only()
    );
   $self->append($str);
 }
