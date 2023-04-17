@@ -1,0 +1,253 @@
+/* Copyright (C) 2023 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(giommconfig.h)
+
+#include <glibmm/object.h>
+#include <glibmm/bytes.h>
+#include <giomm/initable.h>
+#include <giomm/asyncresult.h>
+#include <giomm/cancellable.h>
+#include <giomm/inputstream.h>
+#include <giomm/outputstream.h>
+#include <utility> // std::pair
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+/** Child processes.
+ *
+ * %Gio::Subprocess allows the creation of and interaction with child
+ * processes.
+ *
+ * Processes can be communicated with using standard GIO-style APIs
+ * (Gio::InputStream, Gio::OutputStream). There are GIO-style APIs to wait for
+ * process termination (cancellable and with an asynchronous variant).
+ *
+ * There is an API to force a process to terminate, as well as a
+ * race-free API for sending UNIX signals to a subprocess.
+ *
+ * One major advantage that GIO brings over the core GLib library is
+ * comprehensive API for asynchronous I/O, such as
+ * Gio::OutputStream::splice_async(). This makes %Gio::Subprocess
+ * significantly more powerful and flexible than equivalent APIs in
+ * some other languages such as the `subprocess.py`
+ * included with Python. For example, using %Gio::Subprocess one could
+ * create two child processes, reading standard output from the first,
+ * processing it, and writing to the input stream of the second, all
+ * without blocking the main loop.
+ *
+ * A powerful communicate() API is provided similar to the
+ * `%communicate()` method of `subprocess.py`. This enables very easy
+ * interaction with a subprocess that has been opened with pipes.
+ *
+ * %Gio::Subprocess defaults to tight control over the file descriptors open
+ * in the child process, avoiding dangling-fd issues that are caused by
+ * a simple fork()/exec(). The only open file descriptors in the
+ * spawned process are ones that were explicitly specified by the
+ * %Gio::Subprocess API (unless Gio::Subprocess::Flags::INHERIT_FDS was
+ * specified).
+ *
+ * %Gio::Subprocess will quickly reap all child processes as they exit,
+ * avoiding "zombie processes" remaining around for long periods of
+ * time. wait() can be used to wait for this to happen,
+ * but it will happen even without the call being explicitly made.
+ *
+ * As a matter of principle, %Gio::Subprocess has no API that accepts
+ * shell-style space-separated strings. It will, however, match the
+ * typical shell behaviour of searching the PATH for executables that do
+ * not contain a directory separator in their name. By default, the `PATH`
+ * of the current process is used. You can specify
+ * Gio::Subprocess::Flags::SEARCH_PATH_FROM_ENVP to use the `PATH` of the
+ * launcher environment instead.
+ *
+ * %Gio::Subprocess attempts to have a very simple API for most uses (ie:
+ * spawning a subprocess with arguments and support for most typical
+ * kinds of input and output redirection). See create(). The
+ * Gio::SubprocessLauncher API is provided for more complicated cases
+ * (advanced types of redirection, environment variable manipulation,
+ * change of working directory, child setup functions, etc).
+ *
+ * A typical use of %Gio::Subprocess will involve calling create(), followed by
+ * wait_async() or wait(). After the process exits, the status can be
+ * checked using functions such as get_if_exited() (which are similar to
+ * the familiar WIFEXITED-style POSIX macros).
+ *
+ * @see Gio::SubprocessLauncher
+ * @newin{2,78}
+ */
+class GIOMM_API Subprocess : public Glib::Object, public Initable
+{
+  _CLASS_GOBJECT(Subprocess, GSubprocess, G_SUBPROCESS, Glib::Object, GObject, , , GIOMM_API)
+  _IMPLEMENTS_INTERFACE(Initable)
+
+public:
+  _WRAP_ENUM(Flags, GSubprocessFlags, newin "2,78", decl_prefix GIOMM_API)
+
+protected:
+  // Handwritten to ignore the final GError** parameter in the g_subprocess_newv() function.
+  // It can throw, due to its call to Initable::init().
+  explicit Subprocess(const std::vector<std::string>& argv, Flags flags = Flags::NONE);
+  _IGNORE(g_subprocess_new, g_subprocess_newv)
+
+public:
+  /** Create a new process with the given flags and argument list.
+   *
+   * @newin{2,78}
+   *
+   * @param argv Commandline arguments for the subprocess.
+   * @param flags Flags that define the behaviour of the subprocess.
+   * @return A newly created Subprocess. On error, an exception is thrown.
+   *
+   * @throws Glib::Error
+   */
+  _WRAP_CREATE(const std::vector<std::string>& argv, Flags flags = Flags::NONE)
+
+  _WRAP_METHOD(Glib::RefPtr<OutputStream> get_stdin_pipe(), g_subprocess_get_stdin_pipe, refreturn, newin "2,78")
+  _WRAP_METHOD(Glib::RefPtr<const OutputStream> get_stdin_pipe() const, g_subprocess_get_stdin_pipe, refreturn, constversion, newin "2,78")
+  _WRAP_METHOD(Glib::RefPtr<InputStream> get_stdout_pipe(), g_subprocess_get_stdout_pipe, refreturn, newin "2,78")
+  _WRAP_METHOD(Glib::RefPtr<const InputStream> get_stdout_pipe() const, g_subprocess_get_stdout_pipe, refreturn, constversion, newin "2,78")
+  _WRAP_METHOD(Glib::RefPtr<InputStream> get_stderr_pipe(), g_subprocess_get_stderr_pipe, refreturn, newin "2,78")
+  _WRAP_METHOD(Glib::RefPtr<const InputStream> get_stderr_pipe() const, g_subprocess_get_stderr_pipe, refreturn, constversion, newin "2,78")
+
+  _WRAP_METHOD(Glib::ustring get_identifier() const, g_subprocess_get_identifier, newin "2,78")
+  _WRAP_METHOD(void send_signal(int signal_num), g_subprocess_send_signal, ifdef G_OS_UNIX, newin "2,78")
+  _WRAP_METHOD(void force_exit(), g_subprocess_force_exit, newin "2,78")
+
+  _WRAP_METHOD(void wait(const Glib::RefPtr<Cancellable>& cancellable = {}) const, g_subprocess_wait, errthrow, newin "2,78")
+  _WRAP_METHOD(void wait_async(const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.} = {}) const,
+    g_subprocess_wait_async, slot_name slot, slot_callback giomm_SignalProxy_async_callback, newin "2,78")
+  _WRAP_METHOD(void wait_finish(const Glib::RefPtr<AsyncResult>& result) const, g_subprocess_wait_finish, errthrow, newin "2,78")
+
+  _WRAP_METHOD(void wait_check(const Glib::RefPtr<Cancellable>& cancellable = {}) const, g_subprocess_wait_check, errthrow, newin "2,78")
+  _WRAP_METHOD(void wait_check_async(const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.} = {}) const,
+    g_subprocess_wait_check_async, slot_name slot, slot_callback giomm_SignalProxy_async_callback, newin "2,78")
+  _WRAP_METHOD(void wait_check_finish(const Glib::RefPtr<AsyncResult>& result) const, g_subprocess_wait_check_finish, errthrow, newin "2,78")
+
+  _WRAP_METHOD(int get_status() const, g_subprocess_get_status, newin "2,78")
+  _WRAP_METHOD(bool get_successful() const, g_subprocess_get_successful, newin "2,78")
+  _WRAP_METHOD(bool get_if_exited() const, g_subprocess_get_if_exited, newin "2,78")
+  _WRAP_METHOD(int get_exit_status() const, g_subprocess_get_exit_status, newin "2,78")
+  _WRAP_METHOD(bool get_if_signaled() const, g_subprocess_get_if_signaled, newin "2,78")
+  _WRAP_METHOD(int get_term_sig() const, g_subprocess_get_term_sig, newin "2,78")
+
+  /** Communicate with the subprocess until it terminates, and all input
+   * and output has been completed.
+   *
+   * If @a stdin_buf is given, the subprocess must have been created with
+   * Gio::Subprocess::Flags::STDIN_PIPE. The given data is fed to the
+   * stdin of the subprocess and the pipe is closed (ie: EOF).
+   *
+   * At the same time (as not to cause blocking when dealing with large
+   * amounts of data), if Gio::Subprocess::Flags::STDOUT_PIPE or
+   * Gio::Subprocess::Flags::STDERR_PIPE were used, reads from those
+   * streams. The data that was read is returned in @a stdout_buf and/or
+   * the @a stderr_buf.
+   *
+   * If the subprocess was created with Gio::Subprocess::Flags::STDOUT_PIPE,
+   *  @a stdout_buf will contain the data read from stdout.  Otherwise, for
+   * subprocesses not created with Gio::Subprocess::Flags::STDOUT_PIPE,
+   *  @a stdout_buf will be set to an empty RefPtr. Similar provisions apply to
+   *  @a stderr_buf and Gio::Subprocess::Flags::STDERR_PIPE.
+   *
+   * If you desire the stdout and stderr data to be interleaved, create
+   * the subprocess with Gio::Subprocess::Flags::STDOUT_PIPE and
+   * Gio::Subprocess::Flags::STDERR_MERGE. The merged result will be returned
+   * in @a stdout_buf, and @a stderr_buf will be set to an empty RefPtr.
+   * 
+   * In case of any error (including cancellation), an exception will be thrown.
+   *
+   * After a normal return (no exception thrown), the subprocess has exited and the
+   * exit status inspection APIs (eg: get_if_exited(), get_exit_status()) may be used.
+   *
+   * You should not attempt to use any of the subprocess pipes after
+   * starting this function, since they may be left in strange states,
+   * even if the operation was cancelled. You should especially not
+   * attempt to interact with the pipes while the operation is in progress
+   * (either from another thread or if using the asynchronous version).
+   *
+   * @newin{2,78}
+   *
+   * @param stdin_buf Data to send to the stdin of the subprocess, or an empty RefPtr.
+   * @param cancellable A Cancellable.
+   * @return {stdout_buf, stderr_buf} stdout data and stderr data.
+   *   Can be empty RefPtrs, if there are no data.
+   *
+   * @throws Glib::Error
+   */
+  std::pair<Glib::RefPtr<Glib::Bytes>, Glib::RefPtr<Glib::Bytes>>
+    communicate(const Glib::RefPtr<const Glib::Bytes>& stdin_buf,
+    const Glib::RefPtr<Cancellable>& cancellable = {});
+  _IGNORE(g_subprocess_communicate)
+
+  _WRAP_METHOD(void communicate_async(const Glib::RefPtr<const Glib::Bytes>& stdin_buf{.},
+    const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.} = {}),
+    g_subprocess_communicate_async, slot_name slot, slot_callback giomm_SignalProxy_async_callback, newin "2,78")
+
+  /** Complete an invocation of communicate_async().
+   *
+   * @newin{2,78}
+   *
+   * @param result Result.
+   * @return {stdout_buf, stderr_buf} stdout data and stderr data.
+   *   Can be empty RefPtrs, if there are no data.
+   *
+   * @throws Glib::Error
+   */
+  std::pair<Glib::RefPtr<Glib::Bytes>, Glib::RefPtr<Glib::Bytes>>
+    communicate_finish(const Glib::RefPtr<AsyncResult>& result);
+  _IGNORE(g_subprocess_communicate_finish)
+
+  /** Like communicate(), but validates the output of the
+   * process as UTF-8, and returns it as a regular Glib::ustring.
+   *
+   * On error, an exception is thrown.
+   *
+   * @newin{2,78}
+   *
+   * @param stdin_buf Data to send to the stdin of the subprocess, or an empty string.
+   * @param cancellable A Cancellable.
+   * @return {stdout_buf, stderr_buf} stdout data and stderr data.
+   *
+   * @throws Glib::Error
+   */
+  std::pair<Glib::ustring, Glib::ustring> communicate_utf8(const Glib::ustring& stdin_buf,
+    const Glib::RefPtr<Cancellable>& cancellable = {});
+  _IGNORE(g_subprocess_communicate_utf8)
+
+  _WRAP_METHOD(void communicate_utf8_async(const Glib::ustring& stdin_buf{. NULL},
+    const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.} = {}),
+    g_subprocess_communicate_utf8_async, slot_name slot, slot_callback giomm_SignalProxy_async_callback, newin "2,78")
+
+  /** Complete an invocation of communicate_utf8_async().
+   *
+   * @newin{2,78}
+   *
+   * @param result Result.
+   * @return {stdout_buf, stderr_buf} stdout data and stderr data.
+   *
+   * @throws Glib::Error
+   */
+  std::pair<Glib::ustring, Glib::ustring> communicate_utf8_finish(const Glib::RefPtr<AsyncResult>& result);
+  _IGNORE(g_subprocess_communicate_utf8_finish)
+
+  // _IGNORE_PROPERTY("flags", "argv") // write-only, construct-only
+};
+
+} // namespace Gio

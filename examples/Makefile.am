@@ -33,6 +33,7 @@ check_PROGRAMS =			\
 	properties/example		\
 	regex/example			\
 	settings/settings \
+	subprocess/example \
 	thread/dispatcher \
 	thread/dispatcher2
 
@@ -84,6 +85,9 @@ network_socket_server_LDADD   = $(giomm_ldadd)
 
 settings_settings_SOURCES = settings/settings.cc
 settings_settings_LDADD   = $(giomm_ldadd)
+
+subprocess_example_SOURCES = subprocess/main.cc
+subprocess_example_LDADD   = $(giomm_ldadd)
 
 dist_noinst_DATA = settings/org.gtkmm.demo.gschema.xml
 CLEANFILES = settings/gschemas.compiled

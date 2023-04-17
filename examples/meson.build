@@ -17,6 +17,7 @@ examples = [
   [['properties'], 'example', ['properties_example.cc'], false],
   [['regex'], 'example', ['main.cc'], false],
   [['settings'], 'settings', ['settings.cc', 'org.gtkmm.demo.gschema.xml'], true],
+  [['subprocess'], 'example', ['main.cc'], true],
   [['thread'], 'dispatcher', ['dispatcher.cc'], false],
   [['thread'], 'dispatcher2', ['dispatcher2.cc'], false],
 ]

@@ -75,6 +75,7 @@ _CONV_GIO_ENUM(SocketFamily)
 _CONV_GIO_INCLASS_ENUM(Socket,MsgFlags)
 _CONV_GIO_INCLASS_ENUM(Socket,Protocol)
 _CONV_GIO_INCLASS_ENUM(Socket,Type)
+_CONV_GIO_INCLASS_ENUM(Subprocess,Flags)
 _CONV_GIO_ENUM(TlsCertificateFlags)
 _CONV_GIO_ENUM(TlsCertificateRequestFlags)
 _CONV_GIO_INCLASS_ENUM(TlsDatabase,VerifyFlags)
@@ -333,6 +334,10 @@ _CONVERSION(`const Glib::RefPtr<SocketConnection>&',`GSocketConnection*',__CONVE
 
 #SocketControlMessage
 _CONVERSION(`GSocketControlMessage*',`Glib::RefPtr<SocketControlMessage>',`Glib::wrap($3)')
+
+#Subprocess, SubprocessLauncher
+_CONVERSION(`GSubprocess*',`Glib::RefPtr<Subprocess>',`Glib::wrap($3)')
+_CONVERSION(`GSubprocessLauncher*',`Glib::RefPtr<SubprocessLauncher>',`Glib::wrap($3)')
 
 #TimeZoneMonitor
 _CONVERSION(`GTimeZoneMonitor*',`Glib::RefPtr<TimeZoneMonitor>',`Glib::wrap($3)')

@@ -1,0 +1,89 @@
+/* Copyright (C) 2023 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <giomm/slot_async.h>
+#include <gio/gio.h>
+
+namespace Gio
+{
+Subprocess::Subprocess(const std::vector<std::string>& argv, Flags flags)
+: _CONSTRUCT("argv", Glib::ArrayHandler<std::string>::vector_to_array(argv).data(), "flags", (GSubprocessFlags)flags)
+{
+  init();
+}
+
+std::pair<Glib::RefPtr<Glib::Bytes>, Glib::RefPtr<Glib::Bytes>>
+Subprocess::communicate(const Glib::RefPtr<const Glib::Bytes>& stdin_buf,
+  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  GError* gerror = nullptr;
+  GBytes* gstdout_buf = nullptr;
+  GBytes* gstderr_buf = nullptr;
+  (void)g_subprocess_communicate(gobj(),
+    const_cast<GBytes*>(Glib::unwrap(stdin_buf)),
+    Glib::unwrap(cancellable), &gstdout_buf, &gstderr_buf, &gerror);
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return {Glib::wrap(gstdout_buf), Glib::wrap(gstderr_buf)};
+}
+
+std::pair<Glib::RefPtr<Glib::Bytes>, Glib::RefPtr<Glib::Bytes>>
+Subprocess::communicate_finish(const Glib::RefPtr<AsyncResult>& result)
+{
+  GError* gerror = nullptr;
+  GBytes* gstdout_buf = nullptr;
+  GBytes* gstderr_buf = nullptr;
+  (void)g_subprocess_communicate_finish(gobj(), Glib::unwrap(result),
+    &gstdout_buf, &gstderr_buf, &gerror);
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return {Glib::wrap(gstdout_buf), Glib::wrap(gstderr_buf)};
+}
+
+std::pair<Glib::ustring, Glib::ustring>
+Subprocess::communicate_utf8(const Glib::ustring& stdin_buf,
+  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  GError* gerror = nullptr;
+  char* gstdout_buf = nullptr;
+  char* gstderr_buf = nullptr;
+  (void)g_subprocess_communicate_utf8(gobj(), Glib::c_str_or_nullptr(stdin_buf),
+    Glib::unwrap(cancellable), &gstdout_buf, &gstderr_buf, &gerror);
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return {Glib::convert_return_gchar_ptr_to_ustring(gstdout_buf),
+          Glib::convert_return_gchar_ptr_to_ustring(gstderr_buf)};
+}
+
+std::pair<Glib::ustring, Glib::ustring>
+Subprocess::communicate_utf8_finish(const Glib::RefPtr<AsyncResult>& result)
+{
+  GError* gerror = nullptr;
+  char* gstdout_buf = nullptr;
+  char* gstderr_buf = nullptr;
+  (void)g_subprocess_communicate_utf8_finish(gobj(), Glib::unwrap(result),
+    &gstdout_buf, &gstderr_buf, &gerror);
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return {Glib::convert_return_gchar_ptr_to_ustring(gstdout_buf),
+          Glib::convert_return_gchar_ptr_to_ustring(gstderr_buf)};
+}
+
+} // namespace Gio

@@ -1,0 +1,121 @@
+/* Copyright (C) 2023 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(giommconfig.h)
+
+#include <glibmm/object.h>
+#include <glibmm/spawn.h>
+#include <giomm/subprocess.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+/** Environment options for launching a child process.
+ *
+ * This class contains a set of options for launching child processes,
+ * such as where its standard input and output will be directed, the
+ * argument list, the environment, and more.
+ *
+ * While the Gio::Subprocess class has high level functions covering
+ * popular cases, use of this class allows access to more advanced
+ * options. It can also be used to launch multiple subprocesses with
+ * a similar configuration.
+ *
+ * @see Subprocess
+ * @newin{2,78}
+ */
+class GIOMM_API SubprocessLauncher : public Glib::Object
+{
+  _CLASS_GOBJECT(SubprocessLauncher, GSubprocessLauncher, G_SUBPROCESS_LAUNCHER, Glib::Object, GObject, , , GIOMM_API)
+
+public:
+  // g_subprocess_launcher_new() does more than call g_object_new().
+  _WRAP_METHOD(static Glib::RefPtr<SubprocessLauncher> create(
+    Subprocess::Flags flags = Subprocess::Flags::NONE), g_subprocess_launcher_new, newin "2,78")
+
+#m4 _CONVERSION(`const std::vector<std::string>&', `const gchar*-const*',`Glib::ArrayHandler<std::string>::vector_to_array($3).data()')
+  _WRAP_METHOD(Glib::RefPtr<Subprocess> spawn(const std::vector<std::string>& argv),
+    g_subprocess_launcher_spawnv, errthrow, newin "2,78")
+  _IGNORE(g_subprocess_launcher_spawn)
+
+  /** Inherit the parent process’ environment.
+   * @newin{2,78}
+   */
+  void inherit_environ();
+#m4 _CONVERSION(`const std::vector<std::string>&', `gchar**',`const_cast<char**>(Glib::ArrayHandler<std::string>::vector_to_array($3).data())')
+  _WRAP_METHOD(void set_environ(const std::vector<std::string>& env),
+    g_subprocess_launcher_set_environ, newin "2,78")
+  _WRAP_METHOD(void setenv(const std::string& variable, const std::string& value, bool overwrite),
+    g_subprocess_launcher_setenv, newin "2,78")
+  _WRAP_METHOD(void unsetenv(const std::string& variable),
+    g_subprocess_launcher_unsetenv, newin "2,78")
+  _WRAP_METHOD(std::string getenv(const std::string& variable),
+    g_subprocess_launcher_getenv, newin "2,78")
+
+  _WRAP_METHOD(void set_cwd(const std::string& cwd), g_subprocess_launcher_set_cwd, newin "2,78")
+  _WRAP_METHOD(void set_flags(Subprocess::Flags flags), g_subprocess_launcher_set_flags, newin "2,78")
+
+  // Extended I/O control, only available on UNIX.
+  _WRAP_METHOD(void set_stdin_file_path(const std::string& path{NULL}),
+    g_subprocess_launcher_set_stdin_file_path, ifdef G_OS_UNIX, newin "2,78")
+  _WRAP_METHOD(void take_stdin_fd(int fd), g_subprocess_launcher_take_stdin_fd,
+    ifdef G_OS_UNIX, newin "2,78")
+
+  _WRAP_METHOD(void set_stdout_file_path(const std::string& path{NULL}),
+    g_subprocess_launcher_set_stdout_file_path, ifdef G_OS_UNIX, newin "2,78")
+  _WRAP_METHOD(void take_stdout_fd(int fd), g_subprocess_launcher_take_stdout_fd,
+    ifdef G_OS_UNIX, newin "2,78")
+
+  _WRAP_METHOD(void set_stderr_file_path(const std::string& path{NULL}),
+    g_subprocess_launcher_set_stderr_file_path, ifdef G_OS_UNIX, newin "2,78")
+  _WRAP_METHOD(void take_stderr_fd(int fd), g_subprocess_launcher_take_stderr_fd,
+    ifdef G_OS_UNIX, newin "2,78")
+
+  _WRAP_METHOD(void take_fd(int source_fd, int target_fd), g_subprocess_launcher_take_fd,
+    ifdef G_OS_UNIX, newin "2,78")
+
+  _WRAP_METHOD(void close(), g_subprocess_launcher_close, ifdef G_OS_UNIX, newin "2,78")
+
+#ifdef G_OS_UNIX
+  /** Sets up a child setup function.
+   *
+   * The child setup function will be called after fork() but before
+   * exec() on the child's side.
+   *
+   * A copy of the @a child_setup slot is stored. The copy will not be
+   * automatically deleted on the child's side of the fork(). It will only be
+   * deleted when the last reference on the %SubprocessLauncher is dropped
+   * or when a new child setup slot is given.
+   *
+   * An empty slot can be given as @a child_setup to disable the functionality.
+   *
+   * Child setup functions are only available on UNIX.
+   *
+   * @newin{2,78}
+   *
+   * @param child_setup A Glib::SlotSpawnChildSetup to use as the child setup function.
+   */
+  void set_child_setup(const Glib::SlotSpawnChildSetup& child_setup = {});
+  _IGNORE(g_subprocess_launcher_set_child_setup)
+#endif // G_OS_UNIX
+
+  // _IGNORE_PROPERTY("flags") // write-only, construct-only
+};
+
+} // namespace Gio

@@ -1,0 +1,62 @@
+/* Copyright (C) 2023 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gio/gio.h>
+
+namespace
+{
+extern "C"
+{
+#ifdef G_OS_UNIX
+static void SubprocessLauncher_child_setup_callback(void* user_data)
+{
+  try
+  {
+    (*static_cast<Glib::SlotSpawnChildSetup*>(user_data))();
+  }
+  catch (...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+static void SubprocessLauncher_child_setup_callback_destroy(void* user_data)
+{
+  delete static_cast<Glib::SlotSpawnChildSetup*>(user_data);
+}
+#endif // G_OS_UNIX
+} // extern "C"
+} // anonymous namespace
+
+namespace Gio
+{
+void SubprocessLauncher::inherit_environ()
+{
+  g_subprocess_launcher_set_environ(gobj(), nullptr);
+}
+
+#ifdef G_OS_UNIX
+void SubprocessLauncher::set_child_setup(const Glib::SlotSpawnChildSetup& child_setup)
+{
+  const bool setup_slot = !child_setup.empty();
+
+  g_subprocess_launcher_set_child_setup(gobj(),
+    setup_slot ? &SubprocessLauncher_child_setup_callback : nullptr,
+    setup_slot ? new Glib::SlotSpawnChildSetup(child_setup) : nullptr,
+    setup_slot ? &SubprocessLauncher_child_setup_callback_destroy : nullptr);
+}
+#endif // G_OS_UNIX
+} // namespace Gio

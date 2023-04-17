@@ -142,6 +142,8 @@ giomm_any_hg_ccg_basenames = [
   'socketlistener',
   'socketservice',
   'srvtarget',
+  'subprocess',
+  'subprocesslauncher',
   'tcpconnection',
   'tcpwrapperconnection',
   'threadedsocketservice',
