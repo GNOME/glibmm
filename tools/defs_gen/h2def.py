@@ -401,6 +401,8 @@ proto_pat=re.compile(r"""
 arg_split_pat = re.compile("\s*,\s*")
 
 get_type_pat = re.compile(r'(const-)?([A-Za-z0-9]+)\*?\s+')
+# Graphene and possibly other modules have lowercase type names ending with "_t".
+get_type_t_pat = re.compile(r'(const-)?([a-z0-9_]+_t)\*?\s+')
 pointer_pat = re.compile('.*\*$')
 func_new_pat = re.compile('(\w+)_new$')
 
@@ -548,13 +550,21 @@ class DefsWriter:
     def _write_func(self, name, ret, args):
         if len(args) >= 1:
             # methods must have at least one argument
-            munged_name = name.replace('_', '')
             m = get_type_pat.match(args[0])
             if m:
+                munged_name = name.replace('_', '')
                 obj = m.group(2)
                 if munged_name[:len(obj)] == obj.lower():
                     self._write_method(obj, name, ret, args)
                     return
+            else:
+                m = get_type_t_pat.match(args[0])
+                if m:
+                    obj = m.group(2)
+                    l = len(obj) - 1
+                    if name[:l] == obj[:l]:
+                        self._write_method(obj, name, ret, args)
+                        return
 
         if self.prefix:
             l = len(self.prefix)
@@ -583,8 +593,11 @@ class DefsWriter:
         self._write_arguments(args)
 
     def _write_method(self, obj, name, ret, args):
-        regex = ''.join([x+'_?' for x in obj.lower()])
-        mname = re.sub(regex, '', name, 1)
+        if obj.endswith("_t"):
+            mname = name[len(obj)-1:]
+        else:
+            regex = ''.join([x+'_?' for x in obj.lower()])
+            mname = re.sub(regex, '', name, 1)
         if self.prefix:
             l = len(self.prefix) + 1
             if mname[:l] == self.prefix and mname[l+1] == '_':
