@@ -97,11 +97,11 @@ class GLIBMM_API VariantBase
     g_variant_get, g_variant_get_va)
 public:
 
-   /** Test whether the Variant has an underlying instance.
-    *
-    * @newin{2,50}
-    */
-   explicit operator bool() const;
+  /** Test whether the Variant has an underlying instance.
+   *
+   * @newin{2,50}
+   */
+  explicit operator bool() const;
 
   /** Replace the underlying GVariant.
    * This is for use by methods that take a VariantBase& as an output
@@ -257,7 +257,7 @@ protected:
    */
   bool is_castable_to(const VariantType& supertype) const;
 #endif //DOXYGEN_SHOULD_SKIP_THIS
-};
+}; // VariantBase
 
 template<class V_CastTo>
 V_CastTo VariantBase::cast_dynamic(const VariantBase& v)
@@ -327,7 +327,7 @@ public:
   _IGNORE(g_variant_new_signature)
 
   _WRAP_METHOD(static bool is_signature(const std::string& string), g_variant_is_signature)
-};
+}; // VariantStringBase
 
 /** The base class for multiple-item Variants, such as Variants containing
  * tuples or arrays, and also for maybe-typed (that is, nullable) Variant types.
@@ -418,7 +418,7 @@ protected:
    */
   VariantIter get_iter(const VariantType& container_variant_type) const;
 #endif //DOXYGEN_SHOULD_SKIP_THIS
-};
+}; // VariantContainerBase
 
 template<>
 GLIBMM_API VariantContainerBase VariantBase::cast_dynamic<VariantContainerBase>(const VariantBase& v);
@@ -433,6 +433,38 @@ class Variant : public VariantBase
 public:
   using CppType = T;
 };
+
+/** Creates a Glib::Variant instance.
+ *
+ * @code
+ * std::vector<int> int_vector = { 1, 2, 3, 4, 5, 6, 7, 8 };
+ * auto int_vector_variant = Glib::create_variant(int_vector);
+ * @endcode
+ * is an alternative to
+ * @code
+ * std::vector<int> int_vector = { 1, 2, 3, 4, 5, 6, 7, 8 };
+ * auto int_vector_variant = Glib::Variant<std::vector<int>>::create(int_vector);
+ * @endcode
+ * %Glib::create_variant() can usually deduce the type of the %Glib::Variant
+ * from the type of the argument.
+ *
+ * There is no %Glib::Variant<const char*> specialization.
+ * @code
+ * auto variant1 = Glib::create_variant("Hello, World!"); // Error
+ * auto variant2 = Glib::create_variant<Glib::ustring>("Hello, World!"); // OK
+ * auto variant3 = Glib::create_variant(Glib::ustring("Hello, World!")); // OK
+ * auto variant4 = Glib::Variant<Glib::ustring>("Hello, World!"); // OK
+ * @endcode
+ *
+ * @relates Glib::VariantBase
+ * @ingroup Variant
+ * @newin{2,78}
+ */
+template <typename T>
+Variant<T> create_variant(const T& data)
+{
+  return Variant<T>::create(data);
+}
 
 /****************** Specializations ***********************************/
 

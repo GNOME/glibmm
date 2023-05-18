@@ -25,20 +25,20 @@ bool test_tuple()
   const Glib::ustring s1 = "Hi there";
   const bool b1 = false;
   auto t1 = std::make_tuple(q1, s1, b1);
-  auto tuple1_variant = Glib::Variant<TupleType>::create(t1);
+  auto tuple1_variant = Glib::create_variant(t1);
 
   // Second tuple
   const guint16 q2 = 3;
   const Glib::ustring s2 = "Hello";
   const bool b2 = true;
   auto t2 = std::make_tuple(q2, s2, b2);
-  auto tuple2_variant = Glib::Variant<TupleType>::create(t2);
+  auto tuple2_variant = Glib::create_variant(t2);
 
   // Insert the tuples in a map.
   MapType m;
   m[4] = t1;
   m[5] = t2;
-  auto map_variant = Glib::Variant<MapType>::create(m);
+  auto map_variant = Glib::create_variant(m);
 
   std::string type_string = tuple1_variant.variant_type().get_string();
   ostr << "Type string of tuple1: " << type_string << std::endl;
@@ -79,7 +79,7 @@ bool test_object_path()
 
   // Object path vector
   std::vector<Glib::DBusObjectPathString> vec1 {"/object/path1", "/object/path_two", "/object/pathIII" };
-  auto variantvec1 = Glib::Variant<std::vector<Glib::DBusObjectPathString>>::create(vec1);
+  auto variantvec1 = Glib::create_variant(vec1);
 
   auto vec2 = variantvec1.get();
   ostr << "Extracted object paths: " << vec2[0] << ", " << vec2[1] << ", " << vec2[2] << std::endl;
@@ -94,13 +94,13 @@ bool test_object_path()
 
   // Create the map
   std::map<Glib::ustring, Glib::VariantBase> map1;
-  map1["map1_1"] = Glib::Variant<Glib::ustring>::create("value1");
+  map1["map1_1"] = Glib::create_variant(Glib::ustring("value1"));
   std::map<Glib::ustring, std::map<Glib::ustring, Glib::VariantBase>> map2;
   map2["map2_1"] = map1;
   three_leveled_map map3;
   map3["/map3/path1"] = map2;
   // Create the corresponding Variant and check its type
-  auto variantmap = Glib::Variant<three_leveled_map>::create(map3);
+  auto variantmap = Glib::create_variant(map3);
   ostr << "variantmap.get_type_string() = " << variantmap.get_type_string() << std::endl;
   result_ok &= variantmap.get_type_string() == "a{oa{sa{sv}}}";
   // Extract the map and check that the stored value remains.
@@ -127,9 +127,9 @@ bool test_comparison()
   std::vector<int> int_vector1 = { 1, 2, 3, 4, 5, 6, 7, 8 };
   std::vector<int> int_vector2 = { 1, 2, 3, 4, 5, 6, 7 };
 
-  auto int_variant1 = Glib::Variant<std::vector<int>>::create(int_vector1);
-  auto int_variant2 = Glib::Variant<std::vector<int>>::create(int_vector2);
-  auto int_variant3 = Glib::Variant<std::vector<int>>::create(int_vector1);
+  auto int_variant1 = Glib::create_variant(int_vector1);
+  auto int_variant2 = Glib::create_variant(int_vector2);
+  auto int_variant3 = Glib::create_variant(int_vector1);
 
   // Equality and inequality operators
   ostr << "int_variant1 == int_variant2 (0): " << (int_variant1 == int_variant2) << std::endl;
@@ -169,7 +169,7 @@ main(int, char**)
   for (guint i = 0; i < int_vector.size(); i++)
     ostr << int_vector[i] << std::endl;
 
-  auto integers_variant = Glib::Variant<std::vector<int>>::create(int_vector);
+  auto integers_variant = Glib::create_variant(int_vector);
 
   auto int_vector2 = integers_variant.get();
 
@@ -191,7 +191,7 @@ main(int, char**)
 
   // vector<std::string>:
   std::vector<std::string> vec_strings = { "a" };
-  auto variant_vec_strings = Glib::Variant<std::vector<std::string>>::create(vec_strings);
+  auto variant_vec_strings = Glib::create_variant(vec_strings);
 
   // Dict:
 
@@ -202,7 +202,7 @@ main(int, char**)
   ostr << "The original dictionary entry is (" << dict_entry.first << ", " << dict_entry.second
        << ")." << std::endl;
 
-  auto dict_entry_variant = Glib::Variant<TypeDictEntry>::create(dict_entry);
+  auto dict_entry_variant = Glib::create_variant(dict_entry);
 
   TypeDictEntry copy_entry = dict_entry_variant.get();
 
@@ -228,7 +228,7 @@ main(int, char**)
     ostr << "(" << i << ", " << orig_dict[i] << ")." << std::endl;
   }
 
-  auto orig_dict_variant = Glib::Variant<TypeDict>::create(orig_dict);
+  auto orig_dict_variant = Glib::create_variant(orig_dict);
 
   TypeDict dict_copy = orig_dict_variant.get();
 
@@ -268,7 +268,7 @@ main(int, char**)
 
     Glib::ustring s = "String " + ss.str();
 
-    auto v = Glib::Variant<int>::create(i);
+    auto v = Glib::create_variant(i);
 
     complex_dict1.insert(std::pair<Glib::ustring, Glib::Variant<int>>("Map 1 " + s, v));
 
@@ -279,7 +279,7 @@ main(int, char**)
 
   ComplexVecType complex_vector = { complex_dict1, complex_dict2 };
 
-  auto complex_variant = Glib::Variant<ComplexVecType>::create(complex_vector);
+  auto complex_variant = Glib::create_variant(complex_vector);
 
   // This will output the type string aa{sv}.
   ostr << "The type string of the variant containing a vector of "
@@ -455,7 +455,7 @@ test_dynamic_cast_composite_types()
 static void
 test_dynamic_cast()
 {
-  auto v1 = Glib::Variant<int>::create(10);
+  auto v1 = Glib::create_variant(10);
   Glib::VariantBase& v2 = v1;
   auto v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int>>(v2);
   g_assert(v3.get() == 10);
@@ -465,10 +465,10 @@ test_dynamic_cast()
   g_assert(v3.get() == 10);
 
   Glib::Variant<double> v4;
-  // v4 contain a NULL GVariant: The cast succeed
+  // v4 contains a NULL GVariant: The cast succeeds
   v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int>>(v4);
 
-  v4 = Glib::Variant<double>::create(1.0);
+  v4 = Glib::create_variant(1.0);
   try
   {
     v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int>>(v4);
@@ -480,8 +480,8 @@ test_dynamic_cast()
 
   // A tuple
   std::vector<Glib::VariantBase> vec_var(2);
-  vec_var[0] = Glib::Variant<int>::create(1);
-  vec_var[1] = Glib::Variant<Glib::ustring>::create("coucou");
+  vec_var[0] = Glib::create_variant(1);
+  vec_var[1] = Glib::create_variant<Glib::ustring>("coucou");
   Glib::VariantContainerBase var_tuple = Glib::VariantContainerBase::create_tuple(vec_var);
   g_assert(var_tuple.get_type_string() == "(is)");
 
