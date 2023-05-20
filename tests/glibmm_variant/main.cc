@@ -320,8 +320,8 @@ test_dynamic_cast_ustring_types()
 
   try
   {
-    auto derived = Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(vbase_string);
-    ostr << "Casted string Glib::Variant<Glib::ustring>: " << derived.get() << std::endl;
+    auto derived_get = vbase_string.get_dynamic<Glib::ustring>();
+    ostr << "Casted string Glib::Variant<Glib::ustring>: " << derived_get << std::endl;
   }
   catch (const std::bad_cast& e)
   {
@@ -332,8 +332,8 @@ test_dynamic_cast_ustring_types()
 
   try
   {
-    auto derived = Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(vbase_objectpath);
-    ostr << "Casted object path Glib::Variant<Glib::ustring>: " << derived.get() << std::endl;
+    auto derived_get = vbase_objectpath.get_dynamic<Glib::ustring>();
+    ostr << "Casted object path Glib::Variant<Glib::ustring>: " << derived_get << std::endl;
   }
   catch (const std::bad_cast& e)
   {
@@ -344,8 +344,8 @@ test_dynamic_cast_ustring_types()
 
   try
   {
-    auto derived = Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(vbase_signature);
-    ostr << "Casted signature Glib::Variant<Glib::ustring>: " << derived.get() << std::endl;
+    auto derived_get = vbase_signature.get_dynamic<Glib::ustring>();
+    ostr << "Casted signature Glib::Variant<Glib::ustring>: " << derived_get << std::endl;
   }
   catch (const std::bad_cast& e)
   {
@@ -361,8 +361,8 @@ test_dynamic_cast_string_types()
 
   try
   {
-    auto derived = Glib::VariantBase::cast_dynamic<Glib::Variant<std::string>>(vbase_string);
-    ostr << "Casted string Glib::Variant<std::string>: " << derived.get() << std::endl;
+    auto derived_get = vbase_string.get_dynamic<std::string>();
+    ostr << "Casted string Glib::Variant<std::string>: " << derived_get << std::endl;
   }
   catch (const std::bad_cast& e)
   {
@@ -373,8 +373,8 @@ test_dynamic_cast_string_types()
 
   try
   {
-    auto derived = Glib::VariantBase::cast_dynamic<Glib::Variant<std::string>>(vbase_objectpath);
-    ostr << "Casted object path Glib::Variant<std::string>: " << derived.get() << std::endl;
+    auto derived_get = vbase_objectpath.get_dynamic<std::string>();
+    ostr << "Casted object path Glib::Variant<std::string>: " << derived_get << std::endl;
   }
   catch (const std::bad_cast& e)
   {
@@ -385,8 +385,8 @@ test_dynamic_cast_string_types()
 
   try
   {
-    auto derived = Glib::VariantBase::cast_dynamic<Glib::Variant<std::string>>(vbase_signature);
-    ostr << "Casted signature Glib::Variant<std::string>: " << derived.get() << std::endl;
+    auto derived_get = vbase_signature.get_dynamic<std::string>();
+    ostr << "Casted signature Glib::Variant<std::string>: " << derived_get << std::endl;
   }
   catch (const std::bad_cast& e)
   {
@@ -450,6 +450,15 @@ test_dynamic_cast_composite_types()
   catch (const std::bad_cast& e)
   {
   }
+
+  try
+  {
+    auto derived_get = cppdict.get_dynamic<std::map<Glib::ustring, std::string>>();
+    g_assert_not_reached();
+  }
+  catch (const std::bad_cast& e)
+  {
+  }
 }
 
 static void
@@ -457,21 +466,37 @@ test_dynamic_cast()
 {
   auto v1 = Glib::create_variant(10);
   Glib::VariantBase& v2 = v1;
-  auto v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int>>(v2);
-  g_assert(v3.get() == 10);
+  g_assert(v2.get_dynamic<int>() == 10);
 
   Glib::VariantBase v5 = v1;
-  v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int>>(v5);
-  g_assert(v3.get() == 10);
+  g_assert(v5.get_dynamic<int>() == 10);
 
   Glib::Variant<double> v4;
-  // v4 contains a NULL GVariant: The cast succeeds
-  v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int>>(v4);
+  // v4 does not contain a GVariant: The cast succeeds
+  auto v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int>>(v4);
+  // v4 does not contain a GVariant: The get_dynamic fails
+  try
+  {
+    (void)v4.get_dynamic<int>();
+    g_assert_not_reached();
+  }
+  catch (const std::invalid_argument& e)
+  {
+  }
 
   v4 = Glib::create_variant(1.0);
   try
   {
     v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int>>(v4);
+    g_assert_not_reached();
+  }
+  catch (const std::bad_cast& e)
+  {
+  }
+
+  try
+  {
+    (void)v4.get_dynamic<int>();
     g_assert_not_reached();
   }
   catch (const std::bad_cast& e)
@@ -526,12 +551,14 @@ test_dynamic_cast()
   type_map_sv get_map = var_map_cast.get();
   var_string = Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(get_map["test key"]);
   g_assert(var_string.get() == "test variant");
+  g_assert(get_map["test key"].get_dynamic<Glib::ustring>() == "test variant");
 
   // A variant of type v
   auto var_v = Glib::Variant<Glib::VariantBase>::create(var_string);
   g_assert(var_v.get_type_string() == "v");
   auto var_s2 = Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(var_v.get());
   g_assert(var_s2.get() == "test variant");
+  g_assert(var_v.get().get_dynamic<Glib::ustring>() == "test variant");
 
   test_dynamic_cast_ustring_types();
   test_dynamic_cast_string_types();

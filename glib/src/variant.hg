@@ -228,15 +228,32 @@ public:
    /** Cast to a specific variant type.
     * For instance:
     * @code
-    * Variant<std::string> derived = VariantBase::cast_dynamic< Variant<std::string> >(base);
+    * auto derived = Glib::VariantBase::cast_dynamic<Glib::Variant<std::string>>(base);
     * @endcode
     *
+    * @tparam V_CastTo A subtype of %VariantBase.
     * @param v The variant to cast to a specific type.
     * @result The variant as a specific type.
-    * @throws std::bad_cast if the Variant was not of the expected type.
+    * @throws std::bad_cast if the %Variant was not of the expected type.
     */
    template<class V_CastTo>
    static V_CastTo cast_dynamic(const VariantBase& v);
+
+   /** Cast to a specific variant type and get the value.
+    * For instance:
+    * @code
+    * auto str = variant_base.get_dynamic<std::string>();
+    * @endcode
+    *
+    * @newin{2,78}
+    *
+    * @tparam ValueType The expected type of the variant's value.
+    * @result The value of the variant.
+    * @throws std::invalid_argument if @a *this is empty (does not contain a GVariant).
+    * @throws std::bad_cast if @a *this could not be cast to %Variant<ValueType>.
+    */
+   template <typename ValueType>
+   ValueType get_dynamic() const;
 
    _IGNORE(g_variant_dict_new)
 
@@ -433,6 +450,14 @@ class Variant : public VariantBase
 public:
   using CppType = T;
 };
+
+template <typename ValueType>
+ValueType VariantBase::get_dynamic() const
+{
+  if (!*this)
+    throw std::invalid_argument("Tried to get value of empty Glib::Variant.");
+  return cast_dynamic<Variant<ValueType>>(*this).get();
+}
 
 /** Creates a Glib::Variant instance.
  *
