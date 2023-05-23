@@ -106,6 +106,14 @@ AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
 AC_LANG([C++])
 
 AC_CHECK_SIZEOF([wchar_t])
+AC_CHECK_SIZEOF([short])
+AC_DEFINE_UNQUOTED([GLIBMM_SIZEOF_SHORT], [$ac_cv_sizeof_short], [The size of short, as computed by sizeof.])
+AC_CHECK_SIZEOF([int])
+AC_DEFINE_UNQUOTED([GLIBMM_SIZEOF_INT], [$ac_cv_sizeof_int], [The size of int, as computed by sizeof.])
+AC_CHECK_SIZEOF([long])
+AC_DEFINE_UNQUOTED([GLIBMM_SIZEOF_LONG], [$ac_cv_sizeof_long], [The size of long, as computed by sizeof.])
+AC_CHECK_SIZEOF([long long])
+AC_DEFINE_UNQUOTED([GLIBMM_SIZEOF_LONG_LONG], [$ac_cv_sizeof_long_long], [The size of long long, as computed by sizeof.])
 DK_CHECK_FEATURE([wide stream],
 [
   AC_LANG_PROGRAM([[#include <sstream>]],

@@ -74,6 +74,10 @@ if is_os_cocoa
   glibmm_config_conf_data.set('GLIBMM_OS_COCOA', 1)
 endif
 glibmm_config_conf_data.set('GLIBMM_SIZEOF_WCHAR_T', cpp_compiler.sizeof('wchar_t'))
+glibmm_config_conf_data.set('GLIBMM_SIZEOF_SHORT', cpp_compiler.sizeof('short'))
+glibmm_config_conf_data.set('GLIBMM_SIZEOF_INT', cpp_compiler.sizeof('int'))
+glibmm_config_conf_data.set('GLIBMM_SIZEOF_LONG', cpp_compiler.sizeof('long'))
+glibmm_config_conf_data.set('GLIBMM_SIZEOF_LONG_LONG', cpp_compiler.sizeof('long long'))
 
 conf_tests = [
 # [preprocessor-macro-name, file-name, message]

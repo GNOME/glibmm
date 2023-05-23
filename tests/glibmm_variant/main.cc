@@ -152,6 +152,58 @@ bool test_comparison()
   return result_ok;
 }
 
+// Check that there are Variant specializations for all expected integer
+// types, usually all of short, int, long and long long and the
+// corresponding unsigned types.
+bool test_integer_types()
+{
+  bool result_ok = true;
+
+  // If GLIBMM_SIZEOF_SHORT < 2 there is no Variant<short>.
+#if GLIBMM_SIZEOF_SHORT >= 2
+  auto var_short = Glib::Variant<short>::create(1);
+  auto var_ushort = Glib::Variant<unsigned short>::create(2U);
+  result_ok &= var_short.get() == 1;
+  result_ok &= var_ushort.get() == 2U;
+#endif
+
+  auto var_int = Glib::Variant<int>::create(3);
+  auto var_uint = Glib::Variant<unsigned int>::create(4U);
+  auto var_long = Glib::Variant<long>::create(5L);
+  auto var_ulong = Glib::Variant<unsigned long>::create(6UL);
+  result_ok &= var_int.get() == 3;
+  result_ok &= var_uint.get() == 4U;
+  result_ok &= var_long.get() == 5L;
+  result_ok &= var_ulong.get() == 6UL;
+
+  // If GLIBMM_SIZEOF_LONG_LONG > 8 there is no Variant<long long>.
+#if GLIBMM_SIZEOF_LONG_LONG <= 8
+  auto var_llong = Glib::Variant<long long>::create(7LL);
+  auto var_ullong = Glib::Variant<unsigned long long>::create(8ULL);
+  result_ok &= var_llong.get() == 7LL;
+  result_ok &= var_ullong.get() == 8ULL;
+
+#if GLIBMM_SIZEOF_LONG == GLIBMM_SIZEOF_LONG_LONG
+  bool shall_fail = false;
+  try
+  {
+    // Test some casts between equivalent types.
+    auto var_llong2 = Glib::VariantBase::cast_dynamic<Glib::Variant<long long>>(var_long);
+    auto var_long2 = Glib::VariantBase::cast_dynamic<Glib::Variant<long>>(var_llong);
+    // Test a cast between non-equivalent types.
+    shall_fail = true;
+    auto var_short2 = Glib::VariantBase::cast_dynamic<Glib::Variant<short>>(var_llong);
+    result_ok = false;
+  }
+  catch (const std::bad_cast& e)
+  {
+    result_ok &= shall_fail;
+  }
+#endif
+#endif
+  return result_ok;
+}
+
 } // anonymous namespace
 
 int
@@ -309,6 +361,7 @@ main(int, char**)
   bool result_ok = test_tuple();
   result_ok &= test_object_path();
   result_ok &= test_comparison();
+  result_ok &= test_integer_types();
   return result_ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
