@@ -158,6 +158,7 @@ bool test_comparison()
 bool test_integer_types()
 {
   bool result_ok = true;
+  bool shall_fail = false;
 
   // If GLIBMM_SIZEOF_SHORT < 2 there is no Variant<short>.
 #if GLIBMM_SIZEOF_SHORT >= 2
@@ -184,10 +185,10 @@ bool test_integer_types()
   result_ok &= var_ullong.get() == 8ULL;
 
 #if GLIBMM_SIZEOF_LONG == GLIBMM_SIZEOF_LONG_LONG
-  bool shall_fail = false;
   try
   {
     // Test some casts between equivalent types.
+    shall_fail = false;
     auto var_llong2 = Glib::VariantBase::cast_dynamic<Glib::Variant<long long>>(var_long);
     auto var_long2 = Glib::VariantBase::cast_dynamic<Glib::Variant<long>>(var_llong);
     // Test a cast between non-equivalent types.
@@ -201,6 +202,32 @@ bool test_integer_types()
   }
 #endif
 #endif
+
+  // Test Glib::DBusHandle and Glib::Variant<Glib::DBusHandle>.
+  Glib::DBusHandle handle1 = 3;
+  auto handle2 = handle1;
+  auto handle3 = Glib::DBusHandle(3);
+  gint32 i1 = handle3;
+  auto var_handle1 = Glib::Variant<Glib::DBusHandle>::create(handle2);
+  auto var_int1 = Glib::Variant<gint32>::create(i1);
+  result_ok &= (var_handle1.get() == var_int1.get());
+  try
+  {
+    // A Variant<gint32> can contain a VARIANT_TYPE_INT32 or a VARIANT_TYPE_HANDLE.
+    // A Variant<DBusHandle> can only contain a VARIANT_TYPE_HANDLE.
+    shall_fail = false;
+    auto var_int2 = Glib::VariantBase::cast_dynamic<Glib::Variant<gint32>>(var_handle1);
+    ostr << "VariantTypes of var_handle1,var_int1,var_int2: "
+         << var_handle1.get_type_string() << "," << var_int1.get_type_string()
+         << "," << var_int2.get_type_string() << std::endl;
+    shall_fail = true;
+    auto var_handle2 = Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::DBusHandle>>(var_int1);
+    result_ok = false;
+  }
+  catch (const std::bad_cast& e)
+  {
+    result_ok &= shall_fail;
+  }
   return result_ok;
 }
 

@@ -59,6 +59,29 @@ public:
   using Glib::ustring::ustring;
 };
 
+/** Class for D-Bus handles in Glib::Variant.
+ *
+ * Use it if you want to create a Glib::Variant with a D-Bus handle.
+ *
+ * @code
+ * auto variant = Glib::Variant<Glib::DBusHandle>::create(2);
+ * @endcode
+ *
+ * A %DBusHandle can be implicitly converted to and from a gint32.
+ *
+ * @newin{2,78}
+ * @ingroup Variant
+*/
+class DBusHandle
+{
+public:
+  DBusHandle(gint32 value = 0) : m_value(value) {}
+  operator gint32() const { return m_value; }
+  DBusHandle& operator=(gint32 i) { m_value = i; return *this; }
+private:
+  gint32 m_value;
+};
+
 } // namespace Glib
 
 #endif /* _GLIBMM_VARIANT_DBUS_STRING_H */

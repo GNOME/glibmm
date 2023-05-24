@@ -129,6 +129,7 @@ GLIB_VARIANT_BASIC(gint64, gint64, int64)
 GLIB_VARIANT_BASIC(guint64, guint64, uint64)
 #endif
 
+GLIB_VARIANT_BASIC(DBusHandle, gint32, handle)
 GLIB_VARIANT_BASIC(double, gdouble, double)
 
 } // namespace Glib
