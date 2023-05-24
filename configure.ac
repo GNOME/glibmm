@@ -106,6 +106,7 @@ AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
 AC_LANG([C++])
 
 AC_CHECK_SIZEOF([wchar_t])
+AC_DEFINE_UNQUOTED([GLIBMM_SIZEOF_WCHAR_T], [$ac_cv_sizeof_wchar_t], [The size of wchar_t, as computed by sizeof.])
 AC_CHECK_SIZEOF([short])
 AC_DEFINE_UNQUOTED([GLIBMM_SIZEOF_SHORT], [$ac_cv_sizeof_short], [The size of short, as computed by sizeof.])
 AC_CHECK_SIZEOF([int])

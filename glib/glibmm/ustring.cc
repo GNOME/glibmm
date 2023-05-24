@@ -25,21 +25,9 @@
 #include <cstring>
 #include <stdexcept>
 #include <utility> // For std::move()
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-// If glibmm is built with Autotools, GLIBMM_SIZEOF_WCHAR_T is not defined and
-// SIZEOF_WCHAR_T is defined in config.h.
-// If glibmm is built with Meson, config.h does not exist and
-// GLIBMM_SIZEOF_WCHAR_T is defined in glibmmconfig.h.
-#if !defined(SIZEOF_WCHAR_T) && defined(GLIBMM_SIZEOF_WCHAR_T)
-#define SIZEOF_WCHAR_T GLIBMM_SIZEOF_WCHAR_T
-#endif
 
 namespace
 {
-
 using Glib::ustring;
 using Glib::UStringView;
 
@@ -1363,12 +1351,12 @@ ustring::FormatStream::to_string() const
 #ifdef GLIBMM_HAVE_WIDE_STREAM
   const std::wstring str = stream_.str();
 
-#if (defined(__STDC_ISO_10646__) || defined(_LIBCPP_VERSION)) && SIZEOF_WCHAR_T == 4
+#if (defined(__STDC_ISO_10646__) || defined(_LIBCPP_VERSION)) && GLIBMM_SIZEOF_WCHAR_T == 4
   // Avoid going through iconv if wchar_t always contains UCS-4.
   glong n_bytes = 0;
   const auto buf = make_unique_ptr_gfree(g_ucs4_to_utf8(
     reinterpret_cast<const gunichar*>(str.data()), str.size(), nullptr, &n_bytes, &error));
-#elif defined(G_OS_WIN32) && SIZEOF_WCHAR_T == 2
+#elif defined(G_OS_WIN32) && GLIBMM_SIZEOF_WCHAR_T == 2
   // Avoid going through iconv if wchar_t always contains UTF-16.
   glong n_bytes = 0;
   const auto buf = make_unique_ptr_gfree(g_utf16_to_utf8(
@@ -1451,12 +1439,12 @@ operator>>(std::wistream& is, ustring& utf8_string)
   std::wstring wstr;
   is >> wstr;
 
-#if (defined(__STDC_ISO_10646__) || defined(_LIBCPP_VERSION)) && SIZEOF_WCHAR_T == 4
+#if (defined(__STDC_ISO_10646__) || defined(_LIBCPP_VERSION)) && GLIBMM_SIZEOF_WCHAR_T == 4
   // Avoid going through iconv if wchar_t always contains UCS-4.
   glong n_bytes = 0;
   const auto buf = make_unique_ptr_gfree(g_ucs4_to_utf8(
     reinterpret_cast<const gunichar*>(wstr.data()), wstr.size(), nullptr, &n_bytes, &error));
-#elif defined(G_OS_WIN32) && SIZEOF_WCHAR_T == 2
+#elif defined(G_OS_WIN32) && GLIBMM_SIZEOF_WCHAR_T == 2
   // Avoid going through iconv if wchar_t always contains UTF-16.
   glong n_bytes = 0;
   const auto buf = make_unique_ptr_gfree(g_utf16_to_utf8(
@@ -1482,11 +1470,11 @@ operator<<(std::wostream& os, const ustring& utf8_string)
 {
   GError* error = nullptr;
 
-#if (defined(__STDC_ISO_10646__) || defined(_LIBCPP_VERSION)) && SIZEOF_WCHAR_T == 4
+#if (defined(__STDC_ISO_10646__) || defined(_LIBCPP_VERSION)) && GLIBMM_SIZEOF_WCHAR_T == 4
   // Avoid going through iconv if wchar_t always contains UCS-4.
   const auto buf = make_unique_ptr_gfree(
     g_utf8_to_ucs4(utf8_string.raw().data(), utf8_string.raw().size(), nullptr, nullptr, &error));
-#elif defined(G_OS_WIN32) && SIZEOF_WCHAR_T == 2
+#elif defined(G_OS_WIN32) && GLIBMM_SIZEOF_WCHAR_T == 2
   // Avoid going through iconv if wchar_t always contains UTF-16.
   const auto buf = make_unique_ptr_gfree(
     g_utf8_to_utf16(utf8_string.raw().data(), utf8_string.raw().size(), nullptr, nullptr, &error));
