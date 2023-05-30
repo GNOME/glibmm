@@ -12,7 +12,7 @@ std::ostream& ostr = debug;
 #ifdef G_OS_WIN32
 #define TEST_FILE "c:/windows/write.exe"
 #else
-#define TEST_FILE "/etc/fstab"
+#define TEST_FILE "/etc/passwd"
 #endif
 
 int
