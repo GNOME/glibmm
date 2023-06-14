@@ -44,7 +44,7 @@ name_and_value2 = re.compile(r'^(\w+)\s*=?\s*(-?\s*[0-9]+)$')
 name_and_value3 = re.compile(r'^(\w+)\s*=?\s*(' + optional_cast + r'\(?1[uU]?\s*<<\s*[0-9]+\s*\)?[\s0-9a-fx<-]*)$')
 cast_or_unsigned1 = re.compile(optional_cast + r'(\(?1)[uU]')
 cast_or_unsigned2 = re.compile(optional_cast + r'\(?1[uU]?\s*<<')
-name_with_other_name = re.compile(r'^(\w+)\s*=?\s*(-?[ _x0-9a-fA-Z|()<~,]+)$')
+name_with_other_name = re.compile(r'^(\w+)\s*=?\s*(-?[ _x0-9a-fA-Z|()<~+,]+)$')
 other_name = re.compile(r'([A-Z][_A-Z0-9]+)')
 name_with_char = re.compile(r"^(\w+)\s*=\s*'(.)'$")
 comma_or_rbrace = re.compile(r'^(\w+)\s*=\s*(\%\%[A-Z]+\%\%)$')
@@ -264,7 +264,7 @@ def process(line, enum_def, module, omit):
         unknown_flag = False
       else:
         # if name with other name exists [like MY_FLAG_VALUE = MY_PREV_FLAG_VALUE
-        # or ~(MY_PREV_FLAG_VALUE | MY_EARLIER_VALUE | (1 << 5) - 1 | 0x200)].
+        # or ~(MY_PREV_FLAG_VALUE | MY_EARLIER_VALUE | (1 << 5) + 1 | 0x200)].
         # [MY_FLAG MY_OTHER_FLAG is also supported - note lack of equal char.]
         # [SOME_DEFINITION([X, [Y, [...]]]) definition is also supported.]
         m = name_with_other_name.search(i)
