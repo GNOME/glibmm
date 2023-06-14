@@ -305,10 +305,10 @@ sub process($$)
       $unknown_flag = 0;
     }
     # if name with other name exists [like MY_FLAG_VALUE = MY_PREV_FLAG_VALUE
-    # or ~(MY_PREV_FLAG_VALUE | MY_EARLIER_VALUE | (1 << 5) - 1 | 0x200)].
+    # or ~(MY_PREV_FLAG_VALUE | MY_EARLIER_VALUE | (1 << 5) + 1 | 0x200)].
     # [MY_FLAG MY_OTHER_FLAG is also supported - note lack of equal char.]
     # [SOME_DEFINITION([X, [Y, [...]]]) definition is also supported.]
-    elsif ($i =~ /^(\S+)\s*=?\s*([ _x0-9a-fA-Z|()<~,]+)$/)
+    elsif ($i =~ /^(\S+)\s*=?\s*([ _x0-9a-fA-Z|()<~+,]+)$/)
     {
       my ($tmp1, $tmp2) = ($1, $2);
       push(@c_names, $tmp1);
