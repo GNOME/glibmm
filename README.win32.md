@@ -51,7 +51,7 @@ make install
 In a Visual Studio command prompt, navigate to the `MSVC_NMake` directory.
 Run `nmake /f Makefile.vc CFG=[release|debug]` to build the glibmm and
 giomm DLLs, along with their example programs.  If a prefix other than
-`$(srcroot)\..\vs15\$(Platform)` is desired, pass in `PREFIX=$(your_prefix)`
+`$(srcroot)\..\vs$(VSVER)\$(Platform)` is desired, pass in `PREFIX=$(your_prefix)`
 in the NMake command line.  In order to build the giomm settings example
 program, the `glib-compile-schemas` tool needs to reside in `$(PREFIX)\bin`, or
 it must be specified via passing in `GLIB_COMPILE_SCHEMAS=...` in the NMake
@@ -59,7 +59,7 @@ command line.  If using C++ dependencies that are built with Meson, specify
 `USE_MESON_LIBS=1` in your NMake command line.
 
 The following list lists the `$(VSVER)` and the `vc14x` in the NMake-built DLLs and .lib's that
-corresponds to the Visual Studio version used (Visual Studio versions before 2017 are not
+corresponds to the Visual Studio version used (Visual Studio versions before 2015 are not
 supported):
   * 2015: `14`, `<libname>-vc140-2_4.[dll|pdb|lib]`
   * 2017: `15`, `<libname>-vc141-2_4.[dll|pdb|lib]`
