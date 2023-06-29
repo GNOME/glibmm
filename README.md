@@ -9,7 +9,7 @@ supplier of your operating system, such as your Linux distribution.
 
 ## Building on Windows
 
-See README.win32.md
+See [README.win32.md](README.win32.md)
 
 ## Building from a release tarball
 
