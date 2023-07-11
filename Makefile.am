@@ -45,7 +45,7 @@ nodist_pkgconfig_DATA = glib/$(GLIBMM_MODULE_NAME).pc gio/$(GIOMM_MODULE_NAME).p
 
 include $(srcdir)/MSVC_NMake/filelist.am
 
-text_files = COPYING.tools README.SUN README.win32.md
+text_files = COPYING.tools README.md README.win32.md
 msvc_files = $(addprefix MSVC_NMake/,$(msvc_nmake_data))
 
 dist_noinst_DATA = $(text_files) $(msvc_files)
