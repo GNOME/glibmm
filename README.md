@@ -1,6 +1,36 @@
 # glibmm
 This is glibmm, a C++ API for parts of glib that are useful for C++.
-See http://www.gtkmm.org
+
+# General information
+
+glibmm-2.4 and glibmm-2.68 are different parallel-installable ABIs.
+This file describes glibmm-2.4.
+
+Web site
+ - https://www.gtkmm.org
+
+Download location
+ - https://download.gnome.org/sources/glibmm
+
+Reference documentation
+ - https://developer-old.gnome.org/glibmm/2.66/
+
+This reference documentation does not document the latest release. If you want
+newer documentation, download a tarball. Tarballs contain reference documentation.
+In tarballs generated with Meson, see the untracked/docs/reference/html directory.
+
+Discussion on GNOME's discourse forum
+ - https://discourse.gnome.org/tag/cplusplus
+ - https://discourse.gnome.org/c/platform
+
+Git repository
+ - https://gitlab.gnome.org/GNOME/glibmm
+
+Bugs can be reported to
+ - https://gitlab.gnome.org/GNOME/glibmm/issues
+
+Patches can be submitted to
+ - https://gitlab.gnome.org/GNOME/glibmm/merge_requests
 
 # Building
 
@@ -9,7 +39,7 @@ supplier of your operating system, such as your Linux distribution.
 
 ## Building on Windows
 
-See [README.win32.md](README.win32.md)
+See [README.win32](README.win32.md)
 
 ## Building from a release tarball
 
