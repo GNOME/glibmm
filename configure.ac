@@ -15,9 +15,9 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([glibmm], [2.76.0],
+AC_INIT([glibmm], [2.77.0],
         [https://gitlab.gnome.org/GNOME/glibmm/issues],
-        [glibmm], [http://www.gtkmm.org/])
+        [glibmm], [https://www.gtkmm.org/])
 AC_PREREQ([2.59])
 
 AC_CONFIG_SRCDIR([glib/glibmm.h])
