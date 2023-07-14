@@ -170,8 +170,10 @@ Flags used when creating a #GAppInfo.
 
 <signal name="GAppInfoMonitor::changed">
 <description>
-Signal emitted when the app info database for changes (ie: newly installed
-or removed applications).
+Signal emitted when the app info database changes, when applications are
+installed or removed.
+
+Since: 2.40
 
 </description>
 <parameters>
@@ -3262,6 +3264,9 @@ reported for the toplevel file.
 sizes.  Normally, the block-size is used, if available, as this is a
 more accurate representation of disk space used.
 Compare with `du --apparent-size`.
+Since GLib 2.78. and similarly to `du` since GNU Coreutils 9.2, this will
+ignore the sizes of file types other than regular files and links, as the
+sizes of other file types are not specified in a standard way.
 </parameter_description>
 </parameter>
 <parameter name="G_FILE_MEASURE_NO_XDEV">
@@ -4905,6 +4910,23 @@ Since: 2.36
 </description>
 </property>
 
+<property name="GRegistrySettingsBackend:registry-key">
+<description>
+The location where settings are stored in the registry. Must
+start with one of the following:
+- `HKEY_CLASSES_ROOT`
+- `HKEY_CURRENT_CONFIG`
+- `HKEY_CURRENT_USER`
+- `HKEY_LOCAL_MACHINE`
+- `HKEY_USERS`
+
+Defaults to `HKEY_CURRENT_USER\Software\GSettings`.
+
+Since: 2.78
+
+</description>
+</property>
+
 <signal name="GResolver::reload">
 <description>
 Emitted when the resolver notices that the system resolver
@@ -4919,6 +4941,24 @@ configuration has changed.
 </parameters>
 <return></return>
 </signal>
+
+<property name="GResolver:timeout">
+<description>
+The timeout applied to all resolver lookups, in milliseconds.
+
+This may be changed through the lifetime of the #GResolver. The new value
+will apply to any lookups started after the change, but not to any
+already-ongoing lookups.
+
+If this is `0`, no timeout is applied to lookups.
+
+No timeout was applied to lookups before this property was added in
+GLib 2.78.
+
+Since: 2.78
+
+</description>
+</property>
 
 <enum name="GResolverError">
 <description>
@@ -8445,6 +8485,52 @@ Since: 2.32
 <return></return>
 </function>
 
+<function name="g_action_map_remove_action_entries">
+<description>
+Remove actions from a #GActionMap. This is meant as the reverse of
+g_action_map_add_action_entries().
+
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
+static const GActionEntry entries[] = {
+{ &quot;quit&quot;,         activate_quit              },
+{ &quot;print-string&quot;, activate_print_string, &quot;s&quot; }
+};
+
+void
+add_actions (GActionMap *map)
+{
+g_action_map_add_action_entries (map, entries, G_N_ELEMENTS (entries), NULL);
+}
+
+void
+remove_actions (GActionMap *map)
+{
+g_action_map_remove_action_entries (map, entries, G_N_ELEMENTS (entries));
+}
+]|
+
+Since: 2.78
+
+</description>
+<parameters>
+<parameter name="action_map">
+<parameter_description> The #GActionMap
+</parameter_description>
+</parameter>
+<parameter name="entries">
+<parameter_description> a pointer to
+the first item in an array of #GActionEntry structs
+</parameter_description>
+</parameter>
+<parameter name="n_entries">
+<parameter_description> the length of @entries, or -1 if @entries is %NULL-terminated
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_action_name_is_valid">
 <description>
 Checks if @action_name is valid.
@@ -9379,6 +9465,10 @@ context.
 The #GAppInfoMonitor will emit a &quot;changed&quot; signal in the
 thread-default main context whenever the list of installed
 applications (as reported by g_app_info_get_all()) may have changed.
+
+The #GAppInfoMonitor::changed signal will only be emitted once until
+g_app_info_get_all() (or another `g_app_info_*()` function) is called. Doing
+so will re-arm the signal ready to notify about the next change.
 
 You must only call g_object_unref() on the return value from under
 the same main context as you created it.
@@ -10550,7 +10640,7 @@ Since: 2.42
 Increases the use count of @application.
 
 Use this function to indicate that the application has a reason to
-continue to run.  For example, g_application_hold() is called by GTK+
+continue to run.  For example, g_application_hold() is called by GTK
 when a toplevel window is on the screen.
 
 To cancel the hold, call g_application_release().
@@ -18594,7 +18684,7 @@ Since: 2.30
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GDBusInterfaceVTable (never %NULL).
+<return> the vtable of the D-Bus interface implemented by the skeleton
 
 </return>
 </function>
@@ -26929,22 +27019,67 @@ g_object_unref() when no longer needed.
 <function name="g_file_enumerator_next_files_async">
 <description>
 Request information for a number of files from the enumerator asynchronously.
-When all i/o for the operation is finished the @callback will be called with
+When all I/O for the operation is finished the @callback will be called with
 the requested information. 
 
 See the documentation of #GFileEnumerator for information about the
 order of returned files.
 
-The callback can be called with less than @num_files files in case of error
-or at the end of the enumerator. In case of a partial error the callback will
-be called with any succeeding items and no error, and on the next request the
-error will be reported. If a request is cancelled the callback will be called
-with %G_IO_ERROR_CANCELLED.
+Once the end of the enumerator is reached, or if an error occurs, the
+@callback will be called with an empty list. In this case, the previous call
+to g_file_enumerator_next_files_async() will typically have returned fewer
+than @num_files items.
+
+If a request is cancelled the callback will be called with
+%G_IO_ERROR_CANCELLED.
+
+This leads to the following pseudo-code usage:
+|[
+g_autoptr(GFile) dir = get_directory ();
+g_autoptr(GFileEnumerator) enumerator = NULL;
+g_autolist(GFileInfo) files = NULL;
+g_autoptr(GError) local_error = NULL;
+
+enumerator = yield g_file_enumerate_children_async (dir,
+G_FILE_ATTRIBUTE_STANDARD_NAME &quot;,&quot;
+G_FILE_ATTRIBUTE_STANDARD_TYPE,
+G_FILE_QUERY_INFO_NONE,
+G_PRIORITY_DEFAULT,
+cancellable,
+…,
+&amp;local_error);
+if (enumerator == NULL)
+g_error (&quot;Error enumerating: %s&quot;, local_error-&gt;message);
+
+// Loop until no files are returned, either because the end of the enumerator
+// has been reached, or an error was returned.
+do
+{
+files = yield g_file_enumerator_next_files_async (enumerator,
+5,  // number of files to request
+G_PRIORITY_DEFAULT,
+cancellable,
+…,
+&amp;local_error);
+
+// Process the returned files, but don’t assume that exactly 5 were returned.
+for (GList *l = files; l != NULL; l = l-&gt;next)
+{
+GFileInfo *info = l-&gt;data;
+handle_file_info (info);
+}
+}
+while (files != NULL);
+
+if (local_error != NULL &amp;&amp;
+!g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+g_error (&quot;Error while enumerating: %s&quot;, local_error-&gt;message);
+]|
 
 During an async request no other sync and async calls are allowed, and will
 result in %G_IO_ERROR_PENDING errors. 
 
-Any outstanding i/o request with higher priority (lower numerical value) will
+Any outstanding I/O request with higher priority (lower numerical value) will
 be executed before an outstanding request with lower priority. Default
 priority is %G_PRIORITY_DEFAULT.
 
@@ -30531,6 +30666,29 @@ Since: 2.56
 </parameter>
 <parameter name="Varargs">
 <parameter_description> remaining elements in path, terminated by %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GFile
+
+</return>
+</function>
+
+<function name="g_file_new_build_filenamev">
+<description>
+Constructs a #GFile from a vector of elements using the correct
+separator for filenames.
+
+Using this function is equivalent to calling g_build_filenamev(),
+followed by g_file_new_for_path() on the result.
+
+Since: 2.78
+
+</description>
+<parameters>
+<parameter name="args">
+<parameter_description> %NULL-terminated
+array of strings containing the path elements.
 </parameter_description>
 </parameter>
 </parameters>
@@ -42247,6 +42405,9 @@ the stream may not actually be readable even after the source
 triggers, so you should use g_pollable_input_stream_read_nonblocking()
 rather than g_input_stream_read() from the callback.
 
+The behaviour of this method is undefined if
+g_pollable_input_stream_can_poll() returns %FALSE for @stream.
+
 Since: 2.28
 
 </description>
@@ -42275,6 +42436,9 @@ after this returns %TRUE would still block. To guarantee
 non-blocking behavior, you should always use
 g_pollable_input_stream_read_nonblocking(), which will return a
 %G_IO_ERROR_WOULD_BLOCK error rather than blocking.
+
+The behaviour of this method is undefined if
+g_pollable_input_stream_can_poll() returns %FALSE for @stream.
 
 Since: 2.28
 
@@ -42306,6 +42470,9 @@ use @cancellable to cancel it. However, it will return an error
 if @cancellable has already been cancelled when you call, which
 may happen if you call this method after a source triggers due
 to having been cancelled.
+
+The behaviour of this method is undefined if
+g_pollable_input_stream_can_poll() returns %FALSE for @stream.
 
 Virtual: read_nonblocking
 
@@ -42373,6 +42540,9 @@ the stream may not actually be writable even after the source
 triggers, so you should use g_pollable_output_stream_write_nonblocking()
 rather than g_output_stream_write() from the callback.
 
+The behaviour of this method is undefined if
+g_pollable_output_stream_can_poll() returns %FALSE for @stream.
+
 Since: 2.28
 
 </description>
@@ -42401,6 +42571,9 @@ after this returns %TRUE would still block. To guarantee
 non-blocking behavior, you should always use
 g_pollable_output_stream_write_nonblocking(), which will return a
 %G_IO_ERROR_WOULD_BLOCK error rather than blocking.
+
+The behaviour of this method is undefined if
+g_pollable_output_stream_can_poll() returns %FALSE for @stream.
 
 Since: 2.28
 
@@ -42436,6 +42609,9 @@ to having been cancelled.
 Also note that if %G_IO_ERROR_WOULD_BLOCK is returned some underlying
 transports like D/TLS require that you re-send the same @buffer and
 @count in the next write call.
+
+The behaviour of this method is undefined if
+g_pollable_output_stream_can_poll() returns %FALSE for @stream.
 
 Virtual: write_nonblocking
 
@@ -42486,6 +42662,9 @@ to having been cancelled.
 Also note that if %G_POLLABLE_RETURN_WOULD_BLOCK is returned some underlying
 transports like D/TLS require that you re-send the same @vectors and
 @n_vectors in the next write call.
+
+The behaviour of this method is undefined if
+g_pollable_output_stream_can_poll() returns %FALSE for @stream.
 
 Virtual: writev_nonblocking
 
@@ -43274,6 +43453,26 @@ Since: 2.26
 </return>
 </function>
 
+<function name="g_registry_settings_backend_new">
+<description>
+If @registry_key is %NULL then the default path
+`HKEY_CURRENT_USER\Software\GSettings` is used.
+
+Since: 2.78
+
+</description>
+<parameters>
+<parameter name="registry_key">
+<parameter_description> the path to the registry key where
+settings are stored, or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a registry-backed #GSettingsBackend
+
+</return>
+</function>
+
 <function name="g_remote_action_group_activate_action_full">
 <description>
 Activates the remote action.
@@ -43410,6 +43609,24 @@ Since: 2.22
 <parameters>
 </parameters>
 <return> the default #GResolver.
+
+</return>
+</function>
+
+<function name="g_resolver_get_timeout">
+<description>
+Get the timeout applied to all resolver lookups. See #GResolver:timeout.
+
+Since: 2.78
+
+</description>
+<parameters>
+<parameter name="resolver">
+<parameter_description> a #GResolver
+</parameter_description>
+</parameter>
+</parameters>
+<return> the resolver timeout, in milliseconds, or `0` for no timeout
 
 </return>
 </function>
@@ -44030,6 +44247,26 @@ Since: 2.22
 <parameters>
 <parameter name="resolver">
 <parameter_description> the new default #GResolver
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_resolver_set_timeout">
+<description>
+Set the timeout applied to all resolver lookups. See #GResolver:timeout.
+
+Since: 2.78
+
+</description>
+<parameters>
+<parameter name="resolver">
+<parameter_description> a #GResolver
+</parameter_description>
+</parameter>
+<parameter name="timeout_ms">
+<parameter_description> timeout in milliseconds, or `0` for no timeouts
 </parameter_description>
 </parameter>
 </parameters>
@@ -54740,6 +54977,13 @@ g_task_run_in_thread(), you should not assume that it will always
 do this. If you have a very large number of tasks to run (several tens of
 tasks), but don't want them to all run at once, you should only queue a
 limited number of them (around ten) at a time.
+
+Be aware that if your task depends on other tasks to complete, use of this
+function could lead to a livelock if the other tasks also use this function
+and enough of them (around 10) execute in a dependency chain, as that will
+exhaust the thread pool. If this situation is possible, consider using a
+separate worker thread or thread pool explicitly, rather than using
+g_task_run_in_thread().
 
 Since: 2.36
 

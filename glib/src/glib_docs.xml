@@ -2878,7 +2878,7 @@ efficient than the other orders.
 These flags used to be passed to g_type_init_with_debug_flags() which
 is now deprecated.
 
-If you need to enable debugging features, use the GOBJECT_DEBUG
+If you need to enable debugging features, use the `GOBJECT_DEBUG`
 environment variable.
 
 Deprecated: 2.36: g_type_init() is now done automatically
@@ -2976,7 +2976,7 @@ These are the possible line break classifications.
 Since new unicode versions may add new types here, applications should be ready 
 to handle unknown values. They may be regarded as %G_UNICODE_BREAK_UNKNOWN.
 
-See [Unicode Line Breaking Algorithm](http://www.unicode.org/unicode/reports/tr14/).
+See [Unicode Line Breaking Algorithm](https://www.unicode.org/reports/tr14/).
 
 </description>
 <parameters>
@@ -4978,8 +4978,10 @@ Creates a new #GArray with @data as array data, @len as length and a
 reference count of 1.
 
 This avoids having to copy the data manually, when it can just be
-inherited. @data will eventually be freed using g_free(), so must
-have been allocated with a suitable allocator.
+inherited.
+After this call, @data belongs to the #GArray and may no longer be
+modified by the caller. The memory of @data has to be dynamically
+allocated and will eventually be freed with g_free().
 
 In case the elements need to be cleared when the array is freed, use
 g_array_set_clear_func() to set a #GDestroyNotify function to perform
@@ -5023,8 +5025,10 @@ Creates a new #GArray with @data as array data, computing the length of it
 and setting the reference count to 1.
 
 This avoids having to copy the data manually, when it can just be
-inherited. @data will eventually be freed using g_free(), so must
-have been allocated with a suitable allocator.
+inherited.
+After this call, @data belongs to the #GArray and may no longer be
+modified by the caller. The memory of @data has to be dynamically
+allocated and will eventually be freed with g_free().
 
 The length is calculated by iterating through @data until the first %NULL
 element is found.
@@ -11422,8 +11426,10 @@ Creates a new #GByteArray with a reference count of 1.
 
 <function name="g_byte_array_new_take">
 <description>
-Create byte array containing the data. The data will be owned by the array
-and will be freed with g_free(), i.e. it could be allocated using g_strdup().
+Creates a byte array containing the @data.
+After this call, @data belongs to the #GByteArray and may no longer be
+modified by the caller. The memory of @data has to be dynamically
+allocated and will eventually be freed with g_free().
 
 Do not use it if @len is greater than %G_MAXUINT. #GByteArray
 stores the length of its data in #guint, which may be shorter than
@@ -11965,11 +11971,9 @@ the data to be used for the bytes
 <description>
 Creates a new #GBytes from @data.
 
-After this call, @data belongs to the bytes and may no longer be
-modified by the caller.  g_free() will be called on @data when the
-bytes is no longer in use. Because of this @data must have been created by
-a call to g_malloc(), g_malloc0() or g_realloc() or by one of the many
-functions that wrap these calls (such as g_new(), g_strdup(), etc).
+After this call, @data belongs to the #GBytes and may no longer be
+modified by the caller. The memory of @data has to be dynamically
+allocated and will eventually be freed with g_free().
 
 For creating #GBytes with memory from other allocators, see
 g_bytes_new_with_free_func().
@@ -14706,6 +14710,14 @@ first argument, for instance in another thread
 mechanism, including `waitpid(pid, ...)` or a second child-watch
 source for the same @pid
 * the application must not ignore `SIGCHLD`
+* Before 2.78, the application could not send a signal (`kill()`) to the
+watched @pid in a race free manner. Since 2.78, you can do that while the
+associated #GMainContext is acquired.
+* Before 2.78, even after destroying the #GSource, you could not
+be sure that @pid wasn't already reaped. Hence, it was also not
+safe to `kill()` or `waitpid()` on the process ID after the child watch
+source was gone. Destroying the source before it fired made it
+impossible to reliably reap the process.
 
 If any of those conditions are not met, this and related APIs will
 not work correctly. This can often be diagnosed via a GLib warning
@@ -14788,8 +14800,13 @@ Like g_close(), if closing the file descriptor fails, the error is
 stored in both %errno and @error. If this function succeeds,
 %errno is undefined.
 
-This function is async-signal-safe if @error is %NULL and @fd_ptr
-points to either a negative number or a valid file descriptor.
+On POSIX platforms, this function is async-signal safe
+if @error is %NULL and @fd_ptr points to either a negative number or a
+valid open file descriptor.
+This makes it safe to call from a signal handler or a #GSpawnChildSetupFunc
+under those conditions.
+See [`signal(7)`](man:signal(7)) and
+[`signal-safety(7)`](man:signal-safety(7)) for more details.
 
 It is a programming error for @fd_ptr to point to a non-negative
 number that is not a valid file descriptor.
@@ -15042,8 +15059,12 @@ semantics.
 
 It is a bug to call this function with an invalid file descriptor.
 
-Since 2.76, this function is guaranteed to be async-signal-safe if (and only
-if) @error is %NULL and @fd is a valid open file descriptor.
+On POSIX platforms since GLib 2.76, this function is async-signal safe
+if (and only if) @error is %NULL and @fd is a valid open file descriptor.
+This makes it safe to call from a signal handler or a #GSpawnChildSetupFunc
+under those conditions.
+See [`signal(7)`](man:signal(7)) and
+[`signal-safety(7)`](man:signal-safety(7)) for more details.
 
 Since: 2.36
 
@@ -18400,103 +18421,103 @@ Since: 2.26
 Creates a newly allocated string representing the requested @format.
 
 The format strings understood by this function are a subset of the
-strftime() format language as specified by C99.  The \%D, \%U and \%W
-conversions are not supported, nor is the 'E' modifier.  The GNU
-extensions \%k, \%l, \%s and \%P are supported, however, as are the
-'0', '_' and '-' modifiers. The Python extension \%f is also supported.
+`strftime()` format language as specified by C99.  The `%D`, `%U` and `%W`
+conversions are not supported, nor is the `E` modifier.  The GNU
+extensions `%k`, `%l`, `%s` and `%P` are supported, however, as are the
+`0`, `_` and `-` modifiers. The Python extension `%f` is also supported.
 
-In contrast to strftime(), this function always produces a UTF-8
+In contrast to `strftime()`, this function always produces a UTF-8
 string, regardless of the current locale.  Note that the rendering of
-many formats is locale-dependent and may not match the strftime()
+many formats is locale-dependent and may not match the `strftime()`
 output exactly.
 
 The following format specifiers are supported:
 
-- \%a: the abbreviated weekday name according to the current locale
-- \%A: the full weekday name according to the current locale
-- \%b: the abbreviated month name according to the current locale
-- \%B: the full month name according to the current locale
-- \%c: the preferred date and time representation for the current locale
-- \%C: the century number (year/100) as a 2-digit integer (00-99)
-- \%d: the day of the month as a decimal number (range 01 to 31)
-- \%e: the day of the month as a decimal number (range 1 to 31);
-single digits are preceded by a figure space
-- \%F: equivalent to `%Y-%m-%d` (the ISO 8601 date format)
-- \%g: the last two digits of the ISO 8601 week-based year as a
-decimal number (00-99). This works well with \%V and \%u.
-- \%G: the ISO 8601 week-based year as a decimal number. This works
-well with \%V and \%u.
-- \%h: equivalent to \%b
-- \%H: the hour as a decimal number using a 24-hour clock (range 00 to 23)
-- \%I: the hour as a decimal number using a 12-hour clock (range 01 to 12)
-- \%j: the day of the year as a decimal number (range 001 to 366)
-- \%k: the hour (24-hour clock) as a decimal number (range 0 to 23);
-single digits are preceded by a figure space
-- \%l: the hour (12-hour clock) as a decimal number (range 1 to 12);
-single digits are preceded by a figure space
-- \%m: the month as a decimal number (range 01 to 12)
-- \%M: the minute as a decimal number (range 00 to 59)
-- \%f: the microsecond as a decimal number (range 000000 to 999999)
-- \%p: either &quot;AM&quot; or &quot;PM&quot; according to the given time value, or the
+- `%a`: the abbreviated weekday name according to the current locale
+- `%A`: the full weekday name according to the current locale
+- `%b`: the abbreviated month name according to the current locale
+- `%B`: the full month name according to the current locale
+- `%c`: the preferred date and time representation for the current locale
+- `%C`: the century number (year/100) as a 2-digit integer (00-99)
+- `%d`: the day of the month as a decimal number (range 01 to 31)
+- `%e`: the day of the month as a decimal number (range 1 to 31);
+single digits are preceded by a figure space (U+2007)
+- `%F`: equivalent to `%Y-%m-%d` (the ISO 8601 date format)
+- `%g`: the last two digits of the ISO 8601 week-based year as a
+decimal number (00-99). This works well with `%V` and `%u`.
+- `%G`: the ISO 8601 week-based year as a decimal number. This works
+well with `%V` and `%u`.
+- `%h`: equivalent to `%b`
+- `%H`: the hour as a decimal number using a 24-hour clock (range 00 to 23)
+- `%I`: the hour as a decimal number using a 12-hour clock (range 01 to 12)
+- `%j`: the day of the year as a decimal number (range 001 to 366)
+- `%k`: the hour (24-hour clock) as a decimal number (range 0 to 23);
+single digits are preceded by a figure space (U+2007)
+- `%l`: the hour (12-hour clock) as a decimal number (range 1 to 12);
+single digits are preceded by a figure space (U+2007)
+- `%m`: the month as a decimal number (range 01 to 12)
+- `%M`: the minute as a decimal number (range 00 to 59)
+- `%f`: the microsecond as a decimal number (range 000000 to 999999)
+- `%p`: either ‘AM’ or ‘PM’ according to the given time value, or the
 corresponding  strings for the current locale.  Noon is treated as
-&quot;PM&quot; and midnight as &quot;AM&quot;. Use of this format specifier is discouraged, as
-many locales have no concept of AM/PM formatting. Use \%c or \%X instead.
-- \%P: like \%p but lowercase: &quot;am&quot; or &quot;pm&quot; or a corresponding string for
+‘PM’ and midnight as ‘AM’. Use of this format specifier is discouraged, as
+many locales have no concept of AM/PM formatting. Use `%c` or `%X` instead.
+- `%P`: like `%p` but lowercase: ‘am’ or ‘pm’ or a corresponding string for
 the current locale. Use of this format specifier is discouraged, as
-many locales have no concept of AM/PM formatting. Use \%c or \%X instead.
-- \%r: the time in a.m. or p.m. notation. Use of this format specifier is
-discouraged, as many locales have no concept of AM/PM formatting. Use \%c
-or \%X instead.
-- \%R: the time in 24-hour notation (\%H:\%M)
-- \%s: the number of seconds since the Epoch, that is, since 1970-01-01
+many locales have no concept of AM/PM formatting. Use `%c` or `%X` instead.
+- `%r`: the time in a.m. or p.m. notation. Use of this format specifier is
+discouraged, as many locales have no concept of AM/PM formatting. Use `%c`
+or `%X` instead.
+- `%R`: the time in 24-hour notation (`%H:%M`)
+- `%s`: the number of seconds since the Epoch, that is, since 1970-01-01
 00:00:00 UTC
-- \%S: the second as a decimal number (range 00 to 60)
-- \%t: a tab character
-- \%T: the time in 24-hour notation with seconds (\%H:\%M:\%S)
-- \%u: the ISO 8601 standard day of the week as a decimal, range 1 to 7,
-Monday being 1. This works well with \%G and \%V.
-- \%V: the ISO 8601 standard week number of the current year as a decimal
+- `%S`: the second as a decimal number (range 00 to 60)
+- `%t`: a tab character
+- `%T`: the time in 24-hour notation with seconds (`%H:%M:%S`)
+- `%u`: the ISO 8601 standard day of the week as a decimal, range 1 to 7,
+Monday being 1. This works well with `%G` and `%V`.
+- `%V`: the ISO 8601 standard week number of the current year as a decimal
 number, range 01 to 53, where week 1 is the first week that has at
 least 4 days in the new year. See g_date_time_get_week_of_year().
-This works well with \%G and \%u.
-- \%w: the day of the week as a decimal, range 0 to 6, Sunday being 0.
-This is not the ISO 8601 standard format -- use \%u instead.
-- \%x: the preferred date representation for the current locale without
+This works well with `%G` and `%u`.
+- `%w`: the day of the week as a decimal, range 0 to 6, Sunday being 0.
+This is not the ISO 8601 standard format — use `%u` instead.
+- `%x`: the preferred date representation for the current locale without
 the time
-- \%X: the preferred time representation for the current locale without
+- `%X`: the preferred time representation for the current locale without
 the date
-- \%y: the year as a decimal number without the century
-- \%Y: the year as a decimal number including the century
-- \%z: the time zone as an offset from UTC (+hhmm)
-- \%:z: the time zone as an offset from UTC (+hh:mm).
-This is a gnulib strftime() extension. Since: 2.38
-- \%::z: the time zone as an offset from UTC (+hh:mm:ss). This is a
-gnulib strftime() extension. Since: 2.38
-- \%:::z: the time zone as an offset from UTC, with : to necessary
-precision (e.g., -04, +05:30). This is a gnulib strftime() extension. Since: 2.38
-- \%Z: the time zone or name or abbreviation
-- \%\%: a literal \% character
+- `%y`: the year as a decimal number without the century
+- `%Y`: the year as a decimal number including the century
+- `%z`: the time zone as an offset from UTC (`+hhmm`)
+- `%:z`: the time zone as an offset from UTC (`+hh:mm`).
+This is a gnulib `strftime()` extension. Since: 2.38
+- `%::z`: the time zone as an offset from UTC (`+hh:mm:ss`). This is a
+gnulib `strftime()` extension. Since: 2.38
+- `%:::z`: the time zone as an offset from UTC, with `:` to necessary
+precision (e.g., `-04`, `+05:30`). This is a gnulib `strftime()` extension. Since: 2.38
+- `%Z`: the time zone or name or abbreviation
+- `%%`: a literal `%` character
 
 Some conversion specifications can be modified by preceding the
 conversion specifier by one or more modifier characters. The
 following modifiers are supported for many of the numeric
 conversions:
 
-- O: Use alternative numeric symbols, if the current locale supports those.
-- _: Pad a numeric result with spaces. This overrides the default padding
+- `O`: Use alternative numeric symbols, if the current locale supports those.
+- `_`: Pad a numeric result with spaces. This overrides the default padding
 for the specifier.
-- -: Do not pad a numeric result. This overrides the default padding
+- `-`: Do not pad a numeric result. This overrides the default padding
 for the specifier.
-- 0: Pad a numeric result with zeros. This overrides the default padding
+- `0`: Pad a numeric result with zeros. This overrides the default padding
 for the specifier.
 
-Additionally, when O is used with B, b, or h, it produces the alternative
+Additionally, when `O` is used with `B`, `b`, or `h`, it produces the alternative
 form of a month name. The alternative form should be used when the month
 name is used without a day number (e.g., standalone). It is required in
 some languages (Baltic, Slavic, Greek, and more) due to their grammatical
-rules. For other languages there is no difference. \%OB is a GNU and BSD
-strftime() extension expected to be added to the future POSIX specification,
-\%Ob and \%Oh are GNU strftime() extensions. Since: 2.56
+rules. For other languages there is no difference. `%OB` is a GNU and BSD
+`strftime()` extension expected to be added to the future POSIX specification,
+`%Ob` and `%Oh` are GNU `strftime()` extensions. Since: 2.56
 
 Since: 2.26
 
@@ -19720,12 +19741,12 @@ the message if the default domain as set with textdomain() has no
 translations for the current locale.
 
 The advantage of using this function over dgettext() proper is that
-libraries using this function (like GTK+) will not use translations
+libraries using this function (like GTK) will not use translations
 if the application using the library does not have translations for
 the current locale.  This results in a consistent English-only
 interface instead of one having partial translations.  For this
 feature to work, the call to textdomain() and setlocale() should
-precede any g_dgettext() invocations.  For GTK+, it means calling
+precede any g_dgettext() invocations.  For GTK, it means calling
 textdomain() before gtk_init or its variants.
 
 This function disables translations if and only if upon its first
@@ -19743,7 +19764,7 @@ starting with &quot;en_&quot;)
 
 Note that this behavior may not be desired for example if an application
 has its untranslated messages in a language other than English. In those
-cases the application should call textdomain() after initializing GTK+.
+cases the application should call textdomain() after initializing GTK.
 
 Applications should normally not use this function directly,
 but use the _() macro for translations.
@@ -21607,6 +21628,12 @@ Frees the memory pointed to by @mem.
 If you know the allocated size of @mem, calling g_free_sized() may be faster,
 depending on the libc implementation in use.
 
+Starting from GLib 2.78, this may happen automatically in case a GCC
+compatible compiler is used with some optimization level and the allocated
+size is known at compile time (see [documentation of
+`__builtin_object_size()`](https://gcc.gnu.org/onlinedocs/gcc/Object-Size-Checking.html)
+to understand its caveats).
+
 If @mem is %NULL it simply returns, so there is no need to check @mem
 against %NULL before calling this function.
 
@@ -21629,6 +21656,10 @@ If @mem is %NULL this is a no-op (and @size is ignored).
 It is an error if @size doesn’t match the size passed when @mem was
 allocated. @size is passed to this function to allow optimizations in the
 allocator. If you don’t know the allocation size, use g_free() instead.
+
+In case a GCC compatible compiler is used, this function may be used
+automatically via g_free() if the allocated size is known at compile time,
+since GLib 2.78.
 
 Since: 2.76
 
@@ -22133,7 +22164,7 @@ Gets the name of the program. This name should not be localized,
 in contrast to g_get_application_name().
 
 If you are using #GApplication the program name is set in
-g_application_run(). In case of GDK or GTK+ it is set in
+g_application_run(). In case of GDK or GTK it is set in
 gdk_init(), which is called by gtk_init() and the
 #GtkApplication::startup handler. The program name is found by
 taking the last component of @argv[0].
@@ -28768,7 +28799,7 @@ g_log_set_handler (NULL, G_LOG_LEVEL_WARNING | G_LOG_FLAG_FATAL
 | G_LOG_FLAG_RECURSION, my_log_handler, NULL);
 ]|
 
-This example adds a log handler for all critical messages from GTK+:
+This example adds a log handler for all critical messages from GTK:
 
 |[&lt;!-- language=&quot;C&quot; --&gt; 
 g_log_set_handler (&quot;Gtk&quot;, G_LOG_LEVEL_CRITICAL | G_LOG_FLAG_FATAL
@@ -29446,7 +29477,7 @@ is called as many times as g_main_context_acquire().
 
 You must be the owner of a context before you
 can call g_main_context_prepare(), g_main_context_query(),
-g_main_context_check(), g_main_context_dispatch().
+g_main_context_check(), g_main_context_dispatch(), g_main_context_release().
 
 Since 2.76 @context can be %NULL to use the global-default
 main context.
@@ -30136,6 +30167,9 @@ Releases ownership of a context previously acquired by this thread
 with g_main_context_acquire(). If the context was acquired multiple
 times, the ownership will be released only when g_main_context_release()
 is called as many times as it was acquired.
+
+You must have successfully acquired the context with
+g_main_context_acquire() before you may call this function.
 
 </description>
 <parameters>
@@ -36446,6 +36480,11 @@ Deprecated: 2.44: Use g_option_group_unref() instead.
 <description>
 Creates a new #GOptionGroup.
 
+@description is typically used to provide a title for the group. If so, it
+is recommended that it’s written in title case, and has a trailing colon so
+that it matches the style of built-in GLib group titles such as
+‘Application Options:’.
+
 Since: 2.6
 
 </description>
@@ -38181,7 +38220,7 @@ respectively.
 <description>
 Parses a string containing debugging options
 into a %guint containing bit flags. This is used
-within GDK and GTK+ to parse the debug options passed on the
+within GDK and GTK to parse the debug options passed on the
 command line or through environment variables.
 
 If @string is equal to &quot;all&quot;, all flags are set. Any flags
@@ -39894,8 +39933,10 @@ destroy @array or %NULL
 Creates a new #GPtrArray with @data as pointers, @len as length and a
 reference count of 1.
 
-This avoids having to copy such data manually. @data will eventually be
-freed using g_free(), so must have been allocated with a suitable allocator.
+This avoids having to copy such data manually.
+After this call, @data belongs to the #GPtrArray and may no longer be
+modified by the caller. The memory of @data has to be dynamically
+allocated and will eventually be freed with g_free().
 
 It also sets @element_free_func for freeing each element when the array is
 destroyed either via g_ptr_array_unref(), when g_ptr_array_free() is called
@@ -39934,8 +39975,10 @@ destruction or %NULL
 Creates a new #GPtrArray with @data as pointers, computing the length of it
 and setting the reference count to 1.
 
-This avoids having to copy such data manually. @data will eventually be
-freed using g_free(), so must have been allocated with a suitable allocator.
+This avoids having to copy such data manually.
+After this call, @data belongs to the #GPtrArray and may no longer be
+modified by the caller. The memory of @data has to be dynamically
+allocated and will eventually be freed with g_free().
 
 The length is calculated by iterating through @data until the first %NULL
 element is found.
@@ -40216,7 +40259,7 @@ Note that the comparison function for g_ptr_array_sort() doesn't
 take the pointers from the array as arguments, it takes pointers to
 the pointers in the array.
 
-Use g_ptr_array_sort_with_data() if you want to use normal
+Use g_ptr_array_sort_values() if you want to use normal
 #GCompareFuncs, otherwise here is a full example of use:
 
 |[&lt;!-- language=&quot;C&quot; --&gt;
@@ -40321,7 +40364,7 @@ Note that the comparison function for g_ptr_array_sort_with_data()
 doesn't take the pointers from the array as arguments, it takes
 pointers to the pointers in the array.
 
-Use g_ptr_array_sort_with_data() if you want to use normal
+Use g_ptr_array_sort_values_with_data() if you want to use normal
 #GCompareDataFuncs, otherwise here is a full example of use:
 
 |[&lt;!-- language=&quot;C&quot; --&gt;
@@ -40572,7 +40615,7 @@ will continue to exist until the program terminates. It can be used
 with statically allocated strings in the main program, but not with
 statically allocated memory in dynamically loaded modules, if you
 expect to ever unload the module again (e.g. do not use this
-function in GTK+ theme engines).
+function in GTK theme engines).
 
 This function must not be used before library constructors have finished
 running. In particular, this means it cannot be used to initialize global
@@ -46071,7 +46114,7 @@ Sets the name of the program. This name should not be localized,
 in contrast to g_set_application_name().
 
 If you are using #GApplication the program name is set in
-g_application_run(). In case of GDK or GTK+ it is set in
+g_application_run(). In case of GDK or GTK it is set in
 gdk_init(), which is called by gtk_init() and the
 #GtkApplication::startup handler. The program name is found by
 taking the last component of @argv[0].
@@ -46098,7 +46141,7 @@ default GLib handler if %NULL.
 Any messages passed to g_print() will be output via
 the new handler. The default handler outputs
 the encoded message to stdout. By providing your own handler
-you can redirect the output, to a GTK+ widget or a
+you can redirect the output, to a GTK widget or a
 log file for example.
 
 Since 2.76 this functions always returns a valid
@@ -46129,7 +46172,7 @@ or resets it to the default GLib handler if %NULL.
 Any messages passed to g_printerr() will be output via
 the new handler. The default handler outputs the encoded
 message to stderr. By providing your own handler you can
-redirect the output, to a GTK+ widget or a log file for
+redirect the output, to a GTK widget or a log file for
 example.
 
 Since 2.76 this functions always returns a valid
@@ -47445,12 +47488,18 @@ Blocks all handlers on an instance that match @func and @data.
 <function name="g_signal_handlers_block_matched">
 <description>
 Blocks all handlers on an instance that match a certain selection criteria.
-The criteria mask is passed as an OR-ed combination of #GSignalMatchType
-flags, and the criteria values are passed as arguments.
-Passing at least one of the %G_SIGNAL_MATCH_CLOSURE, %G_SIGNAL_MATCH_FUNC
+
+The criteria mask is passed as a combination of #GSignalMatchType flags, and
+the criteria values are passed as arguments. A handler must match on all
+flags set in @mask to be blocked (i.e. the match is conjunctive).
+
+Passing at least one of the %G_SIGNAL_MATCH_ID, %G_SIGNAL_MATCH_CLOSURE,
+%G_SIGNAL_MATCH_FUNC
 or %G_SIGNAL_MATCH_DATA match flags is required for successful matches.
 If no handlers were found, 0 is returned, the number of blocked handlers
 otherwise.
+
+Support for %G_SIGNAL_MATCH_ID was added in GLib 2.78.
 
 
 </description>
@@ -47554,13 +47603,19 @@ Disconnects all handlers on an instance that match @func and @data.
 <function name="g_signal_handlers_disconnect_matched">
 <description>
 Disconnects all handlers on an instance that match a certain
-selection criteria. The criteria mask is passed as an OR-ed
-combination of #GSignalMatchType flags, and the criteria values are
-passed as arguments.  Passing at least one of the
-%G_SIGNAL_MATCH_CLOSURE, %G_SIGNAL_MATCH_FUNC or
+selection criteria.
+
+The criteria mask is passed as a combination of #GSignalMatchType flags, and
+the criteria values are passed as arguments. A handler must match on all
+flags set in @mask to be disconnected (i.e. the match is conjunctive).
+
+Passing at least one of the %G_SIGNAL_MATCH_ID, %G_SIGNAL_MATCH_CLOSURE,
+%G_SIGNAL_MATCH_FUNC or
 %G_SIGNAL_MATCH_DATA match flags is required for successful
 matches.  If no handlers were found, 0 is returned, the number of
 disconnected handlers otherwise.
+
+Support for %G_SIGNAL_MATCH_ID was added in GLib 2.78.
 
 
 </description>
@@ -47626,13 +47681,20 @@ Unblocks all handlers on an instance that match @func and @data.
 <function name="g_signal_handlers_unblock_matched">
 <description>
 Unblocks all handlers on an instance that match a certain selection
-criteria. The criteria mask is passed as an OR-ed combination of
-#GSignalMatchType flags, and the criteria values are passed as arguments.
-Passing at least one of the %G_SIGNAL_MATCH_CLOSURE, %G_SIGNAL_MATCH_FUNC
+criteria.
+
+The criteria mask is passed as a combination of #GSignalMatchType flags, and
+the criteria values are passed as arguments. A handler must match on all
+flags set in @mask to be unblocked (i.e. the match is conjunctive).
+
+Passing at least one of the %G_SIGNAL_MATCH_ID, %G_SIGNAL_MATCH_CLOSURE,
+%G_SIGNAL_MATCH_FUNC
 or %G_SIGNAL_MATCH_DATA match flags is required for successful matches.
 If no handlers were found, 0 is returned, the number of unblocked handlers
 otherwise. The match criteria should not apply to any handlers that are
 not currently blocked.
+
+Support for %G_SIGNAL_MATCH_ID was added in GLib 2.78.
 
 
 </description>
@@ -50376,7 +50438,7 @@ The name defaults to #NULL.
 
 The source name should describe in a human-readable way
 what the source does. For example, &quot;X11 event queue&quot;
-or &quot;GTK+ repaint idle handler&quot; or whatever it is.
+or &quot;GTK repaint idle handler&quot; or whatever it is.
 
 It is permitted to call this function multiple times, but is not
 recommended due to the potential performance impact.  For example,
@@ -51916,6 +51978,8 @@ On POSIX platforms, this function is async-signal safe
 [`signal-safety(7)`](man:signal-safety(7))), making it safe to call from a
 signal handler or a #GSpawnChildSetupFunc.
 
+This function preserves the value of `errno`.
+
 Since: 2.70
 
 </description>
@@ -53407,6 +53471,30 @@ bytes.
 </return>
 </function>
 
+<function name="g_string_new_take">
+<description>
+Creates a new #GString, initialized with the given string.
+
+After this call, @init belongs to the #GString and may no longer be
+modified by the caller. The memory of @data has to be dynamically
+allocated and will eventually be freed with g_free().
+
+Since: 2.78
+
+</description>
+<parameters>
+<parameter name="init">
+<parameter_description> initial text used as the string.
+Ownership of the string is transferred to the #GString.
+Passing %NULL creates an empty string.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new #GString
+
+</return>
+</function>
+
 <function name="g_string_overwrite">
 <description>
 Overwrites part of a string, lengthening it if necessary.
@@ -54217,7 +54305,7 @@ g_strfreev() to free it.
 <description>
 Searches the string @haystack for the first occurrence
 of the string @needle, limiting the length of the search
-to @haystack_len.
+to @haystack_len or a nul terminator byte (whichever is reached first).
 
 
 </description>
@@ -55133,6 +55221,8 @@ Since: 2.70
 Initialize the GLib testing framework, e.g. by seeding the
 test random number generator, the name for g_get_prgname()
 and parsing test related command line args.
+
+This should be called before calling any other `g_test_*()` functions.
 
 So far, the following arguments are understood:
 
@@ -56656,10 +56746,14 @@ pools are not affected by g_thread_pool_set_max_idle_time()
 since their threads are never considered idle and returned to the
 global pool.
 
-Note that the threads used by exclusive threadpools will all inherit the
+Note that the threads used by exclusive thread pools will all inherit the
 scheduler settings of the current thread while the threads used by
-non-exclusive threadpools will inherit the scheduler settings from the
-first thread that created such a threadpool.
+non-exclusive thread pools will inherit the scheduler settings from the
+first thread that created such a thread pool.
+
+At least one thread will be spawned when this function is called, either to
+create the @max_threads exclusive threads, or to preserve the scheduler
+settings of the current thread for future spawns.
 
 @error can be %NULL to ignore errors, or non-%NULL to report
 errors. An error can only occur when @exclusive is set to %TRUE
@@ -56703,6 +56797,9 @@ This function creates a new thread pool similar to g_thread_pool_new()
 but allowing @item_free_func to be specified to free the data passed
 to g_thread_pool_push() in the case that the #GThreadPool is stopped
 and freed before all tasks have been executed.
+
+@item_free_func will *not* be called on items successfully passed to @func.
+@func is responsible for freeing the items passed to it.
 
 Since: 2.70
 
@@ -57847,6 +57944,32 @@ the range between %G_PRIORITY_DEFAULT and %G_PRIORITY_HIGH.
 </parameter>
 </parameters>
 <return> the ID (greater than 0) of the event source.
+
+</return>
+</function>
+
+<function name="g_timeout_add_seconds_once">
+<description>
+This function behaves like g_timeout_add_once() but with a range in seconds.
+
+Since: 2.78
+
+</description>
+<parameters>
+<parameter name="interval">
+<parameter_description> the time after which the function will be called, in seconds
+</parameter_description>
+</parameter>
+<parameter name="function">
+<parameter_description> function to call
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> data to pass to @function
+</parameter_description>
+</parameter>
+</parameters>
+<return> the ID (greater than 0) of the event source
 
 </return>
 </function>
@@ -59764,8 +59887,8 @@ or 0 if the type system ran out of fundamental type IDs
 <description>
 Returns the number of instances allocated of the particular type;
 this is only available if GLib is built with debugging support and
-the instance_count debug flag is set (by setting the GOBJECT_DEBUG
-variable to include instance-count).
+the `instance-count` debug flag is set (by setting the `GOBJECT_DEBUG`
+variable to include `instance-count`).
 
 Since: 2.44
 
@@ -59862,7 +59985,7 @@ This function used to initialise the type system with debugging
 flags.  Since GLib 2.36, the type system is initialised automatically
 and this function does nothing.
 
-If you need to enable debugging features, use the GOBJECT_DEBUG
+If you need to enable debugging features, use the `GOBJECT_DEBUG`
 environment variable.
 
 Deprecated: 2.36: the type system is now initialised automatically
@@ -61800,10 +61923,13 @@ Since: 2.36
 
 <function name="g_unix_fd_source_new">
 <description>
-Creates a #GSource to watch for a particular IO condition on a file
+Creates a #GSource to watch for a particular I/O condition on a file
 descriptor.
 
-The source will never close the fd -- you must do it yourself.
+The source will never close the @fd — you must do it yourself.
+
+Any callback attached to the returned #GSource must have type
+#GUnixFDSourceFunc.
 
 Since: 2.36
 
@@ -61814,7 +61940,7 @@ Since: 2.36
 </parameter_description>
 </parameter>
 <parameter name="condition">
-<parameter_description> IO conditions to watch for on @fd
+<parameter_description> I/O conditions to watch for on @fd
 </parameter_description>
 </parameter>
 </parameters>
@@ -61859,11 +61985,16 @@ value with g_free()
 <description>
 Similar to the UNIX pipe() call, but on modern systems like Linux
 uses the pipe2() system call, which atomically creates a pipe with
-the configured flags. The only supported flag currently is
-%FD_CLOEXEC. If for example you want to configure %O_NONBLOCK, that
-must still be done separately with fcntl().
+the configured flags.
 
-This function does not take %O_CLOEXEC, it takes %FD_CLOEXEC as if
+As of GLib 2.78, the supported flags are `FD_CLOEXEC` and `O_NONBLOCK`. Prior
+to GLib 2.78, only `FD_CLOEXEC` was supported — if you wanted to configure
+`O_NONBLOCK` then that had to be done separately with `fcntl()`.
+
+It is a programmer error to call this function with unsupported flags, and a
+critical warning will be raised.
+
+This function does not take `O_CLOEXEC`, it takes `FD_CLOEXEC` as if
 for fcntl(); these are different on Linux/glibc.
 
 Since: 2.30
@@ -62530,7 +62661,7 @@ string).
 
 When @host is present, @path must either be empty or begin with a slash (`/`)
 character. When @host is not present, @path cannot begin with two slash
-   characters (`//`). See
+characters (`//`). See
 [RFC 3986, section 3](https://tools.ietf.org/html/rfc3986#section-3).
 
 See also g_uri_join_with_user(), which allows specifying the
@@ -64279,6 +64410,32 @@ errors. Any of the errors in #GConvertError other than
 <return> a pointer to a newly allocated UTF-16 string.
 This value must be freed with g_free(). If an error occurs,
 %NULL will be returned and @error set.
+</return>
+</function>
+
+<function name="g_utf8_truncate_middle">
+<description>
+Cuts off the middle of the string, preserving half of @truncate_length
+characters at the beginning and half at the end.
+
+If @string is already short enough, this returns a copy of @string.
+If @truncate_length is `0`, an empty string is returned.
+
+Since: 2.78
+
+</description>
+<parameters>
+<parameter name="string">
+<parameter_description> a nul-terminated UTF-8 encoded string
+</parameter_description>
+</parameter>
+<parameter name="truncate_length">
+<parameter_description> the new size of @string, in characters, including the ellipsis character
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-allocated copy of @string ellipsized in the middle
+
 </return>
 </function>
 
@@ -66680,7 +66837,8 @@ Looks up a value in a #GVariantDict.
 
 This function is a wrapper around g_variant_dict_lookup_value() and
 g_variant_get().  In the case that %NULL would have been returned,
-this function returns %FALSE.  Otherwise, it unpacks the returned
+this function returns %FALSE and does not modify the values of the arguments
+passed in to @....  Otherwise, it unpacks the returned
 value and returns %TRUE.
 
 @format_string determines the C types that are used for unpacking the
@@ -68941,8 +69099,8 @@ Since: 2.24
 
 <function name="g_variant_new_object_path">
 <description>
-Creates a D-Bus object path #GVariant with the contents of @string.
-@string must be a valid D-Bus object path.  Use
+Creates a D-Bus object path #GVariant with the contents of @object_path.
+@object_path must be a valid D-Bus object path.  Use
 g_variant_is_object_path() if you're not sure.
 
 Since: 2.24
@@ -69179,8 +69337,9 @@ Creates a string #GVariant with the contents of @string.
 @string must be valid UTF-8, and must not be %NULL. To encode
 potentially-%NULL strings, use this with g_variant_new_maybe().
 
-This function consumes @string.  g_free() will be called on @string
-when it is no longer required.
+After this call, @string belongs to the #GVariant and may no longer be
+modified by the caller. The memory of @data has to be dynamically
+allocated and will eventually be freed with g_free().
 
 You must not modify or access @string in any other way after passing
 it to this function.  It is even possible that @string is immediately

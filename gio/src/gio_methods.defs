@@ -627,13 +627,6 @@
   (gtype-id "G_TYPE_TCP_WRAPPER_CONNECTION")
 )
 
-(define-object Resolver
-  (in-module "GThreaded")
-  (parent "GResolver")
-  (c-name "GThreadedResolver")
-  (gtype-id "G_TYPE_THREADED_RESOLVER")
-)
-
 (define-object SocketService
   (in-module "GThreaded")
   (parent "GSocketService")
@@ -2218,6 +2211,16 @@
     '("const-GActionEntry*" "entries")
     '("gint" "n_entries")
     '("gpointer" "user_data")
+  )
+)
+
+(define-method remove_action_entries
+  (of-object "GActionMap")
+  (c-name "g_action_map_remove_action_entries")
+  (return-type "none")
+  (parameters
+    '("const-GActionEntry*" "entries")
+    '("gint" "n_entries")
   )
 )
 
@@ -8195,6 +8198,14 @@
     '("const-gchar*" "first_element")
   )
   (varargs #t)
+)
+
+(define-function g_file_new_build_filenamev
+  (c-name "g_file_new_build_filenamev")
+  (return-type "GFile*")
+  (parameters
+    '("const-gchar*-const*" "args")
+  )
 )
 
 (define-method dup
@@ -14548,9 +14559,13 @@
 
 ;; From gregistrysettingsbackend.h
 
-(define-function g_registry_backend_get_type
-  (c-name "g_registry_backend_get_type")
-  (return-type "GType")
+(define-function g_registry_settings_backend_new
+  (c-name "g_registry_settings_backend_new")
+  (is-constructor-of "GRegistrySettingsBackend")
+  (return-type "GSettingsBackend*")
+  (parameters
+    '("const-gchar*" "registry_key")
+  )
 )
 
 
@@ -14790,6 +14805,21 @@
   (return-type "none")
   (parameters
     '("GList*" "targets")
+  )
+)
+
+(define-method get_timeout
+  (of-object "GResolver")
+  (c-name "g_resolver_get_timeout")
+  (return-type "unsigned")
+)
+
+(define-method set_timeout
+  (of-object "GResolver")
+  (c-name "g_resolver_set_timeout")
+  (return-type "none")
+  (parameters
+    '("unsigned" "timeout_ms")
   )
 )
 
@@ -15269,6 +15299,11 @@
 
 (define-function g_nextstep_settings_backend_get_type
   (c-name "g_nextstep_settings_backend_get_type")
+  (return-type "GType")
+)
+
+(define-function g_registry_settings_backend_get_type
+  (c-name "g_registry_settings_backend_get_type")
   (return-type "GType")
 )
 
@@ -18629,6 +18664,11 @@
   (return-type "gboolean")
 )
 
+(define-function g_task_print_alive_tasks
+  (c-name "g_task_print_alive_tasks")
+  (return-type "none")
+)
+
 
 
 ;; From gtcpconnection.h
@@ -18802,11 +18842,6 @@
 
 
 ;; From gthreadedresolver.h
-
-(define-function g_threaded_resolver_get_type
-  (c-name "g_threaded_resolver_get_type")
-  (return-type "GType")
-)
 
 (define-function g_resolver_records_from_res_query
   (c-name "g_resolver_records_from_res_query")
