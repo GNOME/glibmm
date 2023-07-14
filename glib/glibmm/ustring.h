@@ -720,6 +720,18 @@ public:
   /*! "Normalize" the %Unicode character representation of the string. */
   GLIBMM_API ustring normalize(NormalizeMode mode = NormalizeMode::DEFAULT_COMPOSE) const;
 
+  /*! Cuts off the middle of the string.
+   *
+   * Preserves half of @a truncate_length characters at the beginning
+   * and half at the end.
+   *
+   * If the string is already short enough, this returns a copy of the string.
+   * If @a truncate_length is 0, an empty string is returned.
+   *
+   * @newin{2,78}
+   */
+  GLIBMM_API ustring truncate_middle(gsize truncate_length) const;
+
   //! @}
   //! @name Character case conversion.
   //! @{

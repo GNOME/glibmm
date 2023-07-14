@@ -106,7 +106,7 @@ install_pkgconfigdir = install_libdir / 'pkgconfig'
 #   Dependencies when using the <pkg>mm library.
 
 sigcxx_req = '>= 3.0.0'
-glib_req = '>= 2.73.2'
+glib_req = '>= 2.77.0'
 
 # There are pkg-config files for sigc++ and glib on MSVC, so just use that.
 sigcxx_dep = dependency('sigc++-3.0', version: sigcxx_req)
@@ -284,8 +284,9 @@ if can_add_dist_script
     project_source_root,
   )
 
-  # Don't distribute this file.
+  # Don't distribute these files.
   dont_distribute = [
+    'glibmm.doap',
     '.gitlab-ci.yml',
   ]
   # Add build scripts to the distribution directory, and delete .gitignore

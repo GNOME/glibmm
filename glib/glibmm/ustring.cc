@@ -1232,6 +1232,13 @@ ustring::normalize(NormalizeMode mode) const
 }
 
 ustring
+ustring::truncate_middle(gsize truncate_length) const
+{
+  return convert_return_gchar_ptr_to_ustring(
+    g_utf8_truncate_middle(string_.data(), truncate_length));
+}
+
+ustring
 ustring::uppercase() const
 {
   return convert_return_gchar_ptr_to_ustring(g_utf8_strup(string_.data(), string_.size()));
