@@ -309,6 +309,20 @@ gunichar get_unichar_from_std_iterator(std::string::const_iterator pos) G_GNUC_P
  *                                    12, ustring::format(std::hex, 16));
  * @endcode
  *
+ * @par %Glib::ustring as key in unordered associative containers
+ * @par
+ * To use e.g. std::unordered_map<Glib::ustring, int> there must be
+ * a std::hash<Glib::ustring> specialization. Since glibmm 2.78 there is
+ * such a specialization in glibmm, but it's available only if you include
+ * the @ref ustringhash "ustring_hash.h" file.
+ * @code
+ * #include <glibmm/ustring_hash.h>
+ * @endcode
+ * This file is not included by #include <glibmm.h>, thereby saving some users
+ * from an unpleasant surprise when they upgrade to glibmm 2.78 or later.
+ * (If you have defined your own specialization of std::hash<Glib::ustring>,
+ * the definition in glibmm/ustring_hash.h may clash with your definition.)
+ *
  * @par Implementation notes
  * @par
  * %Glib::ustring does not inherit from std::string, because std::string was

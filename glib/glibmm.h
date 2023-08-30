@@ -94,8 +94,9 @@
  */
 
 #include <glibmmconfig.h>
-//#include <glibmm/i18n.h> //This must be included by the application, after system headers such as
-//<iostream>.
+//#include <glibmm/i18n.h> //This must be included by the application, after system headers such as <iostream>.
+//#include <glibmm/i18n-lib.h> //This must be included by the application, after system headers such as <iostream>.
+//#include <glibmm/ustring_hash.h> //This is not included here because it may clash with user code.
 
 #include <glibmm/base64.h>
 #ifndef GLIBMM_INCLUDED_FROM_WRAP_INIT_CC

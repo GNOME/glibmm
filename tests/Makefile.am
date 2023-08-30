@@ -43,6 +43,7 @@ check_PROGRAMS =				\
 	glibmm_ustring_compare/test		\
 	glibmm_ustring_compose/test		\
 	glibmm_ustring_format/test		\
+	glibmm_ustring_hash/test		\
 	glibmm_ustring_sprintf/test		\
 	glibmm_value/test			\
 	glibmm_variant/test			\
@@ -119,6 +120,7 @@ glibmm_objectbase_move_test_SOURCES      = glibmm_objectbase_move/main.cc \
 glibmm_ustring_compare_test_SOURCES      = glibmm_ustring_compare/main.cc
 glibmm_ustring_compose_test_SOURCES      = glibmm_ustring_compose/main.cc
 glibmm_ustring_format_test_SOURCES       = glibmm_ustring_format/main.cc
+glibmm_ustring_hash_test_SOURCES         = glibmm_ustring_hash/main.cc
 glibmm_ustring_sprintf_test_SOURCES      = glibmm_ustring_sprintf/main.cc
 glibmm_regex_test_SOURCES                = glibmm_regex/main.cc
 glibmm_value_test_SOURCES                = glibmm_value/main.cc

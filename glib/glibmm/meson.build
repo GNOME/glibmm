@@ -110,6 +110,7 @@ glibmm_extra_h_files = [
   'i18n.h',
   'priorities.h',
   'refptr.h',
+  'ustring_hash.h',
   'version.h',
   'wrap_init.h',
 ]
