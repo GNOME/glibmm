@@ -34,6 +34,7 @@ test_programs = [
   [['glibmm_ustring_compare'], 'test', ['main.cc'], false],
   [['glibmm_ustring_compose'], 'test', ['main.cc'], false],
   [['glibmm_ustring_format'], 'test', ['main.cc'], false],
+  [['glibmm_ustring_hash'], 'test', ['main.cc'], false],
   [['glibmm_ustring_make_valid'], 'test', ['main.cc'], false],
   [['glibmm_ustring_sprintf'], 'test', ['main.cc'], false],
   [['glibmm_value'], 'test', ['main.cc'], false],
