@@ -16597,7 +16597,8 @@ Since: 2.34
 </parameter_description>
 </parameter>
 <parameter name="dup_func">
-<parameter_description> function to duplicate the old value
+<parameter_description> function to
+duplicate the old value
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -21089,7 +21090,12 @@ a rendition of the filename in valid UTF-8
 <function name="g_filename_from_uri">
 <description>
 Converts an escaped ASCII-encoded URI to a local filename in the
-encoding used for filenames. 
+encoding used for filenames.
+
+Since GLib 2.78, the query string and fragment can be present in the URI,
+but are not part of the resulting filename.
+We take inspiration from https://url.spec.whatwg.org/#file-state,
+but we don't support the entire standard.
 
 
 </description>
@@ -50672,7 +50678,8 @@ child's environment, or %NULL to inherit parent's
 </parameter_description>
 </parameter>
 <parameter name="child_setup">
-<parameter_description> function to run in the child just before exec()
+<parameter_description> function to run
+in the child just before `exec()`
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -50721,7 +50728,8 @@ it must be non-empty and %NULL-terminated
 </parameter_description>
 </parameter>
 <parameter name="child_setup">
-<parameter_description> function to run in the child just before exec()
+<parameter_description> function to run
+in the child just before `exec()`
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -50783,7 +50791,8 @@ name encoding
 </parameter_description>
 </parameter>
 <parameter name="child_setup">
-<parameter_description> function to run in the child just before exec()
+<parameter_description> function to run
+in the child just before `exec()`
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -51037,7 +51046,8 @@ name encoding
 </parameter_description>
 </parameter>
 <parameter name="child_setup">
-<parameter_description> function to run in the child just before `exec()`
+<parameter_description> function to run
+in the child just before `exec()`
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -51344,7 +51354,8 @@ child's environment, or %NULL to inherit parent's
 </parameter_description>
 </parameter>
 <parameter name="child_setup">
-<parameter_description> function to run in the child just before exec()
+<parameter_description> function to run
+in the child just before `exec()`
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -54246,8 +54257,8 @@ If this is less than 1, the string is split completely.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated %NULL-terminated array of strings. Use
-g_strfreev() to free it.
+<return> a newly-allocated %NULL-terminated array of
+strings. Use g_strfreev() to free it.
 </return>
 </function>
 
@@ -54295,8 +54306,8 @@ If this is less than 1, the string is split completely
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated %NULL-terminated array of strings. Use
-g_strfreev() to free it.
+<return> a newly-allocated %NULL-terminated array of
+strings. Use g_strfreev() to free it.
 
 </return>
 </function>
@@ -54943,6 +54954,22 @@ Since: 2.16
 <return> A newly allocated #GTestSuite instance.
 
 </return>
+</function>
+
+<function name="g_test_disable_crash_reporting">
+<description>
+Attempt to disable system crash reporting infrastructure.
+
+This function should be called before exercising code paths that are
+expected or intended to crash, to avoid wasting resources in system-wide
+crash collection infrastructure such as systemd-coredump or abrt.
+
+Since: 2.78
+
+</description>
+<parameters>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_test_expect_message">
@@ -56217,6 +56244,11 @@ inherit the parent stdout/stderr.)
 If your `main ()` needs to behave differently in
 the subprocess, you can call g_test_subprocess() (after calling
 g_test_init()) to see whether you are in a subprocess.
+
+Internally, this function tracks the child process using
+g_child_watch_source_new(), so your process must not ignore `SIGCHLD`, and
+must not attempt to watch or wait for the child process via another
+mechanism.
 
 The following example tests that calling
 `my_object_new(1000000)` will abort with an error
@@ -58396,7 +58428,8 @@ Since: 2.68
 </parameter_description>
 </parameter>
 </parameters>
-<return> the inserted (or set) node.
+<return> the inserted (or set) node or %NULL
+if insertion would overflow the tree node counter.
 
 </return>
 </function>
@@ -58597,6 +58630,11 @@ Gets the number of nodes in a #GTree.
 </parameter>
 </parameters>
 <return> the number of nodes in @tree
+
+The node counter value type is really a #guint,
+but it is returned as a #gint due to backward
+compatibility issues (can be cast back to #guint to
+support its full range of values).
 </return>
 </function>
 
@@ -58831,7 +58869,8 @@ Since: 2.68
 </parameter_description>
 </parameter>
 </parameters>
-<return> the inserted (or set) node.
+<return> the inserted (or set) node or %NULL
+if insertion would overflow the tree node counter.
 
 </return>
 </function>
@@ -60568,11 +60607,15 @@ Get the corresponding quark of the type IDs name.
 <function name="g_type_query">
 <description>
 Queries the type system for information about a specific type.
+
 This function will fill in a user-provided structure to hold
 type-specific information. If an invalid #GType is passed in, the
 @type member of the #GTypeQuery is 0. All members filled into the
 #GTypeQuery structure should be considered constant and have to be
 left untouched.
+
+Since GLib 2.78, this function allows queries on dynamic types. Previously
+it only supported static types.
 
 </description>
 <parameters>
@@ -61987,15 +62030,18 @@ Similar to the UNIX pipe() call, but on modern systems like Linux
 uses the pipe2() system call, which atomically creates a pipe with
 the configured flags.
 
-As of GLib 2.78, the supported flags are `FD_CLOEXEC` and `O_NONBLOCK`. Prior
-to GLib 2.78, only `FD_CLOEXEC` was supported — if you wanted to configure
-`O_NONBLOCK` then that had to be done separately with `fcntl()`.
+As of GLib 2.78, the supported flags are `O_CLOEXEC`/`FD_CLOEXEC` (see below)
+and `O_NONBLOCK`. Prior to GLib 2.78, only `FD_CLOEXEC` was supported — if
+you wanted to configure `O_NONBLOCK` then that had to be done separately with
+`fcntl()`.
 
 It is a programmer error to call this function with unsupported flags, and a
 critical warning will be raised.
 
-This function does not take `O_CLOEXEC`, it takes `FD_CLOEXEC` as if
-for fcntl(); these are different on Linux/glibc.
+As of GLib 2.78, it is preferred to pass `O_CLOEXEC` in, rather than
+`FD_CLOEXEC`, as that matches the underlying `pipe()` API more closely. Prior
+to 2.78, only `FD_CLOEXEC` was supported. Support for `FD_CLOEXEC` may be
+deprecated and removed in future.
 
 Since: 2.30
 

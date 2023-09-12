@@ -4618,14 +4618,18 @@ Since: 2.32
 
 <property name="GNetworkMonitor:network-metered">
 <description>
-Whether the network is considered metered. That is, whether the
+Whether the network is considered metered.
+
+That is, whether the
 system has traffic flowing through the default connection that is
 subject to limitations set by service providers. For example, traffic
 might be billed by the amount of data transmitted, or there might be a
 quota on the amount of traffic per month. This is typical with tethered
 connections (3G and 4G) and in such situations, bandwidth intensive
 applications may wish to avoid network activity where possible if it will
-cost the user money or use up their limited quota.
+cost the user money or use up their limited quota. Anything more than a
+few hundreds of kilobytes of data usage per hour should be avoided without
+asking permission from the user.
 
 If more information is required about specific devices then the
 system network management API should be used instead (for example,
@@ -9728,7 +9732,7 @@ Support for the XDG Activation Protocol was added in GLib 2.76.
 </parameter_description>
 </parameter>
 <parameter name="files">
-<parameter_description> a #GList of of #GFile objects
+<parameter_description> a #GList of #GFile objects
 </parameter_description>
 </parameter>
 </parameters>
@@ -25423,8 +25427,8 @@ of the operation.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -25963,8 +25967,9 @@ g_file_copy_finish() to get the result of the operation.
 </parameter_description>
 </parameter>
 <parameter name="progress_callback">
-<parameter_description> function to callback with progress
-information, or %NULL if progress information is not needed
+<parameter_description>
+function to callback with progress information, or %NULL if
+progress information is not needed
 </parameter_description>
 </parameter>
 <parameter name="progress_callback_data">
@@ -25972,11 +25977,12 @@ information, or %NULL if progress information is not needed
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> the data to pass to callback function
+<parameter_description> the data to pass to callback
 </parameter_description>
 </parameter>
 </parameters>
@@ -26129,8 +26135,8 @@ of the operation.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -26256,8 +26262,8 @@ Since: 2.22
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -26478,8 +26484,8 @@ Deprecated: 2.22: Use g_file_eject_mountable_with_operation() instead.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied, or %NULL
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -26553,8 +26559,8 @@ or %NULL to avoid user interaction
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied, or %NULL
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -26688,8 +26694,8 @@ the operation.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the
-request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -26780,7 +26786,8 @@ g_file_enumerator_close_finish().
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -27102,7 +27109,8 @@ priority is %G_PRIORITY_DEFAULT.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -27246,8 +27254,8 @@ get the result of the operation.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -27836,6 +27844,34 @@ attribute value, or %NULL; the attribute value will not be %NULL
 </parameters>
 <return> %TRUE if @info has an attribute named @attribute,
 %FALSE otherwise.
+</return>
+</function>
+
+<function name="g_file_info_get_attribute_file_path">
+<description>
+Gets the value of a byte string attribute as a file path.
+
+If the attribute does not contain a byte string, `NULL` will be returned.
+
+This function is meant to be used by language bindings that have specific
+handling for Unix paths.
+
+Since: 2.78
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GFileInfo.
+</parameter_description>
+</parameter>
+<parameter name="attribute">
+<parameter_description> a file attribute key.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the contents of the @attribute value as
+a file path, or %NULL otherwise.
+
 </return>
 </function>
 
@@ -28605,6 +28641,34 @@ if possible.
 <return></return>
 </function>
 
+<function name="g_file_info_set_attribute_file_path">
+<description>
+Sets the @attribute to contain the given @attr_value,
+if possible.
+
+This function is meant to be used by language bindings that have specific
+handling for Unix paths.
+
+Since: 2.78
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GFileInfo.
+</parameter_description>
+</parameter>
+<parameter name="attribute">
+<parameter_description> a file attribute key.
+</parameter_description>
+</parameter>
+<parameter name="attr_value">
+<parameter_description> a file path.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_file_info_set_attribute_int32">
 <description>
 Sets the @attribute to contain the given @attr_value,
@@ -29204,7 +29268,8 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be set
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> callback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -29336,7 +29401,8 @@ Since: 2.22
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> callback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -29467,8 +29533,8 @@ Since: 2.56
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the
-request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -30446,8 +30512,8 @@ or %NULL to avoid user interaction
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied, or %NULL
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -30599,18 +30665,17 @@ Since: 2.72
 </parameter_description>
 </parameter>
 <parameter name="progress_callback">
-<parameter_description> #GFileProgressCallback
-function for updates
+<parameter_description>
+#GFileProgressCallback function for updates
 </parameter_description>
 </parameter>
 <parameter name="progress_callback_data">
-<parameter_description> gpointer to user data for
-the callback function
+<parameter_description> gpointer to user data for the callback function
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -31034,8 +31099,8 @@ Since: 2.22
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -31565,8 +31630,8 @@ operation.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -31703,8 +31768,8 @@ then call g_file_query_info_finish() to get the result of the operation.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the
-request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -31865,8 +31930,8 @@ of the operation.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -32023,8 +32088,8 @@ or %NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -32369,8 +32434,8 @@ or %NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -32776,10 +32841,11 @@ the result of the operation.
 </parameter>
 <parameter name="callback">
 <parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> a #gpointer
+<parameter_description> the data to pass to callback function
 </parameter_description>
 </parameter>
 </parameters>
@@ -32934,8 +33000,8 @@ the result of the operation.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -33273,8 +33339,8 @@ Deprecated: 2.22: Use g_file_unmount_mountable_with_operation() instead.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied, or %NULL
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -33351,8 +33417,8 @@ or %NULL to avoid user interaction
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call
-when the request is satisfied, or %NULL
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -34644,7 +34710,8 @@ override one you must override all.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> callback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -34859,7 +34926,8 @@ a buffer to read data into (which should be at least count bytes long)
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> callback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -34959,7 +35027,8 @@ of the request.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> callback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -35067,7 +35136,8 @@ Since: 2.34
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> callback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -35239,7 +35309,8 @@ However, if you override one, you must override all.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> callback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -36083,7 +36154,8 @@ Since: 2.22
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> callback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -36257,11 +36329,12 @@ Since: 2.28
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback.
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> user data passed to @callback.
+<parameter_description> the data to pass to callback function
 </parameter_description>
 </parameter>
 </parameters>
@@ -36907,8 +36980,8 @@ version of this function, see g_loadable_icon_load().
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the
-request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -40211,8 +40284,8 @@ to get the result of the operation.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the
-request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -40938,7 +41011,8 @@ classes. However, if you override one you must override all.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> callback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -41031,7 +41105,8 @@ result of the operation.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -41263,11 +41338,12 @@ g_output_stream_splice().
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback. 
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> user data passed to @callback.
+<parameter_description> the data to pass to callback function
 </parameter_description>
 </parameter>
 </parameters>
@@ -41503,7 +41579,8 @@ Since: 2.44
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> callback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -41614,7 +41691,8 @@ the contents (without copying) for the duration of the call.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> callback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -41698,7 +41776,8 @@ g_output_stream_write_bytes().
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> callback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -41926,7 +42005,8 @@ Since: 2.60
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> callback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -42034,7 +42114,8 @@ Since: 2.60
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> callback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -47937,11 +48018,11 @@ Deprecated: 2.46: Use g_task_new() and g_task_return_error() instead.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback
+<parameter_description> a #GAsyncReadyCallback.
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> user data passed to @callback
+<parameter_description> user data passed to @callback.
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -48490,8 +48571,8 @@ It is an error to call this multiple times before the previous callback has fini
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request
-is satisfied
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -57590,7 +57671,7 @@ Asynchronously look up certificates issued by this issuer in the database. See
 g_tls_database_lookup_certificates_issued_by() for more information.
 
 The database may choose to hold a reference to the issuer byte array for the duration
-of of this asynchronous operation. The byte array should not be modified during
+of this asynchronous operation. The byte array should not be modified during
 this time.
 
 Since: 2.30
@@ -58570,7 +58651,8 @@ Since: 2.32
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -58708,7 +58790,8 @@ Since: 2.32
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback
+to call when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
