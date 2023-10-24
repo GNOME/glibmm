@@ -357,6 +357,9 @@ def clean_func(buf):
     # This is for types such as 'const gchar* const *'
     buf = re.sub(r'\* const\b', '*-const', buf)
 
+    # make return types that are unsigned work.
+    buf = re.sub(r'\bunsigned\s+(int|long)\b', r'unsigned-\1', buf)
+
     #strip GSEAL macros from the middle of function declarations:
     pat = re.compile(r"""GSEAL""", re.VERBOSE)
     buf = pat.sub('', buf)
