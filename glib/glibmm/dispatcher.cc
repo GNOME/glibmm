@@ -468,6 +468,11 @@ bool DispatchNotifier::pipe_io_handler(Glib::IOCondition)
   {
     Glib::exception_handlers_invoke();
   }
+  // Stop if a signal handler, called by data.dispatcher_impl->signal_(),
+  // deletes the last Dispatcher in this thread and thus this DispatchNotifier.
+  // https://gitlab.gnome.org/GNOME/glibmm/-/issues/116
+  if (!thread_specific_instance_)
+    return false;
 
   if (!orphaned_dispatcher_impl_.empty() && pipe_is_empty())
     orphaned_dispatcher_impl_.clear();
