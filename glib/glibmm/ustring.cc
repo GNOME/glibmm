@@ -1350,12 +1350,14 @@ ustring::FormatStream::~FormatStream() noexcept
 {
 }
 
+  // TODO: C++20: Replace const with &&
 ustring
 ustring::FormatStream::to_string() const
 {
   GError* error = nullptr;
 
 #ifdef GLIBMM_HAVE_WIDE_STREAM
+  // TODO: C++20: std::move(stream_).str()
   const std::wstring str = stream_.str();
 
 #if (defined(__STDC_ISO_10646__) || defined(_LIBCPP_VERSION)) && GLIBMM_SIZEOF_WCHAR_T == 4
@@ -1375,6 +1377,7 @@ ustring::FormatStream::to_string() const
 #endif /* !(__STDC_ISO_10646__ || G_OS_WIN32) */
 
 #else /* !GLIBMM_HAVE_WIDE_STREAM */
+  // TODO: C++20: std::move(stream_).str()
   const std::string str = stream_.str();
 
   gsize n_bytes = 0;
