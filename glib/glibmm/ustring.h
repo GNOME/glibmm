@@ -1035,6 +1035,7 @@ public:
   // This overload exists to avoid the templated stream() being called for non-const char*.
   GLIBMM_API inline void stream(char* value);
 
+  // TODO: C++20: Replace const with &&
   GLIBMM_API ustring to_string() const;
 };
 
@@ -1279,6 +1280,8 @@ ustring::substr(ustring::size_type i, ustring::size_type n) const
   return ustring(*this, i, n);
 }
 
+// TODO: When we can break ABI – replace with a const& overload returning const std::string&
+// to avoid silent copies, and a corresponding && overload to move string out of rvalue this
 inline ustring::operator std::string() const
 {
   return string_;
@@ -1303,6 +1306,7 @@ inline // static
 {
   ustring::FormatStream buf;
   (buf.stream(args), ...);
+  // TODO: C++20: std::move(buf).to_string()
   return buf.to_string();
 }
 
