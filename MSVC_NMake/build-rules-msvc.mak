@@ -93,7 +93,7 @@ $(GIOMM_LIB): $(GIOMM_DLL)
 
 $(GLIBMM_EXTRA_DEFS_GEN_LIB): $(GLIBMM_EXTRA_DEFS_GEN_DLL)
 $(GLIBMM_EXTRA_DEFS_GEN_DLL): vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\generate_extra_defs.obj
-	link /DLL $(LDFLAGS_NOLTCG) $(GOBJECT_LIBS) /implib:$(GLIBMM_EXTRA_DEFS_GEN_LIB) -out:$@ @<<
+	link /DLL $(LDFLAGS_NOLTCG) /libpath:$(GLIB_LIBDIR) $(GOBJECT_LIBS) /implib:$(GLIBMM_EXTRA_DEFS_GEN_LIB) -out:$@ @<<
 $**
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
@@ -106,13 +106,13 @@ $**
 # <<
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
 $(GLIBMM_DLL): $(glibmm_OBJS)
-	link /DLL $(LDFLAGS_NOLTCG) $(GOBJECT_LIBS) $(LIBSIGC_LIB) /implib:$(GLIBMM_LIB) -out:$@ @<<
+	link /DLL $(LDFLAGS_NOLTCG) /libpath:$(GLIB_LIBDIR) $(GOBJECT_LIBS) /libpath:$(LIBSIGC_LIBDIR) $(LIBSIGC_LIB) /implib:$(GLIBMM_LIB) -out:$@ @<<
 $(glibmm_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
 
 $(GIOMM_DLL): $(GLIBMM_LIB) $(giomm_OBJS)
-	link /DLL $(LDFLAGS_NOLTCG) $(GLIBMM_LIB) $(GIO_LIBS) $(LIBSIGC_LIB) /implib:$(GIOMM_LIB) -out:$@ @<<
+	link /DLL $(LDFLAGS_NOLTCG) /libpath:$(GLIB_LIBDIR) $(GLIBMM_LIB) $(GIO_LIBS) /libpath:$(LIBSIGC_LIBDIR) $(LIBSIGC_LIB) /implib:$(GIOMM_LIB) -out:$@ @<<
 $(giomm_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
