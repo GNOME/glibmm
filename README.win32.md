@@ -11,6 +11,11 @@ applications (see the README.win32 that comes with the gtk+ DLLs).
 This MIGHT cause conflicts between the cygwin and msvcrt runtime
 environments.
 
+If building against libsigc++-3.6.0 or later with Visual Studio, it is recommended
+to use Visual Studio 2019 or later for best support-building with maximum warning
+level and treating warnings as errors with Visual Studio 2017 with libsigc++-3.6.x
+or later is not supported.
+
 ### Mingw
 
 The mingw distribution which has been tested with this release is the
