@@ -88,6 +88,28 @@ under `$(PREFIX)`.
   * `clean`: Remove all the built files.  This includes the generated sources if building from a
 GIT checkout, as noted below.
 
+The NMake Makefiles support passing in the following items, with the defaults (everyone of the
+following are optional if the paths of needed headers, libraries and tools are in `%INCLUDE%`,
+`%LIB%` and `%PATH%` unless otherwise noted):
+  * `BASE_TOOLS_PATH` (default: `$(PREFIX)\bin`: Location where tools can be located
+  * `BASE_INCLUDES` (default: `$(PREFIX)\include`: Base directory where dependencies' headers can
+  be located
+  * `BASE_LIBPATH` (default: `$(PREFIX)\lib`: Base directory where dependencies' libraries and
+  architecture-dependent or compiler-dependent headers can be located
+  * `<DEP>_INCLUDEDIR` (default: `$(BASE_INCLUDES)`): Base directory where <DEP>'s headers can be
+  found in their respective subdirectories as applicable, so for instance GLib's headers can be
+  found in `$(GLIB_INCLUDEDIR)\glib-2.0` and `$(GLIB_INCLUDEDIR)\gio-win32-2.0`.  <DEP> here
+  currently covers GLIB and LIBSIGC
+  * `<DEP>_LIBDIR` (default: `$(BASE_LIBPATH)`): Base directory where <DEP>'s architecture-
+  and compiler-dependent headers and .lib's can be found in their respective subdirectories as
+  applicable, so for instance GLib's `glibconfig.h` can be found in
+  `$(GLIB_LIBDIR)\glib-2.0\include`. <DEP> here currently covers GLIB and LIBSIGC.
+  * `<DEP>_BINDIR` (default: `$(BASE_TOOLS_PATH`)`): Base directory where <DEP>'s utility programs
+  can be found. <DEP> here currently covers GLIB.
+  * GLIB_COMPILE_SCHEMAS (default: `$(GLIB_BINDIR)\glib-compile-schemas`): Relative or full path
+  where GLib's `glib-compile-schemas` tool can be located, i.e., if `glib-compile-schemas` is in
+  `%PATH%`, you may opt to just pass in `GLIB_COMPILE_SCHEMAS=glib-compile-schemas`.
+
 The NMake Makefiles now support building the glibmm libraries directly from a GIT checkout
 with a few manual steps required, namely:
 
@@ -100,8 +122,10 @@ that these paths are towards the end of your `%PATH%`. You need to install the
 
   * Make a new copy of the entire source tree to some location, where the build
 is to be done; then in `$(srcroot)\MSVC_NMake` run `nmake /f Makefile.vc CFG=[release|debug]`,
-which will first copy and generate the following files with the proper info (this step will also
-be run if the following files are not present in the unpacked source tarball):
+which will first copy and generate the following files with the proper info (mote that this step
+will also be run if the following files are not present in the unpacked source tarball, meaning
+that in this case a PERL installation needs to be found in PATH or specified in the NMake
+commandline with PERL=<path_to_perl.exe>):
 ```
 $(srcroot)\MSVC_NMake\glibmm\glibmmconfig.h
 $(srcroot)\MSVC_NMake\giomm\giommconfig.h

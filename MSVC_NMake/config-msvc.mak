@@ -1,7 +1,30 @@
 # NMake Makefile portion for enabling features for Windows builds
 
 # These are the base minimum libraries required for building glibmm.
-BASE_INCLUDES =	/I$(PREFIX)\include
+!ifndef BASE_INCLUDEDIR
+BASE_INCLUDEDIR = $(PREFIX)\include
+!endif
+!ifndef BASE_LIBPATH
+BASE_LIBPATH = $(PREFIX)\lib
+!endif
+!ifndef BASE_TOOLS_PATH
+BASE_TOOLS_PATH = $(PREFIX)\bin
+!endif
+!ifndef LIBSIGC_INCLUDEDIR
+LIBSIGC_INCLUDEDIR = $(BASE_INCLUDEDIR)
+!endif
+!ifndef LIBSIGC_LIBDIR
+LIBSIGC_LIBDIR = $(BASE_LIBPATH)
+!endif
+!ifndef GLIB_INCLUDEDIR
+GLIB_INCLUDEDIR = $(BASE_INCLUDEDIR)
+!endif
+!ifndef GLIB_LIBDIR
+GLIB_LIBDIR = $(BASE_LIBPATH)
+!endif
+!ifndef GLIB_BINDIR
+GLIB_BINDIR = $(BASE_TOOLS_PATH)
+!endif
 
 # Please do not change anything beneath this line unless maintaining the NMake Makefiles
 GLIB_API_VERSION = 2.0
@@ -35,11 +58,11 @@ GIOMM_BASE_CFLAGS =	\
 	$(GLIBMM_BASE_CFLAGS)
 
 GLIBMM_EXTRA_INCLUDES =	\
-	/I$(PREFIX)\include\gio-win32-$(GLIB_API_VERSION)	\
-	/I$(PREFIX)\include\glib-$(GLIB_API_VERSION)	\
-	/I$(PREFIX)\lib\glib-$(GLIB_API_VERSION)\include	\
-	/I$(PREFIX)\include\sigc++-$(LIBSIGC_MAJOR_VERSION).$(LIBSIGC_MINOR_VERSION)	\
-	/I$(PREFIX)\lib\sigc++-$(LIBSIGC_MAJOR_VERSION).$(LIBSIGC_MINOR_VERSION)\include
+	/I$(GLIB_INCLUDEDIR)\gio-win32-$(GLIB_API_VERSION)	\
+	/I$(GLIB_INCLUDEDIR)\glib-$(GLIB_API_VERSION)	\
+	/I$(GLIB_LIBDIR)\glib-$(GLIB_API_VERSION)\include	\
+	/I$(LIBSIGC_INCLUDEDIR)\sigc++-$(LIBSIGC_MAJOR_VERSION).$(LIBSIGC_MINOR_VERSION)	\
+	/I$(LIBSIGC_LIBDIR)\sigc++-$(LIBSIGC_MAJOR_VERSION).$(LIBSIGC_MINOR_VERSION)\include
 
 LIBGLIBMM_CFLAGS = /DGLIBMM_BUILD /DSIZEOF_WCHAR_T=2 $(GLIBMM_BASE_CFLAGS) $(GLIBMM_EXTRA_INCLUDES)
 LIBGIOMM_CFLAGS = /DGIOMM_BUILD /DSIZEOF_WCHAR_T=2 $(GIOMM_BASE_CFLAGS) $(GLIBMM_EXTRA_INCLUDES)
@@ -96,5 +119,5 @@ GIOMM_EX_LIBS = $(GIOMM_LIB) $(GLIBMM_LIB) $(LIBSIGC_LIB) $(GIO_LIBS)
 
 # Set a default location for glib-compile-schemas, if not specified
 !ifndef GLIB_COMPILE_SCHEMAS
-GLIB_COMPILE_SCHEMAS = $(PREFIX)\bin\glib-compile-schemas
+GLIB_COMPILE_SCHEMAS = $(GLIB_BINDIR)\glib-compile-schemas
 !endif

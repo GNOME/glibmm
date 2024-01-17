@@ -119,10 +119,10 @@ glibmm_files_extra_ph_int = $(glibmm_files_extra_ph:/=\)
 !if [for %d in (examples tests) do @for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" call create-lists.bat header glibmm.mak %t_OBJS & @(for %s in (..\%d\%t\*.cc) do @call create-lists.bat file glibmm.mak vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-%d\%t-%~ns.obj) & @call create-lists.bat footer glibmm.mak]
 !endif
 
-!if [for %d in (examples tests) do @for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\%t.exe: ^$(GIOMM_LIB) ^$(GLIBMM_LIB) ^$(%t_OBJS)>>glibmm.mak & @echo.	link ^$(LDFLAGS) ^$** ^$(GIO_LIBS) ^$(LIBSIGC_LIB) /out:^$@>>glibmm.mak & @echo.>>glibmm.mak]
+!if [for %d in (examples tests) do @for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\%t.exe: ^$(GIOMM_LIB) ^$(GLIBMM_LIB) ^$(%t_OBJS)>>glibmm.mak & @echo.	link ^$(LDFLAGS) ^$** /libpath:^$^(GLIB_LIBDIR^) ^$(GIO_LIBS) /libpath:^$^(LIBSIGC_LIBDIR^) ^$(LIBSIGC_LIB) /out:^$@>>glibmm.mak & @echo.>>glibmm.mak]
 !endif
 
-!if [for %t in (dbus network thread) do @for %s in (..\examples\%t\*.cc) do @echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\%~ns.exe: ^$(GIOMM_LIB) ^$(GLIBMM_LIB) vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm-examples\%t-%~ns.obj>>glibmm.mak & @echo.	link ^$(LDFLAGS) ^$** ^$(GIO_LIBS) ^$(LIBSIGC_LIB) /out:^$@>>glibmm.mak & @echo.>>glibmm.mak]
+!if [for %t in (dbus network thread) do @for %s in (..\examples\%t\*.cc) do @echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\%~ns.exe: ^$(GIOMM_LIB) ^$(GLIBMM_LIB) vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm-examples\%t-%~ns.obj>>glibmm.mak & @echo.	link ^$(LDFLAGS) ^$** /libpath:^$^(GLIB_LIBDIR^) ^$(GIO_LIBS) /libpath:^$^(LIBSIGC_LIBDIR^) ^$(LIBSIGC_LIB) /out:^$@>>glibmm.mak & @echo.>>glibmm.mak]
 !endif
 
 !include glibmm.mak
