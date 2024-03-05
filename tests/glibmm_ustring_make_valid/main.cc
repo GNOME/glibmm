@@ -54,5 +54,19 @@ main()
   g_assert(correct_output.validate());
   g_assert(correct_output == good_one);
 
+  // A simple test of Glib::wide_from/to_utf8().
+  Glib::ustring tobewide = "ABC åäöěèéêß";
+  std::wstring wide = Glib::wide_from_utf8(tobewide);
+  Glib::ustring waswide = Glib::wide_to_utf8(wide);
+  g_assert(tobewide == waswide);
+  /*
+  // Can't use both std::cout and std::wcout.
+  // The output is distorted, even though it's okay when only
+  // one of std::cout and std::wcout is used.
+  std::cout  << "waswide=\"" << waswide << "\", " << waswide.size()
+    << " characters, " << waswide.bytes() << " bytes\n";
+  std::wcout << "wide=   \"" << wide    << "\", " <<    wide.size()
+    << " characters, " << wide.size() * sizeof(std::wstring::value_type) << " bytes\n";
+  */
   return EXIT_SUCCESS;
 }

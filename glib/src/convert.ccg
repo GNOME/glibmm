@@ -290,4 +290,67 @@ filename_display_name(const std::string& filename)
   return Glib::ustring(make_unique_ptr_gfree(buf).get());
 }
 
+std::wstring
+wide_from_utf8(const Glib::ustring& utf8_string)
+{
+  // Similar to operator<<(std::wostream& os, const ustring& utf8_string) in ustring.cc.
+  glong items_written = 0;
+  GError* error = nullptr;
+
+#if (defined(__STDC_ISO_10646__) || defined(_LIBCPP_VERSION)) && GLIBMM_SIZEOF_WCHAR_T == 4
+  // Avoid going through iconv if wchar_t always contains UCS-4.
+  const auto buf = make_unique_ptr_gfree(
+    g_utf8_to_ucs4(utf8_string.c_str(), utf8_string.bytes(), nullptr,
+                   &items_written, &error));
+#elif defined(G_OS_WIN32) && GLIBMM_SIZEOF_WCHAR_T == 2
+  // Avoid going through iconv if wchar_t always contains UTF-16.
+  const auto buf = make_unique_ptr_gfree(
+    g_utf8_to_utf16(utf8_string.c_str(), utf8_string.bytes(), nullptr,
+                    &items_written, &error));
+#else
+  gsize bytes_written = 0;
+  const auto buf = make_unique_ptr_gfree(g_convert(utf8_string.c_str(),
+    utf8_string.bytes(), "WCHAR_T", "UTF-8", nullptr, &bytes_written, &error));
+    items_written = bytes_written / GLIBMM_SIZEOF_WCHAR_T;
+#endif // !(__STDC_ISO_10646__ || G_OS_WIN32)
+
+  if (error)
+    Glib::Error::throw_exception(error);
+
+  return std::wstring(reinterpret_cast<wchar_t*>(buf.get()),
+                      reinterpret_cast<wchar_t*>(buf.get()) + items_written);
+}
+
+Glib::ustring
+wide_to_utf8(const std::wstring& wide_string)
+{
+  // Similar to operator>>(std::wistream& is, ustring& utf8_string) in ustring.cc.
+  glong bytes_written = 0;
+  GError* error = nullptr;
+
+#if (defined(__STDC_ISO_10646__) || defined(_LIBCPP_VERSION)) && GLIBMM_SIZEOF_WCHAR_T == 4
+  // Avoid going through iconv if wchar_t always contains UCS-4.
+  const auto buf = make_unique_ptr_gfree(g_ucs4_to_utf8(
+    reinterpret_cast<const gunichar*>(wide_string.c_str()), wide_string.size(),
+    nullptr, &bytes_written, &error));
+#elif defined(G_OS_WIN32) && GLIBMM_SIZEOF_WCHAR_T == 2
+  // Avoid going through iconv if wchar_t always contains UTF-16.
+  const auto buf = make_unique_ptr_gfree(g_utf16_to_utf8(
+    reinterpret_cast<const gunichar2*>(wide_string.c_str()), wide_string.size(),
+    nullptr, &bytes_written, &error));
+#else
+  gsize n_bytes = 0;
+  const auto buf = make_unique_ptr_gfree(g_convert(
+    reinterpret_cast<const char*>(wide_string.c_str()),
+    wide_string.size() * GLIBMM_SIZEOF_WCHAR_T, "UTF-8", "WCHAR_T",
+    nullptr, &n_bytes, &error));
+  bytes_written = n_bytes;
+#endif // !(__STDC_ISO_10646__ || G_OS_WIN32)
+
+  if (error)
+    Glib::Error::throw_exception(error);
+
+  return Glib::ustring(buf.get(), buf.get() + bytes_written);
+}
+
 } // namespace Glib

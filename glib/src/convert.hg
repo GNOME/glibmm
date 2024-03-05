@@ -101,8 +101,8 @@ public:
 
 private:
   GIConv gobject_;
-};
 
+}; // class IConv
 
 /** Get the charset used by the current locale.
  * @return Whether the current locale uses the UTF-8 charset.
@@ -277,7 +277,62 @@ Glib::ustring filename_display_basename(const std::string& filename);
 GLIBMM_API
 Glib::ustring filename_display_name(const std::string& filename);
 
+/** Converts from utf-8 encoding to wide character strings.
+ *
+ * The encoding of the returned wide string will be utf-16 for Windows platforms
+ * where the size of wchar_t is 2, and ucs-4/utf32 for Unix-like platforms
+ * where the size of wchar_t is 4.
+ *
+ * For this function to work correctly, the current locale for wide
+ * character strings should have been set with for example a call to
+ * std::locale::global(std::locale("")). Glib::init() usually does that.
+ *
+ * Note that unless the character set is limited to the Basic
+ * Multilingual Plane (UCS-2), in Windows platforms where utf-16 is
+ * used, the wide character set will not be of fixed size, so the
+ * number of complete UCS code points may be less than the value given
+ * by calling std::wstring::size() on the returned string.
+ *
+ * @newin{2,80}
+ *
+ * @param utf8_string The utf-8 string to convert.
+ * @return The wide character string.
+ * @throw Glib::ConvertError
+ */
+GLIBMM_API
+std::wstring wide_from_utf8(const Glib::ustring& utf8_string);
+
+/** Converts from a wide character string to a utf-8 encoding.
+ *
+ * The encoding of the wide string must be utf-16 for Windows platforms
+ * where the size of wchar_t is 2, and ucs-4/utf32 for Unix-like platforms
+ * where the size of wchar_t is 4.
+ *
+ * For this function to work correctly, the current locale for wide
+ * character strings should have been set with for example a call to
+ * std::locale::global(std::locale("")). Glib::init() usually does that.
+ *
+ * Note that unless the character set is limited to the Basic
+ * Multilingual Plane (UCS-2), in Windows platforms where utf-16 is
+ * used, the wide character set will not be of fixed size.  For the
+ * conversion to work correctly where the wide character string passed
+ * to the function is in utf-16 encoding, it must contain only
+ * complete utf-16 characters - that is, there must not be a trailing
+ * partly-formed character at the end of the string.
+ *
+ * Likewise, the last UCS code point in the wide string should not
+ * form a combining character or an incomplete suffix of such a
+ * character.
+ *
+ * @newin{2,80}
+ *
+ * @param wide_string The wide character string to convert.
+ * @return The string in utf-8 encoding.
+ * @throw Glib::ConvertError
+ */
+GLIBMM_API
+Glib::ustring wide_to_utf8(const std::wstring& wide_string);
+
 /** @} group CharsetConv */
 
 } // namespace Glib
-
