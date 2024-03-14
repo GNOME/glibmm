@@ -269,6 +269,16 @@
   )
 )
 
+(define-enum PipeEnd
+  (in-module "GUnix")
+  (c-name "GUnixPipeEnd")
+  (gtype-id "G_TYPE_UNIX_PIPE_END")
+  (values
+    '("read" "G_UNIX_PIPE_END_READ")
+    '("write" "G_UNIX_PIPE_END_WRITE")
+  )
+)
+
 (define-enum n
   (in-module "GIOConditio")
   (c-name "GIOCondition")
@@ -852,6 +862,11 @@
     '("emoji-base" "G_UNICODE_BREAK_EMOJI_BASE")
     '("emoji-modifier" "G_UNICODE_BREAK_EMOJI_MODIFIER")
     '("zero-width-joiner" "G_UNICODE_BREAK_ZERO_WIDTH_JOINER")
+    '("aksara" "G_UNICODE_BREAK_AKSARA")
+    '("aksara-pre-base" "G_UNICODE_BREAK_AKSARA_PRE_BASE")
+    '("aksara-start" "G_UNICODE_BREAK_AKSARA_START")
+    '("virama-final" "G_UNICODE_BREAK_VIRAMA_FINAL")
+    '("virama" "G_UNICODE_BREAK_VIRAMA")
   )
 )
 
@@ -2240,7 +2255,7 @@
 
 (define-function g_atomic_pointer_add
   (c-name "g_atomic_pointer_add")
-  (return-type "gssize")
+  (return-type "gintptr")
   (parameters
     '("volatile-void*" "atomic")
     '("gssize" "val")
@@ -2249,7 +2264,7 @@
 
 (define-function g_atomic_pointer_and
   (c-name "g_atomic_pointer_and")
-  (return-type "gsize")
+  (return-type "guintptr")
   (parameters
     '("volatile-void*" "atomic")
     '("gsize" "val")
@@ -2258,7 +2273,7 @@
 
 (define-function g_atomic_pointer_or
   (c-name "g_atomic_pointer_or")
-  (return-type "gsize")
+  (return-type "guintptr")
   (parameters
     '("volatile-void*" "atomic")
     '("gsize" "val")
@@ -2267,7 +2282,7 @@
 
 (define-function g_atomic_pointer_xor
   (c-name "g_atomic_pointer_xor")
-  (return-type "gsize")
+  (return-type "guintptr")
   (parameters
     '("volatile-void*" "atomic")
     '("gsize" "val")
@@ -2410,6 +2425,16 @@
   )
 )
 
+(define-method bit_lock_and_get
+  (of-object "gpointer")
+  (c-name "g_pointer_bit_lock_and_get")
+  (return-type "none")
+  (parameters
+    '("guint" "lock_bit")
+    '("guintptr*" "out_ptr")
+  )
+)
+
 (define-function g_pointer_bit_trylock
   (c-name "g_pointer_bit_trylock")
   (return-type "gboolean")
@@ -2425,6 +2450,29 @@
   (parameters
     '("volatile-void*" "address")
     '("gint" "lock_bit")
+  )
+)
+
+(define-method bit_lock_mask_ptr
+  (of-object "gpointer")
+  (c-name "g_pointer_bit_lock_mask_ptr")
+  (return-type "gpointer")
+  (parameters
+    '("guint" "lock_bit")
+    '("gboolean" "set")
+    '("guintptr" "preserve_mask")
+    '("gpointer" "preserve_ptr")
+  )
+)
+
+(define-function g_pointer_bit_unlock_and_set
+  (c-name "g_pointer_bit_unlock_and_set")
+  (return-type "none")
+  (parameters
+    '("void*" "address")
+    '("guint" "lock_bit")
+    '("gpointer" "ptr")
+    '("guintptr" "preserve_mask")
   )
 )
 
@@ -4096,6 +4144,22 @@
   )
 )
 
+(define-function g_date_time_new_from_unix_local_usec
+  (c-name "g_date_time_new_from_unix_local_usec")
+  (return-type "GDateTime*")
+  (parameters
+    '("gint64" "usecs")
+  )
+)
+
+(define-function g_date_time_new_from_unix_utc_usec
+  (c-name "g_date_time_new_from_unix_utc_usec")
+  (return-type "GDateTime*")
+  (parameters
+    '("gint64" "usecs")
+  )
+)
+
 (define-function g_date_time_new_from_timeval_local
   (c-name "g_date_time_new_from_timeval_local")
   (return-type "GDateTime*")
@@ -4372,6 +4436,12 @@
   (return-type "gint64")
 )
 
+(define-method to_unix_usec
+  (of-object "GDateTime")
+  (c-name "g_date_time_to_unix_usec")
+  (return-type "gint64")
+)
+
 (define-method to_timeval
   (of-object "GDateTime")
   (c-name "g_date_time_to_timeval")
@@ -4470,6 +4540,18 @@
 (define-method close
   (of-object "GDir")
   (c-name "g_dir_close")
+  (return-type "none")
+)
+
+(define-method ref
+  (of-object "GDir")
+  (c-name "g_dir_ref")
+  (return-type "GDir*")
+)
+
+(define-method unref
+  (of-object "GDir")
+  (c-name "g_dir_unref")
   (return-type "none")
 )
 
@@ -6898,6 +6980,14 @@
   )
 )
 
+(define-function g_fdwalk_set_cloexec
+  (c-name "g_fdwalk_set_cloexec")
+  (return-type "int")
+  (parameters
+    '("int" "lowfd")
+  )
+)
+
 
 
 ;; From glist.h
@@ -8504,6 +8594,17 @@
   )
 )
 
+(define-function g_log_writer_syslog
+  (c-name "g_log_writer_syslog")
+  (return-type "GLogWriterOutput")
+  (parameters
+    '("GLogLevelFlags" "log_level")
+    '("const-GLogField*" "fields")
+    '("gsize" "n_fields")
+    '("gpointer" "user_data")
+  )
+)
+
 (define-function g_log_writer_journald
   (c-name "g_log_writer_journald")
   (return-type "GLogWriterOutput")
@@ -8551,6 +8652,14 @@
   (parameters
     '("GLogLevelFlags" "log_level")
     '("const-char*" "log_domain")
+  )
+)
+
+(define-function g_log_writer_default_set_debug_domains
+  (c-name "g_log_writer_default_set_debug_domains")
+  (return-type "none")
+  (parameters
+    '("const-gchar*-const*" "domains")
   )
 )
 
@@ -12745,6 +12854,15 @@
   (varargs #t)
 )
 
+(define-method take
+  (of-object "GStrvBuilder")
+  (c-name "g_strv_builder_take")
+  (return-type "none")
+  (parameters
+    '("char*" "value")
+  )
+)
+
 (define-method end
   (of-object "GStrvBuilder")
   (c-name "g_strv_builder_end")
@@ -12981,6 +13099,17 @@
   (return-type "none")
   (parameters
     '("const-char*" "test_path")
+    '("guint64" "usec_timeout")
+    '("GTestSubprocessFlags" "test_flags")
+  )
+)
+
+(define-function g_test_trap_subprocess_with_envp
+  (c-name "g_test_trap_subprocess_with_envp")
+  (return-type "none")
+  (parameters
+    '("const-char*" "test_path")
+    '("const-char*-const*" "envp")
     '("guint64" "usec_timeout")
     '("GTestSubprocessFlags" "test_flags")
   )
@@ -13560,6 +13689,23 @@
   (parameters
     '("volatile-void*" "location")
     '("gsize" "result")
+  )
+)
+
+(define-function g_once_init_enter_pointer
+  (c-name "g_once_init_enter_pointer")
+  (return-type "gboolean")
+  (parameters
+    '("void*" "location")
+  )
+)
+
+(define-function g_once_init_leave_pointer
+  (c-name "g_once_init_leave_pointer")
+  (return-type "none")
+  (parameters
+    '("void*" "location")
+    '("gpointer" "result")
   )
 )
 
@@ -16662,7 +16808,7 @@
   (c-name "g_variant_type_checked_")
   (return-type "const-GVariantType*")
   (parameters
-    '("const-gchar" "*")
+    '("const-gchar*" "type_string")
   )
 )
 
@@ -17540,7 +17686,7 @@
   (return-type "gboolean")
   (parameters
     '("GMutex*" "mutex")
-    '("GTimeVal*" "timeval")
+    '("GTimeVal*" "abs_time")
   )
 )
 

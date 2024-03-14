@@ -972,6 +972,7 @@
     '("all-metadata" "G_FILE_COPY_ALL_METADATA")
     '("no-fallback-for-move" "G_FILE_COPY_NO_FALLBACK_FOR_MOVE")
     '("target-default-perms" "G_FILE_COPY_TARGET_DEFAULT_PERMS")
+    '("target-default-modified-time" "G_FILE_COPY_TARGET_DEFAULT_MODIFIED_TIME")
   )
 )
 
@@ -1087,6 +1088,7 @@
     '("not-connected" "G_IO_ERROR_NOT_CONNECTED")
     '("message-too-large" "G_IO_ERROR_MESSAGE_TOO_LARGE")
     '("no-such-device" "G_IO_ERROR_NO_SUCH_DEVICE")
+    '("destination-unset" "G_IO_ERROR_DESTINATION_UNSET")
   )
 )
 
@@ -2696,6 +2698,24 @@
   (return-type "gboolean")
 )
 
+(define-method print_literal
+  (of-object "GApplicationCommandLine")
+  (c-name "g_application_command_line_print_literal")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "message")
+  )
+)
+
+(define-method printerr_literal
+  (of-object "GApplicationCommandLine")
+  (c-name "g_application_command_line_printerr_literal")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "message")
+  )
+)
+
 (define-method print
   (of-object "GApplicationCommandLine")
   (c-name "g_application_command_line_print")
@@ -2746,6 +2766,12 @@
   )
 )
 
+(define-method done
+  (of-object "GApplicationCommandLine")
+  (c-name "g_application_command_line_done")
+  (return-type "none")
+)
+
 
 
 ;; From gapplication.h
@@ -2785,6 +2811,21 @@
   (return-type "none")
   (parameters
     '("const-gchar*" "application_id")
+  )
+)
+
+(define-method get_version
+  (of-object "GApplication")
+  (c-name "g_application_get_version")
+  (return-type "const-gchar*")
+)
+
+(define-method set_version
+  (of-object "GApplication")
+  (c-name "g_application_set_version")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "version")
   )
 )
 
@@ -5839,6 +5880,12 @@
 (define-method get_arg0
   (of-object "GDBusMessage")
   (c-name "g_dbus_message_get_arg0")
+  (return-type "const-gchar*")
+)
+
+(define-method get_arg0_path
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_arg0_path")
   (return-type "const-gchar*")
 )
 
@@ -17474,6 +17521,18 @@
   )
 )
 
+(define-method receive_bytes
+  (of-object "GSocket")
+  (c-name "g_socket_receive_bytes")
+  (return-type "GBytes*")
+  (parameters
+    '("gsize" "size")
+    '("gint64" "timeout_us")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
 (define-method receive_from
   (of-object "GSocket")
   (c-name "g_socket_receive_from")
@@ -17482,6 +17541,19 @@
     '("GSocketAddress**" "address")
     '("gchar*" "buffer")
     '("gsize" "size")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method receive_bytes_from
+  (of-object "GSocket")
+  (c-name "g_socket_receive_bytes_from")
+  (return-type "GBytes*")
+  (parameters
+    '("GSocketAddress**" "address")
+    '("gsize" "size")
+    '("gint64" "timeout_us")
     '("GCancellable*" "cancellable")
     '("GError**" "error")
   )
@@ -18607,6 +18679,17 @@
   )
 )
 
+(define-method return_prefixed_error
+  (of-object "GTask")
+  (c-name "g_task_return_prefixed_error")
+  (return-type "none")
+  (parameters
+    '("GError*" "error")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
 (define-method return_new_error
   (of-object "GTask")
   (c-name "g_task_return_new_error")
@@ -18617,6 +18700,17 @@
     '("const-char*" "format")
   )
   (varargs #t)
+)
+
+(define-method return_new_error_literal
+  (of-object "GTask")
+  (c-name "g_task_return_new_error_literal")
+  (return-type "none")
+  (parameters
+    '("GQuark" "domain")
+    '("gint" "code")
+    '("const-char*" "message")
+  )
 )
 
 (define-method return_value
@@ -18861,25 +18955,6 @@
 
 
 ;; From gthreadedresolver.h
-
-(define-function g_resolver_records_from_res_query
-  (c-name "g_resolver_records_from_res_query")
-  (return-type "GList*")
-  (parameters
-    '("const-gchar*" "rrname")
-    '("gint" "rrtype")
-    '("const-guint8*" "answer")
-    '("gssize" "len")
-    '("gint" "herr")
-    '("GError**" "error")
-  )
-)
-
-(define-method to_rrtype
-  (of-object "GResolverRecordType")
-  (c-name "g_resolver_record_type_to_rrtype")
-  (return-type "gint")
-)
 
 
 
