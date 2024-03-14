@@ -19,6 +19,7 @@
 
 #include <glibmmconfig.h>
 #include <glibmm/ustring.h>
+#include <glibmm/variantdbusstring.h>
 #include <glib.h>
 #include <memory> //For std::unique_ptr.
 
@@ -46,6 +47,14 @@ inline Glib::ustring
 convert_const_gchar_ptr_to_ustring(const char* str)
 {
   return (str) ? Glib::ustring(str) : Glib::ustring();
+}
+
+// Convert const gchar* to DBusObjectPathString, while treating NULL as empty string.
+// Since 2.80
+inline Glib::DBusObjectPathString
+convert_const_gchar_ptr_to_dbus_object_path_string(const char* str)
+{
+  return (str) ? Glib::DBusObjectPathString(str) : Glib::DBusObjectPathString();
 }
 
 // Convert const gchar* to std::string, while treating NULL as empty string.

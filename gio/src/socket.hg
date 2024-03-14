@@ -14,6 +14,7 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <glibmm/bytes.h>
 #include <glibmm/iochannel.h>
 #include <glibmm/object.h>
 #include <giomm/initable.h>
@@ -207,10 +208,15 @@ public:
 
   // TODO: std::string overload?
   _WRAP_METHOD(gssize receive(char* buffer, gsize size, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_receive, errthrow)
+  _WRAP_METHOD(Glib::RefPtr<Glib::Bytes> receive_bytes(gsize size, gint64 timeout_us, const Glib::RefPtr<Cancellable>& cancellable = {}), g_socket_receive_bytes, errthrow)
 
   _IGNORE(g_socket_receive_from)
   gssize receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size, const Glib::RefPtr<Cancellable>& cancellable);
   gssize receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size);
+
+#m4 _INITIALIZATION(`Glib::RefPtr<SocketAddress>&',`GSocketAddress*',`if ($4) $3 = Glib::wrap($4)')
+  _WRAP_METHOD(Glib::RefPtr<Glib::Bytes> receive_bytes_from(Glib::RefPtr<SocketAddress>& address{>>},
+    gsize size, gint64 timeout_us, const Glib::RefPtr<Cancellable>& cancellable = {}), g_socket_receive_bytes_from, errthrow)
   // TODO: wrap g_socket_receive_message -- figure out this GInputVector thing
   // TODO: std::string overload?
 

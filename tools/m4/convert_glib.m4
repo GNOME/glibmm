@@ -98,6 +98,7 @@ _CONVERSION(`const char*',`std::string',__GCHARP_TO_STDSTRING)
 _CONVERSION(`const char*',`const-gchar*',`$3')
 _CONVERSION(`const-gchar*',`const char*',`$3')
 _CONVERSION(`const char*',`const std::string&',__GCHARP_TO_STDSTRING)
+_CONVERSION(`const gchar*',`Glib::DBusObjectPathString',`Glib::convert_const_gchar_ptr_to_dbus_object_path_string($3)')
 
 _CONVERSION(`Glib::UStringView',`const char*',`$3.c_str()')
 
