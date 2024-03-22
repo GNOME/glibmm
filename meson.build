@@ -1,7 +1,7 @@
 # This file is part of glibmm.
 
 project('glibmm', 'cpp',
-  version: '2.66.6',
+  version: '2.66.7',
   license: 'LGPLv2.1+',
   default_options: [
     'cpp_std=c++11',
@@ -288,12 +288,18 @@ if can_add_dist_script
     python3, dist_changelog_py,
     project_source_root,
   )
+
+  # Don't distribute this file.
+  dont_distribute = [
+    'glibmm.doap',
+  ]
   # Add build scripts to the distribution directory, and delete .gitignore
   # files and an empty $MESON_PROJECT_DIST_ROOT/build/ directory.
   meson.add_dist_script(
     python3, dist_build_scripts_py,
     project_source_root,
     'untracked' / 'build_scripts',
+    dont_distribute,
   )
 endif
 
