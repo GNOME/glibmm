@@ -84,15 +84,18 @@ content_type_from_mime_type(const Glib::ustring& mime_type)
     g_content_type_from_mime_type(mime_type.c_str()));
 }
 
+//TODO: When we can break ABI, remove this content_type_guess() overload.
+// Commit https://gitlab.gnome.org/GNOME/glibmm/-/commit/84135b93a20e6c9fe652849959d3ff90474c99bb
+// removed it from contenttype.h, but not from contenttype.cc.
+// For the time being, it's replaced by a function that does almost nothing.
+// clang 19.0.0 does not like a complete version.
+// See issue https://gitlab.gnome.org/GNOME/glibmm/-/issues/118
 Glib::ustring
 content_type_guess(
-  const std::string& filename, const std::basic_string<guchar>& data, bool& result_uncertain)
+  const std::string& /*filename*/, const std::basic_string<guchar>& /*data*/, bool& result_uncertain)
 {
-  gboolean c_result_uncertain = FALSE;
-  const gchar* c_filename = filename.empty() ? nullptr : filename.c_str();
-  gchar* cresult = g_content_type_guess(c_filename, data.c_str(), data.size(), &c_result_uncertain);
-  result_uncertain = c_result_uncertain;
-  return Glib::convert_return_gchar_ptr_to_ustring(cresult);
+  result_uncertain = true;
+  return Glib::ustring();
 }
 
 Glib::ustring
