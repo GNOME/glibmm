@@ -77,8 +77,8 @@ main(int, char**)
   success &= action.property.get_value() == "A new value.";
 
   gchar* prop_value = nullptr;
-  g_object_set(action.gobj(), "custom_property", "Another value", NULL);
-  g_object_get(action.gobj(), "custom_property", &prop_value, NULL);
+  g_object_set(action.gobj(), "custom_property", "Another value", nullptr);
+  g_object_get(action.gobj(), "custom_property", &prop_value, nullptr);
   std::cout << "The custom property after g_object_set/get() is '" << prop_value << "'."
             << std::endl;
   success &= std::strcmp(prop_value, "Another value") == 0;
