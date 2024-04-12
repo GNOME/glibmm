@@ -148,7 +148,7 @@ private:
  * pointer, you must take care of that yourself.
  */
 template <class T, typename Enable>
-class GLIBMM_API Value<T*, Enable> : public Value_Pointer<T*>
+class Value<T*, Enable> : public Value_Pointer<T*>
 {
 };
 
@@ -158,7 +158,7 @@ class GLIBMM_API Value<T*, Enable> : public Value_Pointer<T*>
  * pointer, you must take care of that yourself.
  */
 template <class T, typename Enable>
-class GLIBMM_API Value<const T*, Enable> : public Value_Pointer<const T*>
+class Value<const T*, Enable> : public Value_Pointer<const T*>
 {
 };
 

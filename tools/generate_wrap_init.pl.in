@@ -228,12 +228,18 @@ foreach my $filename_header (sort keys %deprecated)
 
 # Declarations of glib functions.
 
-print "\n#ifdef _MSC_VER\n";
+print "\n#if defined(__GNUC__) || defined (__clang__)\n";
+print "// gcc or clang, https://gitlab.gnome.org/GNOME/glibmm/-/issues/119\n";
+print "#pragma GCC diagnostic push\n";
+print "#pragma GCC diagnostic ignored \"-Wpragmas\"\n";
+print "#pragma GCC diagnostic ignored \"-Winconsistent-dllimport\"\n";
+print "#elif defined(_MSC_VER)\n";
 print "#pragma warning( push )\n";
 print "#pragma warning( disable : 4273 ) // Disable MSVC warning C4273 in wrap_init.cc momentarily\n";
-print "#endif // _MSC_VER\n";
+print "#endif\n";
 print "\nextern \"C\"\n";
 print "{\n";
+
 print "//Declarations of the *_get_type() functions:\n\n";
 
 foreach my $filename_header (sort keys %objects)
@@ -267,9 +273,11 @@ foreach my $filename_header (sort keys %exceptions)
 }
 
 print "} // extern \"C\"\n";
-print "\n#ifdef _MSC_VER\n";
+print "\n#if defined(__GNUC__) || defined(__clang__)\n";
+print "#pragma GCC diagnostic pop\n";
+print "#elif defined(_MSC_VER)\n";
 print "#pragma warning( pop )\n";
-print "#endif // _MSC_VER\n";
+print "#endif\n";
 print "\n";
 
 my $namespace_whole_declarations = "";
