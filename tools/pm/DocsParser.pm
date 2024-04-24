@@ -837,27 +837,26 @@ sub substitute_identifiers($$)
 
     # Convert property names to C++.
     # The standard (and correct) gtk-doc way of referring to properties.
-    s/(#[A-Z]\w+):([a-z\d-]+)/my $name = "$1::property_$2()"; $name =~ s"-"_"g; "$name";/ge;
-    # This is an incorrect format but widely used so correctly treat as a
-    # property.
-    s/(\s)::([a-z\d-]+)(\s+property)/my $name = "$1property_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
+    s/(#[A-Z]\w+):([a-z\d_-]+)/my $name = "$1::property_$2()"; $name =~ s"-"_"g; "$name";/ge;
+    # This is an incorrect format but widely used so correctly treat as a property.
+    s/(\s)::([a-z\d_-]+)(\s+property)/my $name = "$1property_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
     # This one catches properties written in the gtk-doc block as for example
-    # '#GtkActivatable::related-action property'.  The correct way to write it
+    # '#GtkActivatable::related-action property'. The correct way to write it
     # would be 'GtkActivatable:related-action' (with a single colon and not
-    # two because the double colons are specifically for signals -- see the
-    # gtk-doc docs:
-    # http://developer.gnome.org/gtk-doc-manual/unstable/documenting_symbols.html.en)
-    # but a few are written with the double colon in the gtk+ docs so this
+    # two because the double colons are specifically for signals -- see the gtk-doc docs:
+    # https://developer-old.gnome.org/gtk-doc-manual/unstable/documenting_symbols.html.en)
+    # but a few are written with the double colon in the gtk docs so this
     # protects against those errors.
-    s/([A-Z]\w+)::([a-z\d-]+)(\s+property)/my $name = "$1::property_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
+    s/([A-Z]\w+)::([a-z\d_-]+)(\s+property)/my $name = "$1::property_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
     # gi-docgen syntax.
-    s/\[(`?)property@(?:([A-Z]\w*)\.)?([A-Z]\w+):([a-z\d-]+)\1]/"$1" . &DocsParser::substitute_property_or_signal_name($doc_func, $2, $3, "property", $4) . "$1"/ge;
+    s/\[(`?)property@(?:([A-Z]\w*)\.)?([A-Z]\w+):([a-z\d_-]+)\1]/"$1" . &DocsParser::substitute_property_or_signal_name($doc_func, $2, $3, "property", $4) . "$1"/ge;
 
     # Convert signal names to C++.
+    # Don't accept underscore in gtk-doc-formatted signal names.
+    # Converted property names would be found and converted to ClassName::signal_property_name().
     s/(^|\s)::([a-z\d-]+)(\(\))*([^:\w]|$)/my $name = "$1signal_$2()$4"; $name =~ s"-"_"g; "$name";/ge;
     s/(#[A-Z]\w+)::([a-z\d-]+)(\(\))*([^:\w]|$)/my $name = "$1::signal_$2()$4"; $name =~ s"-"_"g; "$name";/ge;
-    s/\[(`?)signal@(?:([A-Z]\w*)\.)?([A-Z]\w+)::([a-z\d-]+)\1]/"$1" . &DocsParser::substitute_property_or_signal_name($doc_func, $2, $3, "signal", $4) . "$1"/ge;
-
+    s/\[(`?)signal@(?:([A-Z]\w*)\.)?([A-Z]\w+)::([a-z\d_-]+)\1]/"$1" . &DocsParser::substitute_property_or_signal_name($doc_func, $2, $3, "signal", $4) . "$1"/ge;
     # Type names
     s/[#%]([A-Z][a-z]*)([A-Z][A-Za-z]+)\b/&DocsParser::substitute_type_name($doc_func, $1, $2)/eg;
     s/`([A-Z][a-z]*)([A-Z][A-Za-z]*[a-z])`/"`" . &DocsParser::substitute_type_name($doc_func, $1, $2) . "`"/eg;
@@ -866,6 +865,7 @@ sub substitute_identifiers($$)
     # Enumerator names
     s/[#%]([A-Z]+)_([A-Z\d_]+)\b/&DocsParser::substitute_enumerator_name($1, $2)/eg;
     s/`([A-Z]+)_([A-Z\d_]+)`/"`" . &DocsParser::substitute_enumerator_name($1, $2) . "`"/eg;
+    s/\[(`?)enum@([A-Z]\w*)\.([A-Z]\w*)\.([A-Z\d_]+)\1]/"$1" . &DocsParser::substitute_enumerator_name3($2, $3, $4) . "$1"/eg;
 
     s/\bG:://g; #Rename G::Something to Something.
 
@@ -892,8 +892,19 @@ sub substitute_type_name($$$)
   {
     return $DocsParser::type_names{$c_name};
   }
+  $module = "Glib" if $module eq "GLib";
   #print "DocsParser.pm: Assuming the type $c_name shall become " . (($module eq "G") ? "" : "${module}::") . "$name.\n";
   return $module . "::" . $name;
+}
+
+sub substitute_enumerator_name3($$$)
+{
+  # For instance Gtk, FontRendering, MANUAL.
+  # Convert to GTK, FONT_RENDERING_MANUAL before calling substitute_enumerator_name().
+  my ($module, $type_name, $enumerator) = @_;
+
+  $type_name =~ s/([a-z])([A-Z])/$1_$2/g;
+  return substitute_enumerator_name(uc($module), uc($type_name) . "_" . $enumerator);
 }
 
 sub substitute_enumerator_name($$)
@@ -993,6 +1004,7 @@ sub substitute_split_function($$$$)
   }
   else
   {
+    $module = "Glib" if $module eq "GLib";
     return $module . "::" . $class . "::" . $name . "()";
   }
 }
