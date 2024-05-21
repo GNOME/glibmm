@@ -681,7 +681,7 @@ sub convert_tags_to_doxygen($)
     # gtk-doc uses @thearg, but doxygen uses @a thearg.
     s" ?\@([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?\b" \@a $1"g;
 
-    # Don't convert Doxygen's $throw, @throws and @param, so these can be used
+    # Don't convert Doxygen's @throw, @throws and @param, so these can be used
     # in the docs_override.xml.
     # Also don't convert @enum and @var which are used for enum documentation.
     s" \@a (throws?|param|enum|var)\b" \@$1"g;
@@ -806,19 +806,20 @@ sub substitute_identifiers($$)
   {
     # TODO: handle more than one namespace
 
+    # The gtk-doc syntax for links to symbols is described in the gtk-doc manual:
+    # yelp gtk-doc/help/manual/C/index.docbook
+    # then select "Documenting the code" and "Documenting symbols".
+
     # Convert property names to C++.
     # The standard (and correct) gtk-doc way of referring to properties.
     s/(#[A-Z]\w+):([a-z\d-]+)/my $name = "$1::property_$2()"; $name =~ s"-"_"g; "$name";/ge;
-    # This is an incorrect format but widely used so correctly treat as a
-    # property.
+    # This is an incorrect format but widely used so correctly treat as a property.
     s/(\s)::([a-z\d-]+)(\s+property)/my $name = "$1property_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
     # This one catches properties written in the gtk-doc block as for example
-    # '#GtkActivatable::related-action property'.  The correct way to write it
+    # '#GtkActivatable::related-action property'. The correct way to write it
     # would be 'GtkActivatable:related-action' (with a single colon and not
-    # two because the double colons are specifically for signals -- see the
-    # gtk-doc docs:
-    # http://developer.gnome.org/gtk-doc-manual/unstable/documenting_symbols.html.en)
-    # but a few are written with the double colon in the gtk+ docs so this
+    # two because the double colons are specifically for signals)
+    # but a few are written with the double colon in the gtk docs so this
     # protects against those errors.
     s/([A-Z]\w+)::([a-z\d-]+)(\s+property)/my $name = "$1::property_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
 
