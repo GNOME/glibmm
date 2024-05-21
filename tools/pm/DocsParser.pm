@@ -832,8 +832,12 @@ sub substitute_identifiers($$)
   {
     # TODO: handle more than one namespace
 
-    # gi-docgen syntax for links to symbols is described at
+    # The gi-docgen syntax for links to symbols is described at
     # https://gnome.pages.gitlab.gnome.org/gi-docgen/linking.html
+    #
+    # The gtk-doc syntax for links to symbols is described in the gtk-doc manual:
+    # yelp gtk-doc/help/manual/C/index.docbook
+    # then select "Documenting the code" and "Documenting symbols".
 
     # Convert property names to C++.
     # The standard (and correct) gtk-doc way of referring to properties.
@@ -843,8 +847,7 @@ sub substitute_identifiers($$)
     # This one catches properties written in the gtk-doc block as for example
     # '#GtkActivatable::related-action property'. The correct way to write it
     # would be 'GtkActivatable:related-action' (with a single colon and not
-    # two because the double colons are specifically for signals -- see the gtk-doc docs:
-    # https://developer-old.gnome.org/gtk-doc-manual/unstable/documenting_symbols.html.en)
+    # two because the double colons are specifically for signals)
     # but a few are written with the double colon in the gtk docs so this
     # protects against those errors.
     s/([A-Z]\w+)::([a-z\d_-]+)(\s+property)/my $name = "$1::property_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
