@@ -249,10 +249,10 @@ sub parse_on_cdata($$)
   }
 }
 
-sub lookup_enum_documentation($$$$$$$)
+sub lookup_enum_documentation($$$$$$$$)
 {
   my ($c_enum_name, $cpp_enum_name, $indent, $ref_subst_in, $ref_subst_out,
-    $deprecation_docs, $newin) = @_;
+    $is_enum_class, $deprecation_docs, $newin) = @_;
 
   my $objFunction = $DocsParser::hasharrayFunctions{$c_enum_name};
   if(!$objFunction)
@@ -265,6 +265,9 @@ sub lookup_enum_documentation($$$$$$$)
 
   my @param_names = @{$$objFunction{param_names}};
   my $param_descriptions = \$$objFunction{param_descriptions};
+
+  # Scoped enum class or old-fashioned plain enum?
+  my $var_delimiter = $is_enum_class ? "::" : " ";
 
   # Append the param docs first so that the enum description can come last and
   # the possible flag docs that the m4 _ENUM() macro appends goes in the right
@@ -293,13 +296,14 @@ sub lookup_enum_documentation($$$$$$$)
       $desc =~ s/^\s+//;
       $desc =~ s/\s+$//;
       $desc .= '.' unless($desc =~ /(?:^|\.)$/);
-      $docs .= "\@var $cpp_enum_name ${param}\n\u${desc}\n\n"; # \u = Convert next char to uppercase
+      # \u = Convert next char to uppercase
+      $docs .= "\@var $cpp_enum_name$var_delimiter${param}\n\u${desc}\n\n";
     }
   }
+  DocsParser::convert_docs_to_cpp($c_enum_name, \$docs);
 
   # Replace @newin in the enum description, but don't in the element descriptions.
-  my $description = "\@enum $cpp_enum_name\n";
-  $description .= $$objFunction{description};
+  my $description = $$objFunction{description};
   DocsParser::convert_docs_to_cpp($c_enum_name, \$description);
   DocsParser::replace_or_add_newin(\$description, $newin);
 
@@ -310,19 +314,23 @@ sub lookup_enum_documentation($$$$$$$)
     $description .= "\n\@deprecated $deprecation_docs\n";
   }
 
-  # Append the enum description docs.
-  DocsParser::convert_docs_to_cpp($c_enum_name, \$docs);
-  $docs .= "\n\n$description";
   DocsParser::add_m4_quotes(\$docs);
+  DocsParser::add_m4_quotes(\$description);
 
   # Escape the space after "i.e." or "e.g." in the brief description.
-  $docs =~ s/^([^.]*\b(?:i\.e\.|e\.g\.))\s/$1\\ /;
+  $description =~ s/^([^.]*\b(?:i\.e\.|e\.g\.))\s/$1\\ /;
 
-  remove_example_code($c_enum_name, \$docs);
+  remove_example_code($c_enum_name, \$description);
 
   # Add indentation and an asterisk on all lines except the first.
   # $docs does not contain leading "/**" and trailing "*/".
+  # That's added by the _ENUM() m4 macro.
   $docs =~ s/\n/\n${indent}\* /g;
+  $description =~ s/\n/\n${indent}\* /g;
+
+  # Append the enum description docs.
+  # Add "*/"  and "/**" between the param docs and the enum docs.
+  $docs .= "\n${indent}\*/\n${indent}/\*\* $description";
 
   return $docs;
 }

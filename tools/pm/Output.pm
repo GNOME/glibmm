@@ -731,7 +731,7 @@ sub output_wrap_enum($$$$$$$$$$$$$$$)
   # Get the enum documentation from the parsed docs.
   $indent = substr($indent, 1); # Remove one blank
   my $enum_docs = DocsParser::lookup_enum_documentation("$c_type", "$cpp_type",
-    $indent, $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin);
+    $indent, $ref_subst_in, $ref_subst_out, $conv_to_int eq "", $deprecation_docs, $newin);
 
   # Merge the passed in comment to the existing enum documentation.
   $comment .= "\n$indent* $enum_docs" if $enum_docs ne "";
@@ -754,10 +754,11 @@ sub output_wrap_enum($$$$$$$$$$$$$$$)
   $self->append($str);
 }
 
-sub output_wrap_enum_docs_only($$$$$$$$$$$$$)
+sub output_wrap_enum_docs_only($$$$$$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $module_canonical, $cpp_type, $c_type,
-    $comment, $ref_subst_in, $ref_subst_out, $in_class, $deprecation_docs, $newin, $decl_prefix) = @_;
+    $comment, $ref_subst_in, $ref_subst_out, $conv_to_int, $in_class,
+    $deprecation_docs, $newin, $decl_prefix) = @_;
 
   my $objEnum = GtkDefs::lookup_enum($c_type);
   if(!$objEnum)
@@ -774,7 +775,7 @@ sub output_wrap_enum_docs_only($$$$$$$$$$$$$)
   my $indent = " ";
   $indent .= "  " if ($in_class);
   my $enum_docs = DocsParser::lookup_enum_documentation("$c_type", "$cpp_type",
-    $indent, $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin);
+    $indent, $ref_subst_in, $ref_subst_out, $conv_to_int eq "", $deprecation_docs, $newin);
 
   if($enum_docs eq "")
   {
@@ -827,7 +828,7 @@ sub output_wrap_gerror($$$$$$$$$$$$$$)
 
   # Get the enum documentation from the parsed docs.
   my $enum_docs = DocsParser::lookup_enum_documentation("$c_type", "Code",
-    "   ", $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin);
+    "   ", $ref_subst_in, $ref_subst_out, 0, $deprecation_docs, $newin);
 
   # Prevent Doxygen from auto-linking to a class called Error.
   $enum_docs =~ s/([^%])(Error code)/$1%$2/g;

@@ -1549,7 +1549,7 @@ sub on_wrap_enum_docs_only($)
   my $comment = $self->extract_preceding_documentation();
 
   # get the arguments
-  my ($cpp_type, $c_type, undef, $ref_subst_in, $ref_subst_out, undef, undef,
+  my ($cpp_type, $c_type, undef, $ref_subst_in, $ref_subst_out, undef, $conv_to_int,
     $argDeprecated, $deprecation_docs, $newin) = $self->on_wrap_any_enum(0);
 
   # Get the module name so the enum docs can be included in the module's
@@ -1558,7 +1558,8 @@ sub on_wrap_enum_docs_only($)
 
   $$self{objOutputter}->output_wrap_enum_docs_only(
     $$self{filename}, $$self{line_num}, $module_canonical, $cpp_type, $c_type,
-    $comment, $ref_subst_in, $ref_subst_out, $$self{in_class}, $deprecation_docs, $newin);
+    $comment, $ref_subst_in, $ref_subst_out, $conv_to_int, $$self{in_class},
+    $deprecation_docs, $newin);
 }
 
 sub on_wrap_gerror($)
