@@ -1,4 +1,4 @@
-# 2024-03-14: ubuntu:latest = 22.04, ubuntu:rolling = 23.10, ubuntu:devel = 24.04
+# 2024-06-11: ubuntu:latest = 24.04, ubuntu:rolling = 24.04, ubuntu:devel = 24.10
 # See https://hub.docker.com/_/ubuntu
 image: ubuntu:rolling
 
@@ -66,7 +66,7 @@ debug_gcc_build:
     # See https://gitlab.gnome.org/help/ci/yaml/script.md#use-special-characters-with-script
     # Don't test subprojects.
     - 'meson test --suite glibmm:'
-    - meson install
+    - meson install --quiet
   artifacts:
     when: on_failure
     paths:
@@ -87,7 +87,7 @@ release_gcc_build:
     - meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
     - meson compile
     - 'meson test --suite glibmm:'
-    - meson install
+    - meson install --quiet
   artifacts:
     when: always
     paths:
@@ -107,7 +107,7 @@ release_clang_build:
     - CC=clang CXX=clang++ meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max
     - meson compile
     - 'meson test --suite glibmm:'
-    - meson install
+    - meson install --quiet
   allow_failure: true
   artifacts:
     when: on_failure
