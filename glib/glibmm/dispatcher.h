@@ -24,8 +24,8 @@ namespace Glib
 {
 
 /** Signal class for inter-thread communication.
- * @ingroup Threads
- * Glib::Dispatcher works similar to sigc::signal<void()>.  But unlike normal
+ *
+ * %Glib::Dispatcher works similar to sigc::signal<void()>.  But unlike normal
  * signals, the notification happens asynchronously through a pipe.  This is
  * a simple and efficient way of communicating between threads, and especially
  * useful in a thread model with a single GUI thread.
@@ -37,26 +37,26 @@ namespace Glib
  * multiple senders are allowed even without locking.
  * @li The GLib main loop must run in the receiving thread (this will be the
  * GUI thread usually).
- * @li The Dispatcher object must be instantiated by the receiver thread.
- * @li The Dispatcher object should be instantiated before creating any of the
+ * @li The %Dispatcher object must be instantiated by the receiver thread.
+ * @li The %Dispatcher object should be instantiated before creating any of the
  * sender threads, if you want to avoid extra locking.
- * @li The Dispatcher object must be deleted by the receiver thread.
- * @li All Dispatcher objects instantiated by the same receiver thread must
+ * @li The %Dispatcher object must be deleted by the receiver thread.
+ * @li All %Dispatcher objects instantiated by the same receiver thread must
  * use the same main context.
  *
  * Notes about performance:
  *
- * @li After instantiation, Glib::Dispatcher will never lock any mutexes on its
+ * @li After instantiation, %Glib::Dispatcher will never lock any mutexes on its
  * own.  The interaction with the GLib main loop might involve locking on the
  * @em receiver side.  The @em sender side, however, is guaranteed not to lock,
  * except for internal locking in the <tt>%write()</tt> system call.
- * @li All Dispatcher instances of a receiver thread share the same pipe.  That
- * is, if you use Glib::Dispatcher only to notify the GUI thread, only one pipe
- * is created no matter how many Dispatcher objects you have.
+ * @li All %Dispatcher instances of a receiver thread share the same pipe.  That
+ * is, if you use %Glib::Dispatcher only to notify the GUI thread, only one pipe
+ * is created no matter how many %Dispatcher objects you have.
  *
- * Using Glib::Dispatcher on Windows:
+ * Using %Glib::Dispatcher on Windows:
  *
- * Glib::Dispatcher also works on win32-based systems.  Unfortunately though,
+ * %Glib::Dispatcher also works on win32-based systems.  Unfortunately though,
  * the implementation cannot use a pipe on win32 and therefore does have to
  * lock a mutex on emission, too.  However, the impact on performance is
  * likely minor and the notification still happens asynchronously.  Apart
@@ -65,7 +65,7 @@ namespace Glib
 class GLIBMM_API Dispatcher
 {
 public:
-  /** Create new Dispatcher instance using the default main context.
+  /** Create new %Dispatcher instance using the default main context.
    * @throw Glib::FileError
    */
   Dispatcher();
@@ -74,7 +74,7 @@ public:
   Dispatcher(const Dispatcher&) = delete;
   Dispatcher& operator=(const Dispatcher&) = delete;
 
-  /** Create new Dispatcher instance using an arbitrary main context.
+  /** Create new %Dispatcher instance using an arbitrary main context.
    * @throw Glib::FileError
    */
   explicit Dispatcher(const Glib::RefPtr<MainContext>& context);

@@ -52,7 +52,7 @@ public:
   /** Resumes a timer that has previously been stopped with stop().
    * stop() must be called before using this function.
    *
-   * @newin{2,70]
+   * @newin{2,70}
    */
   void resume();
 
@@ -69,7 +69,7 @@ public:
 
   /** Exposes whether the timer is currently active.
    *
-   * @newin{2,70]
+   * @newin{2,70}
    * @return <tt>true</tt> if the timer is running, <tt>false</tt> otherwise.
    */
   bool is_active() const;
