@@ -513,10 +513,8 @@ public:
 
   /** Determines information necessary to poll this main loop.
    * @param max_priority Maximum priority source to check.
-   * @param timeout Location to store timeout to be used in polling.
-   * @param fds Location to store Glib::PollFD records that need to be polled.
-   * @return the number of records actually stored in fds, or, if more than n_fds records need to be
-   * stored, the number of records that need to be stored.
+   * @param[out] timeout Location to store timeout to be used in polling.
+   * @param[out] fds Location to store Glib::PollFD records that need to be polled.
    */
   void query(int max_priority, int& timeout, std::vector<PollFD>& fds);
 
