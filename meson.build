@@ -136,24 +136,13 @@ gobject_dep = dependency('gobject-2.0', version: glib_req)
 gmodule_dep = dependency('gmodule-2.0', version: glib_req)
 
 glibmm_build_dep = [sigcxx_dep, glib_dep, gobject_dep, gmodule_dep]
-glibmm_requires = [
-  'sigc++-3.0', sigcxx_req,
-  'glib-2.0', glib_req,
-  'gobject-2.0', glib_req,
-  'gmodule-2.0', glib_req,
-]
 
 gio_dep = dependency('gio-2.0', version: glib_req)
 giomm_build_dep = glibmm_build_dep + [gio_dep]
-giomm_requires = glibmm_requires + ['gio-2.0', glib_req]
 if not is_host_windows
   gio_unix_dep = dependency('gio-unix-2.0', version: glib_req)
   giomm_build_dep += gio_unix_dep
-  giomm_requires += ['gio-unix-2.0', glib_req]
 endif
-
-glibmm_requires = ' '.join(glibmm_requires)
-giomm_requires = ' '.join(giomm_requires)
 
 # Some dependencies are required only in maintainer mode and/or if
 # reference documentation shall be built.
