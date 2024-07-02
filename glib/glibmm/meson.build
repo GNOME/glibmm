@@ -4,7 +4,8 @@
 #        generate_binding_py, handle_built_files_py, m4_files, pm_files,
 #        glibmm_libversion, install_includedir, python3, glibmm_rc, gmmproc_dir,
 #        is_host_windows, gmmproc, generate_wrap_init_pl, glibmm_libname,
-#        macos_darwin_versions
+#        macos_darwin_versions, pkgconfig, base_pkgconfig_vars,
+#        base_pkgconfig_uninstalled_vars, glibmm_build_dep_private
 # Output: glibmm_hg_ccg_basenames, glibmm_extra_h_files, built_files_root,
 #         glibmm_built_h_file_targets, glibmm_h_m4_files, glibmm_own_dep
 
@@ -266,7 +267,7 @@ if maintainer_mode
     cpp_args: glibmm_cpp_args,
     version: glibmm_libversion,
     darwin_versions: macos_darwin_versions,
-    dependencies: glibmm_build_dep,
+    dependencies: glibmm_build_dep + glibmm_build_dep_private,
     install: true,
   )
 
@@ -322,13 +323,31 @@ else # not maintainer_mode
     cpp_args: glibmm_cpp_args,
     version: glibmm_libversion,
     darwin_versions: macos_darwin_versions,
-    dependencies: glibmm_build_dep,
+    dependencies: glibmm_build_dep + glibmm_build_dep_private,
     install: true,
   )
 
   built_h_cc_dir = src_untracked_glibmm
 
 endif
+
+# Generate the pkg-config files
+pkgconfig.generate(
+  glibmm_library,
+  name: 'glibmm',
+  description: 'C++ binding for GLib',
+  filebase: glibmm_pcname,
+  subdirs: glibmm_pcname,
+  url: 'https://gtkmm.gnome.org/',
+  extra_cflags: '-I${libdir}/@0@/include'.format(glibmm_pcname),
+  requires: glibmm_build_dep,
+  variables: base_pkgconfig_vars + [
+    'gmmprocdir=${libdir}/@0@/proc'.format(glibmm_pcname),
+  ],
+  uninstalled_variables: base_pkgconfig_uninstalled_vars + [
+    'gmmprocdir=${prefix}/tools'
+  ]
+)
 
 # Install built .h and _p.h files.
 meson.add_install_script(
@@ -367,5 +386,5 @@ glibmm_own_dep = declare_dependency(
   sources: glibmm_built_h_file_targets,
   link_with: glibmm_library,
   include_directories: extra_include_dirs,
-  dependencies: glibmm_build_dep,
+  dependencies: glibmm_build_dep + glibmm_build_dep_private,
 )
