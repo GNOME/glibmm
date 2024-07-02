@@ -4,7 +4,7 @@
 #        generate_binding_py, handle_built_files_py, m4_files, pm_files,
 #        glibmm_libversion, install_includedir, python3, giomm_rc, gmmproc_dir,
 #        is_host_windows, gmmproc, generate_wrap_init_pl, giomm_libname,
-#        macos_darwin_versions, can_add_dist_script
+#        macos_darwin_versions, can_add_dist_script, glibmm_api_version, pkgconfig
 # Output: giomm_hg_ccg_basenames, giomm_extra_h_files, built_files_root,
 #         giomm_built_h_file_targets, giomm_own_dep
 
@@ -377,6 +377,18 @@ else # not maintainer_mode
   built_h_cc_dir = src_untracked_giomm
 
 endif
+
+pkgconfig.generate(
+  giomm_library,
+  name: 'giomm',
+  url: 'https://www.gtkmm.org/',
+  description: 'C++ wrapper for gio',
+  filebase: giomm_pcname,
+  subdirs: giomm_pcname,
+  extra_cflags: '-I${libdir}/@0@/include'.format(giomm_pcname),
+  variables: base_pkgconfig_vars,
+  uninstalled_variables: base_pkgconfig_uninstalled_vars,
+)
 
 # Install built .h and _p.h files.
 meson.add_install_script(

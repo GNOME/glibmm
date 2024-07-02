@@ -12,8 +12,8 @@ project('glibmm', 'cpp',
 )
 
 glibmm_api_version = '2.68'
-glibmm_pcname = meson.project_name() + '-' + glibmm_api_version
-giomm_pcname = 'giomm-' + glibmm_api_version
+glibmm_pcname = '@0@-@1@'.format(meson.project_name(), glibmm_api_version)
+giomm_pcname = 'giomm-@0@'.format(glibmm_api_version)
 
 glibmm_version_array = meson.project_version().split('.')
 glibmm_major_version = glibmm_version_array[0].to_int()
@@ -50,6 +50,22 @@ is_host_windows = host_machine.system() == 'windows'
 is_os_cocoa = host_machine.system() == 'darwin'
 
 python3 = find_program('python3', version: '>=3.5')
+pkgconfig = import('pkgconfig')
+common_pkgconfig_vars = [
+  'htmlrefpub=https://gnome.pages.gitlab.gnome.org/@0@/'.format(meson.project_name()),
+]
+base_pkgconfig_vars = [
+  'exec_prefix=${prefix}',
+  'datarootdir=${prefix}/share',
+  'datadir=${datarootdir}',
+  'gmmprocdir=${libdir}/@0@/proc'.format(glibmm_pcname),
+  'docdir=${datarootdir}/doc/@0@'.format(glibmm_pcname),
+  'doxytagfile=${docdir}/reference/@0@.tag'.format(glibmm_pcname),
+  'htmlrefdir=${docdir}/reference/html',
+] + common_pkgconfig_vars
+base_pkgconfig_uninstalled_vars = [
+  'doxytagfile=${prefix}/docs/reference/@0@.tag'.format(glibmm_pcname),
+] + common_pkgconfig_vars
 
 # Do we build from a git repository?
 # Suppose we do if and only if the meson.build file is tracked by git.

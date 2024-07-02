@@ -9,20 +9,8 @@
 #         glibmmconfig_h_meson
 
 pkg_conf_data = configuration_data()
-pkg_conf_data.set('prefix', install_prefix)
-pkg_conf_data.set('exec_prefix', '${prefix}')
-pkg_conf_data.set('libdir', '${exec_prefix}' / install_libdir)
-pkg_conf_data.set('datarootdir', '${prefix}' / install_datadir)
-pkg_conf_data.set('datadir', '${datarootdir}')
-pkg_conf_data.set('includedir', '${prefix}' / install_includedir)
-pkg_conf_data.set('PACKAGE_TARNAME', meson.project_name())
 pkg_conf_data.set('PACKAGE_VERSION', meson.project_version())
-pkg_conf_data.set('GLIBMM_MODULE_NAME', glibmm_pcname)
-pkg_conf_data.set('GLIBMM_API_VERSION', glibmm_api_version)
-pkg_conf_data.set('GLIBMM_MODULES', glibmm_requires)
 pkg_conf_data.set('GIOMM_MODULE_NAME', giomm_pcname)
-pkg_conf_data.set('GIOMM_API_VERSION', glibmm_api_version)
-pkg_conf_data.set('GIOMM_MODULES', giomm_requires)
 if not build_deprecated_api
   pkg_conf_data.set('GLIBMM_DISABLE_DEPRECATED', 1)
   pkg_conf_data.set('GIOMM_DISABLE_DEPRECATED', 1)
@@ -33,7 +21,6 @@ pkg_conf_data.set('GLIBMM_MICRO_VERSION', glibmm_micro_version)
 pkg_conf_data.set('GIOMM_MAJOR_VERSION', glibmm_major_version)
 pkg_conf_data.set('GIOMM_MINOR_VERSION', glibmm_minor_version)
 pkg_conf_data.set('GIOMM_MICRO_VERSION', glibmm_micro_version)
-pkg_conf_data.set('MSVC_TOOLSET_VER', msvc14x_toolset_ver)
 
 library_build_type = get_option('default_library')
 
@@ -47,23 +34,6 @@ if library_build_type == 'static'
   pkg_conf_data.set('GLIBMM_STATIC_LIB', 1)
   pkg_conf_data.set('GIOMM_STATIC_LIB', 1)
 endif
-
-configure_file(
-  input: 'glibmm.pc.in',
-  output: glibmm_pcname + '.pc',
-  configuration: pkg_conf_data,
-  install_dir: install_pkgconfigdir,
-)
-
-glibmm_pkg_uninst_conf_data = configuration_data()
-glibmm_pkg_uninst_conf_data.merge_from(pkg_conf_data)
-glibmm_pkg_uninst_conf_data.set('srcdir', meson.current_source_dir())
-
-configure_file(
-  input: 'glibmm-uninstalled.pc.in',
-  output: glibmm_pcname + '-uninstalled.pc',
-  configuration: glibmm_pkg_uninst_conf_data,
-)
 
 glibmm_config_conf_data = configuration_data()
 glibmm_config_conf_data.merge_from(pkg_conf_data)
