@@ -13,8 +13,12 @@ Download location
  - https://download.gnome.org/sources/glibmm
 
 Reference documentation
- - Download a tarball. Tarballs contain reference documentation.
-In tarballs generated with Meson, see the untracked/docs/reference/html directory.
+ - https://gnome.pages.gitlab.gnome.org/glibmm
+
+The documentation on the web describes glibmm-2.68.
+If you want documentation of glibmm-2.4, download a tarball.
+Tarballs contain reference documentation. In tarballs generated with Meson,
+see the untracked/docs/reference/html directory.
 
 Discussion on GNOME's discourse forum
  - https://discourse.gnome.org/tag/cplusplus
