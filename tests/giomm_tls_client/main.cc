@@ -12,9 +12,9 @@
 // If you don't know where the implementations of gio extension points are stored,
 // search for a file named giomodule.cache.
 //
-// https://developer.gnome.org/gio/stable/extending-gio.html (G_TLS_BACKEND_EXTENSION_POINT_NAME)
-// https://developer.gnome.org/gio/stable/gio-Extension-Points.html
-// https://developer.gnome.org/gio/stable/gio-querymodules.html
+// https://docs.gtk.org/gio/const.TLS_BACKEND_EXTENSION_POINT_NAME.html
+// https://docs.gtk.org/gio/struct.IOExtensionPoint.html
+// https://docs.gtk.org/gio/gio-querymodules.html (2024-07-02: broken link)
 
 #include <cstdlib>
 #include <giomm.h>
