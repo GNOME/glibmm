@@ -12,8 +12,8 @@ project('glibmm', 'cpp',
 )
 
 glibmm_api_version = '2.68'
-glibmm_pcname = meson.project_name() + '-' + glibmm_api_version
-giomm_pcname = 'giomm-' + glibmm_api_version
+glibmm_pcname = '@0@-@1@'.format(meson.project_name(), glibmm_api_version)
+giomm_pcname = 'giomm-@0@'.format(glibmm_api_version)
 
 glibmm_version_array = meson.project_version().split('.')
 glibmm_major_version = glibmm_version_array[0].to_int()
@@ -49,7 +49,23 @@ is_msvc = cpp_compiler.get_id() == 'msvc'
 is_host_windows = host_machine.system() == 'windows'
 is_os_cocoa = host_machine.system() == 'darwin'
 
-python3 = find_program('python3', version: '>=3.7')
+python3 = find_program('python3', version: '>=3.5')
+pkgconfig = import('pkgconfig')
+common_pkgconfig_vars = [
+  'htmlrefpub=https://gnome.pages.gitlab.gnome.org/@0@/'.format(meson.project_name()),
+]
+base_pkgconfig_vars = [
+  'exec_prefix=${prefix}',
+  'datarootdir=${prefix}/share',
+  'datadir=${datarootdir}',
+  'gmmprocdir=${libdir}/@0@/proc'.format(glibmm_pcname),
+  'docdir=${datarootdir}/doc/@0@'.format(glibmm_pcname),
+  'doxytagfile=${docdir}/reference/@0@.tag'.format(glibmm_pcname),
+  'htmlrefdir=${docdir}/reference/html',
+] + common_pkgconfig_vars
+base_pkgconfig_uninstalled_vars = [
+  'doxytagfile=${prefix}/docs/reference/@0@.tag'.format(glibmm_pcname),
+] + common_pkgconfig_vars
 
 # Do we build from a git repository?
 # Suppose we do if and only if the meson.build file is tracked by git.
@@ -120,24 +136,13 @@ gobject_dep = dependency('gobject-2.0', version: glib_req)
 gmodule_dep = dependency('gmodule-2.0', version: glib_req)
 
 glibmm_build_dep = [sigcxx_dep, glib_dep, gobject_dep, gmodule_dep]
-glibmm_requires = [
-  'sigc++-3.0', sigcxx_req,
-  'glib-2.0', glib_req,
-  'gobject-2.0', glib_req,
-  'gmodule-2.0', glib_req,
-]
 
 gio_dep = dependency('gio-2.0', version: glib_req)
 giomm_build_dep = glibmm_build_dep + [gio_dep]
-giomm_requires = glibmm_requires + ['gio-2.0', glib_req]
 if not is_host_windows
   gio_unix_dep = dependency('gio-unix-2.0', version: glib_req)
   giomm_build_dep += gio_unix_dep
-  giomm_requires += ['gio-unix-2.0', glib_req]
 endif
-
-glibmm_requires = ' '.join(glibmm_requires)
-giomm_requires = ' '.join(giomm_requires)
 
 # Some dependencies are required only in maintainer mode and/or if
 # reference documentation shall be built.

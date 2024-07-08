@@ -4,7 +4,8 @@
 #        generate_binding_py, handle_built_files_py, m4_files, pm_files,
 #        glibmm_libversion, install_includedir, python3, glibmm_rc, gmmproc_dir,
 #        is_host_windows, gmmproc, generate_wrap_init_pl, glibmm_libname,
-#        macos_darwin_versions, can_add_dist_script
+#        macos_darwin_versions, can_add_dist_script, pkgconfig,
+#        base_pkgconfig_vars, base_pkgconfig_uninstalled_vars
 # Output: glibmm_hg_ccg_basenames, glibmm_extra_h_files, built_files_root,
 #         glibmm_built_h_file_targets, glibmm_h_m4_files, glibmm_own_dep
 
@@ -317,6 +318,23 @@ else # not maintainer_mode
   built_h_cc_dir = src_untracked_glibmm
 
 endif
+
+# Generate the pkg-config files
+pkgconfig.generate(
+  glibmm_library,
+  name: 'glibmm',
+  description: 'C++ wrapper for GLib',
+  filebase: glibmm_pcname,
+  subdirs: glibmm_pcname,
+  url: 'https://www.gtkmm.org/',
+  extra_cflags: '-I${libdir}/@0@/include'.format(glibmm_pcname),
+  variables: base_pkgconfig_vars + [
+    'gmmprocdir=${libdir}/@0@/proc'.format(glibmm_pcname),
+  ],
+  uninstalled_variables: base_pkgconfig_uninstalled_vars + [
+    'gmmprocdir=${prefix}/tools'
+  ]
+)
 
 # Install built .h and _p.h files.
 meson.add_install_script(
