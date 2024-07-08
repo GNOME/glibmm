@@ -7,8 +7,7 @@ project('glibmm', 'cpp',
     'cpp_std=c++17',
     'warning_level=1',
   ],
-  meson_version: '>= 0.55.0', # required for meson.add_dist_script(python3, ...)
-                              # and meson.add_install_script(python3, ...)
+  meson_version: '>= 0.62.0', # required for variables in pkgconfig.generate()
 )
 
 glibmm_api_version = '2.68'
@@ -49,22 +48,20 @@ is_msvc = cpp_compiler.get_id() == 'msvc'
 is_host_windows = host_machine.system() == 'windows'
 is_os_cocoa = host_machine.system() == 'darwin'
 
-python3 = find_program('python3', version: '>=3.5')
+python3 = find_program('python3', version: '>=3.7')
 pkgconfig = import('pkgconfig')
 common_pkgconfig_vars = [
+  'doxytagfile=${docdir}/reference/@0@.tag'.format(glibmm_pcname),
+  'htmlrefdir=${docdir}/reference/html',
   'htmlrefpub=https://gnome.pages.gitlab.gnome.org/@0@/'.format(meson.project_name()),
 ]
 base_pkgconfig_vars = [
   'exec_prefix=${prefix}',
-  'datarootdir=${prefix}/share',
-  'datadir=${datarootdir}',
-  'gmmprocdir=${libdir}/@0@/proc'.format(glibmm_pcname),
-  'docdir=${datarootdir}/doc/@0@'.format(glibmm_pcname),
-  'doxytagfile=${docdir}/reference/@0@.tag'.format(glibmm_pcname),
-  'htmlrefdir=${docdir}/reference/html',
+  'datarootdir=${datadir}',
+  'docdir=${datadir}/doc/@0@'.format(glibmm_pcname),
 ] + common_pkgconfig_vars
 base_pkgconfig_uninstalled_vars = [
-  'doxytagfile=${prefix}/docs/reference/@0@.tag'.format(glibmm_pcname),
+  'docdir=${prefix}/docs',
 ] + common_pkgconfig_vars
 
 # Do we build from a git repository?

@@ -1,15 +1,14 @@
 # glib
 
-# Input: install_prefix, install_libdir, install_datadir, install_includedir,
-#        glibmm_pcname, giomm_pcname, glibmm_api_version,
-#        build_deprecated_api, install_pkgconfigdir,
+# Input: install_libdir, glibmm_pcname, giomm_pcname, build_deprecated_api,
 #        is_os_cocoa, cpp_compiler, glibmm_major_version, glibmm_minor_version,
-#        glibmm_micro_version, msvc14x_toolset_ver
+#        glibmm_micro_version
 # Output: pkg_conf_data, glibmm_config_conf_data, install_glibmmconfigdir,
 #         glibmmconfig_h_meson
 
 pkg_conf_data = configuration_data()
 pkg_conf_data.set('PACKAGE_VERSION', meson.project_version())
+pkg_conf_data.set('GLIBMM_MODULE_NAME', glibmm_pcname)
 pkg_conf_data.set('GIOMM_MODULE_NAME', giomm_pcname)
 if not build_deprecated_api
   pkg_conf_data.set('GLIBMM_DISABLE_DEPRECATED', 1)
