@@ -384,7 +384,7 @@ pkgconfig.generate(
   url: 'https://www.gtkmm.org/',
   description: 'C++ wrapper for gio',
   filebase: giomm_pcname,
-  requires: [glibmm_pcname],
+  requires: ['gio-2.0', glibmm_pcname],
   subdirs: giomm_pcname,
   extra_cflags: '-I${libdir}/@0@/include'.format(giomm_pcname),
   variables: base_pkgconfig_vars,

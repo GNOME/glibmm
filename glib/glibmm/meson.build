@@ -325,6 +325,7 @@ pkgconfig.generate(
   name: 'glibmm',
   description: 'C++ wrapper for GLib',
   filebase: glibmm_pcname,
+  requires: ['gobject-2.0', 'sigc++-3.0'],
   subdirs: glibmm_pcname,
   url: 'https://www.gtkmm.org/',
   extra_cflags: '-I${libdir}/@0@/include'.format(glibmm_pcname),
