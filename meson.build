@@ -348,7 +348,7 @@ if meson.is_subproject()
 
   pkgconfig_vars = {
     'htmlrefdir': install_prefix / install_docdir / 'reference' / 'html',
-    'htmlrefpub': 'https://gnome.pages.gitlab.gnome.org/' + pkg_conf_data.get_unquoted('PACKAGE_TARNAME')
+    'htmlrefpub': 'https://gnome.pages.gitlab.gnome.org/' + meson.project_name(),
   }
   if build_documentation
     pkgconfig_vars += {'doxytagfile': tag_file.full_path()}
