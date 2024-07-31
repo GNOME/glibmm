@@ -50,7 +50,7 @@ public:
    *
    * This slot is called when generating introspection data and also when
    * preparing to dispatch incoming messages in the event that the
-   * Gio::DBus::SUBTREE_FLAGS_DISPATCH_TO_UNENUMERATED_NODES flag is not
+   * Gio::DBus::SubtreeFlags::DISPATCH_TO_UNENUMERATED_NODES flag is not
    * specified (ie: to verify that the object path is valid).
    *
    * Hierarchies are not supported; the items that you return should not
@@ -58,9 +58,9 @@ public:
    *
    * For example,
    * @code
-   * std::vector<Glib::ustring> on_subtree_enumerate(const
-   * Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring&
-   * sender, const Glib::ustring& object_path);
+   * std::vector<Glib::ustring> on_subtree_enumerate(
+   *   const Glib::RefPtr<Gio::DBus::Connection>& connection,
+   *   const Glib::ustring& sender, const Glib::ustring& object_path);
    * @endcode
    */
   using SlotSubtreeEnumerate = sigc::slot<
@@ -72,7 +72,7 @@ public:
 
   /** The type for a slot which handles introspecting a child node.
    *
-   * Subtrees are flat. @a node, if non-<tt>0</tt>, is always exactly one
+   * Subtrees are flat. @a node, if not an empty string, is always exactly one
    * segment of the object path (ie: it never contains a slash).
    *
    * This function should return an empty vector to indicate that there is no
@@ -85,9 +85,10 @@ public:
    * for example,
    * @code
    * std::vector< Glib::RefPtr<Gio::DBus::InterFaceInfo> >
-   * on_subtree_introspect(const Glib::RefPtr<Gio::DBus::Connection>&
-   * connection, const Glib::ustring& sender, const Glib::ustring&
-   * object_path, const Glib::ustring& node);
+   * on_subtree_introspect(
+   *   const Glib::RefPtr<Gio::DBus::Connection>& connection,
+   *   const Glib::ustring& sender, const Glib::ustring& object_path,
+   *   const Glib::ustring& node);
    * @endcode
    */
   using SlotSubtreeIntrospect = sigc::slot<
@@ -98,18 +99,17 @@ public:
     const Glib::ustring&)
     >;
 
-  /** The type for a slot which handles dispatching a remote call on a child
-   * node.
+  /** The type for a slot which handles dispatching a remote call on a child node.
    *
-   * Subtrees are flat. @a node, if non-<tt>0</tt>, is always exactly one
+   * Subtrees are flat. @a node, if not an empty string, is always exactly one
    * segment of the object path (ie: it never contains a slash).
    *
    * for example,
    * @code
-   * const Gio::DBus::InterfaceVTable* on_subtree_dispatch(const
-   * Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring&
-   * sender, const Glib::ustring& object_path, const Glib::ustring&
-   * interface_name, const Glib::ustring& node);
+   * const Gio::DBus::InterfaceVTable* on_subtree_dispatch(
+   *   const Glib::RefPtr<Gio::DBus::Connection>& connection,
+   *   const Glib::ustring& sender, const Glib::ustring& object_path,
+   *   const Glib::ustring& interface_name, const Glib::ustring& node);
    * @endcode
    */
   using SlotSubtreeDispatch = sigc::slot<
@@ -122,9 +122,9 @@ public:
     >;
 
   /** Constructs a new SubtreeVTable using specified slots.
-   * @param slot_enumerate The slot for handling incoming method calls.
-   * @param slot_introspect The slot for getting a property.
-   * @param slot_dispatch The slot for setting a property.
+   * @param slot_enumerate The slot for enumerating child nodes.
+   * @param slot_introspect The slot for introspecting a child node.
+   * @param slot_dispatch The slot for dispatching a remote call on a child node.
    */
   explicit SubtreeVTable(
    const SlotSubtreeEnumerate& slot_enumerate,
