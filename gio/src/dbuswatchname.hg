@@ -43,27 +43,26 @@ using SlotNameVanished = sigc::slot<void(const Glib::RefPtr<Gio::DBus::Connectio
 //TODO: Add example from C API in class docs?
 /** Starts watching @a name on the bus specified by @a bus_type and calls
  * @a name_appeared_slot and @a name_vanished_slot when the name is
- * known to have a owner respectively known to lose its owner. Callbacks will
+ * known to have an owner respectively known to lose its owner. Callbacks will
  * be invoked in the thread-default main loop of the thread you are calling
  * this function from.
  *
- * You are guaranteed that one of the slot will be invoked after calling
+ * You are guaranteed that one of the slots will be invoked after calling
  * this function. When you are done watching the name, just call
  * unwatch_name() with the watcher id this function returns.
  *
  * If the name vanishes or appears (for example the application owning the
- * name could restart), the slot are also invoked. If the Connection
- * that is used for watching the name disconnects, then @a
- * name_vanished_slot is invoked since it is no longer possible to access
- * the name.
+ * name could restart), the slots are also invoked. If the Connection
+ * that is used for watching the name disconnects, then @a name_vanished_slot
+ * is invoked since it is no longer possible to access the name.
  *
- * Another guarantee is that invocations of @a name_appeared_slot and @a
- * name_vanished_slot are guaranteed to alternate; that is, if
+ * Another guarantee is that invocations of @a name_appeared_slot and
+ * @a name_vanished_slot are guaranteed to alternate; that is, if
  * @a name_appeared_slot is invoked then you are guaranteed that the next
- * time one of the slot is invoked, it will be @a name_vanished_slot.
+ * time one of the slots is invoked, it will be @a name_vanished_slot.
  * The reverse is also true.
  *
- * This behavior makes it very simple to write applications that wants to take
+ * This behavior makes it very simple to write applications that want to take
  * action when a certain name exists, see the C API's Example 9, “Simple
  * application watching a name” for more information. Basically, the
  * application should create object proxies in @a name_appeared_slot and
@@ -89,7 +88,7 @@ guint watch_name(
   const SlotNameVanished& name_vanished_slot = {},
   BusNameWatcherFlags flags = Gio::DBus::BusNameWatcherFlags::NONE
 );
-_IGNORE(g_bus_watch_name)
+_IGNORE(g_bus_watch_name, g_bus_watch_name_with_closures)
 
 /** A watch_name() function that takes a Connection instead of a BusType.
  *
@@ -113,7 +112,7 @@ guint watch_name(
   const SlotNameVanished& name_vanished_slot = {},
   BusNameWatcherFlags flags = Gio::DBus::BusNameWatcherFlags::NONE
 );
-_IGNORE(g_bus_watch_name_on_connection)
+_IGNORE(g_bus_watch_name_on_connection, g_bus_watch_name_on_connection_with_closures)
 
 /** Stops watching a name.
  * @param watcher_id An identifier obtained from watch_name().

@@ -50,13 +50,13 @@ using SlotNameLost = sigc::slot<void(const Glib::RefPtr<Gio::DBus::Connection>&,
 
 //TODO: See https://bugzilla.gnome.org/show_bug.cgi?id=646427 about the apparent uselessness of SlotNameAcquired.
 //TODO: Add example from C API in class docs.
-/** Starts acquiring @a name on the bus specified by @a bus_type and calls @a
- * name_acquired_slot and name_@a lost_slot when the name is acquired
+/** Starts acquiring @a name on the bus specified by @a bus_type and calls
+ * @a name_acquired_slot and @a name_lost_slot when the name is acquired
  * respectively lost. Slots will be invoked in the thread-default main
  * loop of the thread you are calling this function from.
  *
- * You are guaranteed that one of the @a name_acquired_slot and @a
- * name_lost_slot slots will be invoked after calling this function - there
+ * You are guaranteed that one of the @a name_acquired_slot and
+ * @a name_lost_slot slots will be invoked after calling this function - there
  * are three possible cases:
  *
  * - @a name_lost_slot with a nullptr connection (if a connection to the bus
@@ -76,10 +76,10 @@ using SlotNameLost = sigc::slot<void(const Glib::RefPtr<Gio::DBus::Connection>&,
  * @a name_lost_slot is invoked since it is no longer possible for other
  * processes to access the process.
  *
- * You cannot use own_name() several times for the same name (unless
+ * You cannot use %own_name() several times for the same name (unless
  * interleaved with calls to unown_name()) - only the first call will work.
  *
- * Another guarantee is that invocations of name_@a acquired_slot and
+ * Another guarantee is that invocations of @a name_acquired_slot and
  * @a name_lost_slot are guaranteed to alternate; that is, if
  * @a name_acquired_slot is invoked then you are guaranteed that the next
  * time one of the slots is invoked, it will be @a name_lost_slot. The
@@ -101,7 +101,7 @@ using SlotNameLost = sigc::slot<void(const Glib::RefPtr<Gio::DBus::Connection>&,
  * @param name_acquired_slot Slot to invoke when name is acquired.
  * @param name_lost_slot Slot to invoke when name is lost.
  * @param flags A set of flags from the BusNameOwnerFlags enumeration.
- * @return An identifier (never 0) that an be used with unown_name() to stop
+ * @return An identifier (never 0) that can be used with unown_name() to stop
  * owning the name.
  *
  * @newin{2,28}
@@ -116,7 +116,30 @@ guint own_name(
   const SlotNameLost& name_lost_slot = {},
   BusNameOwnerFlags flags = Gio::DBus::BusNameOwnerFlags::NONE
 );
-_IGNORE(g_bus_own_name)
+_IGNORE(g_bus_own_name, g_bus_own_name_with_closures)
+
+/** An own_name() function that takes a Connection instead of a BusType.
+ *
+ * @param connection A Connection.
+ * @param name The well-known name to own.
+ * @param name_acquired_slot Slot to invoke when name is acquired.
+ * @param name_lost_slot Slot to invoke when name is lost.
+ * @param flags A set of flags from the BusNameOwnerFlags enumeration.
+ * @return An identifier (never 0) that can be used with unown_name() to stop
+ * owning the name.
+ *
+ * @newin{2,82}
+ * @ingroup DBus
+ */
+GIOMM_API
+guint own_name(
+  const Glib::RefPtr<Connection>& connection,
+  const Glib::ustring& name,
+  const SlotNameAcquired& name_acquired_slot = {},
+  const SlotNameLost& name_lost_slot = {},
+  BusNameOwnerFlags flags = Gio::DBus::BusNameOwnerFlags::NONE
+);
+_IGNORE(g_bus_own_name_on_connection, g_bus_own_name_on_connection_with_closures)
 
 /** Stops owning a name.
  * @param owner_id An identifier obtained from own_name().

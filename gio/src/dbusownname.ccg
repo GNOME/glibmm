@@ -20,7 +20,7 @@
 namespace
 {
 
-// Structure to hold the slots registred with own_name().
+// Structure to hold the slots registered with own_name().
 struct OwnSlots
 {
   Gio::DBus::SlotBusAcquired* bus_acquired_slot;
@@ -119,6 +119,24 @@ own_name(BusType bus_type, const Glib::ustring& name, const SlotBusAcquired& bus
 
   return g_bus_own_name(static_cast<GBusType>(bus_type), name.c_str(),
     static_cast<GBusNameOwnerFlags>(flags), &Bus_Acquired_giomm_callback,
+    &Bus_Name_Acquired_giomm_callback, &Bus_Name_Lost_giomm_callback, slots,
+    &Bus_Own_Name_giomm_callback_destroy);
+}
+
+guint
+own_name(const Glib::RefPtr<Connection>& connection, const Glib::ustring& name,
+  const SlotNameAcquired& name_acquired_slot, const SlotNameLost& name_lost_slot,
+  BusNameOwnerFlags flags)
+{
+  auto slots = new OwnSlots;
+
+  // Make copies of the slots which will be deleted on destroy notification.
+  slots->bus_acquired_slot = nullptr;
+  slots->name_acquired_slot = new SlotNameAcquired(name_acquired_slot);
+  slots->name_lost_slot = new SlotNameLost(name_lost_slot);
+
+  return g_bus_own_name_on_connection(Glib::unwrap(connection), name.c_str(),
+    static_cast<GBusNameOwnerFlags>(flags),
     &Bus_Name_Acquired_giomm_callback, &Bus_Name_Lost_giomm_callback, slots,
     &Bus_Own_Name_giomm_callback_destroy);
 }
