@@ -58,9 +58,9 @@ _GMMPROC_EXTRA_NAMESPACE(DBus)
  */
 
 //TODO: Add example from C API in class docs.
-/** A D-Bus Connection.
- * The Connection type is used for D-Bus connections to remote peers such
- * as a message buses. It is a low-level API that offers a lot of flexibility.
+/** A D-Bus %Connection.
+ * The %Connection type is used for D-Bus connections to remote peers such
+ * as message buses. It is a low-level API that offers a lot of flexibility.
  * For instance, it lets you establish a connection over any transport that
  * can by represented as an IOStream.
  *
@@ -167,10 +167,10 @@ public:
   /** Signature for slot used in signal_subscribe().
    *  For example,
    * @code
-   * void on_signal(const Glib::RefPtr<Connection>& connection, const
-   * Glib::ustring& sender_name, const Glib::ustring& object_path, const
-   * Glib::ustring& object_path, const Glib::ustring& interface_name, const
-   * Glib::ustring& signal_name, const Glib::VariantContainerBase& parameters);.
+   * void on_signal(const Glib::RefPtr<Connection>& connection,
+   *   const Glib::ustring& sender_name, const Glib::ustring& object_path,
+   *   const Glib::ustring& object_path, const Glib::ustring& interface_name,
+   *   const Glib::ustring& signal_name, const Glib::VariantContainerBase& parameters);
    * @endcode
    */
   using SlotSignal = sigc::slot<void(const Glib::RefPtr<Connection>&,
@@ -180,15 +180,15 @@ public:
   /** Signature for slot used in add_filter().
    *  For example,
    * @code
-   * Glib::RefPtr<Message> on_message_filter(const
-   * Glib::RefPtr<Connection> connection, const Glib::RefPtr<Message>&
-   * message, bool incoming);.
+   * Glib::RefPtr<Message> on_message_filter(
+   *   const Glib::RefPtr<Connection>& connection,
+   *   const Glib::RefPtr<Message>& message, bool incoming);
    * @endcode
    *
    * A filter function is passed a Message and expected to return a
    * Message too. Passive filter functions that don't modify the message
-   * can simply return the message object.  Filter functions that wants to
-   * drop a message can simply return <tt>0</tt>.  And filter function may
+   * can simply return the message object. Filter functions that wants to
+   * drop a message can simply return an empty RefPtr. And filter function may
    * modify a message by copying it and return the copy.
    */
   using SlotMessageFilter = sigc::slot<Glib::RefPtr<Message>(
@@ -200,7 +200,7 @@ public:
    * When the operation is finished, @a slot will be invoked. You can then
    * call get_finish() to get the result of the operation.
    *
-   * This is a asynchronous failable function. See get_sync() for the
+   * This is an asynchronous failable function. See get_sync() for the
    * synchronous version.
    *
    * @param bus_type A BusType.
@@ -334,12 +334,12 @@ public:
    * connection disconnects, see property_exit_on_close()).
    *
    * Once the connection is closed, operations such as sending a message will
-   * return with the error Gio::IO_ERROR_CLOSED. Closing a connection will not
+   * return with the error Gio::Error::CLOSED. Closing a connection will not
    * automatically flush the connection so queued messages may be lost. Use
    * flush() if you need such guarantees.
    *
    * If the connection is already closed, this method fails with
-   * Gio::IO_ERROR_CLOSED.
+   * Gio::Error::CLOSED.
    *
    * When the connection has been closed, the "closed" signal is emitted in
    * the thread-default main loop of the thread that connection was
@@ -357,12 +357,12 @@ public:
    * connection disconnects, see property_exit_on_close()).
    *
    * Once the connection is closed, operations such as sending a message will
-   * return with the error Gio::IO_ERROR_CLOSED. Closing a connection will not
+   * return with the error Gio::Error::CLOSED. Closing a connection will not
    * automatically flush the connection so queued messages may be lost. Use
    * flush() if you need such guarantees.
    *
    * If the connection is already closed, this method fails with
-   * Gio::IO_ERROR_CLOSED.
+   * Gio::Error::CLOSED.
    *
    * When the connection has been closed, the "closed" signal is emitted in
    * the thread-default main loop of the thread that connection was
@@ -385,12 +385,12 @@ public:
    * connection disconnects, see property_exit_on_close()).
    *
    * Once the connection is closed, operations such as sending a message will
-   * return with the error Gio::IO_ERROR_CLOSED. Closing a connection will not
+   * return with the error Gio::Error::CLOSED. Closing a connection will not
    * automatically flush the connection so queued messages may be lost. Use
    * flush() if you need such guarantees.
    *
    * If the connection is already closed, this method fails with
-   * Gio::IO_ERROR_CLOSED.
+   * Gio::Error::CLOSED.
    *
    * When the connection has been closed, the "closed" signal is emitted in
    * the thread-default main loop of the thread that connection was
@@ -488,9 +488,9 @@ public:
    * message via Gio::DBus::Message::set_serial().
    *
    * If the connection is closed then the operation will fail with
-   * Gio::IO_ERROR_CLOSED. If @a cancellable is canceled, the operation will
-   * fail with Gio::IO_ERROR_CANCELLED. If @a message is not well-formed, the
-   * operation fails with Gio::IO_ERROR_INVALID_ARGUMENT.
+   * Gio::Error::CLOSED. If @a cancellable is canceled, the operation will
+   * fail with Gio::Error::CANCELLED. If @a message is not well-formed, the
+   * operation fails with Gio::Error::INVALID_ARGUMENT.
    *
    * This is an asynchronous method. When the operation is finished, @a slot
    * will be invoked in the thread-default main loop of the thread you are
@@ -535,13 +535,13 @@ public:
    * message via Gio::DBus::Message::set_serial().
    *
    * If the connection is closed then the operation will fail with
-   * Gio::IO_ERROR_CLOSED. If @a cancellable is canceled, the operation will
-   * fail with Gio::IO_ERROR_CANCELLED. If @a message is not well-formed, the
-   * operation fails with Gio::IO_ERROR_INVALID_ARGUMENT.
+   * Gio::Error::CLOSED. If @a cancellable is canceled, the operation will
+   * fail with Gio::Error::CANCELLED. If @a message is not well-formed, the
+   * operation fails with Gio::Error::INVALID_ARGUMENT.
    *
    * Note that a Glib::Error is thrown if a local in-process error occured.
    * That is to say that the returned Message object may be of type
-   * G_DBUS_MESSAGE_TYPE_ERROR. Use Gio::DBus::Message::to_exception() to
+   * Gio::DBus::MessageType::ERROR. Use Gio::DBus::Message::to_exception() to
    * transcode this to a Glib::Error.
    *
    * See the C API docs for examples.
@@ -591,10 +591,10 @@ public:
    * owned by @a bus_name.
    *
    * If the connection is closed then the operation will fail with
-   * Gio::IO_ERROR_CLOSED. If @a cancellable is cancelled, the operation will
-   * fail with Gio::IO_ERROR_CANCELLED. If @a parameters contains a value not
+   * Gio::Error::CLOSED. If @a cancellable is cancelled, the operation will
+   * fail with Gio::Error::CANCELLED. If @a parameters contains a value not
    * compatible with the D-Bus protocol, the operation fails with
-   * Gio::IO_ERROR_INVALID_ARGUMENT.
+   * Gio::Error::INVALID_ARGUMENT.
    *
    * If @a reply_type is non-<tt>0</tt> then the reply will be checked for
    * having this type and an error will be raised if it does not match. Said
@@ -661,10 +661,10 @@ public:
    * bus_name.
    *
    * If the connection is closed then the operation will fail with
-   * Gio::IO_ERROR_CLOSED. If @a cancellable is cancelled, the operation will
-   * fail with Gio::IO_ERROR_CANCELLED. If @a parameters contains a value not
+   * Gio::Error::CLOSED. If @a cancellable is cancelled, the operation will
+   * fail with Gio::Error::CANCELLED. If @a parameters contains a value not
    * compatible with the D-Bus protocol, the operation fails with
-   * Gio::IO_ERROR_INVALID_ARGUMENT.
+   * Gio::Error::INVALID_ARGUMENT.
    *
    * If @a reply_type is non-<tt>0</tt> then the reply will be checked for
    * having this type and an error will be raised if it does not match. Said
@@ -824,7 +824,7 @@ public:
    * thread-default main loop of the thread you are calling this method from.
    *
    * If the connection is not a message bus connection, @a sender must be
-   * <tt>0</tt>.
+   * an empty string.
    *
    * If @a sender is a well-known name note that @a slot is invoked with the
    * unique name for the owner of @a sender, not the well-known name as one
@@ -835,19 +835,18 @@ public:
    * @param slot Slot to invoke when there is a signal matching the requested
    * data.
    * @param sender Sender name to match on (unique or well-known name) or
-   * <tt>0</tt> to listen from all senders.
-   * @param interface_name D-Bus interface name to match on or <tt>0</tt> to
+   * an empty string to listen from all senders.
+   * @param interface_name D-Bus interface name to match on or an empty string to
    * match on all interfaces.
-   * @param member D-Bus signal name to match on or <tt>0</tt> to match on all
-   * signals.
-   * @param object_path Object path to match on or <tt>0</tt> to match on all
+   * @param member D-Bus signal name to match on or an empty string to match on
+   * all signals.
+   * @param object_path Object path to match on or an empty string to match on all
    * object paths.
-   * @param arg0 Contents of first string argument to match on or <tt>0</tt>
+   * @param arg0 Contents of first string argument to match on or an empty string
    * to match on all kinds of arguments.
    * @param flags Flags describing how to subscribe to the signal (currently
    * unused).
-   * @return A subscription identifier that can be used with
-   * signal_unsubscribe().
+   * @return A subscription identifier that can be used with signal_unsubscribe().
    * @newin{2,28}
    */
   guint signal_subscribe(
@@ -906,11 +905,11 @@ public:
    * @c org.freedesktop.DBus.Error.InvalidArgs errors are returned to the
    * caller.
    *
-   * It is considered a programming error if the SlotDBusInterfaceGetProperty
+   * It is considered a programming error if the InterfaceVTable::SlotInterfaceGetProperty
    * slot in @a vtable returns a Glib::VariantBase of incorrect type.
    *
-   * If an existing slot is already registered at @a object_path and @a
-   * interface_name, then a Glib::Error is thrown.
+   * If an existing slot is already registered at @a object_path and
+   * @a interface_name, then a Gio::Error is thrown.
    *
    * GDBus automatically implements the standard D-Bus interfaces
    * org.freedesktop.DBus.Properties, org.freedesktop.DBus.Introspectable and
@@ -924,13 +923,13 @@ public:
    * @param vtable An InterfaceVTable to call into.
    * @return A registration id (never 0) that can be used with
    * unregister_object() if no Glib::Error is thrown.
-   * @throw Glib::Error.
+   * @throw Gio::Error.
    * @newin{2,28}
    */
   guint register_object(const Glib::ustring& object_path,
     const Glib::RefPtr<InterfaceInfo>& interface_info,
     const InterfaceVTable& vtable);
-  _IGNORE(g_dbus_connection_register_object)
+  _IGNORE(g_dbus_connection_register_object, g_dbus_connection_register_object_with_closures)
 
   /** Registers exported objects at @a object_path with the D-Bus
    * interface that is described in @a interface_info. This method overload,
@@ -939,7 +938,7 @@ public:
    * interfaces</a>.
    *
    * If an existing slot is already registered at @a object_path and @a
-   * interface_name, then a Glib::Error is thrown.
+   * interface_name, then a Gio::Error is thrown.
    *
    * GDBus automatically implements the standard D-Bus interfaces
    * org.freedesktop.DBus.Properties, org.freedesktop.DBus.Introspectable and
@@ -950,11 +949,55 @@ public:
    * @param interface_info Introspection data for the interface.
    * @return A registration id (never 0) that can be used with
    * unregister_object() if no Glib::Error is thrown.
-   * @throw Glib::Error.
+   * @throw Gio::Error.
    * @newin{2,28}
    */
   guint register_object(const Glib::ustring& object_path,
     const Glib::RefPtr<InterfaceInfo>& interface_info);
+
+  /** Registers slots for exported objects at @a object_path with the D-Bus
+   * interface that is described in @a interface_info.
+   *
+   * Calls to the slots will happen in the thread-default main loop
+   * of the thread you are calling this method from.
+   *
+   * Note that all Glib::VariantBase values passed to the slots
+   * will match the signature given in @a interface_info - if a remote caller
+   * passes incorrect values, the @c org.freedesktop.DBus.Error.InvalidArgs is
+   * returned to the remote caller.
+   *
+   * Additionally, if the remote caller attempts to invoke methods or access
+   * properties not mentioned in @a interface_info the
+   * @c org.freedesktop.DBus.Error.UnknownMethod resp.
+   * @c org.freedesktop.DBus.Error.InvalidArgs errors are returned to the caller.
+   *
+   * It is considered a programming error if the InterfaceVTable::SlotInterfaceGetProperty
+   * slot returns a Glib::VariantBase of incorrect type.
+   *
+   * If an existing slot is already registered at @a object_path and
+   * @a interface_name, then a Gio::Error is thrown.
+   *
+   * GDBus automatically implements the standard D-Bus interfaces
+   * org.freedesktop.DBus.Properties, org.freedesktop.DBus.Introspectable and
+   * org.freedesktop.Peer, so you don't have to implement those for the
+   * objects you export. You can implement org.freedesktop.DBus.Properties
+   * yourself, e.g. to handle getting and setting of properties asynchronously.
+   *
+   * @param object_path The object path to register at.
+   * @param interface_info Introspection data for the interface.
+   * @param slot_method_call The slot for handling incoming method calls.
+   * @param slot_get_property The slot for getting a property.
+   * @param slot_set_property The slot for setting a property.
+   * @return A registration id (never 0) that can be used with
+   * unregister_object() if no Glib::Error is thrown.
+   * @throw Gio::Error.
+   * @newin{2,82}
+   */
+  guint register_object(const Glib::ustring& object_path,
+    const Glib::RefPtr<InterfaceInfo>& interface_info,
+    const InterfaceVTable::SlotInterfaceMethodCall& slot_method_call,
+    const InterfaceVTable::SlotInterfaceGetProperty& slot_get_property = {},
+    const InterfaceVTable::SlotInterfaceSetProperty& slot_set_property = {});
 
   _WRAP_METHOD(bool unregister_object(guint registration_id), g_dbus_connection_unregister_object)
 
@@ -976,7 +1019,7 @@ public:
    * main loop of the thread you are calling this method from.
    *
    * If an existing subtree is already registered at @a object_path or then
-   * a Glib::Error is thrown.
+   * a Gio::Error is thrown.
    *
    * Note that it is valid to register regular objects (using
    * register_object()) in a subtree registered with register_subtree() - if
@@ -984,13 +1027,13 @@ public:
    * about a subtree handler is to consider it a “fallback handler” for object
    * paths not registered via register_object().
    *
-   *
    * @param object_path The object path to register the subtree at.
    * @param vtable A SubtreeVTable to enumerate, introspect and dispatch
    * nodes in the subtree.
    * @param flags Flags used to fine tune the behavior of the subtree.
    * @return A subtree registration id (never 0) that can be used with
    * unregister_subtree() if no Glib::Error is thrown.
+   * @throw Gio::Error.
    *
    * @newin{2,28}
    */
@@ -1020,7 +1063,6 @@ public:
 #m4 _CONVERSION(`GError*', `const Glib::Error&', `Glib::Error($3, true)')
   _WRAP_SIGNAL(void closed(bool remote_peer_vanished, const Glib::Error& error), "closed", no_default_handler)
 };
-
 
 } //namespace DBus
 

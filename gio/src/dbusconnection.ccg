@@ -88,6 +88,13 @@ DBusConnection_Message_Filter_giomm_callback_destroy(void* data)
   delete static_cast<Gio::DBus::Connection::SlotMessageFilter*>(data);
 }
 
+// Other InterfaceVTable callback functions are defined in dbusinterfacevtable.ccg.
+static void
+DBusConnection_InterfaceVTable_giomm_callback_destroy(void* data)
+{
+  delete static_cast<Gio::DBus::InterfaceVTable*>(data);
+}
+
 } // extern "C"
 
 // Glib::wrap(GDBusConnection* object, bool take_copy) must be protected by a
@@ -710,6 +717,26 @@ Connection::register_object(
 
   const guint result = g_dbus_connection_register_object(
     gobj(), object_path.c_str(), Glib::unwrap(interface_info), nullptr, nullptr, nullptr, &gerror);
+
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return result;
+}
+
+guint
+Connection::register_object(const Glib::ustring& object_path,
+  const Glib::RefPtr<InterfaceInfo>& interface_info,
+  const InterfaceVTable::SlotInterfaceMethodCall& slot_method_call,
+  const InterfaceVTable::SlotInterfaceGetProperty& slot_get_property,
+  const InterfaceVTable::SlotInterfaceSetProperty& slot_set_property)
+{
+  auto vtable = new InterfaceVTable(slot_method_call, slot_get_property, slot_set_property);
+  GError* gerror = nullptr;
+
+  const guint result =
+    g_dbus_connection_register_object(gobj(), object_path.c_str(), Glib::unwrap(interface_info),
+      vtable->gobj(), vtable, &DBusConnection_InterfaceVTable_giomm_callback_destroy, &gerror);
 
   if (gerror)
     ::Glib::Error::throw_exception(gerror);

@@ -89,7 +89,11 @@ settings_settings_LDADD   = $(giomm_ldadd)
 subprocess_example_SOURCES = subprocess/main.cc
 subprocess_example_LDADD   = $(giomm_ldadd)
 
-dist_noinst_DATA = settings/org.gtkmm.demo.gschema.xml
+dist_noinst_SCRIPTS = dbus/session_bus_client.sh
+dist_noinst_DATA = \
+  keyfile/example.ini \
+  markup/test.xml \
+  settings/org.gtkmm.demo.gschema.xml
 CLEANFILES = settings/gschemas.compiled
 
 settings/gschemas.compiled: $(srcdir)/settings/org.gtkmm.demo.gschema.xml

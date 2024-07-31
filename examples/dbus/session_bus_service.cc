@@ -23,6 +23,8 @@
  *
  * Along with the above it provides a method to get its stdout's file
  * descriptor to test the Gio::DBus::Message API.
+ *
+ * Only the GetTime and SetAlarm methods have been implemented so far.
  */
 
 #include <giomm.h>
@@ -31,7 +33,6 @@
 
 namespace
 {
-
 static Glib::RefPtr<Gio::DBus::NodeInfo> introspection_data;
 
 static Glib::ustring introspection_xml = "<node>"
@@ -61,37 +62,40 @@ on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /* connection */,
 {
   if (method_name == "GetTime")
   {
-    Glib::DateTime curr_time = Glib::DateTime::create_now_local();
-
+    const auto curr_time = Glib::DateTime::create_now_local();
     const Glib::ustring time_str = curr_time.format_iso8601();
     const auto time_var = Glib::Variant<Glib::ustring>::create(time_str);
 
     // Create the tuple.
-    Glib::VariantContainerBase response = Glib::VariantContainerBase::create_tuple(time_var);
+    const auto response = Glib::VariantContainerBase::create_tuple(time_var);
 
     // Return the tuple with the included time.
     invocation->return_value(response);
   }
   else if (method_name == "SetAlarm")
   {
-    // Get the parameter tuple.
-    // Glib::VariantContainerBase parameters;
-    // invocation->get_parameters(parameters);
-
     // Get the variant string.
     Glib::Variant<Glib::ustring> param;
-    parameters.get_child(param);
+    parameters.get_child(param, 0);
 
     // Get the time string.
     const Glib::ustring time_str = param.get();
 
-    curr_alarm = Glib::DateTime::create_from_iso8601(time_str);
+    curr_alarm = Glib::DateTime::create_from_iso8601(time_str,
+      Glib::TimeZone::create_local());
     if (!curr_alarm)
     {
       // If setting alarm was not successful, return an error.
-      Gio::DBus::Error error(
-        Gio::DBus::Error::INVALID_ARGS, "Alarm string is not in ISO8601 format.");
+      Gio::DBus::Error error(Gio::DBus::Error::INVALID_ARGS,
+        "Alarm string \"" + time_str + "\" is not in ISO8601 format.");
       invocation->return_error(error);
+    }
+    else
+    {
+      // Success. Return an empty reply.
+      const auto response = Glib::VariantContainerBase::create_tuple(
+        std::vector<Glib::VariantBase>());
+      invocation->return_value(response);
     }
   }
   else
@@ -101,10 +105,6 @@ on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /* connection */,
     invocation->return_error(error);
   }
 }
-
-// This must be a global instance. See the InterfaceVTable documentation.
-// TODO: Make that unnecessary.
-const Gio::DBus::InterfaceVTable interface_vtable(sigc::ptr_fun(&on_method_call));
 
 void
 on_bus_acquired(
@@ -117,7 +117,8 @@ on_bus_acquired(
   try
   {
     registered_id = connection->register_object(
-      "/org/glibmm/DBus/TestObject", introspection_data->lookup_interface(), interface_vtable);
+      "/org/glibmm/DBus/TestObject", introspection_data->lookup_interface(),
+      sigc::ptr_fun(&on_method_call));
   }
   catch (const Glib::Error& ex)
   {
