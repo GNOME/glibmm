@@ -3831,6 +3831,16 @@
   (return-type "none")
 )
 
+(define-method convert_bytes
+  (of-object "GConverter")
+  (c-name "g_converter_convert_bytes")
+  (return-type "GBytes*")
+  (parameters
+    '("GBytes*" "bytes")
+    '("GError**" "error")
+  )
+)
+
 
 
 ;; From gconverterinputstream.h
@@ -8917,6 +8927,20 @@
   )
 )
 
+(define-method copy_async_with_closures
+  (of-object "GFile")
+  (c-name "g_file_copy_async_with_closures")
+  (return-type "none")
+  (parameters
+    '("GFile*" "destination")
+    '("GFileCopyFlags" "flags")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GClosure*" "progress_callback_closure")
+    '("GClosure*" "ready_callback_closure")
+  )
+)
+
 (define-method copy_finish
   (of-object "GFile")
   (c-name "g_file_copy_finish")
@@ -8954,6 +8978,20 @@
     '("gpointer" "progress_callback_data")
     '("GAsyncReadyCallback" "callback")
     '("gpointer" "user_data")
+  )
+)
+
+(define-method move_async_with_closures
+  (of-object "GFile")
+  (c-name "g_file_move_async_with_closures")
+  (return-type "none")
+  (parameters
+    '("GFile*" "destination")
+    '("GFileCopyFlags" "flags")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GClosure*" "progress_callback_closure")
+    '("GClosure*" "ready_callback_closure")
   )
 )
 
@@ -13694,30 +13732,32 @@
 
 ;; From gopenuriportal.h
 
-(define-function g_openuri_portal_open_uri
-  (c-name "g_openuri_portal_open_uri")
+(define-function g_openuri_portal_open_file
+  (c-name "g_openuri_portal_open_file")
   (return-type "gboolean")
   (parameters
-    '("const-char*" "uri")
+    '("GFile*" "file")
     '("const-char*" "parent_window")
+    '("const-char*" "startup_id")
     '("GError**" "error")
   )
 )
 
-(define-function g_openuri_portal_open_uri_async
-  (c-name "g_openuri_portal_open_uri_async")
+(define-function g_openuri_portal_open_file_async
+  (c-name "g_openuri_portal_open_file_async")
   (return-type "none")
   (parameters
-    '("const-char*" "uri")
+    '("GFile*" "file")
     '("const-char*" "parent_window")
+    '("const-char*" "startup_id")
     '("GCancellable*" "cancellable")
     '("GAsyncReadyCallback" "callback")
     '("gpointer" "user_data")
   )
 )
 
-(define-function g_openuri_portal_open_uri_finish
-  (c-name "g_openuri_portal_open_uri_finish")
+(define-function g_openuri_portal_open_file_finish
+  (c-name "g_openuri_portal_open_file_finish")
   (return-type "gboolean")
   (parameters
     '("GAsyncResult*" "result")
@@ -13747,6 +13787,10 @@
     '("const-gchar*" "scheme")
   )
 )
+
+
+
+;; From gosxnetworkmonitor.h
 
 
 
@@ -15800,6 +15844,20 @@
     '("GSettingsBindSetMapping" "set_mapping")
     '("gpointer" "user_data")
     '("GDestroyNotify" "destroy")
+  )
+)
+
+(define-method bind_with_mapping_closures
+  (of-object "GSettings")
+  (c-name "g_settings_bind_with_mapping_closures")
+  (return-type "none")
+  (parameters
+    '("const-char*" "key")
+    '("GObject*" "object")
+    '("const-char*" "property")
+    '("GSettingsBindFlags" "flags")
+    '("GClosure*" "get_mapping")
+    '("GClosure*" "set_mapping")
   )
 )
 
@@ -20407,6 +20465,16 @@
   )
 )
 
+(define-function g_unix_mount_points_get_from_file
+  (c-name "g_unix_mount_points_get_from_file")
+  (return-type "GUnixMountPoint**")
+  (parameters
+    '("const-char*" "table_path")
+    '("uint64_t*" "time_read_out")
+    '("size_t*" "n_points_out")
+  )
+)
+
 (define-function g_unix_mount_point_at
   (c-name "g_unix_mount_point_at")
   (return-type "GUnixMountPoint*")
@@ -20421,6 +20489,16 @@
   (return-type "GList*")
   (parameters
     '("guint64*" "time_read")
+  )
+)
+
+(define-function g_unix_mounts_get_from_file
+  (c-name "g_unix_mounts_get_from_file")
+  (return-type "GUnixMountEntry**")
+  (parameters
+    '("const-char*" "table_path")
+    '("uint64_t*" "time_read_out")
+    '("size_t*" "n_entries_out")
   )
 )
 

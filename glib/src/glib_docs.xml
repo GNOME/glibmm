@@ -1046,8 +1046,8 @@ Since: 2.50
 
 <enum name="GMainContextFlags">
 <description>
-Flags to pass to g_main_context_new_with_flags() which affect the behaviour
-of a #GMainContext.
+Flags to pass to [ctor@GLib.MainContext.new_with_flags] which affect the
+behaviour of a [struct@GLib.MainContext].
 
 Since: 2.72
 
@@ -1343,7 +1343,7 @@ text_view)
 ]|
 
 It is important to note that you must use
-[canonical parameter names][canonical-parameter-names] as
+[canonical parameter names][class@GObject.ParamSpec#parameter-names] as
 detail strings for the notify signal.
 
 </description>
@@ -2805,16 +2805,38 @@ version use %G_TRAVERSE_NON_LEAFS.
 <enum name="GTraverseType">
 <description>
 Specifies the type of traversal performed by g_tree_traverse(),
-g_node_traverse() and g_node_find(). The different orders are
-illustrated here:
+g_node_traverse() and g_node_find().
+
+The different orders are illustrated here:
+
 - In order: A, B, C, D, E, F, G, H, I
-![](Sorted_binary_tree_inorder.svg)
+&lt;picture&gt;
+&lt;source srcset=&quot;Sorted_binary_tree_inorder-dark.svg&quot;
+media=&quot;(prefers-color-scheme: dark)&quot;&gt;
+&lt;img src=&quot;Sorted_binary_tree_inorder.svg&quot;
+alt=&quot;Sorted binary tree, in-order traversal&quot;&gt;
+&lt;/picture&gt;
 - Pre order: F, B, A, D, C, E, G, I, H
-![](Sorted_binary_tree_preorder.svg)
+&lt;picture&gt;
+&lt;source srcset=&quot;Sorted_binary_tree_preorder-dark.svg&quot;
+media=&quot;(prefers-color-scheme: dark)&quot;&gt;
+&lt;img src=&quot;Sorted_binary_tree_preorder.svg&quot;
+alt=&quot;Sorted binary tree, pre-order traversal&quot;&gt;
+&lt;/picture&gt;
 - Post order: A, C, E, D, B, H, I, G, F
-![](Sorted_binary_tree_postorder.svg)
+&lt;picture&gt;
+&lt;source srcset=&quot;Sorted_binary_tree_postorder-dark.svg&quot;
+media=&quot;(prefers-color-scheme: dark)&quot;&gt;
+&lt;img src=&quot;Sorted_binary_tree_postorder.svg&quot;
+alt=&quot;Sorted binary tree, post-order traversal&quot;&gt;
+&lt;/picture&gt;
 - Level order: F, B, G, A, D, I, C, E, H
-![](Sorted_binary_tree_breadth-first_traversal.svg)
+&lt;picture&gt;
+&lt;source srcset=&quot;Sorted_binary_tree_breadth-first_traversal-dark.svg&quot;
+media=&quot;(prefers-color-scheme: dark)&quot;&gt;
+&lt;img src=&quot;Sorted_binary_tree_breadth-first_traversal.svg&quot;
+alt=&quot;Sorted binary tree, breadth-first level order traversal&quot;&gt;
+&lt;/picture&gt;
 
 </description>
 <parameters>
@@ -14681,24 +14703,25 @@ Since: 2.16
 <function name="g_child_watch_add">
 <description>
 Sets a function to be called when the child indicated by @pid 
-exits, at a default priority, %G_PRIORITY_DEFAULT.
+exits, at a default priority, [const@GLib.PRIORITY_DEFAULT].
 
-If you obtain @pid from g_spawn_async() or g_spawn_async_with_pipes() 
-you will need to pass %G_SPAWN_DO_NOT_REAP_CHILD as flag to 
-the spawn function for the child watching to work.
+If you obtain @pid from [func@GLib.spawn_async] or
+[func@GLib.spawn_async_with_pipes] you will need to pass
+%G_SPAWN_DO_NOT_REAP_CHILD as flag to the spawn function for the child
+watching to work.
 
 Note that on platforms where #GPid must be explicitly closed
-(see g_spawn_close_pid()) @pid must not be closed while the
+(see [func@GLib.spawn_close_pid]) @pid must not be closed while the
 source is still active. Typically, you will want to call
-g_spawn_close_pid() in the callback function for the source.
+[func@GLib.spawn_close_pid] in the callback function for the source.
 
 GLib supports only a single callback per process id.
 On POSIX platforms, the same restrictions mentioned for
-g_child_watch_source_new() apply to this function.
+[func@GLib.child_watch_source_new] apply to this function.
 
 This internally creates a main loop source using 
-g_child_watch_source_new() and attaches it to the main loop context 
-using g_source_attach(). You can do these steps manually if you 
+[func@GLib.child_watch_source_new] and attaches it to the main loop context
+using [method@GLib.Source.attach]. You can do these steps manually if you
 need greater control.
 
 Since: 2.4
@@ -14730,26 +14753,27 @@ to be a child).
 Sets a function to be called when the child indicated by @pid 
 exits, at the priority @priority.
 
-If you obtain @pid from g_spawn_async() or g_spawn_async_with_pipes() 
-you will need to pass %G_SPAWN_DO_NOT_REAP_CHILD as flag to 
-the spawn function for the child watching to work.
+If you obtain @pid from [func@GLib.spawn_async] or
+[func@GLib.spawn_async_with_pipes] you will need to pass
+%G_SPAWN_DO_NOT_REAP_CHILD as flag to the spawn function for the child
+watching to work.
 
-In many programs, you will want to call g_spawn_check_wait_status()
+In many programs, you will want to call [func@GLib.spawn_check_wait_status]
 in the callback to determine whether or not the child exited
 successfully.
 
 Also, note that on platforms where #GPid must be explicitly closed
-(see g_spawn_close_pid()) @pid must not be closed while the source
-is still active.  Typically, you should invoke g_spawn_close_pid()
+(see [func@GLib.spawn_close_pid]) @pid must not be closed while the source
+is still active.  Typically, you should invoke [func@GLib.spawn_close_pid]
 in the callback function for the source.
 
 GLib supports only a single callback per process id.
 On POSIX platforms, the same restrictions mentioned for
-g_child_watch_source_new() apply to this function.
+[func@GLib.child_watch_source_new] apply to this function.
 
 This internally creates a main loop source using 
-g_child_watch_source_new() and attaches it to the main loop context 
-using g_source_attach(). You can do these steps manually if you 
+[func@GLib.child_watch_source_new] and attaches it to the main loop context
+using [method@GLib.Source.attach]. You can do these steps manually if you
 need greater control.
 
 Since: 2.4
@@ -14758,7 +14782,8 @@ Since: 2.4
 <parameters>
 <parameter name="priority">
 <parameter_description> the priority of the idle source. Typically this will be in the
-range between %G_PRIORITY_DEFAULT_IDLE and %G_PRIORITY_HIGH_IDLE.
+range between [const@GLib.PRIORITY_DEFAULT_IDLE] and
+[const@GLib.PRIORITY_HIGH_IDLE].
 </parameter_description>
 </parameter>
 <parameter name="pid">
@@ -14788,17 +14813,17 @@ Windows a handle for a process (which doesn't have to be a child).
 <description>
 Creates a new child_watch source.
 
-The source will not initially be associated with any #GMainContext
-and must be added to one with g_source_attach() before it will be
-executed.
+The source will not initially be associated with any
+[struct@GLib.MainContext] and must be added to one with
+[method@GLib.Source.attach] before it will be executed.
 
 Note that child watch sources can only be used in conjunction with
 `g_spawn...` when the %G_SPAWN_DO_NOT_REAP_CHILD flag is used.
 
 Note that on platforms where #GPid must be explicitly closed
-(see g_spawn_close_pid()) @pid must not be closed while the
+(see [func@GLib.spawn_close_pid]) @pid must not be closed while the
 source is still active. Typically, you will want to call
-g_spawn_close_pid() in the callback function for the source.
+[func@GLib.spawn_close_pid] in the callback function for the source.
 
 On POSIX platforms, the following restrictions apply to this API
 due to limitations in POSIX process interfaces:
@@ -14813,8 +14838,8 @@ source for the same @pid
 * the application must not ignore `SIGCHLD`
 * Before 2.78, the application could not send a signal (`kill()`) to the
 watched @pid in a race free manner. Since 2.78, you can do that while the
-associated #GMainContext is acquired.
-* Before 2.78, even after destroying the #GSource, you could not
+associated [struct@GLib.MainContext] is acquired.
+* Before 2.78, even after destroying the [struct@GLib.Source], you could not
 be sure that @pid wasn't already reaped. Hence, it was also not
 safe to `kill()` or `waitpid()` on the process ID after the child watch
 source was gone. Destroying the source before it fired made it
@@ -14968,7 +14993,7 @@ Clears a numeric handler, such as a #GSource ID.
 @tag_ptr must be a valid pointer to the variable holding the handler.
 
 If the ID is zero then this function does nothing.
-Otherwise, clear_func() is called with the ID as a parameter, and the tag is
+Otherwise, @clear_func is called with the ID as a parameter, and the tag is
 set to zero.
 
 A macro is also included that allows this function to be used without
@@ -15050,9 +15075,32 @@ pointer is set to %NULL.
 A macro is also included that allows this function to be used without
 pointer casts. This will mask any warnings about incompatible function types
 or calling conventions, so you must ensure that your @destroy function is
-compatible with being called as `GDestroyNotify` using the standard calling
-convention for the platform that GLib was compiled for; otherwise the program
-will experience undefined behaviour.
+compatible with being called as [callback@GLib.DestroyNotify] using the
+standard calling convention for the platform that GLib was compiled for;
+otherwise the program will experience undefined behaviour.
+
+Examples of this kind of undefined behaviour include using many Windows Win32
+APIs, as well as many if not all OpenGL and Vulkan calls on 32-bit Windows,
+which typically use the `__stdcall` calling convention rather than the
+`__cdecl` calling convention.
+
+The affected functions can be used by wrapping them in a
+[callback@GLib.DestroyNotify] that is declared with the standard calling
+convention:
+
+```c
+// Wrapper needed to avoid mismatched calling conventions on Windows
+static void
+destroy_sync (void *sync)
+{
+glDeleteSync (sync);
+}
+
+// …
+
+g_clear_pointer (&amp;sync, destroy_sync);
+```
+
 
 Since: 2.34
 
@@ -15064,7 +15112,7 @@ variable, struct member etc. holding a pointer
 </parameter_description>
 </parameter>
 <parameter name="destroy">
-<parameter_description> a function to which a gpointer can be passed, to destroy *@pp
+<parameter_description> a function to which a gpointer can be passed, to destroy `*pp`
 </parameter_description>
 </parameter>
 </parameters>
@@ -16180,7 +16228,7 @@ The following code shows how to correctly perform a timed wait on a
 condition variable (extending the example presented in the
 documentation for #GCond):
 
-|[&lt;!-- language=&quot;C&quot; --&gt; 
+|[&lt;!-- language=&quot;C&quot; --&gt;
 gpointer
 pop_data_timed (void)
 {
@@ -19127,7 +19175,7 @@ Since: 2.26
 <description>
 Creates a #GDateTime corresponding to the given
 [ISO 8601 formatted string](https://en.wikipedia.org/wiki/ISO_8601)
-@text. ISO 8601 strings of the form &lt;date&gt;&lt;sep&gt;&lt;time&gt;&lt;tz&gt; are supported, with
+@text. ISO 8601 strings of the form `&lt;date&gt;&lt;sep&gt;&lt;time&gt;&lt;tz&gt;` are supported, with
 some extensions from [RFC 3339](https://tools.ietf.org/html/rfc3339) as
 mentioned below.
 
@@ -19135,11 +19183,11 @@ Note that as #GDateTime &quot;is oblivious to leap seconds&quot;, leap seconds i
 in an ISO-8601 string will be ignored, so a `23:59:60` time would be parsed as
 `23:59:59`.
 
-&lt;sep&gt; is the separator and can be either 'T', 't' or ' '. The latter two
+`&lt;sep&gt;` is the separator and can be either 'T', 't' or ' '. The latter two
 separators are an extension from
 [RFC 3339](https://tools.ietf.org/html/rfc3339#section-5.6).
 
-&lt;date&gt; is in the form:
+`&lt;date&gt;` is in the form:
 
 - `YYYY-MM-DD` - Year/month/day, e.g. 2016-08-24.
 - `YYYYMMDD` - Same as above without dividers.
@@ -19149,12 +19197,12 @@ separators are an extension from
 e.g. 2016-W34-3.
 - `YYYYWwwD` - Same as above without dividers.
 
-&lt;time&gt; is in the form:
+`&lt;time&gt;` is in the form:
 
 - `hh:mm:ss(.sss)` - Hours, minutes, seconds (subseconds), e.g. 22:10:42.123.
 - `hhmmss(.sss)` - Same as above without dividers.
 
-&lt;tz&gt; is an optional timezone suffix of the form:
+`&lt;tz&gt;` is an optional timezone suffix of the form:
 
 - `Z` - UTC.
 - `+hh:mm` or `-hh:mm` - Offset from UTC in hours and minutes, e.g. +12:00.
@@ -22120,10 +22168,10 @@ the current directory is the target of a symbolic link.
 <description>
 Equivalent to the UNIX gettimeofday() function, but portable.
 
-You may find g_get_real_time() to be more convenient.
+You may find [func@GLib.get_real_time] to be more convenient.
 
-Deprecated: 2.62: #GTimeVal is not year-2038-safe. Use g_get_real_time()
-instead.
+Deprecated: 2.62: #GTimeVal is not year-2038-safe. Use
+[func@GLib.get_real_time] instead.
 
 </description>
 <parameters>
@@ -22454,12 +22502,12 @@ returned.
 <description>
 Queries the system wall-clock time.
 
-This call is functionally equivalent to g_get_current_time() except
+This call is functionally equivalent to [func@GLib.get_current_time] except
 that the return value is often more convenient than dealing with a
 #GTimeVal.
 
 You should only use this call if you are actually interested in the real
-wall-clock time.  g_get_monotonic_time() is probably more useful for
+wall-clock time. [func@GLib.get_monotonic_time] is probably more useful for
 measuring intervals.
 
 Since: 2.28
@@ -23735,8 +23783,9 @@ You can pass %NULL for @lookup_key, provided the hash and equal functions
 of @hash_table are %NULL-safe.
 
 The dictionary implementation optimizes for having all values identical to
-their keys, for example by using g_hash_table_add(). When stealing both the
-key and the value from such a dictionary, the value will be %NULL.
+their keys, for example by using g_hash_table_add(). Before 2.82, when
+stealing both the key and the value from such a dictionary, the value was
+%NULL. Since 2.82, the returned value and key will be the same.
 
 Since: 2.58
 
@@ -24764,18 +24813,18 @@ opening the converter failed.
 <description>
 Adds a function to be called whenever there are no higher priority
 events pending to the default main loop. The function is given the
-default idle priority, %G_PRIORITY_DEFAULT_IDLE.  If the function
+default idle priority, [const@GLib.PRIORITY_DEFAULT_IDLE].  If the function
 returns %FALSE it is automatically removed from the list of event
 sources and will not be called again.
 
-See [memory management of sources][mainloop-memory-management] for details
+See [mainloop memory management](main-loop.html#memory-management-of-sources) for details
 on how to handle the return value and memory management of @data.
 
-This internally creates a main loop source using g_idle_source_new()
-and attaches it to the global #GMainContext using g_source_attach(), so
-the callback will be invoked in whichever thread is running that main
-context. You can do these steps manually if you need greater control or to
-use a custom main context.
+This internally creates a main loop source using [func@GLib.idle_source_new]
+and attaches it to the global [struct@GLib.MainContext] using
+[method@GLib.Source.attach], so the callback will be invoked in whichever
+thread is running that main context. You can do these steps manually if you
+need greater control or to use a custom main context.
 
 
 </description>
@@ -24798,24 +24847,25 @@ use a custom main context.
 Adds a function to be called whenever there are no higher priority
 events pending.
 
-If the function returns %G_SOURCE_REMOVE or %FALSE it is automatically
+If the function returns [const@GLib.SOURCE_REMOVE] or %FALSE it is automatically
 removed from the list of event sources and will not be called again.
 
-See [memory management of sources][mainloop-memory-management] for details
+See [mainloop memory management](main-loop.html#memory-management-of-sources) for details
 on how to handle the return value and memory management of @data.
 
-This internally creates a main loop source using g_idle_source_new()
-and attaches it to the global #GMainContext using g_source_attach(), so
-the callback will be invoked in whichever thread is running that main
-context. You can do these steps manually if you need greater control or to
-use a custom main context.
+This internally creates a main loop source using [func@GLib.idle_source_new]
+and attaches it to the global [struct@GLib.MainContext] using
+[method@GLib.Source.attach], so the callback will be invoked in whichever
+thread is running that main context. You can do these steps manually if you
+need greater control or to use a custom main context.
 
 
 </description>
 <parameters>
 <parameter name="priority">
 <parameter_description> the priority of the idle source. Typically this will be in the
-range between %G_PRIORITY_DEFAULT_IDLE and %G_PRIORITY_HIGH_IDLE.
+range between [const@GLib.PRIORITY_DEFAULT_IDLE] and
+[const@GLib.PRIORITY_HIGH_IDLE].
 </parameter_description>
 </parameter>
 <parameter name="function">
@@ -24839,12 +24889,12 @@ range between %G_PRIORITY_DEFAULT_IDLE and %G_PRIORITY_HIGH_IDLE.
 <description>
 Adds a function to be called whenever there are no higher priority
 events pending to the default main loop. The function is given the
-default idle priority, %G_PRIORITY_DEFAULT_IDLE.
+default idle priority, [const@GLib.PRIORITY_DEFAULT_IDLE].
 
 The function will only be called once and then the source will be
 automatically removed from the main context.
 
-This function otherwise behaves like g_idle_add().
+This function otherwise behaves like [func@GLib.idle_add].
 
 Since: 2.74
 
@@ -24884,11 +24934,12 @@ Removes the idle function with the given data.
 <description>
 Creates a new idle source.
 
-The source will not initially be associated with any #GMainContext
-and must be added to one with g_source_attach() before it will be
-executed. Note that the default priority for idle sources is
-%G_PRIORITY_DEFAULT_IDLE, as compared to other sources which
-have a default priority of %G_PRIORITY_DEFAULT.
+The source will not initially be associated with any
+[struct@GLib.MainContext] and must be added to one with
+[method@GLib.Source.attach] before it will be executed. Note that the
+default priority for idle sources is [const@GLib.PRIORITY_DEFAULT_IDLE], as
+compared to other sources which have a default priority of
+[const@GLib.PRIORITY_DEFAULT].
 
 
 </description>
@@ -29818,12 +29869,13 @@ Tries to become the owner of the specified context.
 If some other thread is the owner of the context,
 returns %FALSE immediately. Ownership is properly
 recursive: the owner can require ownership again
-and will release ownership when g_main_context_release()
-is called as many times as g_main_context_acquire().
+and will release ownership when [method@GLib.MainContext.release]
+is called as many times as [method@GLib.MainContext.acquire].
 
 You must be the owner of a context before you
-can call g_main_context_prepare(), g_main_context_query(),
-g_main_context_check(), g_main_context_dispatch(), g_main_context_release().
+can call [method@GLib.MainContext.prepare], [method@GLib.MainContext.query],
+[method@GLib.MainContext.check], [method@GLib.MainContext.dispatch],
+[method@GLib.MainContext.release].
 
 Since 2.76 @context can be %NULL to use the global-default
 main context.
@@ -29846,7 +29898,7 @@ this thread is now the owner of @context.
 <description>
 Adds a file descriptor to the set of file descriptors polled for
 this context. This will very seldom be used directly. Instead
-a typical event source will use g_source_add_unix_fd() instead.
+a typical event source will use `g_source_add_unix_fd` instead.
 
 </description>
 <parameters>
@@ -29862,8 +29914,8 @@ descriptor to watch.
 </parameter>
 <parameter name="priority">
 <parameter_description> the priority for this file descriptor which should be
-the same as the priority used for g_source_attach() to ensure that the
-file descriptor is polled whenever the results may be needed.
+the same as the priority used for [method@GLib.Source.attach] to ensure
+that the file descriptor is polled whenever the results may be needed.
 </parameter_description>
 </parameter>
 </parameters>
@@ -29874,11 +29926,11 @@ file descriptor is polled whenever the results may be needed.
 <description>
 Passes the results of polling back to the main loop. You should be
 careful to pass @fds and its length @n_fds as received from
-g_main_context_query(), as this functions relies on assumptions
+[method@GLib.MainContext.query], as this functions relies on assumptions
 on how @fds is filled.
 
 You must have successfully acquired the context with
-g_main_context_acquire() before you may call this function.
+[method@GLib.MainContext.acquire] before you may call this function.
 
 Since 2.76 @context can be %NULL to use the global-default
 main context.
@@ -29897,11 +29949,11 @@ main context will be used)
 </parameter>
 <parameter name="fds">
 <parameter_description> array of #GPollFD's that was passed to
-the last call to g_main_context_query()
+the last call to [method@GLib.MainContext.query]
 </parameter_description>
 </parameter>
 <parameter name="n_fds">
-<parameter_description> return value of g_main_context_query()
+<parameter_description> return value of [method@GLib.MainContext.query]
 </parameter_description>
 </parameter>
 </parameters>
@@ -29914,7 +29966,7 @@ the last call to g_main_context_query()
 Returns the global-default main context. This is the main context
 used for main loop functions when a main loop is not explicitly
 specified, and corresponds to the &quot;main&quot; main loop. See also
-g_main_context_get_thread_default().
+[func@GLib.MainContext.get_thread_default].
 
 
 </description>
@@ -29929,7 +29981,7 @@ g_main_context_get_thread_default().
 Dispatches all pending sources.
 
 You must have successfully acquired the context with
-g_main_context_acquire() before you may call this function.
+[method@GLib.MainContext.acquire] before you may call this function.
 
 Since 2.76 @context can be %NULL to use the global-default
 main context.
@@ -29960,7 +30012,7 @@ main context will be used).
 </parameter_description>
 </parameter>
 <parameter name="funcs">
-<parameter_description> the @source_funcs passed to g_source_new().
+<parameter_description> the @source_funcs passed to [ctor@GLib.Source.new].
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -29981,7 +30033,7 @@ It is a programmer error to attempt to look up a non-existent source.
 More specifically: source IDs can be reissued after a source has been
 destroyed and therefore it is never valid to use this function with a
 source ID which may have already been removed.  An example is when
-scheduling an idle to run in another thread with g_idle_add(): the
+scheduling an idle to run in another thread with [func@GLib.idle_add]: the
 idle may already have run and been removed by the time this function
 is called on its (now invalid) source ID.  This source ID may have
 been reissued, leading to the operation being performed against the
@@ -29996,7 +30048,7 @@ main context will be used)
 </parameter_description>
 </parameter>
 <parameter name="source_id">
-<parameter_description> the source ID, as returned by g_source_get_id().
+<parameter_description> the source ID, as returned by [method@GLib.Source.get_id].
 </parameter_description>
 </parameter>
 </parameters>
@@ -30029,7 +30081,7 @@ main context will be used)
 
 <function name="g_main_context_get_poll_func">
 <description>
-Gets the poll function set by g_main_context_set_poll_func().
+Gets the poll function set by [method@GLib.MainContext.set_poll_func].
 
 
 </description>
@@ -30049,14 +30101,14 @@ main context will be used)
 Gets the thread-default #GMainContext for this thread. Asynchronous
 operations that want to be able to be run in contexts other than
 the default one should call this method or
-g_main_context_ref_thread_default() to get a #GMainContext to add
-their #GSources to. (Note that even in single-threaded
-programs applications may sometimes want to temporarily push a
-non-default context, so it is not safe to assume that this will
-always return %NULL if you are running in the default thread.)
+[func@GLib.MainContext.ref_thread_default] to get a
+[struct@GLib.MainContext] to add their [struct@GLib.Source]s to. (Note that
+even in single-threaded programs applications may sometimes want to
+temporarily push a non-default context, so it is not safe to assume that
+this will always return %NULL if you are running in the default thread.)
 
 If you need to hold a reference on the context, use
-g_main_context_ref_thread_default() instead.
+[func@GLib.MainContext.ref_thread_default] instead.
 
 Since: 2.22
 
@@ -30075,19 +30127,19 @@ Invokes a function in such a way that @context is owned during the
 invocation of @function.
 
 If @context is %NULL then the global-default main context — as
-returned by g_main_context_default() — is used.
+returned by [func@GLib.MainContext.default] — is used.
 
 If @context is owned by the current thread, @function is called
 directly.  Otherwise, if @context is the thread-default main context
-of the current thread and g_main_context_acquire() succeeds, then
-@function is called and g_main_context_release() is called
+of the current thread and [method@GLib.MainContext.acquire] succeeds, then
+@function is called and [method@GLib.MainContext.release] is called
 afterwards.
 
 In any other case, an idle source is created to call @function and
 that source is attached to @context (presumably to be run in another
-thread).  The idle source is attached with %G_PRIORITY_DEFAULT
+thread).  The idle source is attached with [const@GLib.PRIORITY_DEFAULT]
 priority.  If you want a different priority, use
-g_main_context_invoke_full().
+[method@GLib.MainContext.invoke_full].
 
 Note that, as with normal idle functions, @function should probably
 return %FALSE.  If it returns %TRUE, it will be continuously run in a
@@ -30119,7 +30171,7 @@ main context
 Invokes a function in such a way that @context is owned during the
 invocation of @function.
 
-This function is the same as g_main_context_invoke() except that it
+This function is the same as [method@GLib.MainContext.invoke] except that it
 lets you specify the priority in case @function ends up being
 scheduled as an idle and also lets you give a #GDestroyNotify for @data.
 
@@ -30158,7 +30210,7 @@ main context
 <function name="g_main_context_is_owner">
 <description>
 Determines whether this thread holds the (recursive)
-ownership of this #GMainContext. This is useful to
+ownership of this [struct@GLib.MainContext]. This is useful to
 know before waiting on another thread that may be
 blocking to get ownership of @context.
 
@@ -30189,7 +30241,7 @@ events sources will be dispatched (if any), that are ready at this
 given moment without further waiting.
 
 Note that even when @may_block is %TRUE, it is still possible for
-g_main_context_iteration() to return %FALSE, since the wait may
+[method@GLib.MainContext.iteration] to return %FALSE, since the wait may
 be interrupted for other reasons than an event source becoming ready.
 
 
@@ -30211,7 +30263,7 @@ main context will be used)
 
 <function name="g_main_context_new">
 <description>
-Creates a new #GMainContext structure.
+Creates a new [struct@GLib.MainContext] structure.
 
 
 </description>
@@ -30223,7 +30275,7 @@ Creates a new #GMainContext structure.
 
 <function name="g_main_context_new_with_flags">
 <description>
-Creates a new #GMainContext structure.
+Creates a new [struct@GLib.MainContext] structure.
 
 Since: 2.72
 
@@ -30278,10 +30330,10 @@ main context
 <function name="g_main_context_prepare">
 <description>
 Prepares to poll sources within a main loop. The resulting information
-for polling is determined by calling g_main_context_query ().
+for polling is determined by calling [method@GLib.MainContext.query].
 
 You must have successfully acquired the context with
-g_main_context_acquire() before you may call this function.
+[method@GLib.MainContext.acquire] before you may call this function.
 
 
 </description>
@@ -30310,32 +30362,33 @@ current thread. This will cause certain asynchronous operations
 started in this thread to run under @context and deliver their
 results to its main loop, rather than running under the global
 default main context in the main thread. Note that calling this function
-changes the context returned by g_main_context_get_thread_default(),
-not the one returned by g_main_context_default(), so it does not affect
-the context used by functions like g_idle_add().
+changes the context returned by [func@GLib.MainContext.get_thread_default],
+not the one returned by [func@GLib.MainContext.default], so it does not
+affect the context used by functions like [func@GLib.idle_add].
 
 Normally you would call this function shortly after creating a new
-thread, passing it a #GMainContext which will be run by a
-#GMainLoop in that thread, to set a new default context for all
+thread, passing it a [struct@GLib.MainContext] which will be run by a
+[struct@GLib.MainLoop] in that thread, to set a new default context for all
 async operations in that thread. In this case you may not need to
-ever call g_main_context_pop_thread_default(), assuming you want the
-new #GMainContext to be the default for the whole lifecycle of the
-thread.
+ever call [method@GLib.MainContext.pop_thread_default], assuming you want
+the new [struct@GLib.MainContext] to be the default for the whole lifecycle
+of the thread.
 
 If you don't have control over how the new thread was created (e.g.
 in the new thread isn't newly created, or if the thread life
 cycle is managed by a #GThreadPool), it is always suggested to wrap
-the logic that needs to use the new #GMainContext inside a
-g_main_context_push_thread_default() / g_main_context_pop_thread_default()
-pair, otherwise threads that are re-used will end up never explicitly
-releasing the #GMainContext reference they hold.
+the logic that needs to use the new [struct@GLib.MainContext] inside a
+[method@GLib.MainContext.push_thread_default] /
+[method@GLib.MainContext.pop_thread_default] pair, otherwise threads that
+are re-used will end up never explicitly releasing the
+[struct@GLib.MainContext] reference they hold.
 
 In some cases you may want to schedule a single operation in a
 non-default context, or temporarily use a non-default context in
 the main thread. In that case, you can wrap the call to the
 asynchronous operation inside a
-g_main_context_push_thread_default() /
-g_main_context_pop_thread_default() pair, but it is up to you to
+[method@GLib.MainContext.push_thread_default] /
+[method@GLib.MainContext.pop_thread_default] pair, but it is up to you to
 ensure that no other asynchronous operations accidentally get
 started while the non-default context is active.
 
@@ -30361,8 +30414,8 @@ main context
 Pop @pusher’s main context as the thread default main context.
 See g_main_context_pusher_new() for details.
 
-This will pop the #GMainContext as the current thread-default main context,
-but will not call g_main_context_unref() on it.
+This will pop the [struct@GLib.MainContext] as the current thread-default
+main context, but will not call [method@GLib.MainContext.unref] on it.
 
 Since: 2.64
 
@@ -30379,13 +30432,13 @@ Since: 2.64
 <function name="g_main_context_pusher_new">
 <description>
 Push @main_context as the new thread-default main context for the current
-thread, using g_main_context_push_thread_default(), and return a new
-#GMainContextPusher. Pop with g_main_context_pusher_free(). Using
-g_main_context_pop_thread_default() on @main_context while a
-#GMainContextPusher exists for it can lead to undefined behaviour.
+thread, using [method@GLib.MainContext.push_thread_default], and return a
+new [alias@GLib.MainContextPusher]. Pop with g_main_context_pusher_free().
+Using [method@GLib.MainContext.pop_thread_default] on @main_context while a
+[alias@GLib.MainContextPusher] exists for it can lead to undefined behaviour.
 
-Using two #GMainContextPushers in the same scope is not allowed, as it leads
-to an undefined pop order.
+Using two [alias@GLib.MainContextPusher]s in the same scope is not allowed,
+as it leads to an undefined pop order.
 
 This is intended to be used with g_autoptr().  Note that g_autoptr()
 is only available when using GCC or clang, so the following example
@@ -30433,11 +30486,11 @@ Since: 2.64
 <description>
 Determines information necessary to poll this main loop. You should
 be careful to pass the resulting @fds array and its length @n_fds
-as is when calling g_main_context_check(), as this function relies
+as is when calling [method@GLib.MainContext.check], as this function relies
 on assumptions made when the array is filled.
 
 You must have successfully acquired the context with
-g_main_context_acquire() before you may call this function.
+[method@GLib.MainContext.acquire] before you may call this function.
 
 
 </description>
@@ -30473,7 +30526,7 @@ of records that need to be stored.
 
 <function name="g_main_context_ref">
 <description>
-Increases the reference count on a #GMainContext object by one.
+Increases the reference count on a [struct@GLib.MainContext] object by one.
 
 
 </description>
@@ -30489,12 +30542,13 @@ Increases the reference count on a #GMainContext object by one.
 
 <function name="g_main_context_ref_thread_default">
 <description>
-Gets the thread-default #GMainContext for this thread, as with
-g_main_context_get_thread_default(), but also adds a reference to
-it with g_main_context_ref(). In addition, unlike
-g_main_context_get_thread_default(), if the thread-default context
-is the global-default context, this will return that #GMainContext
-(with a ref added to it) rather than returning %NULL.
+Gets the thread-default [struct@GLib.MainContext] for this thread, as with
+[func@GLib.MainContext.get_thread_default], but also adds a reference to
+it with [method@GLib.MainContext.ref]. In addition, unlike
+[func@GLib.MainContext.get_thread_default], if the thread-default context
+is the global-default context, this will return that
+[struct@GLib.MainContext] (with a ref added to it) rather than returning
+%NULL.
 
 Since: 2.32
 
@@ -30502,7 +30556,7 @@ Since: 2.32
 <parameters>
 </parameters>
 <return> the thread-default #GMainContext. Unref
-with g_main_context_unref() when you are done with it.
+with [method@GLib.MainContext.unref] when you are done with it.
 
 </return>
 </function>
@@ -30510,12 +30564,12 @@ with g_main_context_unref() when you are done with it.
 <function name="g_main_context_release">
 <description>
 Releases ownership of a context previously acquired by this thread
-with g_main_context_acquire(). If the context was acquired multiple
-times, the ownership will be released only when g_main_context_release()
+with [method@GLib.MainContext.acquire]. If the context was acquired multiple
+times, the ownership will be released only when [method@GLib.MainContext.release]
 is called as many times as it was acquired.
 
 You must have successfully acquired the context with
-g_main_context_acquire() before you may call this function.
+[method@GLib.MainContext.acquire] before you may call this function.
 
 </description>
 <parameters>
@@ -30541,7 +30595,8 @@ main context will be used)
 </parameter_description>
 </parameter>
 <parameter name="fd">
-<parameter_description> a #GPollFD descriptor previously added with g_main_context_add_poll()
+<parameter_description> a #GPollFD descriptor previously added with
+[method@GLib.MainContext.add_poll]
 </parameter_description>
 </parameter>
 </parameters>
@@ -30575,7 +30630,8 @@ main context will be used)
 
 <function name="g_main_context_unref">
 <description>
-Decreases the reference count on a #GMainContext object by one. If
+Decreases the reference count on a [struct@GLib.MainContext] object by one.
+If
 the result is zero, free the context and free all associated memory.
 
 </description>
@@ -30591,12 +30647,13 @@ the result is zero, free the context and free all associated memory.
 <function name="g_main_context_wait">
 <description>
 Tries to become the owner of the specified context,
-as with g_main_context_acquire(). But if another thread
+as with [method@GLib.MainContext.acquire]. But if another thread
 is the owner, atomically drop @mutex and wait on @cond until
 that owner releases ownership or until @cond is signaled, then
 try again (once) to become the owner.
 
-Deprecated: 2.58: Use g_main_context_is_owner() and separate locking instead.
+Deprecated: 2.58: Use [method@GLib.MainContext.is_owner] and separate
+locking instead.
 
 </description>
 <parameters>
@@ -30621,14 +30678,14 @@ this thread is now the owner of @context.
 
 <function name="g_main_context_wakeup">
 <description>
-If @context is currently blocking in g_main_context_iteration()
+If @context is currently blocking in [method@GLib.MainContext.iteration]
 waiting for a source to become ready, cause it to stop blocking
 and return.  Otherwise, cause the next invocation of
-g_main_context_iteration() to return without blocking.
+[method@GLib.MainContext.iteration] to return without blocking.
 
-This API is useful for low-level control over #GMainContext; for
+This API is useful for low-level control over [struct@GLib.MainContext]; for
 example, integrating it with main loop implementations such as
-#GMainLoop.
+[struct@GLib.MainLoop].
 
 Another related use for this function is when implementing a main
 loop with a termination condition, computed from multiple threads:
@@ -30678,11 +30735,11 @@ Since: 2.12
 <function name="g_main_depth">
 <description>
 Returns the depth of the stack of calls to
-g_main_context_dispatch() on any #GMainContext in the current thread.
+[method@GLib.MainContext.dispatch] on any #GMainContext in the current thread.
 That is, when called from the toplevel, it gives 0. When
-called from within a callback from g_main_context_iteration()
-(or g_main_loop_run(), etc.) it returns 1. When called from within 
-a callback to a recursive call to g_main_context_iteration(),
+called from within a callback from [method@GLib.MainContext.iteration]
+(or [method@GLib.MainLoop.run], etc.) it returns 1. When called from within 
+a callback to a recursive call to [method@GLib.MainContext.iteration],
 it returns 2. And so forth.
 
 This function is useful in a situation like the following:
@@ -30723,7 +30780,7 @@ thing from a library, it gets more difficult, since you no longer
 control the main loop. You might think you can simply use an idle
 function to make the call to free_allocated_memory(), but that
 doesn't work, since the idle function could be called from a
-recursive callback. This can be fixed by using g_main_depth()
+recursive callback. This can be fixed by using [func@GLib.main_depth]
 
 |[&lt;!-- language=&quot;C&quot; --&gt; 
 gpointer
@@ -30758,12 +30815,12 @@ l = next;
 }
 ]|
 
-There is a temptation to use g_main_depth() to solve
+There is a temptation to use [func@GLib.main_depth] to solve
 problems with reentrancy. For instance, while waiting for data
 to be received from the network in response to a menu item,
 the menu item might be selected again. It might seem that
 one could make the menu item's callback return immediately
-and do nothing if g_main_depth() returns a value greater than 1.
+and do nothing if [func@GLib.main_depth] returns a value greater than 1.
 However, this should be avoided since the user then sees selecting
 the menu item do nothing. Furthermore, you'll find yourself adding
 these checks all over your code, since there are doubtless many,
@@ -30844,7 +30901,7 @@ source is ready to be processed.
 
 <function name="g_main_loop_get_context">
 <description>
-Returns the #GMainContext of @loop.
+Returns the [struct@GLib.MainContext] of @loop.
 
 
 </description>
@@ -30854,13 +30911,14 @@ Returns the #GMainContext of @loop.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GMainContext of @loop
+<return> the [struct@GLib.MainContext] of @loop
 </return>
 </function>
 
 <function name="g_main_loop_is_running">
 <description>
-Checks to see if the main loop is currently being run via g_main_loop_run().
+Checks to see if the main loop is currently being run via
+[method@GLib.MainLoop.run].
 
 
 </description>
@@ -30876,7 +30934,7 @@ Checks to see if the main loop is currently being run via g_main_loop_run().
 
 <function name="g_main_loop_new">
 <description>
-Creates a new #GMainLoop structure.
+Creates a new [struct@GLib.MainLoop] structure.
 
 
 </description>
@@ -30888,8 +30946,8 @@ main context will be used).
 </parameter>
 <parameter name="is_running">
 <parameter_description> set to %TRUE to indicate that the loop is running. This
-is not very important since calling g_main_loop_run() will set this to
-%TRUE anyway.
+is not very important since calling [method@GLib.MainLoop.run] will set this
+to %TRUE anyway.
 </parameter_description>
 </parameter>
 </parameters>
@@ -30899,11 +30957,11 @@ is not very important since calling g_main_loop_run() will set this to
 
 <function name="g_main_loop_quit">
 <description>
-Stops a #GMainLoop from running. Any calls to g_main_loop_run()
-for the loop will return. 
+Stops a [struct@GLib.MainLoop] from running. Any calls to
+[method@GLib.MainLoop.run] for the loop will return.
 
-Note that sources that have already been dispatched when 
-g_main_loop_quit() is called will still be executed.
+Note that sources that have already been dispatched when
+[method@GLib.MainLoop.quit] is called will still be executed.
 
 </description>
 <parameters>
@@ -30917,7 +30975,7 @@ g_main_loop_quit() is called will still be executed.
 
 <function name="g_main_loop_ref">
 <description>
-Increases the reference count on a #GMainLoop object by one.
+Increases the reference count on a [struct@GLib.MainLoop] object by one.
 
 
 </description>
@@ -30933,7 +30991,7 @@ Increases the reference count on a #GMainLoop object by one.
 
 <function name="g_main_loop_run">
 <description>
-Runs a main loop until g_main_loop_quit() is called on the loop.
+Runs a main loop until [method@GLib.MainLoop.quit] is called on the loop.
 If this is called for the thread of the loop's #GMainContext,
 it will process events from the loop, otherwise it will
 simply wait.
@@ -30950,7 +31008,7 @@ simply wait.
 
 <function name="g_main_loop_unref">
 <description>
-Decreases the reference count on a #GMainLoop object by one. If
+Decreases the reference count on a [struct@GLib.MainLoop] object by one. If
 the result is zero, free the loop and free all associated memory.
 
 </description>
@@ -32041,7 +32099,7 @@ match failed %NULL is returned
 Retrieves the text matching the capturing parentheses named @name.
 
 If @name is a valid sub pattern name but it didn't match anything
-(e.g. sub pattern &quot;X&quot;, matching &quot;b&quot; against &quot;(?P&lt;X&gt;a)?b&quot;)
+(e.g. sub pattern `&quot;X&quot;`, matching `&quot;b&quot;` against `&quot;(?P&lt;X&gt;a)?b&quot;`)
 then an empty string is returned.
 
 The string is fetched from the string passed to the match function,
@@ -32071,7 +32129,7 @@ occurred. You have to free the string yourself
 Retrieves the position in bytes of the capturing parentheses named @name.
 
 If @name is a valid sub pattern name but it didn't match anything
-(e.g. sub pattern &quot;X&quot;, matching &quot;b&quot; against &quot;(?P&lt;X&gt;a)?b&quot;)
+(e.g. sub pattern `&quot;X&quot;`, matching `&quot;b&quot;` against `&quot;(?P&lt;X&gt;a)?b&quot;`)
 then @start_pos and @end_pos are set to -1 and %TRUE is returned.
 
 Since: 2.14
@@ -32958,7 +33016,7 @@ allocated on the stack, or as part of a larger structure.
 It is not necessary to initialize a mutex that has been
 statically allocated.
 
-|[&lt;!-- language=&quot;C&quot; --&gt; 
+|[&lt;!-- language=&quot;C&quot; --&gt;
 typedef struct {
 GMutex m;
 ...
@@ -34501,17 +34559,19 @@ in an interface of this class.
 A convenience function to connect multiple signals at once.
 
 The signal specs expected by this function have the form
-&quot;modifier::signal_name&quot;, where modifier can be one of the following:
-- signal: equivalent to g_signal_connect_data (..., NULL, G_CONNECT_DEFAULT)
-- object-signal, object_signal: equivalent to g_signal_connect_object (..., G_CONNECT_DEFAULT)
-- swapped-signal, swapped_signal: equivalent to g_signal_connect_data (..., NULL, G_CONNECT_SWAPPED)
-- swapped_object_signal, swapped-object-signal: equivalent to g_signal_connect_object (..., G_CONNECT_SWAPPED)
-- signal_after, signal-after: equivalent to g_signal_connect_data (..., NULL, G_CONNECT_AFTER)
-- object_signal_after, object-signal-after: equivalent to g_signal_connect_object (..., G_CONNECT_AFTER)
-- swapped_signal_after, swapped-signal-after: equivalent to g_signal_connect_data (..., NULL, G_CONNECT_SWAPPED | G_CONNECT_AFTER)
-- swapped_object_signal_after, swapped-object-signal-after: equivalent to g_signal_connect_object (..., G_CONNECT_SWAPPED | G_CONNECT_AFTER)
+`modifier::signal_name`, where `modifier` can be one of the
+following:
 
-|[&lt;!-- language=&quot;C&quot; --&gt; 
+- `signal`: equivalent to `g_signal_connect_data (..., NULL, G_CONNECT_DEFAULT)`
+- `object-signal`, `object_signal`: equivalent to `g_signal_connect_object (..., G_CONNECT_DEFAULT)`
+- `swapped-signal`, `swapped_signal`: equivalent to `g_signal_connect_data (..., NULL, G_CONNECT_SWAPPED)`
+- `swapped_object_signal`, `swapped-object-signal`: equivalent to `g_signal_connect_object (..., G_CONNECT_SWAPPED)`
+- `signal_after`, `signal-after`: equivalent to `g_signal_connect_data (..., NULL, G_CONNECT_AFTER)`
+- `object_signal_after`, `object-signal-after`: equivalent to `g_signal_connect_object (..., G_CONNECT_AFTER)`
+- `swapped_signal_after`, `swapped-signal-after`: equivalent to `g_signal_connect_data (..., NULL, G_CONNECT_SWAPPED | G_CONNECT_AFTER)`
+- `swapped_object_signal_after`, `swapped-object-signal-after`: equivalent to `g_signal_connect_object (..., G_CONNECT_SWAPPED | G_CONNECT_AFTER)`
+
+```c
 menu-&gt;toplevel = g_object_connect (g_object_new (GTK_TYPE_WINDOW,
 &quot;type&quot;, GTK_WINDOW_POPUP,
 &quot;child&quot;, menu,
@@ -34520,7 +34580,7 @@ NULL),
 &quot;signal::size_request&quot;, gtk_menu_window_size_request, menu,
 &quot;signal::destroy&quot;, gtk_widget_destroyed, &amp;menu-&gt;toplevel,
 NULL);
-]|
+```
 
 
 </description>
@@ -34534,13 +34594,13 @@ NULL);
 </parameter_description>
 </parameter>
 <parameter name="Varargs">
-<parameter_description> #GCallback for the first signal, followed by data for the
+<parameter_description> [type@GObject.Callback] for the first signal, followed by data for the
 first signal, followed optionally by more signal
-spec/callback/data triples, followed by %NULL
+spec/callback/data triples, followed by `NULL`
 </parameter_description>
 </parameter>
 </parameters>
-<return> @object
+<return> the object
 </return>
 </function>
 
@@ -35791,7 +35851,7 @@ return a floating reference.
 
 Using this function on the return value of the user's callback allows
 the user to do whichever is more convenient for them. The caller will
-alway receives exactly one full reference to the value: either the
+always receives exactly one full reference to the value: either the
 one that was returned in the first place, or a floating reference
 that has been converted to a full reference.
 
@@ -37598,9 +37658,9 @@ See g_param_spec_internal() for details on property names.
 <description>
 Creates a new #GParamSpec instance.
 
-See [canonical parameter names][canonical-parameter-names] for details of
-the rules for @name. Names which violate these rules lead to undefined
-behaviour.
+See [canonical parameter names][class@GObject.ParamSpec#parameter-names]
+for details of the rules for @name. Names which violate these rules lead
+to undefined behaviour.
 
 Beyond the name, #GParamSpecs have two more descriptive strings, the
 @nick and @blurb, which may be used as a localized label and description.
@@ -37644,8 +37704,8 @@ Validate a property name for a #GParamSpec. This can be useful for
 dynamically-generated properties which need to be validated at run-time
 before actually trying to create them.
 
-See [canonical parameter names][canonical-parameter-names] for details of
-the rules for valid names.
+See [canonical parameter names][class@GObject.ParamSpec#parameter-names]
+for details of the rules for valid names.
 
 Since: 2.66
 
@@ -39159,25 +39219,27 @@ root component
 
 <function name="g_pattern_match">
 <description>
-Matches a string against a compiled pattern. Passing the correct
+Matches a string against a compiled pattern.
+
+Passing the correct
 length of the string given is mandatory. The reversed string can be
-omitted by passing %NULL, this is more efficient if the reversed
+omitted by passing `NULL`, this is more efficient if the reversed
 version of the string to be matched is not at hand, as
-g_pattern_match() will only construct it if the compiled pattern
+`g_pattern_match()` will only construct it if the compiled pattern
 requires reverse matches.
 
 Note that, if the user code will (possibly) match a string against a
 multitude of patterns containing wildcards, chances are high that
-some patterns will require a reversed string. In this case, it's
+some patterns will require a reversed string. In this case, it’s
 more efficient to provide the reversed string to avoid multiple
-constructions thereof in the various calls to g_pattern_match().
+constructions thereof in the various calls to `g_pattern_match()`.
 
 Note also that the reverse of a UTF-8 encoded string can in general
-not be obtained by g_strreverse(). This works only if the string
+not be obtained by [func@GLib.strreverse]. This works only if the string
 does not contain any multibyte characters. GLib offers the
-g_utf8_strreverse() function to reverse UTF-8 encoded strings.
+[func@GLib.utf8_strreverse] function to reverse UTF-8 encoded strings.
 
-Deprecated: 2.70: Use g_pattern_spec_match() instead
+Deprecated: 2.70: Use [method@GLib.PatternSpec.match] instead
 
 </description>
 <parameters>
@@ -39186,8 +39248,8 @@ Deprecated: 2.70: Use g_pattern_spec_match() instead
 </parameter_description>
 </parameter>
 <parameter name="string_length">
-<parameter_description> the length of @string (in bytes, i.e. strlen(),
-not g_utf8_strlen())
+<parameter_description> the length of @string (in bytes, i.e. `strlen()`,
+not [func@GLib.utf8_strlen])
 </parameter_description>
 </parameter>
 <parameter name="string">
@@ -39195,7 +39257,7 @@ not g_utf8_strlen())
 </parameter_description>
 </parameter>
 <parameter name="string_reversed">
-<parameter_description> the reverse of @string or %NULL
+<parameter_description> the reverse of @string
 </parameter_description>
 </parameter>
 </parameters>
@@ -39205,10 +39267,12 @@ not g_utf8_strlen())
 
 <function name="g_pattern_match_simple">
 <description>
-Matches a string against a pattern given as a string. If this
-function is to be called in a loop, it's more efficient to compile
-the pattern once with g_pattern_spec_new() and call
-g_pattern_match_string() repeatedly.
+Matches a string against a pattern given as a string.
+
+If this
+function is to be called in a loop, it’s more efficient to compile
+the pattern once with [ctor@GLib.PatternSpec.new] and call
+[method@GLib.PatternSpec.match_string] repeatedly.
 
 
 </description>
@@ -39228,11 +39292,13 @@ g_pattern_match_string() repeatedly.
 
 <function name="g_pattern_match_string">
 <description>
-Matches a string against a compiled pattern. If the string is to be
-matched against more than one pattern, consider using
-g_pattern_match() instead while supplying the reversed string.
+Matches a string against a compiled pattern.
 
-Deprecated: 2.70: Use g_pattern_spec_match_string() instead
+If the string is to be
+matched against more than one pattern, consider using
+[method@GLib.PatternSpec.match] instead while supplying the reversed string.
+
+Deprecated: 2.70: Use [method@GLib.PatternSpec.match_string] instead
 
 </description>
 <parameters>
@@ -39251,7 +39317,7 @@ Deprecated: 2.70: Use g_pattern_spec_match_string() instead
 
 <function name="g_pattern_spec_copy">
 <description>
-Copies @pspec in a new #GPatternSpec.
+Copies @pspec in a new [type@GLib.PatternSpec].
 
 Since: 2.70
 
@@ -39290,7 +39356,7 @@ match the same set of strings.
 
 <function name="g_pattern_spec_free">
 <description>
-Frees the memory allocated for the #GPatternSpec.
+Frees the memory allocated for the [type@GLib.PatternSpec].
 
 </description>
 <parameters>
@@ -39304,23 +39370,25 @@ Frees the memory allocated for the #GPatternSpec.
 
 <function name="g_pattern_spec_match">
 <description>
-Matches a string against a compiled pattern. Passing the correct
+Matches a string against a compiled pattern.
+
+Passing the correct
 length of the string given is mandatory. The reversed string can be
-omitted by passing %NULL, this is more efficient if the reversed
+omitted by passing `NULL`, this is more efficient if the reversed
 version of the string to be matched is not at hand, as
-g_pattern_match() will only construct it if the compiled pattern
+[method@GLib.PatternSpec.match] will only construct it if the compiled pattern
 requires reverse matches.
 
 Note that, if the user code will (possibly) match a string against a
 multitude of patterns containing wildcards, chances are high that
-some patterns will require a reversed string. In this case, it's
+some patterns will require a reversed string. In this case, it’s
 more efficient to provide the reversed string to avoid multiple
-constructions thereof in the various calls to g_pattern_match().
+constructions thereof in the various calls to [method@GLib.PatternSpec.match].
 
 Note also that the reverse of a UTF-8 encoded string can in general
-not be obtained by g_strreverse(). This works only if the string
+not be obtained by [func@GLib.strreverse]. This works only if the string
 does not contain any multibyte characters. GLib offers the
-g_utf8_strreverse() function to reverse UTF-8 encoded strings.
+[func@GLib.utf8_strreverse] function to reverse UTF-8 encoded strings.
 
 Since: 2.70
 
@@ -39331,8 +39399,8 @@ Since: 2.70
 </parameter_description>
 </parameter>
 <parameter name="string_length">
-<parameter_description> the length of @string (in bytes, i.e. strlen(),
-not g_utf8_strlen())
+<parameter_description> the length of @string (in bytes, i.e. `strlen()`,
+not [func@GLib.utf8_strlen])
 </parameter_description>
 </parameter>
 <parameter name="string">
@@ -39340,7 +39408,7 @@ not g_utf8_strlen())
 </parameter_description>
 </parameter>
 <parameter name="string_reversed">
-<parameter_description> the reverse of @string or %NULL
+<parameter_description> the reverse of @string
 </parameter_description>
 </parameter>
 </parameters>
@@ -39351,9 +39419,11 @@ not g_utf8_strlen())
 
 <function name="g_pattern_spec_match_string">
 <description>
-Matches a string against a compiled pattern. If the string is to be
+Matches a string against a compiled pattern.
+
+If the string is to be
 matched against more than one pattern, consider using
-g_pattern_match() instead while supplying the reversed string.
+[method@GLib.PatternSpec.match] instead while supplying the reversed string.
 
 Since: 2.70
 
@@ -39375,7 +39445,7 @@ Since: 2.70
 
 <function name="g_pattern_spec_new">
 <description>
-Compiles a pattern to a #GPatternSpec.
+Compiles a pattern to a [type@GLib.PatternSpec].
 
 
 </description>
@@ -39385,7 +39455,7 @@ Compiles a pattern to a #GPatternSpec.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated #GPatternSpec
+<return> a newly-allocated [type@GLib.PatternSpec]
 </return>
 </function>
 
@@ -41084,10 +41154,14 @@ Since: 2.22
 
 <function name="g_qsort_with_data">
 <description>
-This is just like the standard C qsort() function, but
-the comparison routine accepts a user data argument.
+This is just like the standard C [`qsort()`](man:qsort(3)) function, but
+the comparison routine accepts a user data argument
+(like [`qsort_r()`](man:qsort_r(3))).
 
-This is guaranteed to be a stable sort since version 2.32.
+Unlike `qsort()`, this is guaranteed to be a stable sort (since GLib 2.32).
+
+Deprecated: 2.82: `total_elems` is too small to represent larger arrays; use
+[func@GLib.sort_array] instead
 
 </description>
 <parameters>
@@ -42753,7 +42827,7 @@ structure.
 It is not necessary to initialise a recursive mutex that has been
 statically allocated.
 
-|[&lt;!-- language=&quot;C&quot; --&gt; 
+|[&lt;!-- language=&quot;C&quot; --&gt;
 typedef struct {
 GRecMutex m;
 ...
@@ -43482,15 +43556,15 @@ the #GMatchInfo, or %NULL if you do not need it
 Using the standard algorithm for regular expression matching only
 the longest match in the @string is retrieved, it is not possible
 to obtain all the available matches. For instance matching
-&quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot; against the pattern &quot;&lt;.*&gt;&quot;
-you get &quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot;.
+`&quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot;` against the pattern `&quot;&lt;.*&gt;&quot;`
+you get `&quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot;`.
 
 This function uses a different algorithm (called DFA, i.e. deterministic
 finite automaton), so it can retrieve all the possible matches, all
 starting at the same point in the string. For instance matching
-&quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot; against the pattern &quot;&lt;.*&gt;;&quot;
-you would obtain three matches: &quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot;,
-&quot;&lt;a&gt; &lt;b&gt;&quot; and &quot;&lt;a&gt;&quot;.
+`&quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot;` against the pattern `&quot;&lt;.*&gt;&quot;`
+you would obtain three matches: `&quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot;`,
+`&quot;&lt;a&gt; &lt;b&gt;&quot;` and `&quot;&lt;a&gt;&quot;`.
 
 The number of matched strings is retrieved using
 g_match_info_get_match_count(). To obtain the matched strings and
@@ -43742,13 +43816,13 @@ Since: 2.14
 <function name="g_regex_replace">
 <description>
 Replaces all occurrences of the pattern in @regex with the
-replacement text. Backreferences of the form '\number' or
-'\g&lt;number&gt;' in the replacement text are interpolated by the
-number-th captured subexpression of the match, '\g&lt;name&gt;' refers
-to the captured subexpression with the given name. '\0' refers
-to the complete match, but '\0' followed by a number is the octal
-representation of a character. To include a literal '\' in the
-replacement, write '\\\\'.
+replacement text. Backreferences of the form `\number` or
+`\g&lt;number&gt;` in the replacement text are interpolated by the
+number-th captured subexpression of the match, `\g&lt;name&gt;` refers
+to the captured subexpression with the given name. `\0` refers
+to the complete match, but `\0` followed by a number is the octal
+representation of a character. To include a literal `\` in the
+replacement, write `\\\\`.
 
 There are also escapes that changes the case of the following text:
 
@@ -44628,7 +44702,7 @@ allocated on the stack, or as part of a larger structure.  It is not
 necessary to initialise a reader-writer lock that has been statically
 allocated.
 
-|[&lt;!-- language=&quot;C&quot; --&gt; 
+|[&lt;!-- language=&quot;C&quot; --&gt;
 typedef struct {
 GRWLock l;
 ...
@@ -48346,9 +48420,8 @@ otherwise.
 Validate a signal name. This can be useful for dynamically-generated signals
 which need to be validated at run-time before actually trying to create them.
 
-See [canonical parameter names][canonical-parameter-names] for details of
-the rules for valid names. The rules for signal names are the same as those
-for property names.
+See [func@GObject.signal_new] for details of the rules for valid names.
+The rules for signal names are the same as those for property names.
 
 Since: 2.66
 
@@ -50120,11 +50193,47 @@ was large enough
 </return>
 </function>
 
+<function name="g_sort_array">
+<description>
+This is just like the standard C [`qsort()`](man:qsort(3)) function, but
+the comparison routine accepts a user data argument
+(like [`qsort_r()`](man:qsort_r(3))).
+
+Unlike `qsort()`, this is guaranteed to be a stable sort.
+
+Since: 2.82
+
+</description>
+<parameters>
+<parameter name="array">
+<parameter_description> start of array to sort
+</parameter_description>
+</parameter>
+<parameter name="n_elements">
+<parameter_description> number of elements in the array
+</parameter_description>
+</parameter>
+<parameter name="element_size">
+<parameter_description> size of each element
+</parameter_description>
+</parameter>
+<parameter name="compare_func">
+<parameter_description> function to compare elements
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data to pass to @compare_func
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_source_add_child_source">
 <description>
 Adds @child_source to @source as a &quot;polled&quot; source; when @source is
-added to a #GMainContext, @child_source will be automatically added
-with the same priority, when @child_source is triggered, it will
+added to a [struct@GLib.MainContext], @child_source will be automatically
+added with the same priority, when @child_source is triggered, it will
 cause @source to dispatch (in addition to calling its own
 callback), and when @source is destroyed, it will destroy
 @child_source as well. (@source will also still be dispatched if
@@ -50137,8 +50246,9 @@ callback that does nothing (except return %TRUE if appropriate).
 @source will hold a reference on @child_source while @child_source
 is attached to it.
 
-This API is only intended to be used by implementations of #GSource.
-Do not call this API on a #GSource that you did not create.
+This API is only intended to be used by implementations of
+[struct@GLib.Source]. Do not call this API on a [struct@GLib.Source] that
+you did not create.
 
 Since: 2.28
 
@@ -50159,17 +50269,17 @@ Since: 2.28
 <function name="g_source_add_poll">
 <description>
 Adds a file descriptor to the set of file descriptors polled for
-this source. This is usually combined with g_source_new() to add an
+this source. This is usually combined with [ctor@GLib.Source.new] to add an
 event source. The event source's check function will typically test
 the @revents field in the #GPollFD struct and return %TRUE if events need
 to be processed.
 
-This API is only intended to be used by implementations of #GSource.
-Do not call this API on a #GSource that you did not create.
+This API is only intended to be used by implementations of [struct@GLib.Source].
+Do not call this API on a [struct@GLib.Source] that you did not create.
 
 Using this API forces the linear scanning of event sources on each
 main loop iteration.  Newly-written event sources should try to use
-g_source_add_unix_fd() instead of this API.
+`g_source_add_unix_fd` instead of this API.
 
 </description>
 <parameters>
@@ -50191,8 +50301,8 @@ descriptor to watch.
 Monitors @fd for the IO events in @events.
 
 The tag returned by this function can be used to remove or modify the
-monitoring of the fd using g_source_remove_unix_fd() or
-g_source_modify_unix_fd().
+monitoring of the fd using [method@GLib.Source.remove_unix_fd] or
+[method@GLib.Source.modify_unix_fd].
 
 It is not necessary to remove the fd before destroying the source; it
 will be cleaned up automatically.
@@ -50226,8 +50336,8 @@ Since: 2.36
 
 <function name="g_source_attach">
 <description>
-Adds a #GSource to a @context so that it will be executed within
-that context. Remove it by calling g_source_destroy().
+Adds a [struct@GLib.Source] to a @context so that it will be executed within
+that context. Remove it by calling [method@GLib.Source.destroy].
 
 This function is safe to call from any thread, regardless of which thread
 the @context is running in.
@@ -50252,20 +50362,21 @@ main context will be used)
 
 <function name="g_source_destroy">
 <description>
-Removes a source from its #GMainContext, if any, and mark it as
+Removes a source from its [struct@GLib.MainContext], if any, and mark it as
 destroyed.  The source cannot be subsequently added to another
 context. It is safe to call this on sources which have already been
 removed from their context.
 
-This does not unref the #GSource: if you still hold a reference, use
-g_source_unref() to drop it.
+This does not unref the [struct@GLib.Source]: if you still hold a reference,
+use [method@GLib.Source.unref] to drop it.
 
 This function is safe to call from any thread, regardless of which thread
-the #GMainContext is running in.
+the [struct@GLib.MainContext] is running in.
 
-If the source is currently attached to a #GMainContext, destroying it
-will effectively unset the callback similar to calling g_source_set_callback().
-This can mean, that the data's #GDestroyNotify gets called right away.
+If the source is currently attached to a [struct@GLib.MainContext],
+destroying it will effectively unset the callback similar to calling
+[method@GLib.Source.set_callback]. This can mean, that the data's
+#GDestroyNotify gets called right away.
 
 </description>
 <parameters>
@@ -50280,7 +50391,7 @@ This can mean, that the data's #GDestroyNotify gets called right away.
 <function name="g_source_get_can_recurse">
 <description>
 Checks whether a source is allowed to be called recursively.
-see g_source_set_can_recurse().
+see [method@GLib.Source.set_can_recurse].
 
 
 </description>
@@ -50296,14 +50407,14 @@ see g_source_set_can_recurse().
 
 <function name="g_source_get_context">
 <description>
-Gets the #GMainContext with which the source is associated.
+Gets the [struct@GLib.MainContext] with which the source is associated.
 
 You can call this on a source that has been destroyed, provided
-that the #GMainContext it was attached to still exists (in which
-case it will return that #GMainContext). In particular, you can
+that the [struct@GLib.MainContext] it was attached to still exists (in which
+case it will return that [struct@GLib.MainContext]). In particular, you can
 always call this function on the source returned from
-g_main_current_source(). But calling this function on a source
-whose #GMainContext has been destroyed is an error.
+[func@GLib.main_current_source]. But calling this function on a source
+whose [struct@GLib.MainContext] has been destroyed is an error.
 
 
 </description>
@@ -50322,9 +50433,9 @@ yet been added to a source.
 <function name="g_source_get_current_time">
 <description>
 This function ignores @source and is otherwise the same as
-g_get_current_time().
+[func@GLib.get_current_time].
 
-Deprecated: 2.28: use g_source_get_time() instead
+Deprecated: 2.28: use [method@GLib.Source.get_time] instead
 
 </description>
 <parameters>
@@ -50344,13 +50455,14 @@ Deprecated: 2.28: use g_source_get_time() instead
 <description>
 Returns the numeric ID for a particular source. The ID of a source
 is a positive integer which is unique within a particular main loop 
-context. The reverse
-mapping from ID to source is done by g_main_context_find_source_by_id().
+context. The reverse mapping from ID to source is done by
+[method@GLib.MainContext.find_source_by_id].
 
 You can only call this function while the source is associated to a
-#GMainContext instance; calling this function before g_source_attach()
-or after g_source_destroy() yields undefined behavior. The ID returned
-is unique within the #GMainContext instance passed to g_source_attach().
+[struct@GLib.MainContext] instance; calling this function before
+[method@GLib.Source.attach] or after [method@GLib.Source.destroy] yields
+undefined behavior. The ID returned is unique within the
+[struct@GLib.MainContext] instance passed to [method@GLib.Source.attach].
 
 
 </description>
@@ -50367,7 +50479,7 @@ is unique within the #GMainContext instance passed to g_source_attach().
 <function name="g_source_get_name">
 <description>
 Gets a name for the source, used in debugging and profiling.  The
-name may be #NULL if it has never been set with g_source_set_name().
+name may be #NULL if it has never been set with [method@GLib.Source.set_name].
 
 Since: 2.26
 
@@ -50402,7 +50514,7 @@ Gets the priority of a source.
 <function name="g_source_get_ready_time">
 <description>
 Gets the &quot;ready time&quot; of @source, as set by
-g_source_set_ready_time().
+[method@GLib.Source.set_ready_time].
 
 Any time before or equal to the current monotonic time (including 0)
 is an indication that the source will fire immediately.
@@ -50422,12 +50534,12 @@ is an indication that the source will fire immediately.
 <function name="g_source_get_time">
 <description>
 Gets the time to be used when checking this source. The advantage of
-calling this function over calling g_get_monotonic_time() directly is
+calling this function over calling [func@GLib.get_monotonic_time] directly is
 that when checking multiple sources, GLib can cache a single value
 instead of having to repeatedly get the system monotonic time.
 
 The time here is the system monotonic time, if available, or some
-other reasonable alternative otherwise.  See g_get_monotonic_time().
+other reasonable alternative otherwise.  See [func@GLib.get_monotonic_time].
 
 Since: 2.28
 
@@ -50519,10 +50631,10 @@ return FALSE;
 ]|
 
 Calls to this function from a thread other than the one acquired by the
-#GMainContext the #GSource is attached to are typically redundant, as the
-source could be destroyed immediately after this function returns. However,
-once a source is destroyed it cannot be un-destroyed, so this function can be
-used for opportunistic checks from any thread.
+[struct@GLib.MainContext] the #GSource is attached to are typically
+redundant, as the source could be destroyed immediately after this function
+returns. However, once a source is destroyed it cannot be un-destroyed, so
+this function can be used for opportunistic checks from any thread.
 
 Since: 2.12
 
@@ -50542,10 +50654,10 @@ Since: 2.12
 <description>
 Updates the event mask to watch for the fd identified by @tag.
 
-@tag is the tag returned from g_source_add_unix_fd().
+@tag is the tag returned from [method@GLib.Source.add_unix_fd].
 
 If you want to remove a fd, don't set its event mask to zero.
-Instead, call g_source_remove_unix_fd().
+Instead, call [method@GLib.Source.remove_unix_fd].
 
 This API is only intended to be used by implementations of #GSource.
 Do not call this API on a #GSource that you did not create.
@@ -50561,7 +50673,7 @@ Since: 2.36
 </parameter_description>
 </parameter>
 <parameter name="tag">
-<parameter_description> the tag from g_source_add_unix_fd()
+<parameter_description> the tag from [method@GLib.Source.add_unix_fd]
 </parameter_description>
 </parameter>
 <parameter name="new_events">
@@ -50574,13 +50686,13 @@ Since: 2.36
 
 <function name="g_source_new">
 <description>
-Creates a new #GSource structure. The size is specified to
-allow creating structures derived from #GSource that contain
+Creates a new [struct@GLib.Source] structure. The size is specified to
+allow creating structures derived from [struct@GLib.Source] that contain
 additional data. The size passed in must be at least
 `sizeof (GSource)`.
 
 The source will not initially be associated with any #GMainContext
-and must be added to one with g_source_attach() before it will be
+and must be added to one with [method@GLib.Source.attach] before it will be
 executed.
 
 
@@ -50592,7 +50704,7 @@ the sources behavior.
 </parameter_description>
 </parameter>
 <parameter name="struct_size">
-<parameter_description> size of the #GSource structure to create.
+<parameter_description> size of the [struct@GLib.Source] structure to create.
 </parameter_description>
 </parameter>
 </parameters>
@@ -50622,7 +50734,7 @@ Since: 2.36
 </parameter_description>
 </parameter>
 <parameter name="tag">
-<parameter_description> the tag from g_source_add_unix_fd()
+<parameter_description> the tag from [method@GLib.Source.add_unix_fd]
 </parameter_description>
 </parameter>
 </parameters>
@@ -50650,20 +50762,21 @@ Increases the reference count on a source by one.
 <function name="g_source_remove">
 <description>
 Removes the source with the given ID from the default main context. You must
-use g_source_destroy() for sources added to a non-default main context.
+use [method@GLib.Source.destroy] for sources added to a non-default main context.
 
-The ID of a #GSource is given by g_source_get_id(), or will be
-returned by the functions g_source_attach(), g_idle_add(),
-g_idle_add_full(), g_timeout_add(), g_timeout_add_full(),
-g_child_watch_add(), g_child_watch_add_full(), g_io_add_watch(), and
-g_io_add_watch_full().
+The ID of a #GSource is given by [method@GLib.Source.get_id], or will be
+returned by the functions [method@GLib.Source.attach], [func@GLib.idle_add],
+[func@GLib.idle_add_full], [func@GLib.timeout_add],
+[func@GLib.timeout_add_full], [func@GLib.child_watch_add],
+[func@GLib.child_watch_add_full], [func@GLib.io_add_watch], and
+[func@GLib.io_add_watch_full].
 
 It is a programmer error to attempt to remove a non-existent source.
 
 More specifically: source IDs can be reissued after a source has been
 destroyed and therefore it is never valid to use this function with a
 source ID which may have already been removed.  An example is when
-scheduling an idle to run in another thread with g_idle_add(): the
+scheduling an idle to run in another thread with [func@GLib.idle_add]: the
 idle may already have run and been removed by the time this function
 is called on its (now invalid) source ID.  This source ID may have
 been reissued, leading to the operation being performed against the
@@ -50691,7 +50804,7 @@ same source functions and user data, only one will be destroyed.
 </description>
 <parameters>
 <parameter name="funcs">
-<parameter_description> The @source_funcs passed to g_source_new()
+<parameter_description> The @source_funcs passed to [ctor@GLib.Source.new]
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -50738,7 +50851,7 @@ Since: 2.28
 </parameter>
 <parameter name="child_source">
 <parameter_description> a #GSource previously passed to
-g_source_add_child_source().
+[method@GLib.Source.add_child_source].
 </parameter_description>
 </parameter>
 </parameters>
@@ -50750,8 +50863,8 @@ g_source_add_child_source().
 Removes a file descriptor from the set of file descriptors polled for
 this source. 
 
-This API is only intended to be used by implementations of #GSource.
-Do not call this API on a #GSource that you did not create.
+This API is only intended to be used by implementations of [struct@GLib.Source].
+Do not call this API on a [struct@GLib.Source] that you did not create.
 
 </description>
 <parameters>
@@ -50760,7 +50873,7 @@ Do not call this API on a #GSource that you did not create.
 </parameter_description>
 </parameter>
 <parameter name="fd">
-<parameter_description> a #GPollFD structure previously passed to g_source_add_poll().
+<parameter_description> a #GPollFD structure previously passed to [method@GLib.Source.add_poll].
 </parameter_description>
 </parameter>
 </parameters>
@@ -50769,7 +50882,7 @@ Do not call this API on a #GSource that you did not create.
 
 <function name="g_source_remove_unix_fd">
 <description>
-Reverses the effect of a previous call to g_source_add_unix_fd().
+Reverses the effect of a previous call to [method@GLib.Source.add_unix_fd].
 
 You only need to call this if you want to remove an fd from being
 watched while keeping the same source around.  In the normal case you
@@ -50789,7 +50902,7 @@ Since: 2.36
 </parameter_description>
 </parameter>
 <parameter name="tag">
-<parameter_description> the tag from g_source_add_unix_fd()
+<parameter_description> the tag from [method@GLib.Source.add_unix_fd]
 </parameter_description>
 </parameter>
 </parameters>
@@ -50803,20 +50916,21 @@ called from the source's dispatch function.
 
 The exact type of @func depends on the type of source; ie. you
 should not count on @func being called with @data as its first
-parameter. Cast @func with G_SOURCE_FUNC() to avoid warnings about
+parameter. Cast @func with [func@GLib.SOURCE_FUNC] to avoid warnings about
 incompatible function types.
 
-See [memory management of sources][mainloop-memory-management] for details
+See [mainloop memory management](main-loop.html#memory-management-of-sources) for details
 on how to handle memory management of @data.
 
 Typically, you won't use this function. Instead use functions specific
-to the type of source you are using, such as g_idle_add() or g_timeout_add().
+to the type of source you are using, such as [func@GLib.idle_add] or
+[func@GLib.timeout_add].
 
 It is safe to call this function multiple times on a source which has already
 been attached to a context. The changes will take effect for the next time
 the source is dispatched after this call returns.
 
-Note that g_source_destroy() for a currently attached source has the effect
+Note that [method@GLib.Source.destroy] for a currently attached source has the effect
 of also unsetting the callback.
 
 </description>
@@ -50845,7 +50959,7 @@ of also unsetting the callback.
 <description>
 Sets the callback function storing the data as a refcounted callback
 &quot;object&quot;. This is used internally. Note that calling 
-g_source_set_callback_indirect() assumes
+[method@GLib.Source.set_callback_indirect] assumes
 an initial reference count on @callback_data, and thus
 @callback_funcs-&gt;unref will eventually be called once more
 than @callback_funcs-&gt;ref.
@@ -50922,8 +51036,9 @@ Set @dispose as dispose function on @source. @dispose will be called once
 the reference count of @source reaches 0 but before any of the state of the
 source is freed, especially before the finalize function is called.
 
-This means that at this point @source is still a valid #GSource and it is
-allow for the reference count to increase again until @dispose returns.
+This means that at this point @source is still a valid [struct@GLib.Source]
+and it is allow for the reference count to increase again until @dispose
+returns.
 
 The dispose function can be used to clear any &quot;weak&quot; references to the
 @source in other data structures in a thread-safe way where it is possible
@@ -51010,11 +51125,11 @@ one could change the name in the &quot;check&quot; function of a #GSourceFuncs
 to include details like the event type in the source name.
 
 Use caution if changing the name while another thread may be
-accessing it with g_source_get_name(); that function does not copy
+accessing it with [method@GLib.Source.get_name]; that function does not copy
 the value, and changing the value will free it while the other thread
 may be attempting to use it.
 
-Also see g_source_set_static_name().
+Also see [method@GLib.Source.set_static_name].
 
 Since: 2.26
 
@@ -51037,7 +51152,7 @@ Since: 2.26
 Sets the name of a source using its ID.
 
 This is a convenience utility to set source names from the return
-value of g_idle_add(), g_timeout_add(), etc.
+value of [func@GLib.idle_add], [func@GLib.timeout_add], etc.
 
 It is a programmer error to attempt to set the name of a non-existent
 source.
@@ -51045,7 +51160,7 @@ source.
 More specifically: source IDs can be reissued after a source has been
 destroyed and therefore it is never valid to use this function with a
 source ID which may have already been removed.  An example is when
-scheduling an idle to run in another thread with g_idle_add(): the
+scheduling an idle to run in another thread with [func@GLib.idle_add]: the
 idle may already have run and been removed by the time this function
 is called on its (now invalid) source ID.  This source ID may have
 been reissued, leading to the operation being performed against the
@@ -51112,7 +51227,7 @@ for both sources is reached during the same main context iteration,
 then the order of dispatch is undefined.
 
 It is a no-op to call this function on a #GSource which has already been
-destroyed with g_source_destroy().
+destroyed with [method@GLib.Source.destroy].
 
 This API is only intended to be used by implementations of #GSource.
 Do not call this API on a #GSource that you did not create.
@@ -51136,7 +51251,7 @@ Since: 2.36
 
 <function name="g_source_set_static_name">
 <description>
-A variant of g_source_set_name() that does not
+A variant of [method@GLib.Source.set_name] that does not
 duplicate the @name, and can only be used with
 string literals.
 
@@ -52028,7 +52143,7 @@ Sets @fd_ptr to `-1`, returning the value that was there before.
 
 Conceptually, this transfers the ownership of the file descriptor
 from the referenced variable to the caller of the function (i.e.
-‘steals’ the reference). This is very similar to g_steal_pointer(),
+‘steals’ the reference). This is very similar to [func@GLib.steal_pointer],
 but for file descriptors.
 
 On POSIX platforms, this function is async-signal safe
@@ -52522,9 +52637,20 @@ Since: 2.16
 
 <function name="g_strcompress">
 <description>
-Replaces all escaped characters with their one byte equivalent.
+Makes a copy of a string replacing C string-style escape
+sequences with their one byte equivalent:
 
-This function does the reverse conversion of [func@GLib.strescape].
+- `\b` → [U+0008 Backspace](https://en.wikipedia.org/wiki/Backspace)
+- `\f` → [U+000C Form Feed](https://en.wikipedia.org/wiki/Form_feed)
+- `\n` → [U+000A Line Feed](https://en.wikipedia.org/wiki/Newline)
+- `\r` → [U+000D Carriage Return](https://en.wikipedia.org/wiki/Carriage_return)
+- `\t` → [U+0009 Horizontal Tabulation](https://en.wikipedia.org/wiki/Tab_character)
+- `\v` → [U+000B Vertical Tabulation](https://en.wikipedia.org/wiki/Vertical_Tab)
+- `\` followed by one to three octal digits → the numeric value (mod 255)
+- `\` followed by any other character → the character as is.
+For example, `\\` will turn into a backslash (`\`) and `\&quot;` into a double quote (`&quot;`).
+
+[func@GLib.strescape] does the reverse conversion.
 
 
 </description>
@@ -52779,11 +52905,22 @@ g_strerror (saved_errno);
 
 <function name="g_strescape">
 <description>
-Escapes the special characters '\b', '\f', '\n', '\r', '\t', '\v', '\'
-and '&quot;' in the string @source by inserting a '\' before
-them. Additionally all characters in the range 0x01-0x1F (everything
+It replaces the following special characters in the string @source
+with their corresponding C escape sequence:
+
+Symbol | Escape
+---|---
+[U+0008 Backspace](https://en.wikipedia.org/wiki/Backspace) | `\b`
+[U+000C Form Feed](https://en.wikipedia.org/wiki/Form_feed) | `\f`
+[U+000A Line Feed](https://en.wikipedia.org/wiki/Newline) | `\n`
+[U+000D Carriage Return](https://en.wikipedia.org/wiki/Carriage_return) | `\r`
+[U+0009 Horizontal Tabulation](https://en.wikipedia.org/wiki/Tab_character) | `\t`
+[U+000B Vertical Tabulation](https://en.wikipedia.org/wiki/Vertical_Tab) | `\v`
+
+It also inserts a backslash (`\`) before any backslash or a double quote (`&quot;`).
+Additionally all characters in the range 0x01-0x1F (everything
 below SPACE) and in the range 0x7F-0xFF (all non-ASCII chars) are
-replaced with a '\' followed by their octal representation.
+replaced with a backslash followed by their octal representation.
 Characters supplied in @exceptions are not escaped.
 
 [func@GLib.strcompress] does the reverse conversion.
@@ -54191,6 +54328,9 @@ containing multibyte characters. For that purpose, use
 Searches the string @haystack for the last occurrence
 of the string @needle.
 
+The fact that this function returns `gchar *` rather than `const gchar *` is
+a historical artifact.
+
 
 </description>
 <parameters>
@@ -54203,7 +54343,8 @@ of the string @needle.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer to the found occurrence, or `NULL` if not found
+<return> a pointer to the found occurrence, or
+`NULL` if not found
 </return>
 </function>
 
@@ -54212,6 +54353,9 @@ of the string @needle.
 Searches the string @haystack for the last occurrence
 of the string @needle, limiting the length of the search
 to @haystack_len.
+
+The fact that this function returns `gchar *` rather than `const gchar *` is
+a historical artifact.
 
 
 </description>
@@ -54230,7 +54374,8 @@ can be used to mean &quot;search the entire string&quot;, like [func@GLib.strrst
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer to the found occurrence, or `NULL` if not found
+<return> a pointer to the found occurrence, or
+`NULL` if not found
 </return>
 </function>
 
@@ -54352,6 +54497,9 @@ to @haystack_len or a nul terminator byte (whichever is reached first).
 A length of `-1` can be used to mean “search the entire string”, like
 `strstr()`.
 
+The fact that this function returns `gchar *` rather than `const gchar *` is
+a historical artifact.
+
 
 </description>
 <parameters>
@@ -54369,7 +54517,8 @@ search it entirely
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer to the found occurrence, or `NULL` if not found
+<return> a pointer to the found occurrence, or
+`NULL` if not found
 </return>
 </function>
 
@@ -54596,6 +54745,41 @@ Since: 2.68
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_strv_builder_unref_to_strv">
+<description>
+Decreases the reference count on the string vector builder, and returns
+its contents as a `NULL`-terminated string array.
+
+This function is especially useful for cases where it's not possible
+to use `g_autoptr()`.
+
+```c
+GStrvBuilder *builder = g_strv_builder_new ();
+g_strv_builder_add (builder, &quot;hello&quot;);
+g_strv_builder_add (builder, &quot;world&quot;);
+
+GStrv array = g_strv_builder_unref_to_strv (builder);
+
+g_assert_true (g_strv_equal (array, (const char *[]) { &quot;hello&quot;, &quot;world&quot;, NULL }));
+
+g_strfreev (array);
+```
+
+Since: 2.82
+
+</description>
+<parameters>
+<parameter name="builder">
+<parameter_description> a #GStrvBuilder
+</parameter_description>
+</parameter>
+</parameters>
+<return> the constructed string
+array
+
+</return>
 </function>
 
 <function name="g_strv_contains">
@@ -57650,12 +57834,12 @@ Since: 2.26
 <function name="g_timeout_add">
 <description>
 Sets a function to be called at regular intervals, with the default
-priority, %G_PRIORITY_DEFAULT.
+priority, [const@GLib.PRIORITY_DEFAULT].
 
-The given @function is called repeatedly until it returns %G_SOURCE_REMOVE
-or %FALSE, at which point the timeout is automatically destroyed and the
-function will not be called again. The first call to the function will be
-at the end of the first @interval.
+The given @function is called repeatedly until it returns
+[const@GLib.SOURCE_REMOVE] or %FALSE, at which point the timeout is
+automatically destroyed and the function will not be called again. The first
+call to the function will be at the end of the first @interval.
 
 Note that timeout functions may be delayed, due to the processing of other
 event sources. Thus they should not be relied on for precise timing.
@@ -57663,24 +57847,25 @@ After each call to the timeout function, the time of the next
 timeout is recalculated based on the current time and the given interval
 (it does not try to 'catch up' time lost in delays).
 
-See [memory management of sources][mainloop-memory-management] for details
+See [mainloop memory management](main-loop.html#memory-management-of-sources) for details
 on how to handle the return value and memory management of @data.
 
 If you want to have a timer in the &quot;seconds&quot; range and do not care
 about the exact time of the first call of the timer, use the
-g_timeout_add_seconds() function; this function allows for more
+[func@GLib.timeout_add_seconds] function; this function allows for more
 optimizations and more efficient system power usage.
 
-This internally creates a main loop source using g_timeout_source_new()
-and attaches it to the global #GMainContext using g_source_attach(), so
-the callback will be invoked in whichever thread is running that main
-context. You can do these steps manually if you need greater control or to
-use a custom main context.
+This internally creates a main loop source using
+[func@GLib.timeout_source_new] and attaches it to the global
+[struct@GLib.MainContext] using [method@GLib.Source.attach], so the callback
+will be invoked in whichever thread is running that main context. You can do
+these steps manually if you need greater control or to use a custom main
+context.
 
 It is safe to call this function from any thread.
 
 The interval given is in terms of monotonic time, not wall clock
-time.  See g_get_monotonic_time().
+time. See [func@GLib.get_monotonic_time].
 
 
 </description>
@@ -57718,24 +57903,26 @@ After each call to the timeout function, the time of the next
 timeout is recalculated based on the current time and the given interval
 (it does not try to 'catch up' time lost in delays).
 
-See [memory management of sources][mainloop-memory-management] for details
+See [mainloop memory management](main-loop.html#memory-management-of-sources) for details
 on how to handle the return value and memory management of @data.
 
-This internally creates a main loop source using g_timeout_source_new()
-and attaches it to the global #GMainContext using g_source_attach(), so
-the callback will be invoked in whichever thread is running that main
-context. You can do these steps manually if you need greater control or to
-use a custom main context.
+This internally creates a main loop source using
+[func@GLib.timeout_source_new] and attaches it to the global
+[struct@GLib.MainContext] using [method@GLib.Source.attach], so the callback
+will be invoked in whichever thread is running that main context. You can do
+these steps manually if you need greater control or to use a custom main
+context.
 
 The interval given is in terms of monotonic time, not wall clock time.
-See g_get_monotonic_time().
+See [func@GLib.get_monotonic_time].
 
 
 </description>
 <parameters>
 <parameter name="priority">
 <parameter_description> the priority of the timeout source. Typically this will be in
-the range between %G_PRIORITY_DEFAULT and %G_PRIORITY_HIGH.
+the range between [const@GLib.PRIORITY_DEFAULT] and
+[const@GLib.PRIORITY_HIGH].
 </parameter_description>
 </parameter>
 <parameter name="interval">
@@ -57763,12 +57950,12 @@ the range between %G_PRIORITY_DEFAULT and %G_PRIORITY_HIGH.
 <function name="g_timeout_add_once">
 <description>
 Sets a function to be called after @interval milliseconds have elapsed,
-with the default priority, %G_PRIORITY_DEFAULT.
+with the default priority, [const@GLib.PRIORITY_DEFAULT].
 
 The given @function is called once and then the source will be automatically
 removed from the main context.
 
-This function otherwise behaves like g_timeout_add().
+This function otherwise behaves like [func@GLib.timeout_add].
 
 Since: 2.74
 
@@ -57796,28 +57983,28 @@ milliseconds (1/1000ths of a second)
 <function name="g_timeout_add_seconds">
 <description>
 Sets a function to be called at regular intervals with the default
-priority, %G_PRIORITY_DEFAULT.
+priority, [const@GLib.PRIORITY_DEFAULT].
 
-The function is called repeatedly until it returns %G_SOURCE_REMOVE
+The function is called repeatedly until it returns [const@GLib.SOURCE_REMOVE]
 or %FALSE, at which point the timeout is automatically destroyed
 and the function will not be called again.
 
 This internally creates a main loop source using
-g_timeout_source_new_seconds() and attaches it to the main loop context
-using g_source_attach(). You can do these steps manually if you need
-greater control. Also see g_timeout_add_seconds_full().
+[func@GLib.timeout_source_new_seconds] and attaches it to the main loop context
+using [method@GLib.Source.attach]. You can do these steps manually if you need
+greater control. Also see [func@GLib.timeout_add_seconds_full].
 
 It is safe to call this function from any thread.
 
 Note that the first call of the timer may not be precise for timeouts
 of one second. If you need finer precision and have such a timeout,
-you may want to use g_timeout_add() instead.
+you may want to use [func@GLib.timeout_add] instead.
 
-See [memory management of sources][mainloop-memory-management] for details
+See [mainloop memory management](main-loop.html#memory-management-of-sources) for details
 on how to handle the return value and memory management of @data.
 
 The interval given is in terms of monotonic time, not wall clock
-time.  See g_get_monotonic_time().
+time. See [func@GLib.get_monotonic_time].
 
 Since: 2.14
 
@@ -57845,43 +58032,44 @@ Since: 2.14
 <description>
 Sets a function to be called at regular intervals, with @priority.
 
-The function is called repeatedly until it returns %G_SOURCE_REMOVE
+The function is called repeatedly until it returns [const@GLib.SOURCE_REMOVE]
 or %FALSE, at which point the timeout is automatically destroyed and
 the function will not be called again.
 
-Unlike g_timeout_add(), this function operates at whole second granularity.
-The initial starting point of the timer is determined by the implementation
-and the implementation is expected to group multiple timers together so that
-they fire all at the same time. To allow this grouping, the @interval to the
-first timer is rounded and can deviate up to one second from the specified
-interval. Subsequent timer iterations will generally run at the specified
-interval.
+Unlike [func@GLib.timeout_add], this function operates at whole second
+granularity. The initial starting point of the timer is determined by the
+implementation and the implementation is expected to group multiple timers
+together so that they fire all at the same time. To allow this grouping, the
+@interval to the first timer is rounded and can deviate up to one second
+from the specified interval. Subsequent timer iterations will generally run
+at the specified interval.
 
 Note that timeout functions may be delayed, due to the processing of other
 event sources. Thus they should not be relied on for precise timing.
 After each call to the timeout function, the time of the next
 timeout is recalculated based on the current time and the given @interval
 
-See [memory management of sources][mainloop-memory-management] for details
+See [mainloop memory management](main-loop.html#memory-management-of-sources) for details
 on how to handle the return value and memory management of @data.
 
-If you want timing more precise than whole seconds, use g_timeout_add()
-instead.
+If you want timing more precise than whole seconds, use
+[func@GLib.timeout_add] instead.
 
 The grouping of timers to fire at the same time results in a more power
 and CPU efficient behavior so if your timer is in multiples of seconds
 and you don't require the first timer exactly one second from now, the
-use of g_timeout_add_seconds() is preferred over g_timeout_add().
+use of [func@GLib.timeout_add_seconds] is preferred over
+[func@GLib.timeout_add].
 
-This internally creates a main loop source using 
-g_timeout_source_new_seconds() and attaches it to the main loop context 
-using g_source_attach(). You can do these steps manually if you need 
-greater control.
+This internally creates a main loop source using
+[func@GLib.timeout_source_new_seconds] and attaches it to the main loop
+context using [method@GLib.Source.attach]. You can do these steps manually
+if you need greater control.
 
 It is safe to call this function from any thread.
 
 The interval given is in terms of monotonic time, not wall clock
-time.  See g_get_monotonic_time().
+time. See [func@GLib.get_monotonic_time].
 
 Since: 2.14
 
@@ -57889,7 +58077,8 @@ Since: 2.14
 <parameters>
 <parameter name="priority">
 <parameter_description> the priority of the timeout source. Typically this will be in
-the range between %G_PRIORITY_DEFAULT and %G_PRIORITY_HIGH.
+the range between [const@GLib.PRIORITY_DEFAULT] and
+[const@GLib.PRIORITY_HIGH].
 </parameter_description>
 </parameter>
 <parameter name="interval">
@@ -57916,7 +58105,8 @@ the range between %G_PRIORITY_DEFAULT and %G_PRIORITY_HIGH.
 
 <function name="g_timeout_add_seconds_once">
 <description>
-This function behaves like g_timeout_add_once() but with a range in seconds.
+This function behaves like [func@GLib.timeout_add_once] but with a range in
+seconds.
 
 Since: 2.78
 
@@ -57944,12 +58134,12 @@ Since: 2.78
 <description>
 Creates a new timeout source.
 
-The source will not initially be associated with any #GMainContext
-and must be added to one with g_source_attach() before it will be
+The source will not initially be associated with any [struct@GLib.MainContext]
+and must be added to one with [method@GLib.Source.attach] before it will be
 executed.
 
 The interval given is in terms of monotonic time, not wall clock
-time.  See g_get_monotonic_time().
+time.  See [func@GLib.get_monotonic_time].
 
 
 </description>
@@ -57967,15 +58157,15 @@ time.  See g_get_monotonic_time().
 <description>
 Creates a new timeout source.
 
-The source will not initially be associated with any #GMainContext
-and must be added to one with g_source_attach() before it will be
-executed.
+The source will not initially be associated with any
+[struct@GLib.MainContext] and must be added to one with
+[method@GLib.Source.attach] before it will be executed.
 
 The scheduling granularity/accuracy of this timeout source will be
 in seconds.
 
 The interval given is in terms of monotonic time, not wall clock time.
-See g_get_monotonic_time().
+See [func@GLib.get_monotonic_time].
 
 Since: 2.14	
 
@@ -64817,7 +65007,7 @@ Deprecated: 2.32: Use #GArray and g_array_unref() instead.
 
 <function name="g_value_array_get_nth">
 <description>
-Return a pointer to the value at @index_ containd in @value_array.
+Return a pointer to the value at @index_ contained in @value_array.
 
 Deprecated: 2.32: Use g_array_index() instead.
 
@@ -66371,7 +66561,7 @@ calling g_variant_new() followed by g_variant_builder_add_value().
 
 Note that the arguments must be of the correct width for their types
 specified in @format_string. This can be achieved by casting them. See
-the [GVariant varargs documentation][gvariant-varargs].
+the [GVariant varargs documentation](gvariant-format-strings.html#varargs).
 
 This function might be used as follows:
 
@@ -66425,7 +66615,7 @@ g_variant_builder_add_value().
 
 Note that the arguments must be of the correct width for their types
 specified in @format_string. This can be achieved by casting them. See
-the [GVariant varargs documentation][gvariant-varargs].
+the [GVariant varargs documentation](gvariant-format-strings.html#varargs).
 
 This function might be used as follows:
 
@@ -67400,7 +67590,7 @@ The arguments that are expected by this function are entirely
 determined by @format_string.  @format_string also restricts the
 permissible types of @value.  It is an error to give a value with
 an incompatible type.  See the section on
-[GVariant format strings][gvariant-format-strings].
+[GVariant format strings](gvariant-format-strings.html).
 Please note that the syntax of the format string is very likely to be
 extended in the future.
 
@@ -67712,7 +67902,7 @@ fixed-size, as are tuples containing only other fixed-sized types.
 
 @element_size must be the size of a single element in the array,
 as given by the section on
-[serialized data memory][gvariant-serialized-data-memory].
+[serialized data memory](struct.Variant.html#serialized-data-memory).
 
 In particular, arrays of these fixed-sized types can be interpreted
 as an array of the given C type, with @element_size set to the size
@@ -68855,7 +69045,7 @@ Think of this function as an analogue to g_strdup_printf().
 
 The type of the created instance and the arguments that are expected
 by this function are determined by @format_string. See the section on
-[GVariant format strings][gvariant-format-strings]. Please note that
+[GVariant format strings](gvariant-format-strings.html). Please note that
 the syntax of the format string is very likely to be extended in the
 future.
 
@@ -68865,7 +69055,7 @@ function (and not merely passed through it unmodified).
 
 Note that the arguments must be of the correct width for their types
 specified in @format_string. This can be achieved by casting them. See
-the [GVariant varargs documentation][gvariant-varargs].
+the [GVariant varargs documentation](gvariant-format-strings.html#varargs).
 
 |[&lt;!-- language=&quot;C&quot; --&gt;
 MyFlags some_flags = FLAG_ONE | FLAG_TWO;
@@ -69375,7 +69565,7 @@ g_variant_new() would have collected.
 
 Note that the arguments must be of the correct width for their types
 specified in @format. This can be achieved by casting them. See
-the [GVariant varargs documentation][gvariant-varargs].
+the [GVariant varargs documentation](gvariant-format-strings.html#varargs).
 
 Consider this simple example:
 |[&lt;!-- language=&quot;C&quot; --&gt; 
@@ -69429,7 +69619,7 @@ additional references.
 
 Note that the arguments in @app must be of the correct width for their types
 specified in @format when collected into the #va_list. See
-the [GVariant varargs documentation][gvariant-varargs].
+the [GVariant varargs documentation](gvariant-format-strings.html#varargs).
 
 In order to behave correctly in all cases it is necessary for the
 calling function to g_variant_ref_sink() the return result before
@@ -69507,7 +69697,7 @@ Creates a string #GVariant with the contents of @string.
 
 @string must be valid UTF-8, and must not be %NULL. To encode
 potentially-%NULL strings, use g_variant_new() with `ms` as the
-[format string][gvariant-format-strings-maybe-types].
+[format string](gvariant-format-strings.html#maybe-types).
 
 Since: 2.24
 
@@ -69681,7 +69871,7 @@ pointing to the argument following the last.
 
 Note that the arguments in @app must be of the correct width for their
 types specified in @format_string when collected into the #va_list.
-See the [GVariant varargs documentation][gvariant-varargs].
+See the [GVariant varargs documentation](gvariant-format-strings.html#varargs).
 
 These two generalisations allow mixing of multiple calls to
 g_variant_new_va() and g_variant_get_va() within a single actual
@@ -69878,7 +70068,7 @@ Deprecated: Use g_variant_parse_error_quark() instead.
 <description>
 Pretty-prints @value in the format understood by g_variant_parse().
 
-The format is described [here][gvariant-text].
+The format is described [here](gvariant-text-format.html).
 
 If @type_annotate is %TRUE, then type information is included in
 the output.
@@ -71362,7 +71552,7 @@ exists and is a string, returns that.
 
 It is strongly recommended that packagers of GLib-using libraries
 for Windows do not store installation paths in the Registry to be
-used by this function as that interfers with having several
+used by this function as that interferes with having several
 parallel installations of the library. Enabling multiple
 installations of different versions of some GLib-using library, or
 GLib itself, is desirable for various reasons.
