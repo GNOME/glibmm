@@ -25,7 +25,8 @@ shopt -s nullglob # Skip a filename pattern that matches no file
 if [ $# -eq 0 ]
 then
   # Process files whose names end with .h, but not with private.h.
-  "$gen_methods" "$source_prefix"/glib/!(*private).h "$source_prefix"/glib/deprecated/!(*private).h \
+  # Exclude $source_prefix/glib/gvariant-core.h.
+  "$gen_methods" "$source_prefix"/glib/!(*private|gvariant-core).h "$source_prefix"/glib/deprecated/!(*private).h \
                  "$build_prefix"/glib/!(*private).h "$build_prefix"/glib/deprecated/!(*private).h > "$out_dir"/glib_functions.defs
   "$gen_methods" "$source_prefix"/gmodule/!(*private).h "$build_prefix"/gmodule/!(*private).h > "$out_dir"/gmodule_functions.defs
   "$gen_methods" "$source_prefix"/gobject/!(*private).h "$build_prefix"/gobject/!(*private).h > "$out_dir"/gobject_functions.defs
