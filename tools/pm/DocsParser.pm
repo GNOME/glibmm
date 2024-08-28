@@ -485,8 +485,13 @@ sub append_parameter_docs($$;$)
 
   if (scalar @docs_param_names != scalar @c_param_names)
   {
-    print STDERR "DocsParser.pm: Warning, $$obj_function{name}\n" .
-      "  Incompatible parameter lists in the docs.xml file and the methods.defs file.\n";
+    # If the last parameter in @c_param_names is an error parameter,
+    # it may be deliberately omitted in @docs_param_names.
+    if (!(scalar @c_param_names == (scalar @docs_param_names)+1 && $c_param_names[-1] eq "error"))
+    {
+      print STDERR "DocsParser.pm: Warning, $$obj_function{name}\n" .
+        "  Incompatible parameter lists in the docs.xml file and the methods.defs file.\n";
+    }
   }
 
   # Skip first param if this is a signal.
@@ -512,7 +517,6 @@ sub append_parameter_docs($$;$)
     shift(@docs_param_names);
     shift(@c_param_names);
   }
-
 
   # Skip the last param if there is a slot because it would be a
   # gpointer user_data parameter.
