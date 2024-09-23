@@ -15,11 +15,11 @@ variables:
               python3-pygments
               python3-setuptools
               python3-packaging
-              python3-pip
               libglib2.0-dev
               mm-common
               libsigc++-3.0-dev
               libxml-libxml-perl
+              meson
               ninja-build
               glib-networking
   GIO_EXTRA_MODULES: "/usr/lib/x86_64-linux-gnu/gio/modules"
@@ -29,9 +29,6 @@ variables:
   before_script:
     - export DEBIAN_FRONTEND=noninteractive
     - apt update && apt -y upgrade && apt -y install $DEPENDENCIES
-    # Ubuntu 24.04 contains meson 1.3.2, but glib requires meson >= 1.4.0.
-    # Install it with pip instead of apt.
-    - pip install "meson>=1.4.0"
 
 autotools_build:
   extends: .build_default
