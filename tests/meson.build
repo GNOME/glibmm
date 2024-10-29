@@ -43,7 +43,7 @@ test_programs = [
 ]
 
 thread_dep = dependency('threads')
-meson_backend = find_program(meson.backend(), required: true)
+#meson_backend = find_program(meson.backend(), required: true)
 
 foreach ex : test_programs
   dir = ''
@@ -69,25 +69,28 @@ foreach ex : test_programs
 
   test(ex_name, exe_file)
 
-  if ex[0][0] == 'glibmm_ustring_compare'
+# These tests have been removed. It's now possible to compare Glib::ustring with std::string.
+# See https://gitlab.gnome.org/GNOME/glibmm/-/issues/121
+
+#  if ex[0][0] == 'glibmm_ustring_compare'
 
     # Tests that shall fail to compile.
-    foreach suffix : ['1', '2']
-      ex_name_s = ex_name + suffix
-      exe_file = executable(ex_name_s, ex_sources,
-        cpp_args: ['-DGLIBMM_DISABLE_DEPRECATED', '-DGIOMM_DISABLE_DEPRECATED',
-                   '-DGLIBMM_TEST_THAT_COMPILATION_FAILS=' + suffix],
-        dependencies: mm_dep,
-        implicit_include_directories: false,
-        build_by_default: false,
-        install: false,
-      )
+#    foreach suffix : ['1', '2']
+#      ex_name_s = ex_name + suffix
+#      exe_file = executable(ex_name_s, ex_sources,
+#        cpp_args: ['-DGLIBMM_DISABLE_DEPRECATED', '-DGIOMM_DISABLE_DEPRECATED',
+#                   '-DGLIBMM_TEST_THAT_COMPILATION_FAILS=' + suffix],
+#        dependencies: mm_dep,
+#        implicit_include_directories: false,
+#        build_by_default: false,
+#        install: false,
+#      )
 
-      target_name = 'tests' / ex_name_s
-      test(ex_name_s, meson_backend,
-        args: target_name,
-        should_fail: true,
-      )
-    endforeach
-  endif
+#      target_name = 'tests' / ex_name_s
+#      test(ex_name_s, meson_backend,
+#        args: target_name,
+#        should_fail: true,
+#      )
+#    endforeach
+#  endif
 endforeach

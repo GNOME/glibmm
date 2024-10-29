@@ -85,6 +85,9 @@ main(int, char**)
 
 #else // GLIBMM_TEST_THAT_COMPILATION_FAILS
 
+  // It's now possible to compare Glib::ustring with std::string.
+  // See https://gitlab.gnome.org/GNOME/glibmm/-/issues/121
+
   // By design some combinations of std::string and Glib::ustring are not allowed.
   // Copied from ustring.h: Using the wrong string class shall not be as easy as
   // using the right string class.

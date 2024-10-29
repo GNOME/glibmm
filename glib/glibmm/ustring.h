@@ -1493,8 +1493,11 @@ swap(ustring& lhs, ustring& rhs)
 
 /**** Glib::ustring -- comparison operators ********************************/
 
+// See https://gitlab.gnome.org/GNOME/glibmm/-/issues/65
+// and https://gitlab.gnome.org/GNOME/glibmm/-/issues/121
+
 /** @relates Glib::ustring */
-template <typename T, typename = std::enable_if_t<!std::is_base_of_v<ustring, T>>>
+template <typename T, typename = std::enable_if_t<std::is_convertible_v<T, UStringView>>>
 inline bool
 operator==(const ustring& lhs, const T& rhs)
 {
@@ -1509,7 +1512,7 @@ operator==(UStringView lhs, const ustring& rhs)
 }
 
 /** @relates Glib::ustring */
-template <typename T, typename = std::enable_if_t<!std::is_base_of_v<ustring, T>>>
+template <typename T, typename = std::enable_if_t<std::is_convertible_v<T, UStringView>>>
 inline bool
 operator!=(const ustring& lhs, const T& rhs)
 {
@@ -1524,7 +1527,7 @@ operator!=(UStringView lhs, const ustring& rhs)
 }
 
 /** @relates Glib::ustring */
-template <typename T, typename = std::enable_if_t<!std::is_base_of_v<ustring, T>>>
+template <typename T, typename = std::enable_if_t<std::is_convertible_v<T, UStringView>>>
 inline bool
 operator<(const ustring& lhs, const T& rhs)
 {
@@ -1539,7 +1542,7 @@ operator<(UStringView lhs, const ustring& rhs)
 }
 
 /** @relates Glib::ustring */
-template <typename T, typename = std::enable_if_t<!std::is_base_of_v<ustring, T>>>
+template <typename T, typename = std::enable_if_t<std::is_convertible_v<T, UStringView>>>
 inline bool
 operator>(const ustring& lhs, const T& rhs)
 {
@@ -1554,7 +1557,7 @@ operator>(UStringView lhs, const ustring& rhs)
 }
 
 /** @relates Glib::ustring */
-template <typename T, typename = std::enable_if_t<!std::is_base_of_v<ustring, T>>>
+template <typename T, typename = std::enable_if_t<std::is_convertible_v<T, UStringView>>>
 inline bool
 operator<=(const ustring& lhs, const T& rhs)
 {
@@ -1569,7 +1572,7 @@ operator<=(UStringView lhs, const ustring& rhs)
 }
 
 /** @relates Glib::ustring */
-template <typename T, typename = std::enable_if_t<!std::is_base_of_v<ustring, T>>>
+template <typename T, typename = std::enable_if_t<std::is_convertible_v<T, UStringView>>>
 inline bool
 operator>=(const ustring& lhs, const T& rhs)
 {
