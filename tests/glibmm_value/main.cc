@@ -2,22 +2,18 @@
 #include <glibmm.h>
 #include <cassert>
 
+namespace Gdk { class Pixbuf; } // Incomplete type
+namespace Gtk { class Widget {}; } // Complete type
+
 struct Foo
 {
   int bar = 1;
 };
 
-namespace Gtk
-{
-
-class Widget {
-};
-
-}
-
 void
 test()
 {
+#ifndef GLIBMM_TEST_THAT_COMPILATION_FAILS
   {
     Foo foo;
 
@@ -148,13 +144,18 @@ test()
     const auto v = value.get();
     assert(v);
   }
+#else // GLIBMM_TEST_THAT_COMPILATION_FAILS
+
+  // By design it is impossible to create a Glib::Value<Glib::RefPtr<T>> of an incomplete class.
+  // See https://discourse.gnome.org/t/gtk-cellrendererpixbuf-criticals-is-this-a-gtkmm-bug/24669
+
+#if GLIBMM_TEST_THAT_COMPILATION_FAILS == 1
+  (void)Glib::Value<Glib::RefPtr<Gdk::Pixbuf>>::value_type(); // Shall not compile
+#else
+  (void)Glib::Value<Glib::RefPtr<const Gdk::Pixbuf>>::value_type(); // Shall not compile
+#endif
+#endif
 }
-
-// Glib::Object RefPtr<>
-
-// template Glib::Value< Glib::RefPtr<Gdk::Pixbuf> >;
-// template Glib::Value< Glib::RefPtr<const Gdk::Pixbuf> >;
-//
 
 int main() {
   test();

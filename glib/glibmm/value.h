@@ -275,16 +275,33 @@ struct HasGetBaseType<T, Ret(Args...)> {
   //using type = decltype(Test<T>(0));
 };
 
+template <typename T>
+struct IsIncompleteClassType
+{
+  // sizeof(U) fails if U is an incomplete type.
+  template <typename U, typename = typename std::enable_if_t<std::bool_constant<(sizeof(U) > 0)>::value>>
+  static std::false_type Test(int i);
+
+  template <typename U>
+  static std::true_type Test(...);
+
+  static const bool value = std::is_class_v<T> && decltype(Test<T>(0))::value;
+};
+
 } // namespace Traits
 
 /** Partial specialization for RefPtr<> to Glib::Object.
  * @ingroup glibmmValue
  */
 template <class T>
-class Value<Glib::RefPtr<T>, typename std::enable_if<Glib::Traits::HasGetBaseType<T, GType()>::value>::type>
+class Value<Glib::RefPtr<T>, typename std::enable_if_t<
+  Glib::Traits::HasGetBaseType<T, GType()>::value ||
+  Glib::Traits::IsIncompleteClassType<T>::value>>
 : public ValueBase_Object
 {
 public:
+  static_assert(!Glib::Traits::IsIncompleteClassType<T>::value,
+    "Incomplete class type used in Glib::Value<Glib::RefPtr<T>>.");
   using CppType = Glib::RefPtr<T>;
 
   static GType value_type() { return T::get_base_type(); }
@@ -296,7 +313,7 @@ public:
 // The SUN Forte Compiler has a problem with this:
 #ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
-/** Partial specialization for RefPtr<> to const Glib::Object.
+/* Partial specialization for RefPtr<> to const Glib::Object.
  * @ingroup glibmmValue
  */
 /*
