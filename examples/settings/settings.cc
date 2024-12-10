@@ -65,14 +65,12 @@ on_key_changed_int(const Glib::ustring& key)
 int
 main(int, char**)
 {
-  std::locale::global(std::locale(""));
   Gio::init();
 
-  // this is only a demo so we don't want to rely on an installed schema.
+  // This is only a demo so we don't want to rely on an installed schema.
   // Instead we set some environment variables that allow us to test things
-  // from the source directory.  We need to strip off the .libs/ directory
-  // first (thus the '..').  Generally you would install your schemas to the system schema
-  // directory
+  // from the build directory where the gschemas.compiled file is stored.
+  // Generally you would install your schemas to the system schema directory.
   Glib::setenv("GSETTINGS_SCHEMA_DIR", ".", true);
   Glib::setenv("GSETTINGS_BACKEND", "memory", true);
 

@@ -78,7 +78,6 @@ on_dbus_proxy_available(Glib::RefPtr<Gio::AsyncResult>& result)
 int
 main(int, char**)
 {
-  std::locale::global(std::locale(""));
   Gio::init();
 
   loop = Glib::MainLoop::create();

@@ -17,7 +17,6 @@
 #include <glibmm.h>
 #include <iomanip>
 #include <iostream>
-#include <locale>
 
 namespace
 {
@@ -51,8 +50,6 @@ show_examples()
 int
 main(int, char**)
 {
-  std::locale::global(std::locale(""));
-  std::cout.imbue(std::locale());
   Glib::init();
 
   show_examples();

@@ -144,7 +144,6 @@ on_name_lost(const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::
 int
 main(int, char**)
 {
-  std::locale::global(std::locale(""));
   Gio::init();
 
   try

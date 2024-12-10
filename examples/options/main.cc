@@ -199,13 +199,10 @@ int
 main(int argc, char** argv)
 {
   // This example should be executed like so:
-  //./example --foo=1 --bar=2 --goo=abc
+  //./example --foo=1 --activate_something --goo=abc
   //./example --help
 
   Glib::init();
-
-  // Set up the current locale.
-  setlocale(LC_ALL, "");
 
   Glib::OptionContext context;
 

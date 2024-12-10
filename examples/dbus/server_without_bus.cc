@@ -162,7 +162,6 @@ on_server_new_connection(const Glib::RefPtr<Gio::DBus::Connection>& connection)
 int
 main(int, char**)
 {
-  std::locale::global(std::locale(""));
   Gio::init();
 
   try
