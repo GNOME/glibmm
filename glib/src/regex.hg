@@ -44,7 +44,7 @@ class MatchInfo;
  * syntax and semantics similar to Perl regular expression.
  *
  * Some functions accept a start_position argument, setting it differs from just
- * passing over a shortened string and setting REGEX_MATCH_NOTBOL in the case
+ * passing over a shortened string and setting Glib::Regex::MatchFlags::NOTBOL in the case
  * of a pattern that begins with any kind of lookbehind assertion. For example,
  * consider the pattern "\Biss\B" which finds occurrences of "iss" in the middle
  * of words. ("\B" matches only if the current position in the subject is not a
@@ -55,11 +55,11 @@ class MatchInfo;
  * second occurrence of "iss" because it is able to look behind the starting point
  * to discover that it is preceded by a letter.
  *
- * Note that, unless you set the REGEX_RAW flag, all the strings passed to these
+ * Note that, unless you set the Glib::Regex::CompileFlags::RAW flag, all the strings passed to these
  * functions must be encoded in UTF-8. The lengths and the positions inside the
  *  strings are in bytes and not in characters, so, for instance,
  * "\xc3\xa0" (i.e. "à") is two bytes long but it is treated as a single
- * character. If you set REGEX_RAW the strings can be non-valid UTF-8 strings
+ * character. If you set Glib::Regex::CompileFlags::RAW the strings can be non-valid UTF-8 strings
  * and a byte is treated as a character, so "\xc3\xa0" is two bytes and
  * two characters long.
  *
@@ -73,11 +73,11 @@ class MatchInfo;
  *
  * The behaviour of the dot, circumflex, and dollar metacharacters are affected
  * by newline characters, the default is to recognize any newline character (the
- * same characters recognized by "\R"). This can be changed with REGEX_NEWLINE_CR,
- * REGEX_NEWLINE_LF and REGEX_NEWLINE_CRLF compile options, and with
- * REGEX_MATCH_NEWLINE_ANY, REGEX_MATCH_NEWLINE_CR, REGEX_MATCH_NEWLINE_LF
- * and REGEX_MATCH_NEWLINE_CRLF match options. These settings are also
- * relevant when compiling a pattern if REGEX_EXTENDED is set, and an unescaped
+ * same characters recognized by "\R"). This can be changed with Glib::Regex::CompileFlags::NEWLINE_CR,
+ * Glib::Regex::CompileFlags::NEWLINE_LF and Glib::Regex::CompileFlags::NEWLINE_CRLF compile options, and with
+ * Glib::Regex::MatchFlags::NEWLINE_ANY, Glib::Regex::MatchFlags::NEWLINE_CR, Glib::Regex::MatchFlags::NEWLINE_LF
+ * and Glib::Regex::MatchFlags::NEWLINE_CRLF match options. These settings are also
+ * relevant when compiling a pattern if Glib::Regex::CompileFlags::EXTENDED is set, and an unescaped
  * "#" outside a character class is encountered. This indicates a comment that
  * lasts until after the next newline.
  *
@@ -100,7 +100,9 @@ public:
   _WRAP_ENUM(MatchFlags, GRegexMatchFlags, NO_GTYPE, decl_prefix GLIBMM_API)
 
   /// @throws Glib::RegexError
-  static Glib::RefPtr<Glib::Regex> create(Glib::UStringView pattern, CompileFlags compile_options = static_cast<CompileFlags>(0), MatchFlags match_options = static_cast<MatchFlags>(0));
+  static Glib::RefPtr<Glib::Regex> create(Glib::UStringView pattern,
+    CompileFlags compile_options = CompileFlags::DEFAULT,
+    MatchFlags match_options = MatchFlags::DEFAULT);
 
   _WRAP_METHOD(Glib::ustring get_pattern() const, g_regex_get_pattern)
   _WRAP_METHOD(int get_max_backref() const, g_regex_get_max_backref)
@@ -113,17 +115,19 @@ public:
 
   static Glib::ustring escape_string(const Glib::ustring& string);
 
-  _WRAP_METHOD(static bool match_simple(Glib::UStringView pattern, Glib::UStringView string, CompileFlags compile_options = static_cast<CompileFlags>(0), MatchFlags match_options = static_cast<MatchFlags>(0)), g_regex_match_simple)
+  _WRAP_METHOD(static bool match_simple(Glib::UStringView pattern, Glib::UStringView string,
+    CompileFlags compile_options = CompileFlags::DEFAULT,
+    MatchFlags match_options = MatchFlags::DEFAULT), g_regex_match_simple)
 
   _WRAP_METHOD_DOCS_ONLY(g_regex_match)
   bool match(
     Glib::UStringView string,
     Glib::MatchInfo& match_info,
-    MatchFlags match_options = static_cast<MatchFlags>(0)
+    MatchFlags match_options = MatchFlags::DEFAULT
   );
 
   /// A match() method not requiring a Glib::MatchInfo.
-  bool match(Glib::UStringView string, MatchFlags match_options = static_cast<MatchFlags>(0));
+  bool match(Glib::UStringView string, MatchFlags match_options = MatchFlags::DEFAULT);
 
   /** A match() method with a start position and a Glib::MatchInfo.
    * @throws Glib::RegexError
@@ -132,7 +136,7 @@ public:
     Glib::UStringView string,
     int start_position,
     Glib::MatchInfo& match_info,
-    MatchFlags match_options = static_cast<MatchFlags>(0)
+    MatchFlags match_options = MatchFlags::DEFAULT
   );
 
   _WRAP_METHOD_DOCS_ONLY(g_regex_match_full, errthrow "Glib::RegexError")
@@ -141,7 +145,7 @@ public:
     gssize string_len,
     int start_position,
     Glib::MatchInfo& match_info,
-    MatchFlags match_options = static_cast<MatchFlags>(0)
+    MatchFlags match_options = MatchFlags::DEFAULT
   );
 
   /** A match() method with a start position not requiring a Glib::MatchInfo.
@@ -158,11 +162,11 @@ public:
   bool match_all(
     Glib::UStringView string,
     Glib::MatchInfo& match_info,
-    MatchFlags match_options = static_cast<MatchFlags>(0)
+    MatchFlags match_options = MatchFlags::DEFAULT
   );
 
   /// A match_all() method not requiring a Glib::MatchInfo.
-  bool match_all(Glib::UStringView string, MatchFlags match_options = static_cast<MatchFlags>(0));
+  bool match_all(Glib::UStringView string, MatchFlags match_options = MatchFlags::DEFAULT);
 
   /** A match_all() method with a start positon and a Glib::MatchInfo.
    * @throws Glib::RegexError
@@ -171,7 +175,7 @@ public:
     Glib::UStringView string,
     int start_position,
     Glib::MatchInfo& match_info,
-    MatchFlags match_options = static_cast<MatchFlags>(0)
+    MatchFlags match_options = MatchFlags::DEFAULT
   );
 
   _WRAP_METHOD_DOCS_ONLY(g_regex_match_all_full, errthrow "Glib::RegexError")
@@ -180,7 +184,7 @@ public:
     gssize string_len,
     int start_position,
     Glib::MatchInfo& match_info,
-    MatchFlags match_options = static_cast<MatchFlags>(0)
+    MatchFlags match_options = MatchFlags::DEFAULT
   );
 
   /** A match_all() method with a start position not requiring a Glib::MatchInfo.
@@ -195,24 +199,36 @@ public:
   bool match_all(Glib::UStringView string, gssize string_len, int start_position, MatchFlags match_options);
 
 #m4 _CONVERSION(`gchar**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
-  _WRAP_METHOD(static std::vector<Glib::ustring> split_simple(Glib::UStringView pattern, Glib::UStringView string, CompileFlags compile_options = static_cast<CompileFlags>(0), MatchFlags match_options = static_cast<MatchFlags>(0)), g_regex_split_simple)
-  _WRAP_METHOD(std::vector<Glib::ustring> split(Glib::UStringView string, MatchFlags match_options = static_cast<MatchFlags>(0)), g_regex_split)
+  _WRAP_METHOD(static std::vector<Glib::ustring> split_simple(Glib::UStringView pattern,
+    Glib::UStringView string, CompileFlags compile_options = CompileFlags::DEFAULT,
+    MatchFlags match_options = MatchFlags::DEFAULT), g_regex_split_simple)
+  _WRAP_METHOD(std::vector<Glib::ustring> split(Glib::UStringView string,
+    MatchFlags match_options = MatchFlags::DEFAULT), g_regex_split)
 
-  _WRAP_METHOD(std::vector<Glib::ustring> split(const gchar* string, gssize string_len, int start_position, MatchFlags match_options = static_cast<MatchFlags>(0), int max_tokens = 0) const, g_regex_split_full, errthrow "Glib::RegexError")
+  _WRAP_METHOD(std::vector<Glib::ustring> split(const gchar* string, gssize string_len,
+    int start_position, MatchFlags match_options = MatchFlags::DEFAULT, int max_tokens = 0) const,
+    g_regex_split_full, errthrow "Glib::RegexError")
 
   /// @throws Glib::RegexError
   std::vector<Glib::ustring> split(Glib::UStringView string, int start_position, MatchFlags match_options, int max_tokens) const;
 
-  _WRAP_METHOD(Glib::ustring replace(const gchar* string, gssize string_len, int start_position, Glib::UStringView replacement, MatchFlags match_options = static_cast<MatchFlags>(0)), g_regex_replace, errthrow "Glib::RegexError")
+  _WRAP_METHOD(Glib::ustring replace(const gchar* string, gssize string_len, int start_position,
+    Glib::UStringView replacement, MatchFlags match_options = MatchFlags::DEFAULT),
+    g_regex_replace, errthrow "Glib::RegexError")
   /// @throws Glib::RegexError
   Glib::ustring replace(Glib::UStringView string, int start_position, Glib::UStringView replacement, MatchFlags match_options);
 
-  _WRAP_METHOD(Glib::ustring replace_literal(const gchar *string, gssize string_len, int start_position, Glib::UStringView replacement, MatchFlags match_options = static_cast<MatchFlags>(0)), g_regex_replace_literal, errthrow "Glib::RegexError")
+  _WRAP_METHOD(Glib::ustring replace_literal(const gchar *string, gssize string_len,
+    int start_position, Glib::UStringView replacement, MatchFlags match_options = MatchFlags::DEFAULT),
+    g_regex_replace_literal, errthrow "Glib::RegexError")
   /// @throws Glib::RegexError
   Glib::ustring replace_literal(Glib::UStringView string, int start_position, Glib::UStringView replacement, MatchFlags match_options);
 
-  _WRAP_METHOD(Glib::ustring replace_eval(Glib::UStringView string, gssize string_len, int start_position, MatchFlags match_options, GRegexEvalCallback eval,  gpointer user_data), g_regex_replace_eval, errthrow "Glib::RegexError")
-  _WRAP_METHOD(static bool check_replacement(Glib::UStringView replacement, gboolean* has_references), g_regex_check_replacement, errthrow "Glib::RegexError")
+  _WRAP_METHOD(Glib::ustring replace_eval(Glib::UStringView string, gssize string_len,
+    int start_position, MatchFlags match_options, GRegexEvalCallback eval,  gpointer user_data),
+    g_regex_replace_eval, errthrow "Glib::RegexError")
+  _WRAP_METHOD(static bool check_replacement(Glib::UStringView replacement, gboolean* has_references),
+    g_regex_check_replacement, errthrow "Glib::RegexError")
 };
 
 //TODO: Add C++ iterator like functionality for this class.
@@ -269,7 +285,8 @@ public:
   _WRAP_METHOD(int get_match_count() const, g_match_info_get_match_count)
   _WRAP_METHOD(bool is_partial_match() const, g_match_info_is_partial_match)
 
-  _WRAP_METHOD(Glib::ustring expand_references(Glib::UStringView string_to_expand), g_match_info_expand_references, errthrow "Glib::RegexError")
+  _WRAP_METHOD(Glib::ustring expand_references(Glib::UStringView string_to_expand),
+    g_match_info_expand_references, errthrow "Glib::RegexError")
 
   _WRAP_METHOD(Glib::ustring fetch(int match_num), g_match_info_fetch)
 

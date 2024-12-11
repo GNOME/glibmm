@@ -175,7 +175,7 @@ struct IteratorTraits<const T*>
  * pointing into the same string.
  *
  * The Glib::ustring iterated over must contain only valid UTF-8 data.
- * If it does not, operator++(), operator-\-() and operator*() may make
+ * If it does not, operator++(), operator\--() and operator*() may make
  * accesses outside the bounds of the string. A loop such as the following
  * one would not stop at the end of the string.
  * @code

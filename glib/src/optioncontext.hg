@@ -25,19 +25,21 @@ _DEFS(glibmm,glib)
 extern "C" { typedef struct _GOptionContext GOptionContext; }
 #endif
 
-
 namespace Glib
 {
+/*! @example options/main.cc
+ * An example with Glib::OptionContext, Glib::OptionGroup and Glib::OptionEntry.
+ */
 
 /** Exception class for options.
  */
 _WRAP_GERROR(OptionError, GOptionError, G_OPTION_ERROR, NO_GTYPE, decl_prefix GLIBMM_API)
 
-/** An OptionContext defines and parses commandline options, using OptionGroup%s and \link OptionEntry option entries \endlink.
+/** An %OptionContext defines and parses commandline options, using OptionGroup%s and \link OptionEntry option entries \endlink.
  *
  * It supports short and long commandline options, as shown in the following example:
  *
- * <tt>testtreemodel -r 1 --max-size 20 --rand --display=:1.0 -vb -- file1 file2</tt>
+ * <tt>testtreemodel -r 1 \--max-size 20 \--rand \--display=:1.0 -vb \-- file1 file2</tt>
  *
  * The example demonstrates a number of features of the GOption
  * commandline parser:
@@ -54,34 +56,32 @@ _WRAP_GERROR(OptionError, GOptionError, G_OPTION_ERROR, NO_GTYPE, decl_prefix GL
  *   any remaining arguments (even those starting with a dash) are returned
  *   to the application as rest arguments.
  *
- * The OptionContext groups options in OptionGroups, which makes it easy to
+ * The %OptionContext groups options in OptionGroups, which makes it easy to
  * incorporate options from multiple sources. The intended use for this is
  * to let applications collect option groups from the libraries it uses,
- * add them to their OptionContext, and parse all options by a single call
+ * add them to their %OptionContext, and parse all options by a single call
  * to parse(). See Gtk::Main::add_gtk_option_group(), for an example.
  *
  * Add options by creating OptionEntry instances and appropriately-typed variables,
  * and adding them to an OptionGroup with OptionGroup::add_entry() or
  * OptionGroup::add_entry_filename(). The option group should then be added to
- * the OptionContext with set_main_group() or add_group().
+ * the %OptionContext with set_main_group() or add_group().
  *
  * You might find it convenient to derive your own class from OptionGroup to
  * contain these OptionEntry instances and member variables.
  *
  * If an option is of type string (see OptionGroup::add_entry()) or filename
- * (see OptionGroup::add_entry_filename()), OptionContext takes
+ * (see OptionGroup::add_entry_filename()), %OptionContext takes
  * care of converting it to the right encoding. strings are returned in
  * UTF-8 encoding and filenames are returned in the GLib filename encoding.
  * Note that this only works if setlocale() has been called before
  * OptionContext::parse().
  *
- * OptionContext can automatically generate nicely formatted help output. Unless it is
+ * %OptionContext can automatically generate nicely formatted help output. Unless it is
  * explicitly turned off with set_help_enabled(), this will recognize
- * the --help, -?, --help-all and --help-groupname options
+ * the \--help, -?, \--help-all and \--help-groupname options
  * (where groupname is the name of an OptionGroup) and write suitable text to
  * stdout.
- *
- *
  */
 class GLIBMM_API OptionContext
 {
@@ -90,7 +90,7 @@ class GLIBMM_API OptionContext
 public:
 
   /** Creates a new option context.
-   * @param parameter_string A string which is displayed in the first line of --help output, after programname [OPTION...]
+   * @param parameter_string A string which is displayed in the first line of \--help output, after programname [OPTION...]
    */
   explicit OptionContext(const Glib::ustring& parameter_string = {});
 
@@ -158,7 +158,7 @@ public:
   _IGNORE(g_option_context_add_group)
 
   /** Sets an OptionGroup as the main group of the context. This has the same effect as calling add_group(), the only
-   * difference is that the options in the main group are treated differently when generating --help output.
+   * difference is that the options in the main group are treated differently when generating \--help output.
    * Note that the group will not be copied, so it should exist for as long as the context exists.
    *
    * @param group The group to add.
@@ -172,16 +172,26 @@ public:
   _IGNORE(g_option_context_get_main_group)
 
   #m4 _CONVERSION(`const OptionGroup&',`GOptionGroup*',`const_cast<GOptionGroup*>(($3).gobj())')
+  /** Returns a formatted, translated help text for the given context.
+   *
+   * - To obtain the text produced by \--help, call get_help(true).
+   * - To obtain the text produced by \--help-all, call get_help(false).
+   * - To obtain the help text for an option group, call get_help(false, group).
+   *
+   * @param main_help If <tt>true</tt>, only include the main group.
+   * @param group The OptionGroup to create help for.
+   * @result A string containing the help text.
+   */
   _WRAP_METHOD(Glib::ustring get_help(bool main_help, const OptionGroup& group) const, g_option_context_get_help)
 
   /** Returns a formatted, translated help text for the given context.
    *
-   * - To obtain the text produced by --help, call get_help(true).
-   * - To obtain the text produced by --help-all, call get_help(false).
+   * - To obtain the text produced by \--help, call get_help(true).
+   * - To obtain the text produced by \--help-all, call get_help(false).
    * - To obtain the help text for an option group, call get_help(false, group).
    *
-   * @param main_help If true, only include the main group.
-   * @result string containing the help text.
+   * @param main_help If <tt>true</tt>, only include the main group.
+   * @result A string containing the help text.
    */
   Glib::ustring get_help(bool main_help = true) const;
 
@@ -196,14 +206,14 @@ public:
   _WRAP_METHOD(void set_translation_domain(const Glib::ustring& domain), g_option_context_set_translation_domain)
 
   /**
-   * This function is used to translate user-visible strings, for --help output.
+   * This function is used to translate user-visible strings, for \--help output.
    * The function takes an untranslated string and returns a translated string
    */
   using SlotTranslate = sigc::slot<Glib::ustring(const Glib::ustring&)>;
 
   /**
    * Sets the function which is used to translate user-visible
-   * strings, for --help output.  Different groups can use different functions.
+   * strings, for \--help output.  Different groups can use different functions.
    *
    * If you are using gettext(), you only need to set the translation domain,
    * see set_translation_domain().
@@ -219,6 +229,4 @@ protected:
   bool has_ownership_;
 };
 
-
 } // namespace Glib
-

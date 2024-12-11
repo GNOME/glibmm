@@ -23,6 +23,9 @@
 
 namespace Glib
 {
+/*! @example properties/properties_example.cc
+ * A Glib::Property example.
+ */
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
