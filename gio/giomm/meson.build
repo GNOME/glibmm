@@ -381,7 +381,7 @@ endif
 pkgconfig.generate(
   giomm_library,
   name: 'giomm',
-  url: 'https://www.gtkmm.org/',
+  url: 'https://gtkmm.gnome.org/',
   description: 'C++ wrapper for gio',
   filebase: giomm_pcname,
   requires: ['gio-2.0', glibmm_pcname],

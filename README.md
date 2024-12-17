@@ -7,7 +7,7 @@ glibmm-2.4 and glibmm-2.68 are different parallel-installable ABIs.
 This file describes glibmm-2.68.
 
 Web site
- - https://www.gtkmm.org
+ - https://gtkmm.gnome.org
 
 Download location
  - https://download.gnome.org/sources/glibmm

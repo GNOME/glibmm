@@ -327,7 +327,7 @@ pkgconfig.generate(
   filebase: glibmm_pcname,
   requires: ['gobject-2.0', 'sigc++-3.0'],
   subdirs: glibmm_pcname,
-  url: 'https://www.gtkmm.org/',
+  url: 'https://gtkmm.gnome.org/',
   extra_cflags: '-I${libdir}/@0@/include'.format(glibmm_pcname),
   variables: base_pkgconfig_vars + [
     'gmmprocdir=${libdir}/@0@/proc'.format(glibmm_pcname),

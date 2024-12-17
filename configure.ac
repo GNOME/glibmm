@@ -17,7 +17,7 @@
 
 AC_INIT([glibmm], [2.82.0],
         [https://gitlab.gnome.org/GNOME/glibmm/issues],
-        [glibmm], [https://www.gtkmm.org/])
+        [glibmm], [https://gtkmm.gnome.org/])
 AC_PREREQ([2.59])
 
 AC_CONFIG_SRCDIR([glib/glibmm.h])
