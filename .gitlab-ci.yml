@@ -1,10 +1,18 @@
-# 2024-10-29: ubuntu:latest = 24.04, ubuntu:rolling = 24.10, ubuntu:devel = ?
+# 2025-01-15: ubuntu:latest = 24.04, ubuntu:rolling = 24.10, ubuntu:devel = 25.04
 # See https://hub.docker.com/_/ubuntu
 image: ubuntu:rolling
+
+include:
+  - component: "gitlab.gnome.org/GNOME/citemplates/release-service@master"
+    inputs:
+      job-stage: "release"
+      dist-job-name: "build_release_tarball"
+      tarball-artifact-path: "_build/meson-dist/${CI_PROJECT_NAME}-${CI_COMMIT_TAG}.tar.xz"
 
 stages:
   - build
   - deploy
+  - release
 
 variables:
   MESON_DEPS: g++
@@ -18,10 +26,14 @@ variables:
               libglib2.0-dev
               mm-common
               libsigc++-3.0-dev
+              libsigc++-3.0-doc
               libxml-libxml-perl
               meson
               ninja-build
               glib-networking
+
+  GLIB_MESON_OPTIONS: -Dglib:tests=false
+
   GIO_EXTRA_MODULES: "/usr/lib/x86_64-linux-gnu/gio/modules"
   GIT_SUBMODULE_STRATEGY: normal
 
@@ -60,7 +72,7 @@ debug_gcc_build:
     # -Ddebug=true + -Doptimization=0 correspond to -Dbuildtype=debug
     # Don't use warning_level and werror. They are applied also to subprojects.
     # meson setup --prefix=/usr --libdir=lib -Ddebug=true -Doptimization=0 -Dwarnings=fatal -Dwarning_level=3 -Dwerror=true
-    - meson setup --prefix=/usr --libdir=lib -Ddebug=true -Doptimization=0 -Dwarnings=fatal
+    - meson setup --prefix=/usr --libdir=lib -Ddebug=true -Doptimization=0 -Dwarnings=fatal $GLIB_MESON_OPTIONS
     - meson compile
     # Must wrap the command in single quotes because of the colon.
     # See https://gitlab.gnome.org/help/ci/yaml/script.md#use-special-characters-with-script
@@ -84,7 +96,7 @@ release_gcc_build:
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     # Don't use warning_level and werror. They are applied also to subprojects.
     # meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal -Dwarning_level=3 -Dwerror=true
-    - meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
+    - meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal $GLIB_MESON_OPTIONS
     - meson compile
     - 'meson test --suite glibmm:'
     - meson install --quiet
@@ -104,7 +116,7 @@ release_clang_build:
     # Accept warnings. See https://gitlab.gnome.org/GNOME/glibmm/-/issues/98
     # Don't use warning_level and werror. They are applied also to subprojects.
     # CC=clang CXX=clang++ meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max -Dwarning_level=3
-    - CC=clang CXX=clang++ meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max
+    - CC=clang CXX=clang++ meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max $GLIB_MESON_OPTIONS
     - meson compile
     - 'meson test --suite glibmm:'
     - meson install --quiet
@@ -126,6 +138,28 @@ pages:
   artifacts:
     paths:
       - public
-  only:
-    refs:
-      - master
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+build_release_tarball:
+  extends: .build_default
+  stage: build
+  needs: []
+  rules:
+    - if: $CI_COMMIT_TAG  # Run this job when a tag is created
+    - when: manual        # and when manually triggered.
+      allow_failure: true # Don't block the CI pipeline until triggered.
+  variables:
+    DEPENDENCIES: $MESON_DEPS
+  script:
+    - mkdir _build && cd _build
+    # Don't use warning_level and werror. They are applied also to subprojects.
+    - meson setup --buildtype=release $GLIB_MESON_OPTIONS
+    # Must compile before 'meson dist' to generate source code and documentation.
+    - meson compile
+    - meson dist
+  artifacts:
+    name: "${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
+    when: always
+    paths:
+      - "_build/meson-dist/*.tar.xz"
