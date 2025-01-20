@@ -1,0 +1,143 @@
+# 2025-01-15: ubuntu:latest = 24.04, ubuntu:rolling = 24.10, ubuntu:devel = 25.04
+# See https://hub.docker.com/_/ubuntu
+image: ubuntu:rolling
+
+include:
+  - component: "gitlab.gnome.org/GNOME/citemplates/release-service@master"
+    inputs:
+      job-stage: "release"
+      dist-job-name: "build_release_tarball"
+      tarball-artifact-path: "_build/meson-dist/${CI_PROJECT_NAME}-${CI_COMMIT_TAG}.tar.xz"
+
+stages:
+  - build
+  - deploy
+  - release
+
+variables:
+  MESON_DEPS: g++
+              gettext
+              git
+              yelp-tools
+              gtk-doc-tools
+              python3-pygments
+              python3-setuptools
+              python3-packaging
+              libglib2.0-dev
+              mm-common
+              libsigc++-2.0-dev
+              libxml-libxml-perl
+              meson
+              ninja-build
+              glib-networking
+
+  GLIB_MESON_OPTIONS: -Dglib:tests=false
+
+  GIO_EXTRA_MODULES: "/usr/lib/x86_64-linux-gnu/gio/modules"
+  GIT_SUBMODULE_STRATEGY: normal
+
+.build_default:
+  before_script:
+    - export DEBIAN_FRONTEND=noninteractive
+    - apt update && apt -y upgrade && apt -y install $DEPENDENCIES
+
+autotools_build:
+  extends: .build_default
+  stage: build
+  variables:
+    DEPENDENCIES: $MESON_DEPS make autoconf
+  script:
+    # Don't try to build with Autotools if the image's version of glib is too old.
+    # Meson can build glib as a subproject, but Autotools has no subprojects.
+    - glib_required=`sed -n '/glibreq=/ s/.*\(2\.[0-9]*\.[0-9]*\).*/\1/p' configure.ac`
+    - glib_exists=`pkg-config --modversion glib-2.0`
+    - if test $glib_required '>' $glib_exists; then
+    - echo GLib $glib_exists exists, $glib_required required. Skip building with Autotools.
+    - else
+    - ./autogen.sh --enable-warnings=fatal --prefix=/usr
+    - make
+    - make check
+    - make install
+    - fi
+  allow_failure: true
+
+release_gcc_build:
+  extends: .build_default
+  stage: build
+  variables:
+    DEPENDENCIES: $MESON_DEPS
+  script:
+    - mkdir _build && cd _build
+    # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
+    # Don't use warning_level and werror. They are applied also to subprojects.
+    # meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal -Dwarning_level=3 -Dwerror=true
+    - meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal $GLIB_MESON_OPTIONS
+    - meson compile
+    # Must wrap the command in single quotes because of the colon.
+    # See https://gitlab.gnome.org/help/ci/yaml/script.md#use-special-characters-with-script
+    # Don't test subprojects.
+    - 'meson test --suite glibmm:'
+    - meson install --quiet
+  artifacts:
+    when: always
+    paths:
+      - _build/docs/reference
+
+release_clang_build:
+  extends: .build_default
+  stage: build
+  variables:
+    DEPENDENCIES: $MESON_DEPS clang
+  script:
+    - mkdir _build && cd _build
+    # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
+    # Accept warnings. See https://gitlab.gnome.org/GNOME/glibmm/-/issues/98
+    # Don't use warning_level and werror. They are applied also to subprojects.
+    # CC=clang CXX=clang++ meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max -Dwarning_level=3
+    - CC=clang CXX=clang++ meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max $GLIB_MESON_OPTIONS
+    - meson compile
+    - 'meson test --suite glibmm:'
+    - meson install --quiet
+  allow_failure: true
+  artifacts:
+    when: on_failure
+    paths:
+      - _build/meson-logs/testlog.txt
+      - _build/meson-logs/meson-log.txt
+    expire_in: 1 week
+
+# Publish reference documentation at gnome.pages.gitlab.gnome.org/glibmm
+pages:
+  stage: deploy
+  needs: [release_gcc_build]
+  script:
+    - mkdir public
+    - mv _build/docs/reference/html/* public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+build_release_tarball:
+  extends: .build_default
+  stage: build
+  needs: []
+  rules:
+    - if: $CI_COMMIT_TAG  # Run this job when a tag is created
+    - when: manual        # and when manually triggered.
+      allow_failure: true # Don't block the CI pipeline until triggered.
+  variables:
+    DEPENDENCIES: $MESON_DEPS
+  script:
+    - mkdir _build && cd _build
+    # Don't use warning_level and werror. They are applied also to subprojects.
+    - meson setup --buildtype=release $GLIB_MESON_OPTIONS
+    # Must compile before 'meson dist' to generate source code and documentation.
+    - meson compile
+    - meson dist
+  artifacts:
+    name: "${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
+    when: always
+    paths:
+      - "_build/meson-dist/*.tar.xz"
