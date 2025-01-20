@@ -4,7 +4,7 @@
 #        generate_binding_py, handle_built_files_py, m4_files, pm_files,
 #        glibmm_libversion, install_includedir, python3, glibmm_rc, gmmproc_dir,
 #        is_host_windows, gmmproc, generate_wrap_init_pl, glibmm_libname,
-#        macos_darwin_versions, can_add_dist_script
+#        macos_darwin_versions
 # Output: glibmm_hg_ccg_basenames, glibmm_extra_h_files, built_files_root,
 #         glibmm_built_h_file_targets, glibmm_h_m4_files, glibmm_own_dep
 
@@ -345,21 +345,19 @@ meson.add_install_script(
   glibmm_h_m4_files,
 )
 
-if can_add_dist_script
-  # Distribute built files.
-  meson.add_dist_script(
-    python3, generate_binding_py, 'dist_built_files',
-    built_h_cc_dir,
-    untracked_glibmm,
-    glibmm_hg_ccg_basenames,
-  )
-  meson.add_dist_script(
-    python3, handle_built_files_py, 'dist_built_files',
-    built_h_cc_dir,
-    untracked_glibmm,
-    glibmm_h_m4_files + glibmm_cc_m4_files,
-  )
-endif
+# Distribute built files.
+meson.add_dist_script(
+  python3, generate_binding_py, 'dist_built_files',
+  built_h_cc_dir,
+  untracked_glibmm,
+  glibmm_hg_ccg_basenames,
+)
+meson.add_dist_script(
+  python3, handle_built_files_py, 'dist_built_files',
+  built_h_cc_dir,
+  untracked_glibmm,
+  glibmm_h_m4_files + glibmm_cc_m4_files,
+)
 
 # This is used when building example programs and test programs.
 # It's also a part of glibmm_dep, when glibmm is a subproject.
