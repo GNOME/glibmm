@@ -156,8 +156,14 @@ build_release_tarball:
     - when: manual        # and when manually triggered.
       allow_failure: true # Don't block the CI pipeline until triggered.
   variables:
-    DEPENDENCIES: $MESON_DEPS
+    DEPENDENCIES: $MESON_DEPS wget
   script:
+    # Get libsigc++'s Doxygen tag file. It's published with the reference documentation.
+    - DOXYTAG_PATH=$(pkg-config --variable=doxytagfile sigc++-3.0)
+    - DOXYTAG_FILE=$(basename $DOXYTAG_PATH)
+    - DOXYTAG_DIR=$(dirname $DOXYTAG_PATH)
+    - mkdir --parents $DOXYTAG_DIR
+    - wget --timeout=120 --tries=2 --no-clobber --directory-prefix=$DOXYTAG_DIR $(pkg-config --variable=htmlrefpub sigc++-3.0)/$DOXYTAG_FILE || true
     - mkdir _build && cd _build
     # Don't use warning_level and werror. They are applied also to subprojects.
     - meson setup --buildtype=release $GLIB_MESON_OPTIONS
