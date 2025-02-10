@@ -641,15 +641,6 @@ Since: 2.28
 
 </description>
 <parameters>
-<parameter name="G_APPLICATION_FLAGS_NONE">
-<parameter_description> Default. Deprecated in 2.74, use
-%G_APPLICATION_DEFAULT_FLAGS instead
-</parameter_description>
-</parameter>
-<parameter name="G_APPLICATION_DEFAULT_FLAGS">
-<parameter_description> Default flags. Since: 2.74
-</parameter_description>
-</parameter>
 <parameter name="G_APPLICATION_IS_SERVICE">
 <parameter_description> Run as a service. In this mode, registration
 fails if the service is already running, and the application
@@ -3800,6 +3791,13 @@ The underlying base stream on which the I/O ops will be done.
 <property name="GFilterInputStream:close-base-stream">
 <description>
 Whether the base stream should be closed when the filter stream is closed.
+
+</description>
+</property>
+
+<property name="GFilterOutputStream:base-stream">
+<description>
+The underlying base stream on which the I/O ops will be done.
 
 </description>
 </property>
@@ -8243,7 +8241,7 @@ Since: 2.20
 
 <signal name="GUnixMountMonitor::mountpoints-changed">
 <description>
-Emitted when the unix mount points have changed.
+Emitted when the Unix mount points have changed.
 
 </description>
 <parameters>
@@ -8257,7 +8255,7 @@ Emitted when the unix mount points have changed.
 
 <signal name="GUnixMountMonitor::mounts-changed">
 <description>
-Emitted when the unix mounts have changed.
+Emitted when the Unix mount entries have changed.
 
 </description>
 <parameters>
@@ -8271,60 +8269,60 @@ Emitted when the unix mounts have changed.
 
 <enum name="GUnixMountType">
 <description>
-Types of UNIX mounts.
+Types of Unix mounts.
 
 </description>
 <parameters>
 <parameter name="G_UNIX_MOUNT_TYPE_UNKNOWN">
-<parameter_description> Unknown UNIX mount type.
+<parameter_description> Unknown Unix mount type.
 </parameter_description>
 </parameter>
 <parameter name="G_UNIX_MOUNT_TYPE_FLOPPY">
-<parameter_description> Floppy disk UNIX mount type.
+<parameter_description> Floppy disk Unix mount type.
 </parameter_description>
 </parameter>
 <parameter name="G_UNIX_MOUNT_TYPE_CDROM">
-<parameter_description> CDROM UNIX mount type.
+<parameter_description> CDROM Unix mount type.
 </parameter_description>
 </parameter>
 <parameter name="G_UNIX_MOUNT_TYPE_NFS">
-<parameter_description> Network File System (NFS) UNIX mount type.
+<parameter_description> Network File System (NFS) Unix mount type.
 </parameter_description>
 </parameter>
 <parameter name="G_UNIX_MOUNT_TYPE_ZIP">
-<parameter_description> ZIP UNIX mount type.
+<parameter_description> ZIP Unix mount type.
 </parameter_description>
 </parameter>
 <parameter name="G_UNIX_MOUNT_TYPE_JAZ">
-<parameter_description> JAZZ UNIX mount type.
+<parameter_description> JAZZ Unix mount type.
 </parameter_description>
 </parameter>
 <parameter name="G_UNIX_MOUNT_TYPE_MEMSTICK">
-<parameter_description> Memory Stick UNIX mount type.
+<parameter_description> Memory Stick Unix mount type.
 </parameter_description>
 </parameter>
 <parameter name="G_UNIX_MOUNT_TYPE_CF">
-<parameter_description> Compact Flash UNIX mount type.
+<parameter_description> Compact Flash Unix mount type.
 </parameter_description>
 </parameter>
 <parameter name="G_UNIX_MOUNT_TYPE_SM">
-<parameter_description> Smart Media UNIX mount type.
+<parameter_description> Smart Media Unix mount type.
 </parameter_description>
 </parameter>
 <parameter name="G_UNIX_MOUNT_TYPE_SDMMC">
-<parameter_description> SD/MMC UNIX mount type.
+<parameter_description> SD/MMC Unix mount type.
 </parameter_description>
 </parameter>
 <parameter name="G_UNIX_MOUNT_TYPE_IPOD">
-<parameter_description> iPod UNIX mount type.
+<parameter_description> iPod Unix mount type.
 </parameter_description>
 </parameter>
 <parameter name="G_UNIX_MOUNT_TYPE_CAMERA">
-<parameter_description> Digital camera UNIX mount type.
+<parameter_description> Digital camera Unix mount type.
 </parameter_description>
 </parameter>
 <parameter name="G_UNIX_MOUNT_TYPE_HD">
-<parameter_description> Hard drive UNIX mount type.
+<parameter_description> Hard drive Unix mount type.
 </parameter_description>
 </parameter>
 </parameters>
@@ -14028,9 +14026,11 @@ Convenience function to connect to the #GCancellable::cancelled
 signal. Also handles the race condition that may happen
 if the cancellable is cancelled right before connecting.
 
-@callback is called at most once, either directly at the
-time of the connect if @cancellable is already cancelled,
-or when @cancellable is cancelled in some thread.
+@callback is called exactly once each time @cancellable is cancelled,
+either directly at the time of the connect if @cancellable is already
+cancelled, or when @cancellable is cancelled in some thread.
+In case the cancellable is reset via [method@Gio.Cancellable.reset]
+then the callback can be called again if the @cancellable is cancelled.
 
 @data_destroy_func will be called when the handler is
 disconnected, or immediately if the cancellable is already
@@ -18358,6 +18358,11 @@ that can be used with g_dbus_connection_unregister_object()
 Version of g_dbus_connection_register_object() using closures instead of a
 #GDBusInterfaceVTable for easier binding in other languages.
 
+Note that the reference counting semantics of the function wrapped by
+@method_call_closure are the same as those of
+[callback@Gio.DBusInterfaceMethodCallFunc]: ownership of a reference to the
+[class@Gio.DBusMethodInvocation] is transferred to the function.
+
 Since: 2.46
 
 </description>
@@ -19212,7 +19217,7 @@ Since: 2.26
 
 <function name="g_dbus_error_set_dbus_error">
 <description>
-Does nothing if @error is %NULL. Otherwise sets *@error to
+Does nothing if @error is %NULL. Otherwise sets `*error` to
 a new #GError created with g_dbus_error_new_for_dbus_error()
 with @dbus_error_message prepend with @format (unless %NULL).
 
@@ -21419,6 +21424,11 @@ Since: 2.26
 <description>
 Gets the name of the D-Bus interface the method was invoked on.
 
+This can be `NULL` if it was not specified by the sender. See
+[callback@Gio.DBusInterfaceMethodCallFunc] or the
+[D-Bus Specification](https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol-types-method)
+for details on when this can happen and how it should be handled.
+
 If this method call is a property Get, Set or GetAll call that has
 been redirected to the method call handler then
 &quot;org.freedesktop.DBus.Properties&quot; will be returned.  See
@@ -21572,6 +21582,9 @@ Since: 2.38
 <function name="g_dbus_method_invocation_get_sender">
 <description>
 Gets the bus name that invoked the method.
+
+This can return %NULL if not specified by the caller, e.g. on peer-to-peer
+connections.
 
 Since: 2.26
 
@@ -32752,8 +32765,11 @@ When you are done with it, release it with g_object_unref()
 
 <function name="g_file_query_exists">
 <description>
-Utility function to check if a particular file exists. This is
-implemented using g_file_query_info() and as such does blocking I/O.
+Utility function to check if a particular file exists.
+
+The fallback implementation of this API is using [method@Gio.File.query_info]
+and therefore may do blocking I/O. To asynchronously query the existence
+of a file, use [method@Gio.File.query_info_async].
 
 Note that in many cases it is [racy to first check for file existence](https://en.wikipedia.org/wiki/Time_of_check_to_time_of_use)
 and then execute something based on the outcome of that, because the
@@ -34499,7 +34515,7 @@ Since: 2.22
 Sends @file to the &quot;Trashcan&quot;, if possible. This is similar to
 deleting it, but the user can recover it before emptying the trashcan.
 Trashing is disabled for system mounts by default (see
-g_unix_mount_is_system_internal()), so this call can return the
+g_unix_mount_entry_is_system_internal()), so this call can return the
 %G_IO_ERROR_NOT_SUPPORTED error. Since GLib 2.66, the `x-gvfs-notrash` unix
 mount option can be used to disable g_file_trash() support for particular
 mounts, the %G_IO_ERROR_NOT_SUPPORTED error will be returned in that case.
@@ -36173,9 +36189,9 @@ a buffer to read data into (which should be at least count bytes long).
 Request an asynchronous read of @count bytes from the stream into the
 buffer starting at @buffer.
 
-This is the asynchronous equivalent of g_input_stream_read_all().
+This is the asynchronous equivalent of [method@InputStream.read_all].
 
-Call g_input_stream_read_all_finish() to collect the result.
+Call [method@InputStream.read_all_finish] to collect the result.
 
 Any outstanding I/O request with higher priority (lower numerical
 value) will be executed before an outstanding request with lower
@@ -36222,7 +36238,7 @@ to call when the request is satisfied
 <function name="g_input_stream_read_all_finish">
 <description>
 Finishes an asynchronous stream read operation started with
-g_input_stream_read_all_async().
+[method@InputStream.read_all_async].
 
 As a special exception to the normal conventions for functions that
 use #GError, if this function returns %FALSE (and sets @error) then
@@ -45643,10 +45659,11 @@ Since: 2.78
 <function name="g_resource_enumerate_children">
 <description>
 Returns all the names of children at the specified @path in the resource.
-The return result is a %NULL terminated list of strings which should
-be released with g_strfreev().
 
-If @path is invalid or does not exist in the #GResource,
+The return result is a `NULL` terminated list of strings which should
+be released with [func@GLib.strfreev].
+
+If @path is invalid or does not exist in the [struct@Gio.Resource],
 %G_RESOURCE_ERROR_NOT_FOUND will be returned.
 
 @lookup_flags controls the behaviour of the lookup.
@@ -45656,19 +45673,19 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="resource">
-<parameter_description> A #GResource
+<parameter_description> A [struct@Gio.Resource]
 </parameter_description>
 </parameter>
 <parameter name="path">
-<parameter_description> A pathname inside the resource
+<parameter_description> A path name inside the resource
 </parameter_description>
 </parameter>
 <parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags
+<parameter_description> A [flags@Gio.ResourceLookupFlags]
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL
+<parameter_description> return location for a [type@GLib.Error], or `NULL`
 </parameter_description>
 </parameter>
 </parameters>
@@ -45679,14 +45696,14 @@ Since: 2.32
 
 <function name="g_resource_error_quark">
 <description>
-Gets the #GResource Error Quark.
+Gets the [struct@Gio.Resource] Error Quark.
 
 Since: 2.32
 
 </description>
 <parameters>
 </parameters>
-<return> a #GQuark
+<return> a [type@GLib.Quark]
 
 </return>
 </function>
@@ -45698,7 +45715,51 @@ if found returns information about it.
 
 @lookup_flags controls the behaviour of the lookup.
 
+The only error this can return is %G_RESOURCE_ERROR_NOT_FOUND, if @path was
+not found in @resource.
+
 Since: 2.32
+
+</description>
+<parameters>
+<parameter name="resource">
+<parameter_description> A [struct@Gio.Resource]
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> A path name inside the resource
+</parameter_description>
+</parameter>
+<parameter name="lookup_flags">
+<parameter_description> A [flags@Gio.ResourceLookupFlags]
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> a location to place the length of the contents of the file,
+or `NULL` if the length is not needed
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> a location to place the flags about the file,
+or `NULL` if the length is not needed
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a [type@GLib.Error], or `NULL`
+</parameter_description>
+</parameter>
+</parameters>
+<return> `TRUE` if the file was found, `FALSE` if there were errors
+
+</return>
+</function>
+
+<function name="g_resource_has_children">
+<description>
+Returns whether the specified @path in the resource
+has children.
+
+Since: 2.84
 
 </description>
 <parameters>
@@ -45710,42 +45771,24 @@ Since: 2.32
 <parameter_description> A pathname inside the resource
 </parameter_description>
 </parameter>
-<parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags
-</parameter_description>
-</parameter>
-<parameter name="size">
-<parameter_description> a location to place the length of the contents of the file,
-or %NULL if the length is not needed
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> a location to place the flags about the file,
-or %NULL if the length is not needed
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> return location for a #GError, or %NULL
-</parameter_description>
-</parameter>
 </parameters>
-<return> %TRUE if the file was found. %FALSE if there were errors
+<return> %TRUE if @path has children
 
 </return>
 </function>
 
 <function name="g_resource_load">
 <description>
-Loads a binary resource bundle and creates a #GResource representation of it, allowing
-you to query it for data.
+Loads a binary resource bundle and creates a [struct@Gio.Resource]
+representation of it, allowing you to query it for data.
 
 If you want to use this resource in the global resource namespace you need
-to register it with g_resources_register().
+to register it with [func@Gio.resources_register].
 
 If @filename is empty or the data in it is corrupt,
 %G_RESOURCE_ERROR_INTERNAL will be returned. If @filename doesn’t exist, or
-there is an error in reading it, an error from g_mapped_file_new() will be
-returned.
+there is an error in reading it, an error from [ctor@GLib.MappedFile.new]
+will be returned.
 
 Since: 2.32
 
@@ -45756,11 +45799,11 @@ Since: 2.32
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL
+<parameter_description> return location for a [type@GLib.Error], or `NULL`
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GResource, or %NULL on error
+<return> a new [struct@Gio.Resource], or `NULL` on error
 
 </return>
 </function>
@@ -45768,55 +45811,59 @@ Since: 2.32
 <function name="g_resource_lookup_data">
 <description>
 Looks for a file at the specified @path in the resource and
-returns a #GBytes that lets you directly access the data in
+returns a [struct@GLib.Bytes] that lets you directly access the data in
 memory.
 
 The data is always followed by a zero byte, so you
 can safely use the data as a C string. However, that byte
-is not included in the size of the GBytes.
+is not included in the size of the [struct@GLib.Bytes].
 
 For uncompressed resource files this is a pointer directly into
-the resource bundle, which is typically in some readonly data section
-in the program binary. For compressed files we allocate memory on
-the heap and automatically uncompress the data.
+the resource bundle, which is typically in some read-only data section
+in the program binary. For compressed files, memory is allocated on
+the heap and the data is automatically uncompressed.
 
 @lookup_flags controls the behaviour of the lookup.
+
+This can return error %G_RESOURCE_ERROR_NOT_FOUND if @path was not found in
+@resource, or %G_RESOURCE_ERROR_INTERNAL if decompression of a compressed
+resource failed.
 
 Since: 2.32
 
 </description>
 <parameters>
 <parameter name="resource">
-<parameter_description> A #GResource
+<parameter_description> A [struct@Gio.Resource]
 </parameter_description>
 </parameter>
 <parameter name="path">
-<parameter_description> A pathname inside the resource
+<parameter_description> A path name inside the resource
 </parameter_description>
 </parameter>
 <parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags
+<parameter_description> A [flags@Gio.ResourceLookupFlags]
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL
+<parameter_description> return location for a [type@GLib.Error], or `NULL`
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GBytes or %NULL on error.
-Free the returned object with g_bytes_unref()
+<return> [struct@GLib.Bytes] or `NULL` on error
 
 </return>
 </function>
 
 <function name="g_resource_new_from_data">
 <description>
-Creates a GResource from a reference to the binary resource bundle.
+Creates a [struct@Gio.Resource] from a reference to the binary resource bundle.
+
 This will keep a reference to @data while the resource lives, so
 the data should not be modified or freed.
 
 If you want to use this resource in the global resource namespace you need
-to register it with g_resources_register().
+to register it with [func@Gio.resources_register].
 
 Note: @data must be backed by memory that is at least pointer aligned.
 Otherwise this function will internally create a copy of the memory since
@@ -45829,15 +45876,15 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="data">
-<parameter_description> A #GBytes
+<parameter_description> A [struct@GLib.Bytes]
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL
+<parameter_description> return location for a [type@GLib.Error], or `NULL`
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GResource, or %NULL on error
+<return> a new [struct@Gio.Resource], or `NULL` on error
 
 </return>
 </function>
@@ -45845,61 +45892,65 @@ Since: 2.32
 <function name="g_resource_open_stream">
 <description>
 Looks for a file at the specified @path in the resource and
-returns a #GInputStream that lets you read the data.
+returns a [class@Gio.InputStream] that lets you read the data.
 
 @lookup_flags controls the behaviour of the lookup.
+
+The only error this can return is %G_RESOURCE_ERROR_NOT_FOUND, if @path was
+not found in @resource.
 
 Since: 2.32
 
 </description>
 <parameters>
 <parameter name="resource">
-<parameter_description> A #GResource
+<parameter_description> A [struct@Gio.Resource]
 </parameter_description>
 </parameter>
 <parameter name="path">
-<parameter_description> A pathname inside the resource
+<parameter_description> A path name inside the resource
 </parameter_description>
 </parameter>
 <parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags
+<parameter_description> A [flags@Gio.ResourceLookupFlags]
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL
+<parameter_description> return location for a [type@GLib.Error], or `NULL`
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GInputStream or %NULL on error.
-Free the returned object with g_object_unref()
+<return> [class@Gio.InputStream] or `NULL` on error
 
 </return>
 </function>
 
 <function name="g_resource_ref">
 <description>
-Atomically increments the reference count of @resource by one. This
-function is MT-safe and may be called from any thread.
+Atomically increments the reference count of @resource by one.
+
+This function is threadsafe and may be called from any thread.
 
 Since: 2.32
 
 </description>
 <parameters>
 <parameter name="resource">
-<parameter_description> A #GResource
+<parameter_description> A [struct@Gio.Resource]
 </parameter_description>
 </parameter>
 </parameters>
-<return> The passed in #GResource
+<return> The passed in [struct@Gio.Resource]
 
 </return>
 </function>
 
 <function name="g_resource_unref">
 <description>
-Atomically decrements the reference count of @resource by one. If the
-reference count drops to 0, all memory allocated by the resource is
-released. This function is MT-safe and may be called from any
+Atomically decrements the reference count of @resource by one.
+
+If the reference count drops to 0, all memory allocated by the resource is
+released. This function is threadsafe and may be called from any
 thread.
 
 Since: 2.32
@@ -45907,7 +45958,7 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="resource">
-<parameter_description> A #GResource
+<parameter_description> A [struct@Gio.Resource]
 </parameter_description>
 </parameter>
 </parameters>
@@ -45918,8 +45969,9 @@ Since: 2.32
 <description>
 Returns all the names of children at the specified @path in the set of
 globally registered resources.
-The return result is a %NULL terminated list of strings which should
-be released with g_strfreev().
+
+The return result is a `NULL` terminated list of strings which should
+be released with [func@GLib.strfreev].
 
 @lookup_flags controls the behaviour of the lookup.
 
@@ -45928,15 +45980,15 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="path">
-<parameter_description> A pathname inside the resource
+<parameter_description> A path name inside the resource
 </parameter_description>
 </parameter>
 <parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags
+<parameter_description> A [flags@Gio.ResourceLookupFlags]
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL
+<parameter_description> return location for a [type@GLib.Error], or `NULL`
 </parameter_description>
 </parameter>
 </parameters>
@@ -45957,29 +46009,48 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="path">
-<parameter_description> A pathname inside the resource
+<parameter_description> A path name inside the resource
 </parameter_description>
 </parameter>
 <parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags
+<parameter_description> A [flags@Gio.ResourceLookupFlags]
 </parameter_description>
 </parameter>
 <parameter name="size">
 <parameter_description> a location to place the length of the contents of the file,
-or %NULL if the length is not needed
+or `NULL` if the length is not needed
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a location to place the #GResourceFlags about the file,
-or %NULL if the flags are not needed
+<parameter_description> a location to place the [flags@Gio.ResourceFlags] about the file,
+or `NULL` if the flags are not needed
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL
+<parameter_description> return location for a [type@GLib.Error], or `NULL`
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the file was found. %FALSE if there were errors
+<return> `TRUE` if the file was found, `FALSE` if there were errors
+
+</return>
+</function>
+
+<function name="g_resources_has_children">
+<description>
+Returns whether the specified @path in the set of
+globally registered resources has children.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="path">
+<parameter_description> A pathname
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @patch has children
 
 </return>
 </function>
@@ -45987,15 +46058,15 @@ or %NULL if the flags are not needed
 <function name="g_resources_lookup_data">
 <description>
 Looks for a file at the specified @path in the set of
-globally registered resources and returns a #GBytes that
+globally registered resources and returns a [struct@GLib.Bytes] that
 lets you directly access the data in memory.
 
 The data is always followed by a zero byte, so you
 can safely use the data as a C string. However, that byte
-is not included in the size of the GBytes.
+is not included in the size of the [struct@GLib.Bytes].
 
 For uncompressed resource files this is a pointer directly into
-the resource bundle, which is typically in some readonly data section
+the resource bundle, which is typically in some read-only data section
 in the program binary. For compressed files we allocate memory on
 the heap and automatically uncompress the data.
 
@@ -46006,20 +46077,19 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="path">
-<parameter_description> A pathname inside the resource
+<parameter_description> A path name inside the resource
 </parameter_description>
 </parameter>
 <parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags
+<parameter_description> A [flags@Gio.ResourceLookupFlags]
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL
+<parameter_description> return location for a [type@GLib.Error], or `NULL`
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GBytes or %NULL on error.
-Free the returned object with g_bytes_unref()
+<return> [struct@GLib.Bytes] or `NULL` on error
 
 </return>
 </function>
@@ -46027,7 +46097,7 @@ Free the returned object with g_bytes_unref()
 <function name="g_resources_open_stream">
 <description>
 Looks for a file at the specified @path in the set of
-globally registered resources and returns a #GInputStream
+globally registered resources and returns a [class@Gio.InputStream]
 that lets you read the data.
 
 @lookup_flags controls the behaviour of the lookup.
@@ -46037,20 +46107,19 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="path">
-<parameter_description> A pathname inside the resource
+<parameter_description> A path name inside the resource
 </parameter_description>
 </parameter>
 <parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags
+<parameter_description> A [flags@Gio.ResourceLookupFlags]
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL
+<parameter_description> return location for a [type@GLib.Error], or `NULL`
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GInputStream or %NULL on error.
-Free the returned object with g_object_unref()
+<return> [class@Gio.InputStream] or `NULL` on error
 
 </return>
 </function>
@@ -46058,15 +46127,17 @@ Free the returned object with g_object_unref()
 <function name="g_resources_register">
 <description>
 Registers the resource with the process-global set of resources.
+
 Once a resource is registered the files in it can be accessed
-with the global resource lookup functions like g_resources_lookup_data().
+with the global resource lookup functions like
+[func@Gio.resources_lookup_data].
 
 Since: 2.32
 
 </description>
 <parameters>
 <parameter name="resource">
-<parameter_description> A #GResource
+<parameter_description> A [struct@Gio.Resource]
 </parameter_description>
 </parameter>
 </parameters>
@@ -46082,7 +46153,7 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="resource">
-<parameter_description> A #GResource
+<parameter_description> A [struct@Gio.Resource]
 </parameter_description>
 </parameter>
 </parameters>
@@ -49811,7 +49882,7 @@ blocking.
 If @enumerator is expected to yield addresses, but for some reason
 is unable to (eg, because of a DNS error), then the first call to
 g_socket_address_enumerator_next() will return an appropriate error
-in *@error. However, if the first call to
+in `*error`. However, if the first call to
 g_socket_address_enumerator_next() succeeds, then any further
 internal errors (other than @cancellable being triggered) will be
 ignored.
@@ -49833,7 +49904,7 @@ ignored.
 </parameter>
 </parameters>
 <return> a #GSocketAddress (owned by the caller), or %NULL on
-error (in which case *@error will be set) or if there are no
+error (in which case `*error` will be set) or if there are no
 more addresses.
 </return>
 </function>
@@ -49893,7 +49964,7 @@ error handling.
 </parameter>
 </parameters>
 <return> a #GSocketAddress (owned by the caller), or %NULL on
-error (in which case *@error will be set) or if there are no
+error (in which case `*error` will be set) or if there are no
 more addresses.
 </return>
 </function>
@@ -54330,10 +54401,11 @@ Since: 2.22
 
 <function name="g_static_resource_fini">
 <description>
-Finalized a GResource initialized by g_static_resource_init().
+Finalizes a [struct@Gio.Resource] initialized by
+[method@Gio.StaticResource.init].
 
 This is normally used by code generated by
-[glib-compile-resources][glib-compile-resources]
+[`glib-compile-resources`](glib-compile-resources.html)
 and is not typically used by other code.
 
 Since: 2.32
@@ -54341,7 +54413,7 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="static_resource">
-<parameter_description> pointer to a static #GStaticResource
+<parameter_description> pointer to a static [struct@Gio.StaticResource]
 </parameter_description>
 </parameter>
 </parameters>
@@ -54350,10 +54422,11 @@ Since: 2.32
 
 <function name="g_static_resource_get_resource">
 <description>
-Gets the GResource that was registered by a call to g_static_resource_init().
+Gets the [struct@Gio.Resource] that was registered by a call to
+[method@Gio.StaticResource.init].
 
 This is normally used by code generated by
-[glib-compile-resources][glib-compile-resources]
+[`glib-compile-resources`](glib-compile-resources.html)
 and is not typically used by other code.
 
 Since: 2.32
@@ -54361,22 +54434,22 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="static_resource">
-<parameter_description> pointer to a static #GStaticResource
+<parameter_description> pointer to a static [struct@Gio.StaticResource]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GResource
+<return> a [struct@Gio.Resource]
 
 </return>
 </function>
 
 <function name="g_static_resource_init">
 <description>
-Initializes a GResource from static data using a
-GStaticResource.
+Initializes a [struct@Gio.Resource] from static data using a
+[struct@Gio.StaticResource].
 
 This is normally used by code generated by
-[glib-compile-resources][glib-compile-resources]
+[`glib-compile-resources`](glib-compile-resources.html)
 and is not typically used by other code.
 
 Since: 2.32
@@ -54384,7 +54457,7 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="static_resource">
-<parameter_description> pointer to a static #GStaticResource
+<parameter_description> pointer to a static [struct@Gio.StaticResource]
 </parameter_description>
 </parameter>
 </parameters>
@@ -56621,8 +56694,7 @@ For example, ‘Open file’ or ‘Connect to network host’. It is used to set
 name of the #GSource used for idle completion of the task.
 
 This function may only be called before the @task is first used in a thread
-other than the one it was constructed in. It is called automatically by
-g_task_set_source_tag() if not called already.
+other than the one it was constructed in.
 
 Since: 2.60
 
@@ -56754,6 +56826,9 @@ Since: 2.36
 Sets @task’s name, used in debugging and profiling.
 
 This is a variant of g_task_set_name() that avoids copying @name.
+
+This function is called automatically by [method@Gio.Task.set_source_tag]
+unless a name is set.
 
 Since: 2.76
 
@@ -60812,7 +60887,9 @@ Since: 2.20
 <function name="g_unix_is_mount_path_system_internal">
 <description>
 Determines if @mount_path is considered an implementation of the
-OS. This is primarily used for hiding mountable and mounted volumes
+OS.
+
+This is primarily used for hiding mountable and mounted volumes
 that only are used in the OS and has little to no relevance to the
 casual user.
 
@@ -60824,18 +60901,20 @@ casual user.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @mount_path is considered an implementation detail 
-of the OS.
+<return> true if @mount_path is considered an implementation detail
+of the OS; false otherwise
 </return>
 </function>
 
 <function name="g_unix_is_system_device_path">
 <description>
 Determines if @device_path is considered a block device path which is only
-used in implementation of the OS. This is primarily used for hiding
-mounted volumes that are intended as APIs for programs to read, and system
-administrators at a shell; rather than something that should, for example,
-appear in a GUI. For example, the Linux `/proc` filesystem.
+used in implementation of the OS.
+
+This is primarily used for hiding mounted volumes that are intended as APIs
+for programs to read, and system administrators at a shell; rather than
+something that should, for example, appear in a GUI. For example, the Linux
+`/proc` filesystem.
 
 The list of device paths considered ‘system’ ones may change over time.
 
@@ -60848,18 +60927,20 @@ Since: 2.56
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @device_path is considered an implementation detail of
-the OS.
+<return> true if @device_path is considered an implementation detail of
+the OS; false otherwise
 </return>
 </function>
 
 <function name="g_unix_is_system_fs_type">
 <description>
 Determines if @fs_type is considered a type of file system which is only
-used in implementation of the OS. This is primarily used for hiding
-mounted volumes that are intended as APIs for programs to read, and system
-administrators at a shell; rather than something that should, for example,
-appear in a GUI. For example, the Linux `/proc` filesystem.
+used in implementation of the OS.
+
+This is primarily used for hiding mounted volumes that are intended as APIs
+for programs to read, and system administrators at a shell; rather than
+something that should, for example, appear in a GUI. For example, the Linux
+`/proc` filesystem.
 
 The list of file system types considered ‘system’ ones may change over time.
 
@@ -60872,55 +60953,60 @@ Since: 2.56
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @fs_type is considered an implementation detail of the OS.
+<return> true if @fs_type is considered an implementation detail of the OS;
+false otherwise
 </return>
 </function>
 
 <function name="g_unix_mount_at">
 <description>
-Gets a #GUnixMountEntry for a given mount path. If @time_read
-is set, it will be filled with a unix timestamp for checking
-if the mounts have changed since with g_unix_mounts_changed_since().
+Gets a [struct@GioUnix.MountEntry] for a given mount path.
+
+If @time_read is set, it will be filled with a Unix timestamp for checking
+if the mounts have changed since with
+[func@GioUnix.mount_entries_changed_since].
 
 If more mounts have the same mount path, the last matching mount
 is returned.
 
-This will return %NULL if there is no mount point at @mount_path.
+This will return `NULL` if there is no mount point at @mount_path.
 
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.at] instead.
 
 </description>
 <parameters>
 <parameter name="mount_path">
-<parameter_description> path for a possible unix mount.
+<parameter_description> path for a possible Unix mount
 </parameter_description>
 </parameter>
 <parameter name="time_read">
-<parameter_description> guint64 to contain a timestamp.
+<parameter_description> return location for a timestamp
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GUnixMountEntry.
+<return> a [struct@GioUnix.MountEntry]
 </return>
 </function>
 
 <function name="g_unix_mount_compare">
 <description>
-Compares two unix mounts.
+Compares two Unix mounts.
 
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.compare] instead.
 
 </description>
 <parameters>
 <parameter name="mount1">
-<parameter_description> first #GUnixMountEntry to compare.
+<parameter_description> first [struct@GioUnix.MountEntry] to compare
 </parameter_description>
 </parameter>
 <parameter name="mount2">
-<parameter_description> second #GUnixMountEntry to compare.
+<parameter_description> second [struct@GioUnix.MountEntry] to compare
 </parameter_description>
 </parameter>
 </parameters>
-<return> 1, 0 or -1 if @mount1 is greater than, equal to,
-or less than @mount2, respectively. 
+<return> `1`, `0` or `-1` if @mount1 is greater than, equal to,
+or less than @mount2, respectively
 </return>
 </function>
 
@@ -60929,57 +61015,507 @@ or less than @mount2, respectively.
 Makes a copy of @mount_entry.
 
 Since: 2.54
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.copy] instead.
 
 </description>
 <parameters>
 <parameter name="mount_entry">
-<parameter_description> a #GUnixMountEntry.
+<parameter_description> a [struct@GioUnix.MountEntry]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GUnixMountEntry
+<return> a new [struct@GioUnix.MountEntry]
+</return>
+</function>
 
+<function name="g_unix_mount_entries_changed_since">
+<description>
+Checks if the Unix mounts have changed since a given Unix time.
+
+This can only work reliably if a [class@GioUnix.MountMonitor] is running in
+the process, otherwise changes in the mount entries file (such as
+`/proc/self/mountinfo` on Linux) cannot be detected and, as a result, this
+function has to conservatively always return `TRUE`.
+
+It is more efficient to use [signal@GioUnix.MountMonitor::mounts-changed] to
+be signalled of changes to the mount entries, rather than polling using this
+function. This function is more appropriate for infrequently determining
+cache validity.
+
+Since 2.84
+
+</description>
+<parameters>
+<parameter name="time">
+<parameter_description> a timestamp
+</parameter_description>
+</parameter>
+</parameters>
+<return> true if the mounts have changed since @time; false otherwise
+</return>
+</function>
+
+<function name="g_unix_mount_entries_get">
+<description>
+Gets a list of [struct@GioUnix.MountEntry] instances representing the Unix
+mounts.
+
+If @time_read is set, it will be filled with the mount timestamp, allowing
+for checking if the mounts have changed with
+[func@GioUnix.mount_entries_changed_since].
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="time_read">
+<parameter_description> return location for a timestamp
+</parameter_description>
+</parameter>
+</parameters>
+<return> a list of the
+Unix mounts
+</return>
+</function>
+
+<function name="g_unix_mount_entries_get_from_file">
+<description>
+Gets an array of [struct@Gio.UnixMountEntry]s containing the Unix mounts
+listed in @table_path.
+
+This is a generalized version of [func@GioUnix.mount_entries_get], mainly
+intended for internal testing use. Note that [func@GioUnix.mount_entries_get]
+may parse multiple hierarchical table files, so this function is not a direct
+superset of its functionality.
+
+If there is an error reading or parsing the file, `NULL` will be returned
+and both out parameters will be set to `0`.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="table_path">
+<parameter_description> path to the mounts table file (for example `/proc/self/mountinfo`)
+</parameter_description>
+</parameter>
+<parameter name="time_read_out">
+<parameter_description> return location for the
+modification time of @table_path
+</parameter_description>
+</parameter>
+<parameter name="n_entries_out">
+<parameter_description> return location for the
+number of mount entries returned
+</parameter_description>
+</parameter>
+</parameters>
+<return> mount
+entries, or `NULL` if there was an error loading them
+</return>
+</function>
+
+<function name="g_unix_mount_entry_at">
+<description>
+Gets a [struct@GioUnix.MountEntry] for a given mount path.
+
+If @time_read is set, it will be filled with a Unix timestamp for checking
+if the mounts have changed since with
+[func@GioUnix.mount_entries_changed_since].
+
+If more mounts have the same mount path, the last matching mount
+is returned.
+
+This will return `NULL` if there is no mount point at @mount_path.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount_path">
+<parameter_description> path for a possible Unix mount
+</parameter_description>
+</parameter>
+<parameter name="time_read">
+<parameter_description> return location for a timestamp
+</parameter_description>
+</parameter>
+</parameters>
+<return> a [struct@GioUnix.MountEntry]
+</return>
+</function>
+
+<function name="g_unix_mount_entry_compare">
+<description>
+Compares two Unix mounts.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount1">
+<parameter_description> first [struct@GioUnix.MountEntry] to compare
+</parameter_description>
+</parameter>
+<parameter name="mount2">
+<parameter_description> second [struct@GioUnix.MountEntry] to compare
+</parameter_description>
+</parameter>
+</parameters>
+<return> `1`, `0` or `-1` if @mount1 is greater than, equal to,
+or less than @mount2, respectively
+</return>
+</function>
+
+<function name="g_unix_mount_entry_copy">
+<description>
+Makes a copy of @mount_entry.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a [struct@GioUnix.MountEntry]
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new [struct@GioUnix.MountEntry]
+</return>
+</function>
+
+<function name="g_unix_mount_entry_for">
+<description>
+Gets a [struct@GioUnix.MountEntry] for a given file path.
+
+If @time_read is set, it will be filled with a Unix timestamp for checking
+if the mounts have changed since with
+[func@GioUnix.mount_entries_changed_since].
+
+If more mounts have the same mount path, the last matching mount
+is returned.
+
+This will return `NULL` if looking up the mount entry fails, if
+@file_path doesn’t exist or there is an I/O error.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="file_path">
+<parameter_description> file path on some Unix mount
+</parameter_description>
+</parameter>
+<parameter name="time_read">
+<parameter_description> return location for a timestamp
+</parameter_description>
+</parameter>
+</parameters>
+<return> a [struct@GioUnix.MountEntry]
+</return>
+</function>
+
+<function name="g_unix_mount_entry_free">
+<description>
+Frees a Unix mount.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a [struct@GioUnix.MountEntry]
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_unix_mount_entry_get_device_path">
+<description>
+Gets the device path for a Unix mount.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a [struct@GioUnix.MountEntry]
+</parameter_description>
+</parameter>
+</parameters>
+<return> a string containing the device path
+</return>
+</function>
+
+<function name="g_unix_mount_entry_get_fs_type">
+<description>
+Gets the filesystem type for the Unix mount.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a [struct@GioUnix.MountEntry]
+</parameter_description>
+</parameter>
+</parameters>
+<return> a string containing the file system type
+</return>
+</function>
+
+<function name="g_unix_mount_entry_get_mount_path">
+<description>
+Gets the mount path for a Unix mount.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a [struct@GioUnix.MountEntry] to get the mount path for
+</parameter_description>
+</parameter>
+</parameters>
+<return> the mount path for @mount_entry
+</return>
+</function>
+
+<function name="g_unix_mount_entry_get_options">
+<description>
+Gets a comma separated list of mount options for the Unix mount.
+
+For example: `rw,relatime,seclabel,data=ordered`.
+
+This is similar to [func@GioUnix.MountPoint.get_options], but it takes
+a [struct@GioUnix.MountEntry] as an argument.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a [struct@GioUnix.MountEntry]
+</parameter_description>
+</parameter>
+</parameters>
+<return> a string containing the options, or `NULL` if not
+available.
+</return>
+</function>
+
+<function name="g_unix_mount_entry_get_root_path">
+<description>
+Gets the root of the mount within the filesystem. This is useful e.g. for
+mounts created by bind operation, or btrfs subvolumes.
+
+For example, the root path is equal to `/` for a mount created by
+`mount /dev/sda1 /mnt/foo` and `/bar` for
+`mount --bind /mnt/foo/bar /mnt/bar`.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a [struct@GioUnix.MountEntry]
+</parameter_description>
+</parameter>
+</parameters>
+<return> a string containing the root, or `NULL` if not supported
+</return>
+</function>
+
+<function name="g_unix_mount_entry_guess_can_eject">
+<description>
+Guesses whether a Unix mount entry can be ejected.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a [struct@GioUnix.MountEntry]
+</parameter_description>
+</parameter>
+</parameters>
+<return> true if @mount_entry is deemed to be ejectable; false otherwise
+</return>
+</function>
+
+<function name="g_unix_mount_entry_guess_icon">
+<description>
+Guesses the icon of a Unix mount entry.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a [struct@GioUnix.MountEntry]
+</parameter_description>
+</parameter>
+</parameters>
+<return> a [iface@Gio.Icon]
+</return>
+</function>
+
+<function name="g_unix_mount_entry_guess_name">
+<description>
+Guesses the name of a Unix mount entry.
+
+The result is a translated string.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a [struct@GioUnix.MountEntry]
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated translated string
+</return>
+</function>
+
+<function name="g_unix_mount_entry_guess_should_display">
+<description>
+Guesses whether a Unix mount entry should be displayed in the UI.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a [struct@GioUnix.MountEntry]
+</parameter_description>
+</parameter>
+</parameters>
+<return> true if @mount_entry is deemed to be displayable; false otherwise
+</return>
+</function>
+
+<function name="g_unix_mount_entry_guess_symbolic_icon">
+<description>
+Guesses the symbolic icon of a Unix mount entry.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a [struct@GioUnix.MountEntry]
+</parameter_description>
+</parameter>
+</parameters>
+<return> a [iface@Gio.Icon]
+</return>
+</function>
+
+<function name="g_unix_mount_entry_guess_type">
+<description>
+Guesses the type of a Unix mount entry.
+
+If the mount type cannot be determined, returns
+[enum@GioUnix.MountType.UNKNOWN].
+
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a [struct@GioUnix.MountEntry]
+</parameter_description>
+</parameter>
+</parameters>
+<return> a [enum@GioUnix.MountType]
+</return>
+</function>
+
+<function name="g_unix_mount_entry_is_readonly">
+<description>
+Checks if a Unix mount is mounted read only.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a [struct@GioUnix.MountEntry]
+</parameter_description>
+</parameter>
+</parameters>
+<return> true if @mount_entry is read only; false otherwise
+</return>
+</function>
+
+<function name="g_unix_mount_entry_is_system_internal">
+<description>
+Checks if a Unix mount is a system mount.
+
+This is the Boolean OR of
+[func@GioUnix.is_system_fs_type], [func@GioUnix.is_system_device_path] and
+[func@GioUnix.is_mount_path_system_internal] on @mount_entry’s properties.
+
+The definition of what a ‘system’ mount entry is may change over time as new
+file system types and device paths are ignored.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a [struct@GioUnix.MountEntry]
+</parameter_description>
+</parameter>
+</parameters>
+<return> true if the Unix mount is for a system path; false otherwise
 </return>
 </function>
 
 <function name="g_unix_mount_for">
 <description>
-Gets a #GUnixMountEntry for a given file path. If @time_read
-is set, it will be filled with a unix timestamp for checking
-if the mounts have changed since with g_unix_mounts_changed_since().
+Gets a [struct@GioUnix.MountEntry] for a given file path.
+
+If @time_read is set, it will be filled with a Unix timestamp for checking
+if the mounts have changed since with
+[func@GioUnix.mount_entries_changed_since].
 
 If more mounts have the same mount path, the last matching mount
 is returned.
 
-This will return %NULL if looking up the mount entry fails, if
+This will return `NULL` if looking up the mount entry fails, if
 @file_path doesn’t exist or there is an I/O error.
 
 Since: 2.52
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.for] instead.
 
 </description>
 <parameters>
 <parameter name="file_path">
-<parameter_description> file path on some unix mount.
+<parameter_description> file path on some Unix mount
 </parameter_description>
 </parameter>
 <parameter name="time_read">
-<parameter_description> guint64 to contain a timestamp.
+<parameter_description> return location for a timestamp
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GUnixMountEntry.
-
+<return> a [struct@GioUnix.MountEntry]
 </return>
 </function>
 
 <function name="g_unix_mount_free">
 <description>
-Frees a unix mount.
+Frees a Unix mount.
+
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.free] instead.
 
 </description>
 <parameters>
 <parameter name="mount_entry">
-<parameter_description> a #GUnixMountEntry.
+<parameter_description> a [struct@GioUnix.MountEntry]
 </parameter_description>
 </parameter>
 </parameters>
@@ -60988,72 +61524,76 @@ Frees a unix mount.
 
 <function name="g_unix_mount_get_device_path">
 <description>
-Gets the device path for a unix mount.
+Gets the device path for a Unix mount.
 
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.get_device_path] instead.
 
 </description>
 <parameters>
 <parameter name="mount_entry">
-<parameter_description> a #GUnixMount.
+<parameter_description> a [struct@GioUnix.MountEntry]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the device path.
+<return> a string containing the device path
 </return>
 </function>
 
 <function name="g_unix_mount_get_fs_type">
 <description>
-Gets the filesystem type for the unix mount.
+Gets the filesystem type for the Unix mount.
 
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.get_fs_type] instead.
 
 </description>
 <parameters>
 <parameter name="mount_entry">
-<parameter_description> a #GUnixMount.
+<parameter_description> a [struct@GioUnix.MountEntry]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the file system type.
+<return> a string containing the file system type
 </return>
 </function>
 
 <function name="g_unix_mount_get_mount_path">
 <description>
-Gets the mount path for a unix mount.
+Gets the mount path for a Unix mount.
 
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.get_mount_path] instead.
 
 </description>
 <parameters>
 <parameter name="mount_entry">
-<parameter_description> input #GUnixMountEntry to get the mount path for.
+<parameter_description> a [struct@GioUnix.MountEntry] to get the mount path for
 </parameter_description>
 </parameter>
 </parameters>
-<return> the mount path for @mount_entry.
+<return> the mount path for @mount_entry
 </return>
 </function>
 
 <function name="g_unix_mount_get_options">
 <description>
-Gets a comma-separated list of mount options for the unix mount. For example,
-`rw,relatime,seclabel,data=ordered`.
+Gets a comma separated list of mount options for the Unix mount.
 
-This is similar to g_unix_mount_point_get_options(), but it takes
-a #GUnixMountEntry as an argument.
+For example: `rw,relatime,seclabel,data=ordered`.
+
+This is similar to [func@GioUnix.MountPoint.get_options], but it takes
+a [struct@GioUnix.MountEntry] as an argument.
 
 Since: 2.58
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.get_options] instead.
 
 </description>
 <parameters>
 <parameter name="mount_entry">
-<parameter_description> a #GUnixMountEntry.
+<parameter_description> a [struct@GioUnix.MountEntry]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the options, or %NULL if not
+<return> a string containing the options, or `NULL` if not
 available.
-
 </return>
 </function>
 
@@ -61062,198 +61602,187 @@ available.
 Gets the root of the mount within the filesystem. This is useful e.g. for
 mounts created by bind operation, or btrfs subvolumes.
 
-For example, the root path is equal to &quot;/&quot; for mount created by
-&quot;mount /dev/sda1 /mnt/foo&quot; and &quot;/bar&quot; for
-&quot;mount --bind /mnt/foo/bar /mnt/bar&quot;.
+For example, the root path is equal to `/` for a mount created by
+`mount /dev/sda1 /mnt/foo` and `/bar` for
+`mount --bind /mnt/foo/bar /mnt/bar`.
 
 Since: 2.60
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.get_root_path] instead.
 
 </description>
 <parameters>
 <parameter name="mount_entry">
-<parameter_description> a #GUnixMountEntry.
+<parameter_description> a [struct@GioUnix.MountEntry]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the root, or %NULL if not supported.
-
+<return> a string containing the root, or `NULL` if not supported
 </return>
 </function>
 
 <function name="g_unix_mount_guess_can_eject">
 <description>
-Guesses whether a Unix mount can be ejected.
+Guesses whether a Unix mount entry can be ejected.
 
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.guess_can_eject] instead.
 
 </description>
 <parameters>
 <parameter name="mount_entry">
-<parameter_description> a #GUnixMountEntry
+<parameter_description> a [struct@GioUnix.MountEntry]
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @mount_entry is deemed to be ejectable.
+<return> true if @mount_entry is deemed to be ejectable; false otherwise
 </return>
 </function>
 
 <function name="g_unix_mount_guess_icon">
 <description>
-Guesses the icon of a Unix mount. 
+Guesses the icon of a Unix mount entry.
 
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.guess_icon] instead.
 
 </description>
 <parameters>
 <parameter name="mount_entry">
-<parameter_description> a #GUnixMountEntry
+<parameter_description> a [struct@GioUnix.MountEntry]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GIcon
+<return> a [iface@Gio.Icon]
 </return>
 </function>
 
 <function name="g_unix_mount_guess_name">
 <description>
-Guesses the name of a Unix mount. 
+Guesses the name of a Unix mount entry.
+
 The result is a translated string.
 
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.guess_name] instead.
 
 </description>
 <parameters>
 <parameter name="mount_entry">
-<parameter_description> a #GUnixMountEntry
+<parameter_description> a [struct@GioUnix.MountEntry]
 </parameter_description>
 </parameter>
 </parameters>
-<return> A newly allocated string that must
-be freed with g_free()
+<return> a newly allocated translated string
 </return>
 </function>
 
 <function name="g_unix_mount_guess_should_display">
 <description>
-Guesses whether a Unix mount should be displayed in the UI.
+Guesses whether a Unix mount entry should be displayed in the UI.
 
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.guess_should_display] instead.
 
 </description>
 <parameters>
 <parameter name="mount_entry">
-<parameter_description> a #GUnixMountEntry
+<parameter_description> a [struct@GioUnix.MountEntry]
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @mount_entry is deemed to be displayable.
+<return> true if @mount_entry is deemed to be displayable; false otherwise
 </return>
 </function>
 
 <function name="g_unix_mount_guess_symbolic_icon">
 <description>
-Guesses the symbolic icon of a Unix mount.
+Guesses the symbolic icon of a Unix mount entry.
 
 Since: 2.34
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.guess_symbolic_icon] instead.
 
 </description>
 <parameters>
 <parameter name="mount_entry">
-<parameter_description> a #GUnixMountEntry
+<parameter_description> a [struct@GioUnix.MountEntry]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GIcon
-
-</return>
-</function>
-
-<function name="g_unix_mount_guess_type">
-<description>
-Guesses the type of a unix mount. If the mount type cannot be 
-determined, returns %G_UNIX_MOUNT_TYPE_UNKNOWN.
-
-
-</description>
-<parameters>
-<parameter name="mount_entry">
-<parameter_description> a #GUnixMount.
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GUnixMountType. 
+<return> a [iface@Gio.Icon]
 </return>
 </function>
 
 <function name="g_unix_mount_is_readonly">
 <description>
-Checks if a unix mount is mounted read only.
+Checks if a Unix mount is mounted read only.
 
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.is_readonly] instead.
 
 </description>
 <parameters>
 <parameter name="mount_entry">
-<parameter_description> a #GUnixMount.
+<parameter_description> a [struct@GioUnix.MountEntry]
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @mount_entry is read only.
+<return> true if @mount_entry is read only; false otherwise
 </return>
 </function>
 
 <function name="g_unix_mount_is_system_internal">
 <description>
-Checks if a Unix mount is a system mount. This is the Boolean OR of
-g_unix_is_system_fs_type(), g_unix_is_system_device_path() and
-g_unix_is_mount_path_system_internal() on @mount_entry’s properties.
+Checks if a Unix mount is a system mount.
+
+This is the Boolean OR of
+[func@GioUnix.is_system_fs_type], [func@GioUnix.is_system_device_path] and
+[func@GioUnix.is_mount_path_system_internal] on @mount_entry’s properties.
 
 The definition of what a ‘system’ mount entry is may change over time as new
 file system types and device paths are ignored.
 
+Deprecated: 2.84: Use [func@GioUnix.MountEntry.is_system_internal] instead.
 
 </description>
 <parameters>
 <parameter name="mount_entry">
-<parameter_description> a #GUnixMount.
+<parameter_description> a [struct@GioUnix.MountEntry]
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the unix mount is for a system path.
+<return> true if the Unix mount is for a system path; false otherwise
 </return>
 </function>
 
 <function name="g_unix_mount_monitor_get">
 <description>
-Gets the #GUnixMountMonitor for the current thread-default main
+Gets the [class@GioUnix.MountMonitor] for the current thread-default main
 context.
 
 The mount monitor can be used to monitor for changes to the list of
 mounted filesystems as well as the list of mount points (ie: fstab
 entries).
 
-You must only call g_object_unref() on the return value from under
-the same main context as you called this function.
+You must only call [method@GObject.Object.unref] on the return value from
+under the same main context as you called this function.
 
 Since: 2.44
 
 </description>
 <parameters>
 </parameters>
-<return> the #GUnixMountMonitor.
-
+<return> the [class@GioUnix.MountMonitor]
 </return>
 </function>
 
 <function name="g_unix_mount_monitor_new">
 <description>
-Deprecated alias for g_unix_mount_monitor_get().
+Deprecated alias for [func@GioUnix.MountMonitor.get].
 
 This function was never a true constructor, which is why it was
 renamed.
 
-Deprecated:2.44:Use g_unix_mount_monitor_get() instead.
+Deprecated: 2.44: Use [func@GioUnix.MountMonitor.get] instead.
 
 </description>
 <parameters>
 </parameters>
-<return> a #GUnixMountMonitor.
-
+<return> a [class@GioUnix.MountMonitor]
 </return>
 </function>
 
@@ -61268,18 +61797,16 @@ that calling this function would have side effects for other users of
 the monitor.
 
 Since: 2.18
-
-Deprecated:2.44:This function does nothing.  Don't call it.
+Deprecated: 2.44: This function does nothing. Don’t call it.
 
 </description>
 <parameters>
 <parameter name="mount_monitor">
-<parameter_description> a #GUnixMountMonitor
+<parameter_description> a [class@GioUnix.MountMonitor]
 </parameter_description>
 </parameter>
 <parameter name="limit_msec">
-<parameter_description> a integer with the limit in milliseconds to
-poll for changes.
+<parameter_description> a integer with the limit (in milliseconds) to poll for changes
 </parameter_description>
 </parameter>
 </parameters>
@@ -61288,9 +61815,11 @@ poll for changes.
 
 <function name="g_unix_mount_point_at">
 <description>
-Gets a #GUnixMountPoint for a given mount path. If @time_read is set, it
-will be filled with a unix timestamp for checking if the mount points have
-changed since with g_unix_mount_points_changed_since().
+Gets a [struct@GioUnix.MountPoint] for a given mount path.
+
+If @time_read is set, it will be filled with a Unix timestamp for checking if
+the mount points have changed since with
+[func@GioUnix.mount_points_changed_since].
 
 If more mount points have the same mount path, the last matching mount point
 is returned.
@@ -61300,38 +61829,37 @@ Since: 2.66
 </description>
 <parameters>
 <parameter name="mount_path">
-<parameter_description> path for a possible unix mount point.
+<parameter_description> path for a possible Unix mount point
 </parameter_description>
 </parameter>
 <parameter name="time_read">
-<parameter_description> guint64 to contain a timestamp.
+<parameter_description> return location for a timestamp
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GUnixMountPoint, or %NULL if no match
-is found.
-
+<return> a [struct@GioUnix.MountPoint], or `NULL`
+if no match is found
 </return>
 </function>
 
 <function name="g_unix_mount_point_compare">
 <description>
-Compares two unix mount points.
+Compares two Unix mount points.
 
 
 </description>
 <parameters>
 <parameter name="mount1">
-<parameter_description> a #GUnixMount.
+<parameter_description> a [struct@GioUnix.MountPoint]
 </parameter_description>
 </parameter>
 <parameter name="mount2">
-<parameter_description> a #GUnixMount.
+<parameter_description> a [struct@GioUnix.MountPoint]
 </parameter_description>
 </parameter>
 </parameters>
-<return> 1, 0 or -1 if @mount1 is greater than, equal to,
-or less than @mount2, respectively.
+<return> `1`, `0` or `-1` if @mount1 is greater than, equal to,
+or less than @mount2, respectively
 </return>
 </function>
 
@@ -61344,23 +61872,22 @@ Since: 2.54
 </description>
 <parameters>
 <parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint.
+<parameter_description> a [struct@GioUnix.MountPoint]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GUnixMountPoint
-
+<return> a new [struct@GioUnix.MountPoint]
 </return>
 </function>
 
 <function name="g_unix_mount_point_free">
 <description>
-Frees a unix mount point.
+Frees a Unix mount point.
 
 </description>
 <parameters>
 <parameter name="mount_point">
-<parameter_description> unix mount point to free.
+<parameter_description> Unix mount point to free.
 </parameter_description>
 </parameter>
 </parameters>
@@ -61369,17 +61896,17 @@ Frees a unix mount point.
 
 <function name="g_unix_mount_point_get_device_path">
 <description>
-Gets the device path for a unix mount point.
+Gets the device path for a Unix mount point.
 
 
 </description>
 <parameters>
 <parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint.
+<parameter_description> a [struct@GioUnix.MountPoint]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the device path.
+<return> a string containing the device path
 </return>
 </function>
 
@@ -61391,27 +61918,27 @@ Gets the file system type for the mount point.
 </description>
 <parameters>
 <parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint.
+<parameter_description> a [struct@GioUnix.MountPoint]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the file system type.
+<return> a string containing the file system type
 </return>
 </function>
 
 <function name="g_unix_mount_point_get_mount_path">
 <description>
-Gets the mount path for a unix mount point.
+Gets the mount path for a Unix mount point.
 
 
 </description>
 <parameters>
 <parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint.
+<parameter_description> a [struct@GioUnix.MountPoint]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the mount path.
+<return> a string containing the mount path
 </return>
 </function>
 
@@ -61424,12 +61951,11 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint.
+<parameter_description> a [struct@GioUnix.MountPoint]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the options.
-
+<return> a string containing the options
 </return>
 </function>
 
@@ -61441,45 +61967,45 @@ Guesses whether a Unix mount point can be ejected.
 </description>
 <parameters>
 <parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint
+<parameter_description> a [struct@GioUnix.MountPoint]
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @mount_point is deemed to be ejectable.
+<return> true if @mount_point is deemed to be ejectable; false otherwise
 </return>
 </function>
 
 <function name="g_unix_mount_point_guess_icon">
 <description>
-Guesses the icon of a Unix mount point. 
+Guesses the icon of a Unix mount point.
 
 
 </description>
 <parameters>
 <parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint
+<parameter_description> a [struct@GioUnix.MountPoint]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GIcon
+<return> a [iface@Gio.Icon]
 </return>
 </function>
 
 <function name="g_unix_mount_point_guess_name">
 <description>
-Guesses the name of a Unix mount point. 
+Guesses the name of a Unix mount point.
+
 The result is a translated string.
 
 
 </description>
 <parameters>
 <parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint
+<parameter_description> a [struct@GioUnix.MountPoint]
 </parameter_description>
 </parameter>
 </parameters>
-<return> A newly allocated string that must 
-be freed with g_free()
+<return> a newly allocated translated string
 </return>
 </function>
 
@@ -61492,114 +62018,126 @@ Since: 2.34
 </description>
 <parameters>
 <parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint
+<parameter_description> a [struct@GioUnix.MountPoint]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GIcon
-
+<return> a [iface@Gio.Icon]
 </return>
 </function>
 
 <function name="g_unix_mount_point_guess_type">
 <description>
-Guesses the type of a unix mount point. 
-If the mount type cannot be determined, 
-returns %G_UNIX_MOUNT_TYPE_UNKNOWN.
+Guesses the type of a Unix mount point.
+
+If the mount type cannot be determined, returns
+[enum@GioUnix.MountType.UNKNOWN].
 
 
 </description>
 <parameters>
 <parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint.
+<parameter_description> a [struct@GioUnix.MountPoint]
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GUnixMountType.
+<return> a [enum@GioUnix.MountType]
 </return>
 </function>
 
 <function name="g_unix_mount_point_is_loopback">
 <description>
-Checks if a unix mount point is a loopback device.
+Checks if a Unix mount point is a loopback device.
 
 
 </description>
 <parameters>
 <parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint.
+<parameter_description> a [struct@GioUnix.MountPoint]
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the mount point is a loopback. %FALSE otherwise. 
+<return> true if the mount point is a loopback device; false otherwise
 </return>
 </function>
 
 <function name="g_unix_mount_point_is_readonly">
 <description>
-Checks if a unix mount point is read only.
+Checks if a Unix mount point is read only.
 
 
 </description>
 <parameters>
 <parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint.
+<parameter_description> a [struct@GioUnix.MountPoint]
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if a mount point is read only.
+<return> true if a mount point is read only; false otherwise
 </return>
 </function>
 
 <function name="g_unix_mount_point_is_user_mountable">
 <description>
-Checks if a unix mount point is mountable by the user.
+Checks if a Unix mount point is mountable by the user.
 
 
 </description>
 <parameters>
 <parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint.
+<parameter_description> a [struct@GioUnix.MountPoint]
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the mount point is user mountable.
+<return> true if the mount point is user mountable; false otherwise
 </return>
 </function>
 
 <function name="g_unix_mount_points_changed_since">
 <description>
-Checks if the unix mount points have changed since a given unix time.
+Checks if the Unix mount points have changed since a given Unix time.
+
+Unlike [func@GioUnix.mount_entries_changed_since], this function can work
+reliably without a [class@GioUnix.MountMonitor] running, as it accesses the
+static mount point information (such as `/etc/fstab` on Linux), which has a
+valid modification time.
+
+It is more efficient to use [signal@GioUnix.MountMonitor::mountpoints-changed]
+to be signalled of changes to the mount points, rather than polling using
+this function. This function is more appropriate for infrequently determining
+cache validity.
 
 
 </description>
 <parameters>
 <parameter name="time">
-<parameter_description> guint64 to contain a timestamp.
+<parameter_description> a timestamp
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the mount points have changed since @time. 
+<return> true if the mount points have changed since @time; false otherwise
 </return>
 </function>
 
 <function name="g_unix_mount_points_get">
 <description>
-Gets a #GList of #GUnixMountPoint containing the unix mount points.
-If @time_read is set, it will be filled with the mount timestamp,
-allowing for checking if the mounts have changed with
-g_unix_mount_points_changed_since().
+Gets a list of [struct@GioUnix.MountPoint] instances representing the Unix
+mount points.
+
+If @time_read is set, it will be filled with the mount timestamp, allowing
+for checking if the mounts have changed with
+[func@GioUnix.mount_points_changed_since].
 
 
 </description>
 <parameters>
 <parameter name="time_read">
-<parameter_description> guint64 to contain a timestamp.
+<parameter_description> return location for a timestamp
 </parameter_description>
 </parameter>
 </parameters>
-<return>
-a #GList of the UNIX mountpoints.
+<return> a list of the Unix
+mount points
 </return>
 </function>
 
@@ -61608,10 +62146,10 @@ a #GList of the UNIX mountpoints.
 Gets an array of [struct@Gio.UnixMountPoint]s containing the Unix mount
 points listed in @table_path.
 
-This is a generalized version of g_unix_mount_points_get(), mainly intended
-for internal testing use. Note that g_unix_mount_points_get() may parse
-multiple hierarchical table files, so this function is not a direct superset
-of its functionality.
+This is a generalized version of [func@GioUnix.mount_points_get], mainly
+intended for internal testing use. Note that [func@GioUnix.mount_points_get]
+may parse multiple hierarchical table files, so this function is not a direct
+superset of its functionality.
 
 If there is an error reading or parsing the file, `NULL` will be returned
 and both out parameters will be set to `0`.
@@ -61642,37 +62180,41 @@ points, or `NULL` if there was an error loading them
 
 <function name="g_unix_mounts_changed_since">
 <description>
-Checks if the unix mounts have changed since a given unix time.
+Checks if the Unix mounts have changed since a given Unix time.
 
+Deprecated: 2.84: Use [func@GioUnix.mount_entries_changed_since] instead.
 
 </description>
 <parameters>
 <parameter name="time">
-<parameter_description> guint64 to contain a timestamp.
+<parameter_description> a timestamp
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the mounts have changed since @time. 
+<return> true if the mounts have changed since @time; false otherwise
 </return>
 </function>
 
 <function name="g_unix_mounts_get">
 <description>
-Gets a #GList of #GUnixMountEntry containing the unix mounts.
-If @time_read is set, it will be filled with the mount
-timestamp, allowing for checking if the mounts have changed
-with g_unix_mounts_changed_since().
+Gets a list of [struct@GioUnix.MountEntry] instances representing the Unix
+mounts.
 
+If @time_read is set, it will be filled with the mount timestamp, allowing
+for checking if the mounts have changed with
+[func@GioUnix.mount_entries_changed_since].
+
+Deprecated: 2.84: Use [func@GioUnix.mount_entries_get] instead.
 
 </description>
 <parameters>
 <parameter name="time_read">
-<parameter_description> guint64 to contain a timestamp, or %NULL
+<parameter_description> return location for a timestamp
 </parameter_description>
 </parameter>
 </parameters>
-<return>
-a #GList of the UNIX mounts.
+<return> a list of the
+Unix mounts
 </return>
 </function>
 
@@ -61681,15 +62223,16 @@ a #GList of the UNIX mounts.
 Gets an array of [struct@Gio.UnixMountEntry]s containing the Unix mounts
 listed in @table_path.
 
-This is a generalized version of g_unix_mounts_get(), mainly intended for
-internal testing use. Note that g_unix_mounts_get() may parse multiple
-hierarchical table files, so this function is not a direct superset of its
-functionality.
+This is a generalized version of [func@GioUnix.mount_entries_get], mainly
+intended for internal testing use. Note that [func@GioUnix.mount_entries_get]
+may parse multiple hierarchical table files, so this function is not a direct
+superset of its functionality.
 
 If there is an error reading or parsing the file, `NULL` will be returned
 and both out parameters will be set to `0`.
 
 Since: 2.82
+Deprecated: 2.84: Use [func@GioUnix.mount_entries_get_from_file] instead.
 
 </description>
 <parameters>
