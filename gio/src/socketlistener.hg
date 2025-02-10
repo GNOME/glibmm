@@ -46,6 +46,9 @@ class GIOMM_API SocketListener : public Glib::Object
 {
   _CLASS_GOBJECT(SocketListener, GSocketListener, G_SOCKET_LISTENER, Glib::Object, GObject, , , GIOMM_API)
 
+public:
+  _WRAP_ENUM(Event, GSocketListenerEvent, newin "2,84", decl_prefix GIOMM_API)
+
 protected:
   _CTOR_DEFAULT
 
@@ -92,7 +95,6 @@ Glib::RefPtr<Socket> accept_socket(Glib::RefPtr<Glib::Object>& source_object, co
   _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket)
   Glib::RefPtr<Socket> accept_socket();
 
-
   _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket_async)
   void accept_socket_async(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
   _IGNORE(g_socket_listener_accept_socket_async)
@@ -134,6 +136,11 @@ Glib::RefPtr<Socket> accept_socket(Glib::RefPtr<Glib::Object>& source_object, co
   Glib::RefPtr<SocketConnection> accept_finish(const Glib::RefPtr<AsyncResult>& result);
 
   _WRAP_METHOD(void close(), g_socket_listener_close)
+
+#m4 _CONVERSION(`GSocket*',`const Glib::RefPtr<Socket>&',`Glib::wrap($3, true)')
+  // TODO: Remove no_default_handler when we can break ABI:
+  _WRAP_SIGNAL(void event(Event event, const Glib::RefPtr<Socket>& socket), "event",
+    no_default_handler, newin "2,84")
 
   _WRAP_PROPERTY("listen-backlog", int)
 };

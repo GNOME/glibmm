@@ -2128,8 +2128,13 @@ public:
                g_file_poll_mountable_finish, errthrow)
 
   _WRAP_METHOD(Glib::RefPtr<AppInfo> query_default_handler(const Glib::RefPtr<Cancellable>& cancellable{?}),
-               g_file_query_default_handler,
-               errthrow)
+               g_file_query_default_handler, errthrow)
+  _WRAP_METHOD(void query_default_handler_async(const SlotAsyncReady& slot{callback},
+    const Glib::RefPtr<Cancellable>& cancellable{.} = {},
+    int io_priority{.} = Glib::PRIORITY_DEFAULT), g_file_query_default_handler_async,
+    slot_name slot, slot_callback giomm_SignalProxy_async_callback, newin "2,84")
+  _WRAP_METHOD(Glib::RefPtr<AppInfo> query_default_handler_finish(const Glib::RefPtr<AsyncResult>& result),
+    g_file_query_default_handler_finish, errthrow, newin "2,84")
 
   //TODO: Something better than char*& for contents?
   /** Loads the content of the file into memory, returning the size of the data.
