@@ -23,7 +23,9 @@ gmmproc = configure_file(
   input: 'gmmproc.in',
   output: '@BASENAME@',
   configuration: gmmproc_conf_data,
+  install: true,
   install_dir: install_procdir,
+  install_tag: 'bin-devel',
 )
 
 # Configuration data for generate_wrap_init.pl.
@@ -36,7 +38,9 @@ generate_wrap_init_pl = configure_file(
   input: 'generate_wrap_init.pl.in',
   output: '@BASENAME@',
   configuration: gen_wrap_init_conf_data,
+  install: true,
   install_dir: install_procdir,
+  install_tag: 'bin-devel',
 )
 
 # Install m4 files for reuse by other *mm projects, when building from git.
@@ -76,7 +80,10 @@ foreach file : m4_basefiles
   m4_files += 'm4' / file
 endforeach
 m4_files = files(m4_files)
-install_data(m4_files, install_dir: install_procdir / 'm4')
+install_data(m4_files,
+  install_dir: install_procdir / 'm4',
+  install_tag: 'bin-devel',
+)
 
 # Install pm files for reuse by other *mm projects, when building from git.
 pm_basefiles = [
@@ -96,4 +103,7 @@ foreach file : pm_basefiles
   pm_files += 'pm' / file
 endforeach
 pm_files = files(pm_files)
-install_data(pm_files, install_dir: install_procdir / 'pm')
+install_data(pm_files,
+  install_dir: install_procdir / 'pm',
+  install_tag: 'bin-devel',
+)

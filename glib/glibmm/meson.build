@@ -335,7 +335,8 @@ meson.add_install_script(
   python3, generate_binding_py, 'install_built_h_files',
   built_h_cc_dir,
   install_includedir / glibmm_pcname / 'glibmm', # subdir below {prefix}
-  glibmm_hg_ccg_basenames
+  glibmm_hg_ccg_basenames,
+  install_tag: 'devel',
 )
 # Install .h files built from .m4 files.
 meson.add_install_script(
@@ -343,6 +344,7 @@ meson.add_install_script(
   built_h_cc_dir,
   install_includedir / glibmm_pcname / 'glibmm', # subdir below {prefix}
   glibmm_h_m4_files,
+  install_tag: 'devel',
 )
 
 # Distribute built files.

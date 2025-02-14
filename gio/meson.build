@@ -7,7 +7,9 @@ configure_file(
   input: 'giomm.pc.in',
   output: giomm_pcname + '.pc',
   configuration: pkg_conf_data,
+  install: true,
   install_dir: install_pkgconfigdir,
+  install_tag: 'devel',
 )
 
 giomm_pkg_uninst_conf_data = configuration_data()
@@ -26,5 +28,7 @@ configure_file(
   input: giommconfig_h_meson,
   output: 'giommconfig.h',
   configuration: pkg_conf_data,
+  install: true,
   install_dir: install_giommconfigdir,
+  install_tag: 'devel',
 )

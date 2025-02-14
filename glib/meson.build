@@ -52,7 +52,9 @@ configure_file(
   input: 'glibmm.pc.in',
   output: glibmm_pcname + '.pc',
   configuration: pkg_conf_data,
+  install: true,
   install_dir: install_pkgconfigdir,
+  install_tag: 'devel',
 )
 
 glibmm_pkg_uninst_conf_data = configuration_data()
@@ -129,5 +131,7 @@ configure_file(
   input: glibmmconfig_h_meson,
   output: 'glibmmconfig.h',
   configuration: glibmm_config_conf_data,
+  install: true,
   install_dir: install_glibmmconfigdir,
+  install_tag: 'devel',
 )
