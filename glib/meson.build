@@ -84,5 +84,7 @@ configure_file(
   input: glibmmconfig_h_meson,
   output: 'glibmmconfig.h',
   configuration: glibmm_config_conf_data,
+  install: true,
   install_dir: install_glibmmconfigdir,
+  install_tag: 'devel',
 )

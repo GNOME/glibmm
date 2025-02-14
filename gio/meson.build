@@ -9,5 +9,7 @@ configure_file(
   input: giommconfig_h_meson,
   output: 'giommconfig.h',
   configuration: pkg_conf_data,
+  install: true,
   install_dir: install_giommconfigdir,
+  install_tag: 'devel',
 )
