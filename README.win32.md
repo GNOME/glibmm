@@ -157,7 +157,10 @@ enabled, you will also need a PERL interpreter and the `m4.exe` and `sh.exe` fro
 MSYS/MSYS64, and you will need to also install Doxygen, LLVM (likely needed by Doxygen) and
 GraphViz unless you pass in `-Dbuild-documentation=false` in your Meson configure command
 line.  You will still need to have `mm-common` installed with its `bin` directory in your
-`%PATH%`
+`%PATH%`.
+It is recommended that in your `%PATH%`, the path of the Python 3.x installation
+obtained from www.python.org or the Windows store or from Visual Studio comes
+before your Cygwin or MSYS/MSYS64 installation.
 
 ### Glibmm methods and signals not available on win32
 
