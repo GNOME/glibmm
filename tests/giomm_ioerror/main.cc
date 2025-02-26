@@ -22,7 +22,7 @@ std::ostream& ostr = debug;
 #endif
 
 #ifdef G_OS_WIN32
-#define TEST_FILE "c:/windows/write.exe"
+#define TEST_FILE "c:/windows/notepad.exe"
 #else
 #define TEST_FILE "/etc/passwd"
 #endif
