@@ -52,7 +52,7 @@ ConstructParams::ConstructParams(
   va_start(var_args, first_property_name);
 
   GObjectClass* const g_class =
-    static_cast<GObjectClass*>(g_type_class_ref(glibmm_class.get_type()));
+    static_cast<GObjectClass*>(g_type_class_get(glibmm_class.get_type()));
 
   unsigned int n_alloced_params = 0;
   char* collect_error = nullptr; // output argument of G_VALUE_COLLECT()
@@ -94,8 +94,6 @@ ConstructParams::ConstructParams(
 
     ++n_parameters;
   }
-
-  g_type_class_unref(g_class);
 
   va_end(var_args);
 }

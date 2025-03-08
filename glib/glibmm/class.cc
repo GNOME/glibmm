@@ -266,7 +266,7 @@ Class::custom_class_init_function(void* g_class, void* class_data)
 
   for (guint i = 0; i < n_interfaces; ++i)
   {
-    void* const g_iface = g_type_default_interface_ref(iface_types[i]);
+    void* const g_iface = g_type_default_interface_get(iface_types[i]);
 
     guint n_iface_props = 0;
     GParamSpec** iface_props = g_object_interface_list_properties(g_iface, &n_iface_props);
@@ -290,7 +290,6 @@ Class::custom_class_init_function(void* g_class, void* class_data)
       }
     } // end for p
 
-    g_type_default_interface_unref(g_iface);
     g_free(iface_props);
 
   } // end for i

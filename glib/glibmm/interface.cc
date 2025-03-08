@@ -63,7 +63,7 @@ Interface::Interface(const Interface_Class& interface_class)
 
       if (!g_type_interface_peek(instance_class, iface_type))
       {
-        void* const g_iface = g_type_default_interface_ref(iface_type);
+        void* const g_iface = g_type_default_interface_get(iface_type);
 
         // Override the properties of the derived interface, if any.
 
@@ -96,7 +96,6 @@ Interface::Interface(const Interface_Class& interface_class)
 
         interface_class.add_interface(custom_type);
 
-        g_type_default_interface_unref(g_iface);
         g_free(iface_props);
       }
     }
