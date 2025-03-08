@@ -1976,8 +1976,8 @@ guaranteed to never be %NULL (either may be empty though).
 This signal exists purely as a convenience to avoid having to
 connect signals to all interface proxies managed by @manager.
 
-This signal is emitted in the
-[thread-default main context][g-main-context-push-thread-default]
+This signal is emitted in the thread-default main context
+(see [method@GLib.MainContext.push_thread_default])
 that @manager was constructed in.
 
 Since: 2.30
@@ -2016,8 +2016,8 @@ Emitted when a D-Bus signal is received on @interface_proxy.
 This signal exists purely as a convenience to avoid having to
 connect signals to all interface proxies managed by @manager.
 
-This signal is emitted in the
-[thread-default main context][g-main-context-push-thread-default]
+This signal is emitted in the thread-default main context
+(see [method@GLib.MainContext.push_thread_default])
 that @manager was constructed in.
 
 Since: 2.30
@@ -2527,8 +2527,8 @@ the #GDBusConnection::closed signal.
 
 If #GDBusServer:flags contains %G_DBUS_SERVER_FLAGS_RUN_IN_THREAD
 then the signal is emitted in a new thread dedicated to the
-connection. Otherwise the signal is emitted in the
-[thread-default main context][g-main-context-push-thread-default]
+connection. Otherwise the signal is emitted in the thread-default
+main context (see [method@GLib.MainContext.push_thread_default])
 of the thread that @server was constructed in.
 
 You are guaranteed that signal handlers for this signal runs
@@ -4385,10 +4385,10 @@ Defaults to `$XDG_CONFIG_HOME/glib-2.0/settings/keyfile`.
 
 <property name="GKeyfileSettingsBackend:root-group">
 <description>
-If @root_group is non-%NULL then it specifies the name of the keyfile
+If @root_group is non-`NULL` then it specifies the name of the keyfile
 group used for keys that are written directly below the root path.
 
-Defaults to NULL.
+Defaults to `NULL`.
 
 </description>
 </property>
@@ -4396,10 +4396,12 @@ Defaults to NULL.
 <property name="GKeyfileSettingsBackend:root-path">
 <description>
 All settings read to or written from the backend must fall under the
-path given in @root_path (which must start and end with a slash and
-not contain two consecutive slashes).  @root_path may be &quot;/&quot;.
+path given in @root_path.
 
-Defaults to &quot;/&quot;.
+The path must start and end with a slash and not contain two consecutive
+slashes. It may be `&quot;/&quot;`.
+
+Defaults to `&quot;/&quot;`.
 
 </description>
 </property>
@@ -12460,10 +12462,10 @@ before the list of options, or %NULL
 <description>
 Sets (or unsets) the base resource path of @application.
 
-The path is used to automatically load various [application
-resources][gresource] such as menu layouts and action descriptions.
-The various types of resources will be found at fixed names relative
-to the given base path.
+The path is used to automatically load various
+[application resources][struct@Gio.Resource] such as menu layouts and
+action descriptions. The various types of resources will be found at
+fixed names relative to the given base path.
 
 By default, the resource base path is determined from the application
 ID by prefixing '/' and replacing each '.' with '/'.  This is done at
@@ -13489,8 +13491,8 @@ Free with g_object_unref().
 <description>
 Starts acquiring @name on the bus specified by @bus_type and calls
 @name_acquired_handler and @name_lost_handler when the name is
-acquired respectively lost. Callbacks will be invoked in the 
-[thread-default main context][g-main-context-push-thread-default]
+acquired respectively lost. Callbacks will be invoked in the thread-default
+main context (see [method@GLib.MainContext.push_thread_default])
 of the thread you are calling this function from.
 
 You are guaranteed that one of the @name_acquired_handler and @name_lost_handler
@@ -13533,7 +13535,7 @@ in @bus_acquired_handler since you are guaranteed that this will run
 before @name is requested from the bus.
 
 This behavior makes it very simple to write applications that wants
-to [own names][gdbus-owning-names] and export objects.
+to [own names](dbus-name-owning.html#d-bus-name-owning) and export objects.
 Simply register objects to be exported in @bus_acquired_handler and
 unregister the objects (if any) in @name_lost_handler.
 
@@ -13761,8 +13763,8 @@ Since: 2.26
 Starts watching @name on the bus specified by @bus_type and calls
 @name_appeared_handler and @name_vanished_handler when the name is
 known to have an owner respectively known to lose its
-owner. Callbacks will be invoked in the
-[thread-default main context][g-main-context-push-thread-default]
+owner. Callbacks will be invoked in the thread-default main context
+(see [method@GLib.MainContext.push_thread_default])
 of the thread you are calling this function from.
 
 You are guaranteed that one of the handlers will be invoked after
@@ -13783,7 +13785,7 @@ guaranteed that the next time one of the handlers is invoked, it
 will be @name_vanished_handler. The reverse is also true.
 
 This behavior makes it very simple to write applications that want
-to take action when a certain [name exists][gdbus-watching-names].
+to take action when a certain [name exists](dbus-name-watching.html#d-bus-name-watching).
 Basically, the application should create object proxies in
 @name_appeared_handler and destroy them again (if any) in
 @name_vanished_handler.
@@ -14428,6 +14430,38 @@ Since: 2.24
 </parameter>
 <parameter name="use_fallback">
 <parameter_description> %TRUE to use fallbacks
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_clear_dbus_signal_subscription">
+<description>
+If @subscription_id_pointer points to a nonzero subscription ID,
+unsubscribe from that D-Bus signal subscription as if via
+[method@Gio.DBusConnection.signal_unsubscribe].
+
+Also set the value pointed to by @subscription_id_pointer to zero,
+which signifies it’s no longer a valid subscription ID.
+
+This convenience function for C code helps to ensure that each signal
+subscription is unsubscribed exactly once, similar to
+[func@GObject.clear_object] and [func@GObject.clear_signal_handler].
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="subscription_id_pointer">
+<parameter_description> A pointer to either a
+subscription ID obtained from [method@Gio.DBusConnection.signal_subscribe],
+or zero.
+</parameter_description>
+</parameter>
+<parameter name="connection">
+<parameter_description> The connection from which the subscription ID was obtained.
+This pointer may be `NULL` or invalid, if the subscription ID is zero.
 </parameter_description>
 </parameter>
 </parameters>
@@ -17073,8 +17107,8 @@ NULL);
 ]|
 
 This is an asynchronous method. When the operation is finished,
-@callback will be invoked in the
-[thread-default main context][g-main-context-push-thread-default]
+@callback will be invoked in the thread-default main context
+(see [method@GLib.MainContext.push_thread_default])
 of the thread you are calling this method from. You can then call
 g_dbus_connection_call_finish() to get the result of the operation.
 See g_dbus_connection_call_sync() for the synchronous version of this
@@ -17484,13 +17518,13 @@ If @connection is already closed, this method fails with
 %G_IO_ERROR_CLOSED.
 
 When @connection has been closed, the #GDBusConnection::closed
-signal is emitted in the
-[thread-default main context][g-main-context-push-thread-default]
+signal is emitted in the thread-default main context
+(see [method@GLib.MainContext.push_thread_default])
 of the thread that @connection was constructed in.
 
 This is an asynchronous method. When the operation is finished,
-@callback will be invoked in the 
-[thread-default main context][g-main-context-push-thread-default]
+@callback will be invoked in the thread-default main context
+(see [method@GLib.MainContext.push_thread_default])
 of the thread you are calling this method from. You can
 then call g_dbus_connection_close_finish() to get the result of the
 operation. See g_dbus_connection_close_sync() for the synchronous
@@ -17721,15 +17755,15 @@ Since: 2.32
 <function name="g_dbus_connection_flush">
 <description>
 Asynchronously flushes @connection, that is, writes all queued
-outgoing message to the transport and then flushes the transport
+outgoing messages to the transport and then flushes the transport
 (using g_output_stream_flush_async()). This is useful in programs
-that wants to emit a D-Bus signal and then exit immediately. Without
-flushing the connection, there is no guaranteed that the message has
+that want to emit a D-Bus signal and then exit immediately. Without
+flushing the connection, there is no guarantee that the message has
 been sent to the networking buffers in the OS kernel.
 
 This is an asynchronous method. When the operation is finished,
-@callback will be invoked in the
-[thread-default main context][g-main-context-push-thread-default]
+@callback will be invoked in the thread-default main context
+(see [method@GLib.MainContext.push_thread_default])
 of the thread you are calling this method from. You can
 then call g_dbus_connection_flush_finish() to get the result of the
 operation. See g_dbus_connection_flush_sync() for the synchronous
@@ -18279,8 +18313,8 @@ Registers callbacks for exported objects at @object_path with the
 D-Bus interface that is described in @interface_info.
 
 Calls to functions in @vtable (and @user_data_free_func) will happen
-in the 
-[thread-default main context][g-main-context-push-thread-default]
+in the thread-default main context
+(see [method@GLib.MainContext.push_thread_default])
 of the thread you are calling this method from.
 
 Note that all #GVariant values passed to functions in @vtable will match
@@ -18312,7 +18346,8 @@ incremented by 1 (unless allocated statically, e.g. if the
 reference count is -1, see g_dbus_interface_info_ref()) for as long
 as the object is exported. Also note that @vtable will be copied.
 
-See this [server][gdbus-server] for an example of how to use this method.
+See this [server][class@Gio.DBusConnection#an-example-d-bus-server]
+for an example of how to use this method.
 
 Since: 2.26
 
@@ -18364,6 +18399,9 @@ Note that the reference counting semantics of the function wrapped by
 [class@Gio.DBusMethodInvocation] is transferred to the function.
 
 Since: 2.46
+Deprecated: 2.84: Deprecated in favour of
+[method@Gio.DBusConnection.register_object_with_closures2], which has more
+binding-friendly reference counting semantics.
 
 </description>
 <parameters>
@@ -18402,6 +18440,60 @@ that can be used with g_dbus_connection_unregister_object() .
 </return>
 </function>
 
+<function name="g_dbus_connection_register_object_with_closures2">
+<description>
+Version of [method@Gio.DBusConnection.register_object] using closures instead
+of a [type@Gio.DBusInterfaceVTable] for easier binding in other languages.
+
+In contrast to [method@Gio.DBusConnection.register_object] and
+[method@Gio.DBusConnection.register_object_with_closures], the reference
+counting semantics of the function wrapped by @method_call_closure are *not*
+the same as those of [callback@Gio.DBusInterfaceMethodCallFunc]. Ownership of
+a reference to the [class@Gio.DBusMethodInvocation] is *not* transferred to
+the function. Bindings must ensure that they add a reference to the
+[class@Gio.DBusMethodInvocation] before calling any
+`g_dbus_method_invocation_return_*()` methods on it. This should be automatic
+as a result of the introspection annotations on those methods.
+
+Since: 2.84
+
+</description>
+<parameters>
+<parameter name="connection">
+<parameter_description> A [class@Gio.DBusConnection].
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> The object path to register at.
+</parameter_description>
+</parameter>
+<parameter name="interface_info">
+<parameter_description> Introspection data for the interface.
+</parameter_description>
+</parameter>
+<parameter name="method_call_closure">
+<parameter_description> [type@GObject.Closure] for handling incoming method calls.
+</parameter_description>
+</parameter>
+<parameter name="get_property_closure">
+<parameter_description> [type@GObject.Closure] for getting a property.
+</parameter_description>
+</parameter>
+<parameter name="set_property_closure">
+<parameter_description> [type@GObject.Closure] for setting a property.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or `NULL`.
+</parameter_description>
+</parameter>
+</parameters>
+<return> `0` if @error is set, otherwise a registration ID (never `0`)
+that can be used with [method@Gio.DBusConnection.unregister_object].
+
+</return>
+</function>
+
 <function name="g_dbus_connection_register_subtree">
 <description>
 Registers a whole subtree of dynamic objects.
@@ -18419,8 +18511,8 @@ where to dispatch the call. The collected #GDBusInterfaceVTable and
 #gpointer will be used to call into the interface vtable for processing
 the request.
 
-All calls into user-provided code will be invoked in the
-[thread-default main context][g-main-context-push-thread-default]
+All calls into user-provided code will be invoked in the thread-default
+main context (see [method@GLib.MainContext.push_thread_default])
 of the thread you are calling this method from.
 
 If an existing subtree is already registered at @object_path or
@@ -18436,8 +18528,8 @@ registered via g_dbus_connection_register_object() or other bindings.
 Note that @vtable will be copied so you cannot change it after
 registration.
 
-See this [server][gdbus-subtree-server] for an example of how to use
-this method.
+See this [server][class@Gio.DBusConnection#an-example-for-exporting-a-subtree]
+for an example of how to use this method.
 
 Since: 2.26
 
@@ -18523,7 +18615,8 @@ If @connection is closed then the operation will fail with
 %G_IO_ERROR_CLOSED. If @message is not well-formed,
 the operation fails with %G_IO_ERROR_INVALID_ARGUMENT.
 
-See this [server][gdbus-server] and [client][gdbus-unix-fd-client]
+See this [server][class@Gio.DBusConnection#an-example-d-bus-server]
+and [client][class@Gio.DBusConnection#an-example-for-file-descriptor-passing]
 for an example of how to use this low-level API to send and receive
 UNIX file descriptors.
 
@@ -18581,8 +18674,8 @@ fail with %G_IO_ERROR_CANCELLED. If @message is not well-formed,
 the operation fails with %G_IO_ERROR_INVALID_ARGUMENT.
 
 This is an asynchronous method. When the operation is finished, @callback
-will be invoked in the 
-[thread-default main context][g-main-context-push-thread-default]
+will be invoked in the thread-default main context
+(see [method@GLib.MainContext.push_thread_default])
 of the thread you are calling this method from. You can then call
 g_dbus_connection_send_message_with_reply_finish() to get the result of the operation.
 See g_dbus_connection_send_message_with_reply_sync() for the synchronous version.
@@ -18590,7 +18683,8 @@ See g_dbus_connection_send_message_with_reply_sync() for the synchronous version
 Note that @message must be unlocked, unless @flags contain the
 %G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL flag.
 
-See this [server][gdbus-server] and [client][gdbus-unix-fd-client]
+See this [server][class@Gio.DBusConnection#an-example-d-bus-server]
+and [client][class@Gio.DBusConnection#an-example-for-file-descriptor-passing]
 for an example of how to use this low-level API to send and receive
 UNIX file descriptors.
 
@@ -18646,7 +18740,8 @@ occurred. That is to say that the returned #GDBusMessage object may
 be of type %G_DBUS_MESSAGE_TYPE_ERROR. Use
 g_dbus_message_to_gerror() to transcode this to a #GError.
 
-See this [server][gdbus-server] and [client][gdbus-unix-fd-client]
+See this [server][class@Gio.DBusConnection#an-example-d-bus-server]
+and [client][class@Gio.DBusConnection#an-example-for-file-descriptor-passing]
 for an example of how to use this low-level API to send and receive
 UNIX file descriptors.
 
@@ -18699,7 +18794,8 @@ occurred. That is to say that the returned #GDBusMessage object may
 be of type %G_DBUS_MESSAGE_TYPE_ERROR. Use
 g_dbus_message_to_gerror() to transcode this to a #GError.
 
-See this [server][gdbus-server] and [client][gdbus-unix-fd-client]
+See this [server][class@Gio.DBusConnection#an-example-d-bus-server]
+and [client][class@Gio.DBusConnection#an-example-for-file-descriptor-passing]
 for an example of how to use this low-level API to send and receive
 UNIX file descriptors.
 
@@ -18780,8 +18876,8 @@ when @connection is closed by the remote peer
 <function name="g_dbus_connection_signal_subscribe">
 <description>
 Subscribes to signals on @connection and invokes @callback whenever
-the signal is received. Note that @callback will be invoked in the 
-[thread-default main context][g-main-context-push-thread-default]
+the signal is received. Note that @callback will be invoked in the
+thread-default main context (see [method@GLib.MainContext.push_thread_default])
 of the thread you are calling this method from.
 
 If @connection is not a message bus connection, @sender must be
@@ -19925,7 +20021,7 @@ Since: 2.30
 </parameter>
 </parameters>
 <return> A #GVariant of type
-['a{sv}'][G-VARIANT-TYPE-VARDICT:CAPS].
+['a{sv}'](../glib/gvariant-text-format.html#dictionaries-and-dictionary-entries).
 Free with g_variant_unref().
 
 </return>
@@ -21238,6 +21334,9 @@ Since: 2.26
 <description>
 Sets the serial for @message.
 
+The [D-Bus specification](https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol-messages)
+does not allow the @serial to be zero.
+
 Since: 2.26
 
 </description>
@@ -21247,7 +21346,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="serial">
-<parameter_description> A #guint32.
+<parameter_description> A #guint32, which must not be zero.
 </parameter_description>
 </parameter>
 </parameters>
@@ -21455,7 +21554,8 @@ you need to use low-level protocol features, such as UNIX file
 descriptor passing, that cannot be properly expressed in the
 #GVariant API.
 
-See this [server][gdbus-server] and [client][gdbus-unix-fd-client]
+See this [server][class@Gio.DBusConnection#an-example-d-bus-server]
+and [client][class@Gio.DBusConnection#an-example-for-file-descriptor-passing]
 for an example of how to use this low-level API to send and receive
 UNIX file descriptors.
 
@@ -21956,7 +22056,7 @@ The introspection XML must contain exactly one top-level
 `&lt;node&gt;` element.
 
 Note that this routine is using a
-[GMarkup][glib-Simple-XML-Subset-Parser.description]-based
+[GMarkup](../glib/markup.html)-based
 parser that only accepts a subset of valid XML documents.
 
 Since: 2.26
@@ -22162,10 +22262,10 @@ exists. Free with g_free().
 Asynchronously creates a new #GDBusObjectManagerClient object.
 
 This is an asynchronous failable constructor. When the result is
-ready, @callback will be invoked in the
-[thread-default main context][g-main-context-push-thread-default]
-of the thread you are calling this method from. You can
-then call g_dbus_object_manager_client_new_finish() to get the result. See
+ready, @callback will be invoked in the thread-default main context
+(see [method@GLib.MainContext.push_thread_default])
+of the thread you are calling this method from. You can then call
+g_dbus_object_manager_client_new_finish() to get the result. See
 g_dbus_object_manager_client_new_sync() for the synchronous version.
 
 Since: 2.30
@@ -22246,8 +22346,8 @@ Like g_dbus_object_manager_client_new() but takes a #GBusType instead of a
 #GDBusConnection.
 
 This is an asynchronous failable constructor. When the result is
-ready, @callback will be invoked in the
-[thread-default main loop][g-main-context-push-thread-default]
+ready, @callback will be invoked in the thread-default main context
+(see [method@GLib.MainContext.push_thread_default])
 of the thread you are calling this method from. You can
 then call g_dbus_object_manager_client_new_for_bus_finish() to get the result. See
 g_dbus_object_manager_client_new_for_bus_sync() for the synchronous version.
@@ -22929,8 +23029,8 @@ If @proxy has an expected interface (see
 then the return value is checked against the return type.
 
 This is an asynchronous method. When the operation is finished,
-@callback will be invoked in the
-[thread-default main context][g-main-context-push-thread-default]
+@callback will be invoked in the thread-default main context
+(see [method@GLib.MainContext.push_thread_default])
 of the thread you are calling this method from.
 You can then call g_dbus_proxy_call_finish() to get the result of
 the operation. See g_dbus_proxy_call_sync() for the synchronous
@@ -23461,7 +23561,7 @@ g_dbus_proxy_new_finish() to get the result.
 
 See g_dbus_proxy_new_sync() and for a synchronous version of this constructor.
 
-#GDBusProxy is used in this [example][gdbus-wellknown-proxy].
+#GDBusProxy is used in this [example][class@Gio.DBusProxy#a-watch-proxy-example].
 
 Since: 2.26
 
@@ -23534,7 +23634,7 @@ Free with g_object_unref().
 <description>
 Like g_dbus_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
 
-#GDBusProxy is used in this [example][gdbus-wellknown-proxy].
+#GDBusProxy is used in this [example][class@Gio.DBusProxy#a-watch-proxy-example].
 
 Since: 2.26
 
@@ -23607,7 +23707,7 @@ Free with g_object_unref().
 <description>
 Like g_dbus_proxy_new_sync() but takes a #GBusType instead of a #GDBusConnection.
 
-#GDBusProxy is used in this [example][gdbus-wellknown-proxy].
+#GDBusProxy is used in this [example][class@Gio.DBusProxy#a-watch-proxy-example].
 
 Since: 2.26
 
@@ -23676,7 +23776,7 @@ will be requested to launch a name owner for the name.
 This is a synchronous failable constructor. See g_dbus_proxy_new()
 and g_dbus_proxy_new_finish() for the asynchronous version.
 
-#GDBusProxy is used in this [example][gdbus-wellknown-proxy].
+#GDBusProxy is used in this [example][class@Gio.DBusProxy#a-watch-proxy-example].
 
 Since: 2.26
 
@@ -23919,7 +24019,7 @@ incoming connections.
 The returned #GDBusServer isn't active - you have to start it with
 g_dbus_server_start().
 
-#GDBusServer is used in this [example][gdbus-peer-to-peer].
+#GDBusServer is used in this [example](https://gitlab.gnome.org/GNOME/glib/-/blob/HEAD/gio/tests/gdbus-example-peer.c).
 
 This is a synchronous failable constructor. There is currently no
 asynchronous version.
@@ -28987,8 +29087,8 @@ Clears the status information from @info.
 
 <function name="g_file_info_copy_into">
 <description>
-First clears all of the [GFileAttribute][gio-GFileAttribute] of @dest_info,
-and then copies all of the file attributes from @src_info to @dest_info.
+First clears all of the [GFileAttribute](file-attributes.html#file-attributes) of
+@dest_info, and then copies all of the file attributes from @src_info to @dest_info.
 
 </description>
 <parameters>
@@ -29480,7 +29580,7 @@ It is an error to call this if the #GFileInfo does not contain
 
 <function name="g_file_info_get_etag">
 <description>
-Gets the [entity tag](iface.File.html#entity-tags) for a given
+Gets the [entity tag][iface@Gio.File#entity-tags] for a given
 #GFileInfo. See %G_FILE_ATTRIBUTE_ETAG_VALUE.
 
 It is an error to call this if the #GFileInfo does not contain
@@ -30195,7 +30295,7 @@ See %G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE.
 </parameter_description>
 </parameter>
 <parameter name="content_type">
-<parameter_description> a content type. See [GContentType][gio-GContentType]
+<parameter_description> a [content type](content-types.html#content-types).
 </parameter_description>
 </parameter>
 </parameters>
@@ -31595,8 +31695,8 @@ has taken place. Should be called from file monitor
 implementations only.
 
 Implementations are responsible to call this method from the
-[thread-default main context][g-main-context-push-thread-default] of the
-thread that the monitor was created in.
+thread-default main context (see [method@GLib.MainContext.push_thread_default])
+of the thread that the monitor was created in.
 
 </description>
 <parameters>
@@ -34491,8 +34591,8 @@ Since: 2.22
 
 <function name="g_file_supports_thread_contexts">
 <description>
-Checks if @file supports
-[thread-default contexts][g-main-context-push-thread-default-context].
+Checks if @file supports thread-default main contexts
+(see [method@GLib.MainContext.push_thread_default])
 If this returns %FALSE, you cannot perform asynchronous operations on
 @file in a thread that has a thread-default context.
 
@@ -35755,7 +35855,7 @@ the object doesn't support cancellable initialization the error
 If the object is not initialized, or initialization returns with an
 error, then all operations on the object except g_object_ref() and
 g_object_unref() are considered to be invalid, and have undefined
-behaviour. See the [introduction][ginitable] for more details.
+behaviour. See the [description][iface@Gio.Initable#description] for more details.
 
 Callers should not assume that a class which implements #GInitable can be
 initialized multiple times, unless the class explicitly documents itself as
@@ -37676,54 +37776,54 @@ ignore.
 
 <function name="g_keyfile_settings_backend_new">
 <description>
-Creates a keyfile-backed #GSettingsBackend.
+Creates a keyfile-backed [class@Gio.SettingsBackend].
 
 The filename of the keyfile to use is given by @filename.
 
 All settings read to or written from the backend must fall under the
 path given in @root_path (which must start and end with a slash and
-not contain two consecutive slashes).  @root_path may be &quot;/&quot;.
+not contain two consecutive slashes).  @root_path may be `&quot;/&quot;`.
 
-If @root_group is non-%NULL then it specifies the name of the keyfile
+If @root_group is non-`NULL` then it specifies the name of the keyfile
 group used for keys that are written directly below @root_path.  For
-example, if @root_path is &quot;/apps/example/&quot; and @root_group is
-&quot;toplevel&quot;, then settings the key &quot;/apps/example/enabled&quot; to a value
-of %TRUE will cause the following to appear in the keyfile:
+example, if @root_path is `&quot;/apps/example/&quot;` and @root_group is
+`&quot;toplevel&quot;`, then setting the key `&quot;/apps/example/enabled&quot;` to true will
+cause the following to appear in the keyfile:
 
-|[
+```
 [toplevel]
 enabled=true
-]|
+```
 
-If @root_group is %NULL then it is not permitted to store keys
+If @root_group is `NULL` then it is not permitted to store keys
 directly below the @root_path.
 
 For keys not stored directly below @root_path (ie: in a sub-path),
 the name of the subpath (with the final slash stripped) is used as
 the name of the keyfile group.  To continue the example, if
-&quot;/apps/example/profiles/default/font-size&quot; were set to
-12 then the following would appear in the keyfile:
+`&quot;/apps/example/profiles/default/font-size&quot;` were set to
+`12` then the following would appear in the keyfile:
 
-|[
+```
 [profiles/default]
 font-size=12
-]|
+```
 
 The backend will refuse writes (and return writability as being
-%FALSE) for keys outside of @root_path and, in the event that
-@root_group is %NULL, also for keys directly under @root_path.
+false) for keys outside of @root_path and, in the event that
+@root_group is `NULL`, also for keys directly under @root_path.
 Writes will also be refused if the backend detects that it has the
 inability to rewrite the keyfile (ie: the containing directory is not
 writable).
 
 There is no checking done for your key namespace clashing with the
-syntax of the key file format.  For example, if you have '[' or ']'
-characters in your path names or '=' in your key names you may be in
+syntax of the key file format.  For example, if you have `[` or `]`
+characters in your path names or `=` in your key names you may be in
 trouble.
 
 The backend reads default values from a keyfile called `defaults` in
-the directory specified by the #GKeyfileSettingsBackend:defaults-dir property,
-and a list of locked keys from a text file with the name `locks` in
+the directory specified by the `GKeyfileSettingsBackend:defaults-dir`
+property, and a list of locked keys from a text file with the name `locks` in
 the same location.
 
 
@@ -37738,12 +37838,12 @@ the same location.
 </parameter_description>
 </parameter>
 <parameter name="root_group">
-<parameter_description> the group name corresponding to
-@root_path, or %NULL
+<parameter_description> the group name corresponding to @root_path, or
+`NULL` to disallow storing keys directly beneath @root_path
 </parameter_description>
 </parameter>
 </parameters>
-<return> a keyfile-backed #GSettingsBackend
+<return> a keyfile-backed [class@Gio.SettingsBackend]
 </return>
 </function>
 
@@ -49117,7 +49217,7 @@ Deprecated: 2.46: Use #GTask instead.
 <function name="g_simple_async_result_complete_in_idle">
 <description>
 Completes an asynchronous function in an idle handler in the
-[thread-default main context][g-main-context-push-thread-default]
+thread-default main context (see [method@GLib.MainContext.push_thread_default])
 of the thread that @simple was initially created in
 (and re-pushes that context around the invocation of the callback).
 
@@ -55870,8 +55970,8 @@ Since: 2.44
 <function name="g_task_get_context">
 <description>
 Gets the #GMainContext that @task will return its result in (that
-is, the context that was the
-[thread-default main context][g-main-context-push-thread-default]
+is, the context that was the thread-default main context
+(see [method@GLib.MainContext.push_thread_default])
 at the point when @task was created).
 
 This will always return a non-%NULL value, even if the task's
@@ -56045,8 +56145,8 @@ if not
 <function name="g_task_new">
 <description>
 Creates a #GTask acting on @source_object, which will eventually be
-used to invoke @callback in the current
-[thread-default main context][g-main-context-push-thread-default].
+used to invoke @callback in the current thread-default main context
+(see [method@GLib.MainContext.push_thread_default]).
 
 Call this in the &quot;start&quot; method of your asynchronous method, and
 pass the #GTask around throughout the asynchronous operation. You
@@ -63191,7 +63291,7 @@ Gets the volume monitor used by gio.
 <parameters>
 </parameters>
 <return> a reference to the #GVolumeMonitor used by gio. Call
-g_object_unref() when done with it.
+g_object_unref() when done with it, after disconnecting any signal handlers.
 </return>
 </function>
 
