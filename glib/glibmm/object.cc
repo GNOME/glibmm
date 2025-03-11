@@ -73,8 +73,10 @@ ConstructParams::ConstructParams(
   va_list var_args;
   va_start(var_args, first_property_name);
 
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   GObjectClass* const g_class =
     static_cast<GObjectClass*>(g_type_class_ref(glibmm_class.get_type()));
+  G_GNUC_END_IGNORE_DEPRECATIONS
 
   unsigned int n_alloced_params = 0;
   char* collect_error = nullptr; // output argument of G_VALUE_COLLECT()
@@ -116,7 +118,9 @@ G_GNUC_END_IGNORE_DEPRECATIONS
     ++n_parameters;
   }
 
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   g_type_class_unref(g_class);
+  G_GNUC_END_IGNORE_DEPRECATIONS
 
   va_end(var_args);
 }

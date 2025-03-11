@@ -63,7 +63,9 @@ Interface::Interface(const Interface_Class& interface_class)
 
       if (!g_type_interface_peek(instance_class, iface_type))
       {
+        G_GNUC_BEGIN_IGNORE_DEPRECATIONS
         void* const g_iface = g_type_default_interface_ref(iface_type);
+        G_GNUC_END_IGNORE_DEPRECATIONS
 
         // Override the properties of the derived interface, if any.
 
@@ -96,7 +98,9 @@ Interface::Interface(const Interface_Class& interface_class)
 
         interface_class.add_interface(custom_type);
 
+        G_GNUC_BEGIN_IGNORE_DEPRECATIONS
         g_type_default_interface_unref(g_iface);
+        G_GNUC_END_IGNORE_DEPRECATIONS
         g_free(iface_props);
       }
     }

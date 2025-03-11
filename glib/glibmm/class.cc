@@ -252,7 +252,9 @@ Class::custom_class_init_function(void* g_class, void* class_data)
 
   for (guint i = 0; i < n_interfaces; ++i)
   {
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     void* const g_iface = g_type_default_interface_ref(iface_types[i]);
+    G_GNUC_END_IGNORE_DEPRECATIONS
 
     guint n_iface_props = 0;
     GParamSpec** iface_props = g_object_interface_list_properties(g_iface, &n_iface_props);
@@ -275,7 +277,9 @@ Class::custom_class_init_function(void* g_class, void* class_data)
       }
     } // end for p
 
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     g_type_default_interface_unref(g_iface);
+    G_GNUC_END_IGNORE_DEPRECATIONS
     g_free(iface_props);
 
   } // end for i
