@@ -47,9 +47,9 @@ is_msvc = cpp_compiler.get_id() == 'msvc'
 is_host_windows = host_machine.system() == 'windows'
 is_os_cocoa = host_machine.system() == 'darwin'
 
-python_executable = is_msvc ? 'python' : 'python3'
+# Use the Python installation that Meson uses. Its version is >= 3.7.
+python3 = import('python').find_installation()
 
-python3 = find_program(python_executable, version: '>=3.7')
 pkgconfig = import('pkgconfig')
 common_pkgconfig_vars = [
   'doxytagfile=${docdir}/reference/@0@.tag'.format(glibmm_pcname),
