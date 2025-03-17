@@ -47,7 +47,8 @@ is_msvc = cpp_compiler.get_id() == 'msvc'
 is_host_windows = host_machine.system() == 'windows'
 is_os_cocoa = host_machine.system() == 'darwin'
 
-python3 = find_program('python3', version: '>=3.7')
+# Use the Python installation that Meson uses. Its version is >= 3.7.
+python3 = import('python').find_installation()
 
 # Do we build from a git repository?
 # Suppose we do if and only if the meson.build file is tracked by git.
