@@ -587,7 +587,7 @@ class DefsWriter:
 
     def _write_method(self, obj, name, ret, args):
         regex = ''.join([x+'_?' for x in obj.lower()])
-        mname = re.sub(regex, '', name, 1)
+        mname = re.sub(regex, '', name, count=1)
         if self.prefix:
             l = len(self.prefix) + 1
             if mname[:l] == self.prefix and mname[l+1] == '_':
