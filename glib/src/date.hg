@@ -316,6 +316,26 @@ public:
    */
   unsigned int get_sunday_week_of_year() const;
 
+  /** Calculates the week of the year during which this date falls.
+   *
+   * The result depends on which day is considered the first day of the week,
+   * which varies by locale. Both this date and `first_day_of_week` must be valid.
+   *
+   * If this date is before the start of the first week of the year (for example,
+   * before the first Monday in January if @c first_day_of_week is
+   * Glib::Date::Weekday::MONDAY) then zero will be returned.
+   *
+   * @param first_day_of_week The day which is considered the first day of the week.
+   *    (For example, this would be Glib::Date::Weekday::SUNDAY in US locales,
+   *    Glib::Date::Weekday::MONDAY in British locales, and
+   *    Glib::Date::Weekday::SATURDAY in Egyptian locales.)
+   * @return Week number (starting from 1), or `0` if this date is before the start
+   *    of the first week of the year.
+   *
+   * @newin{2,86}
+   */
+  unsigned int get_week_of_year(Weekday first_day_of_week) const;
+
   /** Returns the week of the year, where weeks are interpreted according to ISO 8601.
    * The date must be valid.
    * @return ISO 8601 week number of the year.
@@ -356,6 +376,26 @@ public:
    * @return Number of weeks.
    */
   static guint8 get_sunday_weeks_in_year(Year year);
+
+  /** Calculates the number of weeks in the year.
+   *
+   * The result depends on which day is considered the first day of the week,
+   * which varies by locale. `first_day_of_week` must be valid.
+   *
+   * The result will be either 52 or 53. Years always have 52 seven-day periods,
+   * plus one or two extra days depending on whether it’s a leap year. This
+   * function effectively calculates how many @c first_day_of_week days there are in
+   * the year.
+   *
+   * @param year Year to count weeks in.
+   * @param first_day_of_week The day which is considered the first day of the week.
+   *    (For example, this would be Glib::Date::Weekday::SUNDAY in US locales,
+   *    Glib::Date::Weekday::MONDAY in British locales, and
+   *    Glib::Date::Weekday::SATURDAY in Egyptian locales.)
+   * @return The number of weeks in @c year.
+   * @newin{2,86}
+   */
+  static guint8 get_weeks_in_year(Year year, Weekday first_day_of_week);
 
   /** Returns true if the year is a leap year.
    * @param year Year to check.

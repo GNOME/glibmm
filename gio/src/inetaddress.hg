@@ -45,12 +45,26 @@ class GIOMM_API InetAddress
   _CLASS_GOBJECT(InetAddress, GInetAddress, G_INET_ADDRESS, Glib::Object, GObject, , , GIOMM_API)
 
 protected:
- _WRAP_CTOR(InetAddress(const guint8 *bytes, SocketFamily family), g_inet_address_new_from_bytes)
- _IGNORE(g_inet_address_mask_new)dnl// Belongs to GInetAddressMask.
+  _WRAP_CTOR(InetAddress(const guint8* bytes, SocketFamily family), g_inet_address_new_from_bytes)
+  _WRAP_CTOR(InetAddress(const guint8* bytes, SocketFamily family, guint32 flowinfo, guint32 scope_id),
+    g_inet_address_new_from_bytes_with_ipv6_info)
+  _IGNORE(g_inet_address_mask_new)dnl// Belongs to GInetAddressMask.
 
 public:
   static Glib::RefPtr<InetAddress> create(const Glib::ustring& string);
-  _WRAP_CREATE(const guint8 *bytes, SocketFamily family)
+  _WRAP_CREATE(const guint8* bytes, SocketFamily family)
+  /** Creates a new %Gio::InetAddress from the given @c family, @c bytes and @c scope_id.
+   *
+   * @c bytes must be 4 bytes for Gio::SocketFamily::IPV4 and 16 bytes for
+   * Gio::SocketFamily::IPV6.
+   *
+   * @param bytes Raw address data.
+   * @param family The address family of @c bytes.
+   * @param scope_id The scope-id of the address.
+   * @return A new internet address corresponding to @c family, @c bytes and @c scope_id
+   * @newin{2,86}
+   */
+  _WRAP_CREATE(const guint8* bytes, SocketFamily family, guint32 flowinfo, guint32 scope_id)
   static Glib::RefPtr<InetAddress> create_any(SocketFamily family);
   static Glib::RefPtr<InetAddress> create_loopback(SocketFamily family);
 
@@ -70,6 +84,8 @@ public:
   _WRAP_METHOD(bool get_is_multicast() const, g_inet_address_get_is_multicast)
   _WRAP_METHOD(bool get_is_site_local() const, g_inet_address_get_is_site_local)
   _WRAP_METHOD(gsize get_native_size() const, g_inet_address_get_native_size)
+  _WRAP_METHOD(guint32 get_scope_id() const, g_inet_address_get_scope_id)
+  _WRAP_METHOD(guint32 get_flowinfo() const, g_inet_address_get_flowinfo)
 
   _WRAP_PROPERTY("bytes", void*)
   _WRAP_PROPERTY("family", SocketFamily)
@@ -83,6 +99,8 @@ public:
   _WRAP_PROPERTY("is-mc-site-local", bool)
   _WRAP_PROPERTY("is-multicast", bool)
   _WRAP_PROPERTY("is-site-local", bool)
+  _WRAP_PROPERTY("flowinfo", guint)
+  _WRAP_PROPERTY("scope-id", guint)
 };
 
 } // namespace Gio
