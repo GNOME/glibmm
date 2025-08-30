@@ -2406,6 +2406,16 @@
   )
 )
 
+(define-function g_bit_lock_and_get
+  (c-name "g_bit_lock_and_get")
+  (return-type "none")
+  (parameters
+    '("gint*" "address")
+    '("guint" "lock_bit")
+    '("gint*" "out_val")
+  )
+)
+
 (define-function g_bit_trylock
   (c-name "g_bit_trylock")
   (return-type "gboolean")
@@ -2421,6 +2431,17 @@
   (parameters
     '("volatile-gint*" "address")
     '("gint" "lock_bit")
+  )
+)
+
+(define-function g_bit_unlock_and_set
+  (c-name "g_bit_unlock_and_set")
+  (return-type "none")
+  (parameters
+    '("gint*" "address")
+    '("guint" "lock_bit")
+    '("gint" "new_val")
+    '("gint" "preserve_mask")
   )
 )
 
@@ -3848,6 +3869,15 @@
   (return-type "guint")
 )
 
+(define-method get_week_of_year
+  (of-object "GDate")
+  (c-name "g_date_get_week_of_year")
+  (return-type "guint")
+  (parameters
+    '("GDateWeekday" "first_day_of_week")
+  )
+)
+
 (define-method get_iso8601_week_of_year
   (of-object "GDate")
   (c-name "g_date_get_iso8601_week_of_year")
@@ -4042,6 +4072,15 @@
   (return-type "guint8")
   (parameters
     '("GDateYear" "year")
+  )
+)
+
+(define-function g_date_get_weeks_in_year
+  (c-name "g_date_get_weeks_in_year")
+  (return-type "guint8")
+  (parameters
+    '("GDateYear" "year")
+    '("GDateWeekday" "first_day_of_week")
   )
 )
 
@@ -7636,6 +7675,12 @@
   (return-type "GMainContext*")
 )
 
+(define-method dup_context
+  (of-object "GSource")
+  (c-name "g_source_dup_context")
+  (return-type "GMainContext*")
+)
+
 (define-method set_callback
   (of-object "GSource")
   (c-name "g_source_set_callback")
@@ -8533,6 +8578,11 @@
   (parameters
     '("GLogLevelFlags" "fatal_mask")
   )
+)
+
+(define-function g_log_get_always_fatal
+  (c-name "g_log_get_always_fatal")
+  (return-type "GLogLevelFlags")
 )
 
 (define-function g_log_structured
@@ -12546,6 +12596,12 @@
   (parameters
     '("gsize" "dfl_size")
   )
+)
+
+(define-method copy
+  (of-object "GString")
+  (c-name "g_string_copy")
+  (return-type "GString*")
 )
 
 (define-method free_and_steal

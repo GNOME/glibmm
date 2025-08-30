@@ -784,11 +784,6 @@ Since: 2.26
 specified %G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT, then take the name from the other connection.
 </parameter_description>
 </parameter>
-<parameter name="G_BUS_NAME_OWNER_FLAGS_DO_NOT_QUEUE">
-<parameter_description> If another message bus connection owns the name, immediately
-return an error from g_bus_own_name() rather than entering the waiting queue for that name. (Since 2.54)
-</parameter_description>
-</parameter>
 </parameters>
 </enum>
 
@@ -4202,6 +4197,16 @@ Since: 2.22
 </description>
 </property>
 
+<property name="GInetAddress:flowinfo">
+<description>
+The flowinfo for an IPv6 address.
+See [method@Gio.InetAddress.get_flowinfo].
+
+Since: 2.86
+
+</description>
+</property>
+
 <property name="GInetAddress:is-any">
 <description>
 Whether this is the &quot;any&quot; address for its family.
@@ -4302,6 +4307,16 @@ Since: 2.22
 </description>
 </property>
 
+<property name="GInetAddress:scope-id">
+<description>
+The scope-id for an IPv6 address.
+See [method@Gio.InetAddress.get_scope_id].
+
+Since: 2.86
+
+</description>
+</property>
+
 <property name="GInetAddressMask:address">
 <description>
 The base address.
@@ -4342,6 +4357,8 @@ Since: 2.22
 <description>
 The `sin6_flowinfo` field, for IPv6 addresses.
 
+If unset this property is inherited from [property@Gio.InetSocketAddress:address].
+
 Since: 2.32
 
 </description>
@@ -4359,6 +4376,8 @@ Since: 2.22
 <property name="GInetSocketAddress:scope-id">
 <description>
 The `sin6_scope_id` field, for IPv6 addresses.
+
+If unset this property is inherited from [property@Gio.InetSocketAddress:address].
 
 Since: 2.32
 
@@ -4488,10 +4507,16 @@ Since: 2.74
 
 <signal name="GMemoryMonitor::low-memory-warning">
 <description>
-Emitted when the system is running low on free memory. The signal
+Emitted when the system is running low on free memory.
+
+The signal
 handler should then take the appropriate action depending on the
 warning level. See the #GMemoryMonitorWarningLevel documentation for
 details.
+
+Since the [iface@Gio.MemoryMonitor] is a singleton, this signal will be
+emitted in the [func@GLib.MainContext.default][global-default main
+context].
 
 Since: 2.64
 
@@ -4508,6 +4533,37 @@ Since: 2.64
 </parameters>
 <return></return>
 </signal>
+
+<property name="GMemoryMonitorPoll:mem-free-ratio">
+<description>
+Override the memory free ratio
+
+Since: 2.86
+
+</description>
+</property>
+
+<property name="GMemoryMonitorPoll:poll-interval-ms">
+<description>
+Override the poll interval for monitoring the memory usage.
+
+The interval is in milliseconds. Zero means to use the default interval.
+
+Since: 2.86
+
+</description>
+</property>
+
+<property name="GMemoryMonitorPsi:proc-path">
+<description>
+Kernel PSI path to use, if not the default.
+
+This is typically only used for test purposes.
+
+Since: 2.86
+
+</description>
+</property>
 
 <enum name="GMemoryMonitorWarningLevel">
 <description>
@@ -5922,21 +5978,22 @@ Since: 2.32
 
 <signal name="GSettings::change-event">
 <description>
-The &quot;change-event&quot; signal is emitted once per change event that
-affects this settings object.  You should connect to this signal
+Emitted once per change event that affects this settings object.
+
+You should connect to this signal
 only if you are interested in viewing groups of changes before they
-are split out into multiple emissions of the &quot;changed&quot; signal.
-For most use cases it is more appropriate to use the &quot;changed&quot; signal.
+are split out into multiple emissions of the [signal@Gio.Settings::changed] signal.
+For most use cases it is more appropriate to use the [signal@Gio.Settings::changed] signal.
 
 In the event that the change event applies to one or more specified
-keys, @keys will be an array of #GQuark of length @n_keys.  In the
-event that the change event applies to the #GSettings object as a
+keys, @keys will be an array of [alias@GLib.Quark]s of length @n_keys.  In the
+event that the change event applies to the [class@Gio.Settings] object as a
 whole (ie: potentially every key has been changed) then @keys will
-be %NULL and @n_keys will be 0.
+be `NULL` and @n_keys will be `0`.
 
-The default handler for this signal invokes the &quot;changed&quot; signal
+The default handler for this signal invokes the [signal@Gio.Settings::changed] signal
 for each affected key.  If any other connected handler returns
-%TRUE then this default functionality will be suppressed.
+true then this default functionality will be suppressed.
 
 
 </description>
@@ -5946,29 +6003,30 @@ for each affected key.  If any other connected handler returns
 </parameter_description>
 </parameter>
 <parameter name="keys">
-<parameter_description>
-an array of #GQuarks for the changed keys, or %NULL
+<parameter_description> array of the
+keys which have changed
 </parameter_description>
 </parameter>
 <parameter name="n_keys">
-<parameter_description> the length of the @keys array, or 0
+<parameter_description> the length of the @keys array, or `0`
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE to stop other handlers from being invoked for the
-event. FALSE to propagate the event further.
+<return> true to stop other handlers from being invoked for the
+event, false to propagate the event further
 </return>
 </signal>
 
 <signal name="GSettings::changed">
 <description>
-The &quot;changed&quot; signal is emitted when a key has potentially changed.
-You should call one of the g_settings_get() calls to check the new
+Emitted when a key has potentially changed.
+
+You should call one of the [method@Gio.Settings.get] calls to check the new
 value.
 
 This signal supports detailed connections.  You can connect to the
-detailed signal &quot;changed::x&quot; in order to only receive callbacks
-when key &quot;x&quot; changes.
+detailed signal `changed::x` in order to only receive callbacks
+when key `x` changes.
 
 Note that @settings only emits this signal if you have read @key at
 least once while a signal handler was already connected for @key.
@@ -5989,23 +6047,24 @@ least once while a signal handler was already connected for @key.
 
 <signal name="GSettings::writable-change-event">
 <description>
-The &quot;writable-change-event&quot; signal is emitted once per writability
-change event that affects this settings object.  You should connect
+Emitted once per writability change event that affects this settings object.
+
+You should connect
 to this signal if you are interested in viewing groups of changes
 before they are split out into multiple emissions of the
-&quot;writable-changed&quot; signal.  For most use cases it is more
-appropriate to use the &quot;writable-changed&quot; signal.
+[signal@Gio.Settings::writable-changed] signal.  For most use cases it is more
+appropriate to use the [signal@Gio.Settings::writable-changed] signal.
 
 In the event that the writability change applies only to a single
-key, @key will be set to the #GQuark for that key.  In the event
+key, @key will be set to the [alias@GLib.Quark] for that key.  In the event
 that the writability change affects the entire settings object,
-@key will be 0.
+@key will be `0`.
 
-The default handler for this signal invokes the &quot;writable-changed&quot;
-and &quot;changed&quot; signals for each affected key.  This is done because
+The default handler for this signal invokes the [signal@Gio.Settings::writable-changed]
+and [signal@Gio.Settings::changed] signals for each affected key.  This is done because
 changes in writability might also imply changes in value (if for
 example, a new mandatory setting is introduced).  If any other
-connected handler returns %TRUE then this default functionality
+connected handler returns true then this default functionality
 will be suppressed.
 
 
@@ -6016,24 +6075,25 @@ will be suppressed.
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the quark of the key, or 0
+<parameter_description> the quark of the key, or `0`
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE to stop other handlers from being invoked for the
-event. FALSE to propagate the event further.
+<return> true to stop other handlers from being invoked for the
+event, false to propagate the event further
 </return>
 </signal>
 
 <signal name="GSettings::writable-changed">
 <description>
-The &quot;writable-changed&quot; signal is emitted when the writability of a
-key has potentially changed.  You should call
-g_settings_is_writable() in order to determine the new status.
+Emitted when the writability of a key has potentially changed.
+
+You should call [method@Gio.Settings.is_writable] in order to determine the
+new status.
 
 This signal supports detailed connections.  You can connect to the
-detailed signal &quot;writable-changed::x&quot; in order to only receive
-callbacks when the writability of &quot;x&quot; changes.
+detailed signal `writable-changed::x` in order to only receive
+callbacks when the writability of `x` changes.
 
 </description>
 <parameters>
@@ -6058,8 +6118,8 @@ The name of the context that the settings are stored in.
 
 <property name="GSettings:delay-apply">
 <description>
-Whether the #GSettings object is in 'delay-apply' mode. See
-g_settings_delay() for details.
+Whether the [class@Gio.Settings] object is in
+[‘delay-apply’ mode](class.Settings.html#delay-apply-mode).
 
 Since: 2.28
 
@@ -6068,8 +6128,9 @@ Since: 2.28
 
 <property name="GSettings:has-unapplied">
 <description>
-If this property is %TRUE, the #GSettings object has outstanding
-changes that will be applied when g_settings_apply() is called.
+Whether the [class@Gio.Settings] object has outstanding changes.
+
+These changes will be applied when [method@Gio.Settings.apply] is called.
 
 </description>
 </property>
@@ -6084,17 +6145,17 @@ The path within the backend where the settings are stored.
 <property name="GSettings:schema">
 <description>
 The name of the schema that describes the types of keys
-for this #GSettings object.
+for this [class@Gio.Settings] object.
 
-The type of this property is *not* #GSettingsSchema.
-#GSettingsSchema has only existed since version 2.32 and
+The type of this property is *not* [struct@Gio.SettingsSchema].
+[struct@Gio.SettingsSchema] has only existed since version 2.32 and
 unfortunately this name was used in previous versions to refer to
 the schema ID rather than the schema itself.  Take care to use the
-'settings-schema' property if you wish to pass in a
-#GSettingsSchema.
+[property@Gio.Settings:settings-schema] property if you wish to pass in a
+[struct@Gio.SettingsSchema].
 
-Deprecated:2.32:Use the 'schema-id' property instead.  In a future
-version, this property may instead refer to a #GSettingsSchema.
+Deprecated:2.32:Use the [property@Gio.Settings:schema-id] property instead.
+In a future version, this property may instead refer to a [struct@Gio.SettingsSchema].
 
 </description>
 </property>
@@ -6102,19 +6163,20 @@ version, this property may instead refer to a #GSettingsSchema.
 <property name="GSettings:schema-id">
 <description>
 The name of the schema that describes the types of keys
-for this #GSettings object.
+for this [class@Gio.Settings] object.
 
 </description>
 </property>
 
 <property name="GSettings:settings-schema">
 <description>
-The #GSettingsSchema describing the types of keys for this
-#GSettings object.
+The [struct@Gio.SettingsSchema] describing the types of keys for this
+[class@Gio.Settings] object.
 
-Ideally, this property would be called 'schema'.  #GSettingsSchema
+Ideally, this property would be called [property@Gio.Settings:schema].
+[struct@Gio.SettingsSchema]
 has only existed since version 2.32, however, and before then the
-'schema' property was used to refer to the ID of the schema rather
+[property@Gio.Settings:schema] property was used to refer to the ID of the schema rather
 than the schema itself.  Take care.
 
 </description>
@@ -6122,9 +6184,10 @@ than the schema itself.  Take care.
 
 <enum name="GSettingsBindFlags">
 <description>
-Flags used when creating a binding. These flags determine in which
-direction the binding works. The default is to synchronize in both
-directions.
+Flags used when creating a binding.
+
+These flags determine in which direction the binding works. The default is to
+synchronize in both directions.
 
 </description>
 <parameters>
@@ -6133,28 +6196,30 @@ directions.
 </parameter_description>
 </parameter>
 <parameter name="G_SETTINGS_BIND_GET">
-<parameter_description> Update the #GObject property when the setting changes.
+<parameter_description> Update the [class@GObject.Object] property when the setting changes.
 It is an error to use this flag if the property is not writable.
 </parameter_description>
 </parameter>
 <parameter name="G_SETTINGS_BIND_SET">
-<parameter_description> Update the setting when the #GObject property changes.
+<parameter_description> Update the setting when the [class@GObject.Object] property changes.
 It is an error to use this flag if the property is not readable.
 </parameter_description>
 </parameter>
 <parameter name="G_SETTINGS_BIND_NO_SENSITIVITY">
-<parameter_description> Do not try to bind a &quot;sensitivity&quot; property to the writability of the setting
+<parameter_description> Do not try to bind a ‘sensitivity’ property to the writability of the setting
 </parameter_description>
 </parameter>
 <parameter name="G_SETTINGS_BIND_GET_NO_CHANGES">
-<parameter_description> When set in addition to %G_SETTINGS_BIND_GET, set the #GObject property
+<parameter_description> When set in addition to [flags@Gio.SettingsBindFlags.GET],
+set the [class@GObject.Object] property
 value initially from the setting, but do not listen for changes of the setting
 </parameter_description>
 </parameter>
 <parameter name="G_SETTINGS_BIND_INVERT_BOOLEAN">
-<parameter_description> When passed to g_settings_bind(), uses a pair of mapping functions that invert
+<parameter_description> When passed to [method@Gio.Settings.bind],
+uses a pair of mapping functions that invert
 the boolean value when mapping between the setting and the property.  The setting and property must both
-be booleans.  You cannot pass this flag to g_settings_bind_with_mapping().
+be booleans.  You cannot pass this flag to [method@Gio.Settings.bind_with_mapping].
 </parameter_description>
 </parameter>
 </parameters>
@@ -8731,9 +8796,14 @@ Since: 2.46
 
 <property name="GZlibCompressor:file-info">
 <description>
-If set to a non-%NULL #GFileInfo object, and #GZlibCompressor:format is
-%G_ZLIB_COMPRESSOR_FORMAT_GZIP, the compressor will write the file name
-and modification time from the file info to the GZIP header.
+A [class@Gio.FileInfo] containing file information to put into the gzip
+header.
+
+The file name and modification time from the file info will be used.
+
+This will only be used if non-`NULL` and
+[property@Gio.ZlibCompressor:format] is
+[enum@Gio.ZlibCompressorFormat.GZIP].
 
 Since: 2.26
 
@@ -8752,9 +8822,29 @@ Since: 2.24
 <property name="GZlibCompressor:level">
 <description>
 The level of compression from `0` (no compression) to `9` (most
-compression). `-1` for the default level.
+compression).
+
+`-1` for the default level.
 
 Since: 2.24
+
+</description>
+</property>
+
+<property name="GZlibCompressor:os">
+<description>
+The OS code of the gzip header.
+
+This will be used if set to a non-negative value, and if
+[property@Gio.ZlibCompressor:format] is
+[enum@Gio.ZlibCompressorFormat.GZIP], the compressor will set the OS code of
+the gzip header to this value.
+
+If the value is unset, zlib will set the OS code depending on the platform.
+This may be undesirable when reproducible output is desired. In that case setting
+the OS code to `3` (for Unix) is recommended.
+
+Since: 2.86
 
 </description>
 </property>
@@ -8785,10 +8875,12 @@ Since: 2.24
 
 <property name="GZlibDecompressor:file-info">
 <description>
-A #GFileInfo containing the information found in the GZIP header
-of the data stream processed, or %NULL if the header was not yet
-fully processed, is not present at all, or the compressor's
-#GZlibDecompressor:format property is not %G_ZLIB_COMPRESSOR_FORMAT_GZIP.
+A [class@Gio.FileInfo] containing the information found in the gzip header
+of the data stream processed.
+
+This will be `NULL` if the header was not yet fully processed, is not
+present at all, or the compressor’s [property@Gio.ZlibDecompressor:format]
+property is not [enum@Gio.ZlibCompressorFormat.GZIP].
 
 Since: 2.26
 
@@ -13489,37 +13581,38 @@ Free with g_object_unref().
 
 <function name="g_bus_own_name">
 <description>
-Starts acquiring @name on the bus specified by @bus_type and calls
-@name_acquired_handler and @name_lost_handler when the name is
-acquired respectively lost. Callbacks will be invoked in the thread-default
+Requests ownership of @name on the bus specified by @bus_type.
+
+It asynchronously calls @name_acquired_handler and @name_lost_handler when
+the name is acquired and lost, respectively.
+
+Callbacks will be invoked in the thread-default
 main context (see [method@GLib.MainContext.push_thread_default])
 of the thread you are calling this function from.
 
 You are guaranteed that one of the @name_acquired_handler and @name_lost_handler
-callbacks will be invoked after calling this function - there are three
+callbacks will be invoked after calling this function — there are three
 possible cases:
 
-- @name_lost_handler with a %NULL connection (if a connection to the bus
-can't be made).
-
-- @bus_acquired_handler then @name_lost_handler (if the name can't be
-obtained)
-
+- @name_lost_handler with a `NULL` connection (if a connection to the bus
+can’t be made).
+- @bus_acquired_handler then @name_lost_handler (if the name can’t be
+obtained).
 - @bus_acquired_handler then @name_acquired_handler (if the name was
 obtained).
 
-When you are done owning the name, just call g_bus_unown_name()
-with the owner id this function returns.
+When you are done owning the name, call [func@Gio.bus_unown_name] with the
+owner ID this function returns.
 
 If the name is acquired or lost (for example another application
 could acquire the name if you allow replacement or the application
 currently owning the name exits), the handlers are also invoked.
-If the #GDBusConnection that is used for attempting to own the name
+If the [class@Gio.DBusConnection] that is used for attempting to own the name
 closes, then @name_lost_handler is invoked since it is no longer
 possible for other processes to access the process.
 
-You cannot use g_bus_own_name() several times for the same name (unless
-interleaved with calls to g_bus_unown_name()) - only the first call
+You cannot use [func@Gio.bus_own_name] several times for the same name (unless
+interleaved with calls to [func@Gio.bus_unown_name]) — only the first call
 will work.
 
 Another guarantee is that invocations of @name_acquired_handler
@@ -13528,13 +13621,13 @@ is, if @name_acquired_handler is invoked then you are
 guaranteed that the next time one of the handlers is invoked, it
 will be @name_lost_handler. The reverse is also true.
 
-If you plan on exporting objects (using e.g.
-g_dbus_connection_register_object()), note that it is generally too late
+If you plan on exporting objects (using, for example,
+[method@Gio.DBusConnection.register_object]), note that it is generally too late
 to export the objects in @name_acquired_handler. Instead, you can do this
 in @bus_acquired_handler since you are guaranteed that this will run
 before @name is requested from the bus.
 
-This behavior makes it very simple to write applications that wants
+This behavior makes it very simple to write applications that want
 to [own names](dbus-name-owning.html#d-bus-name-owning) and export objects.
 Simply register objects to be exported in @bus_acquired_handler and
 unregister the objects (if any) in @name_lost_handler.
@@ -13552,22 +13645,22 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of flags from the #GBusNameOwnerFlags enumeration
+<parameter_description> a set of flags with ownership options
 </parameter_description>
 </parameter>
 <parameter name="bus_acquired_handler">
 <parameter_description> handler to invoke when
-connected to the bus of type @bus_type or %NULL
+connected to the bus of type @bus_type, or `NULL` to ignore
 </parameter_description>
 </parameter>
 <parameter name="name_acquired_handler">
 <parameter_description> handler to invoke when
-@name is acquired or %NULL
+@name is acquired, or `NULL` to ignore
 </parameter_description>
 </parameter>
 <parameter name="name_lost_handler">
 <parameter_description> handler to invoke when @name
-is lost or %NULL
+is lost, or `NULL` to ignore
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -13575,27 +13668,26 @@ is lost or %NULL
 </parameter_description>
 </parameter>
 <parameter name="user_data_free_func">
-<parameter_description> function for freeing @user_data or %NULL
+<parameter_description> function for freeing @user_data
 </parameter_description>
 </parameter>
 </parameters>
 <return> an identifier (never 0) that can be used with
-g_bus_unown_name() to stop owning the name.
-
+[func@Gio.bus_unown_name] to stop owning the name
 </return>
 </function>
 
 <function name="g_bus_own_name_on_connection">
 <description>
-Like g_bus_own_name() but takes a #GDBusConnection instead of a
-#GBusType.
+Like [func@Gio.bus_own_name] but takes a [class@Gio.DBusConnection] instead
+of a [enum@Gio.BusType].
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="connection">
-<parameter_description> a #GDBusConnection
+<parameter_description> a bus connection
 </parameter_description>
 </parameter>
 <parameter name="name">
@@ -13603,17 +13695,17 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of flags from the #GBusNameOwnerFlags enumeration
+<parameter_description> a set of flags with ownership options
 </parameter_description>
 </parameter>
 <parameter name="name_acquired_handler">
 <parameter_description> handler to invoke when
-@name is acquired or %NULL
+@name is acquired, or `NULL` to ignore
 </parameter_description>
 </parameter>
 <parameter name="name_lost_handler">
 <parameter_description> handler to invoke when @name
-is lost or %NULL
+is lost, or `NULL` to ignore
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -13621,19 +13713,18 @@ is lost or %NULL
 </parameter_description>
 </parameter>
 <parameter name="user_data_free_func">
-<parameter_description> function for freeing @user_data or %NULL
+<parameter_description> function for freeing @user_data
 </parameter_description>
 </parameter>
 </parameters>
 <return> an identifier (never 0) that can be used with
-g_bus_unown_name() to stop owning the name
-
+[func@Gio.bus_unown_name] to stop owning the name
 </return>
 </function>
 
 <function name="g_bus_own_name_on_connection_with_closures">
 <description>
-Version of g_bus_own_name_on_connection() using closures instead of
+Version of [func@Gio.bus_own_name_on_connection] using closures instead of
 callbacks for easier binding in other languages.
 
 Since: 2.26
@@ -13641,7 +13732,7 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="connection">
-<parameter_description> a #GDBusConnection
+<parameter_description> a bus connection
 </parameter_description>
 </parameter>
 <parameter name="name">
@@ -13649,29 +13740,28 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of flags from the #GBusNameOwnerFlags enumeration
+<parameter_description> a set of flags with ownership options
 </parameter_description>
 </parameter>
 <parameter name="name_acquired_closure">
-<parameter_description> #GClosure to invoke when @name is
-acquired or %NULL
+<parameter_description> closure to invoke when @name is
+acquired, or `NULL` to ignore
 </parameter_description>
 </parameter>
 <parameter name="name_lost_closure">
-<parameter_description> #GClosure to invoke when @name is lost
-or %NULL
+<parameter_description> closure to invoke when @name is lost,
+or `NULL` to ignore
 </parameter_description>
 </parameter>
 </parameters>
 <return> an identifier (never 0) that can be used with
-g_bus_unown_name() to stop owning the name.
-
+[func@Gio.bus_unown_name] to stop owning the name.
 </return>
 </function>
 
 <function name="g_bus_own_name_with_closures">
 <description>
-Version of g_bus_own_name() using closures instead of callbacks for
+Version of [func@Gio.bus_own_name using closures instead of callbacks for
 easier binding in other languages.
 
 Since: 2.26
@@ -13687,28 +13777,27 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of flags from the #GBusNameOwnerFlags enumeration
+<parameter_description> a set of flags with ownership options
 </parameter_description>
 </parameter>
 <parameter name="bus_acquired_closure">
-<parameter_description> #GClosure to invoke when connected to
-the bus of type @bus_type or %NULL
+<parameter_description> closure to invoke when connected to
+the bus of type @bus_type, or `NULL` to ignore
 </parameter_description>
 </parameter>
 <parameter name="name_acquired_closure">
-<parameter_description> #GClosure to invoke when @name is
-acquired or %NULL
+<parameter_description> closure to invoke when @name is
+acquired, or `NULL` to ignore
 </parameter_description>
 </parameter>
 <parameter name="name_lost_closure">
-<parameter_description> #GClosure to invoke when @name is lost or
-%NULL
+<parameter_description> closure to invoke when @name is lost, or
+`NULL` to ignore
 </parameter_description>
 </parameter>
 </parameters>
 <return> an identifier (never 0) that can be used with
-g_bus_unown_name() to stop owning the name.
-
+[func@Gio.bus_unown_name] to stop owning the name.
 </return>
 </function>
 
@@ -13717,18 +13806,19 @@ g_bus_unown_name() to stop owning the name.
 Stops owning a name.
 
 Note that there may still be D-Bus traffic to process (relating to owning
-and unowning the name) in the current thread-default #GMainContext after
-this function has returned. You should continue to iterate the #GMainContext
-until the #GDestroyNotify function passed to g_bus_own_name() is called, in
-order to avoid memory leaks through callbacks queued on the #GMainContext
-after it’s stopped being iterated.
+and unowning the name) in the current thread-default
+[struct@GLib.MainContext] after this function has returned. You should
+continue to iterate the [struct@GLib.MainContext] until the
+[callback@GLib.DestroyNotify] function passed to [func@Gio.bus_own_name] is
+called, in order to avoid memory leaks through callbacks queued on the
+[struct@GLib.MainContext] after it’s stopped being iterated.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="owner_id">
-<parameter_description> an identifier obtained from g_bus_own_name()
+<parameter_description> an identifier obtained from [func@Gio.bus_own_name]
 </parameter_description>
 </parameter>
 </parameters>
@@ -14012,6 +14102,9 @@ cancel the operation from the same thread in which it is running,
 then the operation's #GAsyncReadyCallback will not be invoked until
 the application returns to the main loop.
 
+It is safe (although useless, since it will be a no-op) to call
+this function from a [signal@Gio.Cancellable::cancelled] signal handler.
+
 </description>
 <parameters>
 <parameter name="cancellable">
@@ -14032,7 +14125,10 @@ if the cancellable is cancelled right before connecting.
 either directly at the time of the connect if @cancellable is already
 cancelled, or when @cancellable is cancelled in some thread.
 In case the cancellable is reset via [method@Gio.Cancellable.reset]
-then the callback can be called again if the @cancellable is cancelled.
+then the callback can be called again if the @cancellable is cancelled and
+if it had not been previously cancelled at the time
+[method@Gio.Cancellable.connect] was called (e.g. if the connection actually
+took place, returning a non-zero value).
 
 @data_destroy_func will be called when the handler is
 disconnected, or immediately if the cancellable is already
@@ -14041,9 +14137,21 @@ cancelled.
 See #GCancellable::cancelled for details on how to use this.
 
 Since GLib 2.40, the lock protecting @cancellable is not held when
-@callback is invoked.  This lifts a restriction in place for
+@callback is invoked. This lifts a restriction in place for
 earlier GLib versions which now makes it easier to write cleanup
-code that unconditionally invokes e.g. g_cancellable_cancel().
+code that unconditionally invokes e.g. [method@Gio.Cancellable.cancel].
+Note that since 2.82 GLib still holds a lock during the callback but it’s
+designed in a way that most of the [class@Gio.Cancellable] methods can be
+called, including [method@Gio.Cancellable.cancel] or
+[method@GObject.Object.unref].
+
+There are still some methods that will deadlock (by design) when
+called from the [signal@Gio.Cancellable::cancelled] callbacks:
+- [method@Gio.Cancellable.connect]
+- [method@Gio.Cancellable.disconnect]
+- [method@Gio.Cancellable.reset]
+- [method@Gio.Cancellable.make_pollfd]
+- [method@Gio.Cancellable.release_fd]
 
 Since: 2.22
 
@@ -14185,6 +14293,11 @@ You are not supposed to read from the fd yourself, just check for
 readable status. Reading to unset the readable status is done
 with g_cancellable_reset().
 
+Note that in the event that a [signal@Gio.Cancellable::cancelled] signal handler is
+currently running, this call will block until the handler has finished.
+Calling this function from a signal handler will therefore result in a
+deadlock.
+
 Since: 2.22
 
 </description>
@@ -14271,6 +14384,11 @@ block scarce file descriptors until it is finalized if this function
 is not called. This can cause the application to run out of file 
 descriptors when many #GCancellables are used at the same time.
 
+Note that in the event that a [signal@Gio.Cancellable::cancelled] signal handler is
+currently running, this call will block until the handler has finished.
+Calling this function from a signal handler will therefore result in a
+deadlock.
+
 Since: 2.22
 
 </description>
@@ -14296,6 +14414,11 @@ as this function might tempt you to do. The recommended practice
 is to drop the reference to a cancellable after cancelling it,
 and let it die with the outstanding async operations. You should
 create a fresh cancellable for further async operations.
+
+In the event that a [signal@Gio.Cancellable::cancelled] signal handler is currently
+running, this call will block until the handler has finished.
+Calling this function from a signal handler will therefore result in a
+deadlock.
 
 </description>
 <parameters>
@@ -19131,30 +19254,31 @@ g_dbus_connection_register_subtree()
 
 <function name="g_dbus_error_encode_gerror">
 <description>
-Creates a D-Bus error name to use for @error. If @error matches
-a registered error (cf. g_dbus_error_register_error()), the corresponding
-D-Bus error name will be returned.
+Creates a D-Bus error name to use for @error.
+
+If @error matches a registered error (see
+[func@Gio.DBusError.register_error]), the corresponding D-Bus error name
+will be returned.
 
 Otherwise the a name of the form
 `org.gtk.GDBus.UnmappedGError.Quark._ESCAPED_QUARK_NAME.Code_ERROR_CODE`
 will be used. This allows other GDBus applications to map the error
-on the wire back to a #GError using g_dbus_error_new_for_dbus_error().
+on the wire back to a [type@GLib.Error] using
+[func@Gio.DBusError.new_for_dbus_error].
 
 This function is typically only used in object mappings to put a
-#GError on the wire. Regular applications should not use it.
+[type@GLib.Error] on the wire. Regular applications should not use it.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="error">
-<parameter_description> A #GError.
+<parameter_description> an error
 </parameter_description>
 </parameter>
 </parameters>
-<return> A D-Bus error name (never %NULL).
-Free with g_free().
-
+<return> a D-Bus error name
 </return>
 </function>
 
@@ -19163,98 +19287,98 @@ Free with g_free().
 Gets the D-Bus error name used for @error, if any.
 
 This function is guaranteed to return a D-Bus error name for all
-#GErrors returned from functions handling remote method calls
-(e.g. g_dbus_connection_call_finish()) unless
-g_dbus_error_strip_remote_error() has been used on @error.
+[type@GLib.Error]s returned from functions handling remote method calls
+(for example, [method@Gio.DBusConnection.call_finish]) unless
+[func@Gio.DBusError.strip_remote_error] has already been used on @error.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="error">
-<parameter_description> a #GError
+<parameter_description> an error
 </parameter_description>
 </parameter>
 </parameters>
-<return> an allocated string or %NULL if the
-D-Bus error name could not be found. Free with g_free().
-
+<return> an allocated string, or `NULL` if the
+D-Bus error name could not be found
 </return>
 </function>
 
 <function name="g_dbus_error_is_remote_error">
 <description>
-Checks if @error represents an error received via D-Bus from a remote peer. If so,
-use g_dbus_error_get_remote_error() to get the name of the error.
+Checks if @error represents an error received via D-Bus from a remote peer.
+
+If so, use [func@Gio.DBusError.get_remote_error] to get the name of the error.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="error">
-<parameter_description> A #GError.
+<parameter_description> an error
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @error represents an error from a remote peer,
-%FALSE otherwise.
-
+<return> true if @error represents an error from a remote peer; false otherwise
 </return>
 </function>
 
 <function name="g_dbus_error_new_for_dbus_error">
 <description>
-Creates a #GError based on the contents of @dbus_error_name and
+Creates a [type@GLib.Error] based on the contents of @dbus_error_name and
 @dbus_error_message.
 
-Errors registered with g_dbus_error_register_error() will be looked
+Errors registered with [func@Gio.DBusError.register_error] will be looked
 up using @dbus_error_name and if a match is found, the error domain
-and code is used. Applications can use g_dbus_error_get_remote_error()
+and code is used. Applications can use [func@Gio.DBusError.get_remote_error]
 to recover @dbus_error_name.
 
 If a match against a registered error is not found and the D-Bus
-error name is in a form as returned by g_dbus_error_encode_gerror()
+error name is in a form as returned by [func@Gio.DBusError.encode_gerror]
 the error domain and code encoded in the name is used to
-create the #GError. Also, @dbus_error_name is added to the error message
-such that it can be recovered with g_dbus_error_get_remote_error().
+create the [type@GLib.Error]. Also, @dbus_error_name is added to the error
+message such that it can be recovered with
+[func@Gio.DBusError.get_remote_error].
 
-Otherwise, a #GError with the error code %G_IO_ERROR_DBUS_ERROR
-in the %G_IO_ERROR error domain is returned. Also, @dbus_error_name is
+Otherwise, a [type@GLib.Error] with the error code
+[error@Gio.IOErrorEnum.DBUS_ERROR]
+in the [error@Gio.IOErrorEnum] error domain is returned. Also, @dbus_error_name is
 added to the error message such that it can be recovered with
-g_dbus_error_get_remote_error().
+[func@Gio.DBusError.get_remote_error].
 
 In all three cases, @dbus_error_name can always be recovered from the
-returned #GError using the g_dbus_error_get_remote_error() function
-(unless g_dbus_error_strip_remote_error() hasn't been used on the returned error).
+returned [type@GLib.Error] using the [func@Gio.DBusError.get_remote_error]
+function (unless [func@Gio.DBusError.strip_remote_error] hasn’t been used on
+the returned error).
 
 This function is typically only used in object mappings to prepare
-#GError instances for applications. Regular applications should not use
-it.
+[type@GLib.Error] instances for applications. Regular applications should not
+use it.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="dbus_error_name">
-<parameter_description> D-Bus error name.
+<parameter_description> D-Bus error name
 </parameter_description>
 </parameter>
 <parameter name="dbus_error_message">
-<parameter_description> D-Bus error message.
+<parameter_description> D-Bus error message
 </parameter_description>
 </parameter>
 </parameters>
-<return> An allocated #GError. Free with g_error_free().
-
+<return> an allocated [type@GLib.Error]
 </return>
 </function>
 
 <function name="g_dbus_error_register_error">
 <description>
-Creates an association to map between @dbus_error_name and
-#GErrors specified by @error_domain and @error_code.
+Creates an association mapping between @dbus_error_name and
+[type@GLib.Error]s specified by @error_domain and @error_code.
 
-This is typically done in the routine that returns the #GQuark for
+This is typically done in the function that returns the [type@GLib.Quark] for
 an error domain.
 
 Since: 2.26
@@ -19262,27 +19386,27 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="error_domain">
-<parameter_description> A #GQuark for an error domain.
+<parameter_description> a [type@GLib.Quark] for an error domain
 </parameter_description>
 </parameter>
 <parameter name="error_code">
-<parameter_description> An error code.
+<parameter_description> an error code
 </parameter_description>
 </parameter>
 <parameter name="dbus_error_name">
-<parameter_description> A D-Bus error name.
+<parameter_description> a D-Bus error name
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the association was created, %FALSE if it already
-exists.
-
+<return> true if the association was created, false if it already
+exists
 </return>
 </function>
 
 <function name="g_dbus_error_register_error_domain">
 <description>
-Helper function for associating a #GError error domain with D-Bus error names.
+Helper function for associating a [type@GLib.Error] error domain with D-Bus
+error names.
 
 While @quark_volatile has a `volatile` qualifier, this is a historical
 artifact and the argument passed to it should not be `volatile`.
@@ -19292,19 +19416,20 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="error_domain_quark_name">
-<parameter_description> The error domain name.
+<parameter_description> the error domain name
 </parameter_description>
 </parameter>
 <parameter name="quark_volatile">
-<parameter_description> A pointer where to store the #GQuark.
+<parameter_description> return location for the [type@GLib.Quark] representing the
+error domain
 </parameter_description>
 </parameter>
 <parameter name="entries">
-<parameter_description> A pointer to @num_entries #GDBusErrorEntry struct items.
+<parameter_description> items to register
 </parameter_description>
 </parameter>
 <parameter name="num_entries">
-<parameter_description> Number of items to register.
+<parameter_description> number of items to register
 </parameter_description>
 </parameter>
 </parameters>
@@ -19313,32 +19438,38 @@ Since: 2.26
 
 <function name="g_dbus_error_set_dbus_error">
 <description>
-Does nothing if @error is %NULL. Otherwise sets `*error` to
-a new #GError created with g_dbus_error_new_for_dbus_error()
-with @dbus_error_message prepend with @format (unless %NULL).
+Sets `*error` to a new [type@GLib.Error] created with
+[func@Gio.DBusError.new_for_dbus_error].
+
+If @format is non-`NULL` then it is prepended to @dbus_error_message.
+Otherwise @dbus_error_message is used unmodified.
+
+This function does nothing if @error is `NULL`.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="error">
-<parameter_description> A pointer to a #GError or %NULL.
+<parameter_description> return location for
+a [type@GLib.Error]
 </parameter_description>
 </parameter>
 <parameter name="dbus_error_name">
-<parameter_description> D-Bus error name.
+<parameter_description> D-Bus error name
 </parameter_description>
 </parameter>
 <parameter name="dbus_error_message">
-<parameter_description> D-Bus error message.
+<parameter_description> D-Bus error message
 </parameter_description>
 </parameter>
 <parameter name="format">
-<parameter_description> printf()-style format to prepend to @dbus_error_message or %NULL.
+<parameter_description> `printf()`-style format to prepend to
+@dbus_error_message, or `NULL` to not modify the message
 </parameter_description>
 </parameter>
 <parameter name="Varargs">
-<parameter_description> Arguments for @format.
+<parameter_description> arguments for @format
 </parameter_description>
 </parameter>
 </parameters>
@@ -19347,30 +19478,32 @@ Since: 2.26
 
 <function name="g_dbus_error_set_dbus_error_valist">
 <description>
-Like g_dbus_error_set_dbus_error() but intended for language bindings.
+Like [func@Gio.DBusError.set_dbus_error] but intended for language bindings.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="error">
-<parameter_description> A pointer to a #GError or %NULL.
+<parameter_description> return location for
+a [type@GLib.Error]
 </parameter_description>
 </parameter>
 <parameter name="dbus_error_name">
-<parameter_description> D-Bus error name.
+<parameter_description> D-Bus error name
 </parameter_description>
 </parameter>
 <parameter name="dbus_error_message">
-<parameter_description> D-Bus error message.
+<parameter_description> D-Bus error message
 </parameter_description>
 </parameter>
 <parameter name="format">
-<parameter_description> printf()-style format to prepend to @dbus_error_message or %NULL.
+<parameter_description> `printf()`-style format to prepend to
+@dbus_error_message, or `NULL` to not modify the message
 </parameter_description>
 </parameter>
 <parameter name="var_args">
-<parameter_description> Arguments for @format.
+<parameter_description> arguments for @format
 </parameter_description>
 </parameter>
 </parameters>
@@ -19380,7 +19513,9 @@ Since: 2.26
 <function name="g_dbus_error_strip_remote_error">
 <description>
 Looks for extra information in the error message used to recover
-the D-Bus error name and strips it if found. If stripped, the
+the D-Bus error name and strips it if found.
+
+If stripped, the
 message field in @error will correspond exactly to what was
 received on the wire.
 
@@ -19391,38 +19526,37 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="error">
-<parameter_description> A #GError.
+<parameter_description> an error
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if information was stripped, %FALSE otherwise.
-
+<return> true if information was stripped; false otherwise
 </return>
 </function>
 
 <function name="g_dbus_error_unregister_error">
 <description>
-Destroys an association previously set up with g_dbus_error_register_error().
+Destroys an association previously set up with
+[func@Gio.DBusError.register_error].
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="error_domain">
-<parameter_description> A #GQuark for an error domain.
+<parameter_description> a [type@GLib.Quark] for an error domain
 </parameter_description>
 </parameter>
 <parameter name="error_code">
-<parameter_description> An error code.
+<parameter_description> an error code
 </parameter_description>
 </parameter>
 <parameter name="dbus_error_name">
-<parameter_description> A D-Bus error name.
+<parameter_description> a D-Bus error name
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the association was destroyed, %FALSE if it wasn't found.
-
+<return> true if the association was destroyed, false if it wasn’t found
 </return>
 </function>
 
@@ -29148,9 +29282,24 @@ Since: 2.70
 
 <function name="g_file_info_get_attribute_as_string">
 <description>
-Gets the value of an attribute, formatted as a string.
-This escapes things as needed to make the string valid
-UTF-8.
+Gets the value of an attribute, formatted as a human readable string.
+
+This escapes things as needed to make the string valid UTF-8 and readable by
+humans. It’s not meant to be a machine readable or reversible escaping
+format.
+
+To format file name attributes of type
+[enum@Gio.FileAttributeType.BYTE_STRING] for output as UTF-8, use
+[func@GLib.filename_to_utf8] instead:
+```c
+const char *trash_orig_path_byte_string;
+g_autofree char *trash_orig_path_utf8 = NULL;
+
+trash_orig_path_byte_string = g_file_info_get_attribute_byte_string (info, G_FILE_ATTRIBUTE_TRASH_ORIG_PATH);
+trash_orig_path_utf8 = g_filename_to_utf8 (trash_orig_path_byte_string, -1, NULL, NULL, NULL);
+if (trash_orig_path_utf8 != NULL)
+g_message (&quot;Some larger UTF-8 string with filename embedded as %s&quot;, trash_orig_path_utf8);
+```
 
 
 </description>
@@ -31200,13 +31349,17 @@ present, it will be set appropriately.
 
 <function name="g_file_make_directory">
 <description>
-Creates a directory. Note that this will only create a child directory
+Creates a directory.
+
+Note that this will only create a child directory
 of the immediate parent directory of the path or URI given by the #GFile.
 To recursively create directories, see g_file_make_directory_with_parents().
+
 This function will fail if the parent directory does not exist, setting
 @error to %G_IO_ERROR_NOT_FOUND. If the file system doesn't support
 creating directories, this function will fail, setting @error to
-%G_IO_ERROR_NOT_SUPPORTED.
+%G_IO_ERROR_NOT_SUPPORTED. If the directory already exists,
+[error@Gio.IOErrorEnum.EXISTS] will be returned.
 
 For a local #GFile the newly created directory will have the default
 (current) ownership and permissions of the current process.
@@ -31709,7 +31862,7 @@ of the thread that the monitor was created in.
 </parameter_description>
 </parameter>
 <parameter name="other_file">
-<parameter_description> a #GFile.
+<parameter_description> a #GFile, or %NULL.
 </parameter_description>
 </parameter>
 <parameter name="event_type">
@@ -33071,41 +33224,54 @@ Free the returned object with g_object_unref().
 <function name="g_file_query_info">
 <description>
 Gets the requested information about specified @file.
-The result is a #GFileInfo object that contains key-value
+
+The result is a [class@Gio.FileInfo] object that contains key-value
 attributes (such as the type or size of the file).
 
 The @attributes value is a string that specifies the file
 attributes that should be gathered. It is not an error if
-it's not possible to read a particular requested attribute
-from a file - it just won't be set. @attributes should be a
-comma-separated list of attributes or attribute wildcards.
-The wildcard &quot;*&quot; means all attributes, and a wildcard like
-&quot;standard::*&quot; means all attributes in the standard namespace.
-An example attribute query be &quot;standard::*,owner::user&quot;.
-The standard attributes are available as defines, like
-%G_FILE_ATTRIBUTE_STANDARD_NAME.
+it’s not possible to read a particular requested attribute
+from a file — it just won't be set. In particular this means that if a file
+is inaccessible (due to being in a folder with restrictive permissions), for
+example, you can expect the returned [class@Gio.FileInfo] to have very few
+attributes set. You should check whether an attribute is set using
+[method@Gio.FileInfo.has_attribute] before trying to retrieve its value.
 
-If @cancellable is not %NULL, then the operation can be cancelled
+It is guaranteed that if any of the following attributes are listed in
+@attributes, they will always be set in the returned [class@Gio.FileInfo],
+even if the user doesn’t have permissions to access the file:
+
+- [const@Gio.FILE_ATTRIBUTE_STANDARD_NAME]
+- [const@Gio.FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME]
+
+@attributes should be a comma-separated list of attributes or attribute
+wildcards. The wildcard `&quot;*&quot;` means all attributes, and a wildcard like
+`&quot;standard::*&quot;` means all attributes in the standard namespace.
+An example attribute query might be `&quot;standard::*,owner::user&quot;`.
+The standard attributes are available as defines, like
+[const@Gio.FILE_ATTRIBUTE_STANDARD_NAME].
+
+If @cancellable is not `NULL`, then the operation can be cancelled
 by triggering the cancellable object from another thread. If the
-operation was cancelled, the error %G_IO_ERROR_CANCELLED will be
+operation was cancelled, the error [error@Gio.IOErrorEnum.CANCELLED] will be
 returned.
 
 For symlinks, normally the information about the target of the
 symlink is returned, rather than information about the symlink
-itself. However if you pass %G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS
+itself. However if you pass [flags@Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS]
 in @flags the information about the symlink itself will be returned.
 Also, for symlinks that point to non-existing files the information
 about the symlink itself will be returned.
 
-If the file does not exist, the %G_IO_ERROR_NOT_FOUND error will be
+If the file does not exist, the [error@Gio.IOErrorEnum.NOT_FOUND] error will be
 returned. Other errors are possible too, and depend on what kind of
-filesystem the file is on.
+file system the file is on.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile
+<parameter_description> input file
 </parameter_description>
 </parameter>
 <parameter name="attributes">
@@ -33113,21 +33279,19 @@ filesystem the file is on.
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileQueryInfoFlags
+<parameter_description> flags to affect the query operation
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object,
-%NULL to ignore
+<parameter_description> optional cancellable object
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError
+<parameter_description> return location for an error
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileInfo for the given @file, or %NULL
-on error. Free the returned object with g_object_unref().
+<return> a [class@Gio.FileInfo] for the given @file
 </return>
 </function>
 
@@ -34860,7 +35024,10 @@ Since: 2.22
 
 <function name="g_filename_completer_get_completion_suffix">
 <description>
-Obtains a completion for @initial_text from @completer.
+Obtains a suffix completion for @initial_text from @completer.
+
+Suffix will be an empty string if there's no shared suffix among matching
+completions. If there's no matching completions anyway, `NULL` is returned.
 
 
 </description>
@@ -34874,9 +35041,8 @@ Obtains a completion for @initial_text from @completer.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a completed string, or %NULL if no
-completion exists. This string is not owned by GIO, so remember to g_free()
-it when finished.
+<return> a suffix completion string, or `NULL` if no
+completion exists.
 </return>
 </function>
 
@@ -34917,6 +35083,9 @@ Creates a new filename completer.
 <description>
 If @dirs_only is %TRUE, @completer will only 
 complete directory names, and not file names.
+
+This function needs to be called before waiting for results from the
+completer to be populated.
 
 </description>
 <parameters>
@@ -35213,6 +35382,23 @@ Since: 2.22
 </return>
 </function>
 
+<function name="g_inet_address_get_flowinfo">
+<description>
+Gets the value of [property@Gio.InetAddress:flowinfo].
+
+Since: 2.86
+
+</description>
+<parameters>
+<parameter name="address">
+<parameter_description> a #GInetAddress
+</parameter_description>
+</parameter>
+</parameters>
+<return> The flowinfo for the address, `0` if unset or not IPv6 address.
+</return>
+</function>
+
 <function name="g_inet_address_get_is_any">
 <description>
 Tests whether @address is the &quot;any&quot; address for its family.
@@ -35414,6 +35600,23 @@ Since: 2.22
 </parameters>
 <return> the number of bytes used for the native version of @address.
 
+</return>
+</function>
+
+<function name="g_inet_address_get_scope_id">
+<description>
+Gets the value of [property@Gio.InetAddress:scope-id].
+
+Since: 2.86
+
+</description>
+<parameters>
+<parameter name="address">
+<parameter_description> a #GInetAddress
+</parameter_description>
+</parameter>
+</parameters>
+<return> The scope-id for the address, `0` if unset or not IPv6 address.
 </return>
 </function>
 
@@ -35633,9 +35836,44 @@ Free the returned object with g_object_unref().
 </return>
 </function>
 
+<function name="g_inet_address_new_from_bytes_with_ipv6_info">
+<description>
+Creates a new [class@Gio.InetAddress] from the given @family, @bytes
+and @scope_id.
+
+@bytes must be 4 bytes for [enum@Gio.SocketFamily.IPV4] and 16 bytes for
+[enum@Gio.SocketFamily.IPV6].
+
+Since: 2.86
+
+</description>
+<parameters>
+<parameter name="bytes">
+<parameter_description> raw address data
+</parameter_description>
+</parameter>
+<parameter name="family">
+<parameter_description> the address family of @bytes
+</parameter_description>
+</parameter>
+<parameter name="scope_id">
+<parameter_description> the scope-id of the address
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new internet address corresponding to
+@family, @bytes and @scope_id
+
+</return>
+</function>
+
 <function name="g_inet_address_new_from_string">
 <description>
 Parses @string as an IP address and creates a new #GInetAddress.
+
+If @address is an IPv6 address, it can also contain a scope ID
+(separated from the address by a `%`). Note that currently this
+behavior is platform specific. This may change in a future release.
 
 Since: 2.22
 
@@ -35736,6 +35974,8 @@ g_object_ref()'d if it will be stored
 Gets the `sin6_flowinfo` field from @address,
 which must be an IPv6 address.
 
+If not overridden this value will be inherited from [property@Gio.InetSocketAddress:address].
+
 Since: 2.32
 
 </description>
@@ -35772,6 +36012,8 @@ Since: 2.22
 <description>
 Gets the `sin6_scope_id` field from @address,
 which must be an IPv6 address.
+
+If not overridden this value will be inherited from [property@Gio.InetSocketAddress:address].
 
 Since: 2.32
 
@@ -35814,7 +36056,8 @@ Since: 2.22
 Creates a new #GInetSocketAddress for @address and @port.
 
 If @address is an IPv6 address, it can also contain a scope ID
-(separated from the address by a `%`).
+(separated from the address by a `%`). Note that currently this
+behavior is platform specific. This may change in a future release.
 
 Since: 2.40
 
@@ -46399,15 +46642,16 @@ appropriately if present.
 
 <function name="g_settings_apply">
 <description>
-Applies any changes that have been made to the settings.  This
-function does nothing unless @settings is in 'delay-apply' mode;
-see g_settings_delay().  In the normal case settings are always
-applied immediately.
+Applies any changes that have been made to the settings.
+
+This function does nothing unless @settings is in
+[‘delay-apply’ mode](class.Settings.html#delay-apply-mode).  In the normal
+case settings are always applied immediately.
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings instance
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 </parameters>
@@ -46688,14 +46932,14 @@ and the property @property of @object.
 The binding uses the default GIO mapping functions to map
 between the settings and property values. These functions
 handle booleans, numeric types and string types in a
-straightforward way. Use g_settings_bind_with_mapping() if
+straightforward way. Use [method@Gio.Settings.bind_with_mapping] if
 you need a custom mapping, or map between types that are not
 supported by the default mapping functions.
 
-Unless the @flags include %G_SETTINGS_BIND_NO_SENSITIVITY, this
+Unless the @flags include [flags@Gio.SettingsBindFlags.NO_SENSITIVITY], this
 function also establishes a binding between the writability of
-@key and the &quot;sensitive&quot; property of @object (if @object has
-a boolean property by that name). See g_settings_bind_writable()
+@key and the `sensitive` property of @object (if @object has
+a boolean property by that name). See [method@Gio.Settings.bind_writable]
 for more details about writable bindings.
 
 Note that the lifecycle of the binding is tied to @object,
@@ -46708,7 +46952,7 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -46716,7 +46960,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="object">
-<parameter_description> a #GObject
+<parameter_description> the object with property to bind
 </parameter_description>
 </parameter>
 <parameter name="property">
@@ -46749,7 +46993,7 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -46757,7 +47001,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="object">
-<parameter_description> a #GObject
+<parameter_description> the object with property to bind
 </parameter_description>
 </parameter>
 <parameter name="property">
@@ -46770,12 +47014,12 @@ Since: 2.26
 </parameter>
 <parameter name="get_mapping">
 <parameter_description> a function that gets called to convert values
-from @settings to @object, or %NULL to use the default GIO mapping
+from @settings to @object, or `NULL` to use the default GIO mapping
 </parameter_description>
 </parameter>
 <parameter name="set_mapping">
 <parameter_description> a function that gets called to convert values
-from @object to @settings, or %NULL to use the default GIO mapping
+from @object to @settings, or `NULL` to use the default GIO mapping
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -46783,7 +47027,7 @@ from @object to @settings, or %NULL to use the default GIO mapping
 </parameter_description>
 </parameter>
 <parameter name="destroy">
-<parameter_description> #GDestroyNotify function for @user_data
+<parameter_description> destroy notify function for @user_data
 </parameter_description>
 </parameter>
 </parameters>
@@ -46794,16 +47038,17 @@ from @object to @settings, or %NULL to use the default GIO mapping
 <description>
 Create a binding between the writability of @key in the
 @settings object and the property @property of @object.
-The property must be boolean; &quot;sensitive&quot; or &quot;visible&quot;
+
+The property must be boolean; `sensitive` or `visible`
 properties of widgets are the most likely candidates.
 
 Writable bindings are always uni-directional; changes of the
 writability of the setting will be propagated to the object
 property, not the other way.
 
-When the @inverted argument is %TRUE, the binding inverts the
+When the @inverted argument is true, the binding inverts the
 value as it passes from the setting to the object, i.e. @property
-will be set to %TRUE if the key is not writable.
+will be set to true if the key is not writable.
 
 Note that the lifecycle of the binding is tied to @object,
 and that you can have only one binding per object property.
@@ -46815,7 +47060,7 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -46823,7 +47068,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="object">
-<parameter_description>a #GObject
+<parameter_description> the object with property to bind
 </parameter_description>
 </parameter>
 <parameter name="property">
@@ -46831,7 +47076,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="inverted">
-<parameter_description> whether to 'invert' the value
+<parameter_description> whether to ‘invert’ the value
 </parameter_description>
 </parameter>
 </parameters>
@@ -46840,7 +47085,7 @@ Since: 2.26
 
 <function name="g_settings_create_action">
 <description>
-Creates a #GAction corresponding to a given #GSettings key.
+Creates a [iface@Gio.Action] corresponding to a given [class@Gio.Settings] key.
 
 The action has the same name as the key.
 
@@ -46860,7 +47105,7 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -46868,23 +47113,26 @@ Since: 2.32
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GAction
+<return> a new [iface@Gio.Action]
 
 </return>
 </function>
 
 <function name="g_settings_delay">
 <description>
-Changes the #GSettings object into 'delay-apply' mode. In this
+Changes the [class@Gio.Settings] object into
+[‘delay-apply’ mode](class.Settings.html#delay-apply-mode).
+
+In this
 mode, changes to @settings are not immediately propagated to the
-backend, but kept locally until g_settings_apply() is called.
+backend, but kept locally until [method@Gio.Settings.apply] is called.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 </parameters>
@@ -46895,11 +47143,11 @@ Since: 2.26
 <description>
 Gets the value that is stored at @key in @settings.
 
-A convenience function that combines g_settings_get_value() with
-g_variant_get().
+A convenience function that combines [method@Gio.Settings.get_value] with
+[method@GLib.Variant.get].
 
-It is a programmer error to give a @key that isn't contained in the
-schema for @settings or for the #GVariantType of @format to mismatch
+It is a programmer error to give a @key that isn’t contained in the
+schema for @settings or for the [struct@GLib.VariantType] of @format to mismatch
 the type given in the schema.
 
 Since: 2.26
@@ -46907,7 +47155,7 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -46915,7 +47163,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="format">
-<parameter_description> a #GVariant format string
+<parameter_description> a [struct@GLib.Variant] format string
 </parameter_description>
 </parameter>
 <parameter name="Varargs">
@@ -46930,17 +47178,17 @@ Since: 2.26
 <description>
 Gets the value that is stored at @key in @settings.
 
-A convenience variant of g_settings_get() for booleans.
+A convenience variant of [method@Gio.Settings.get] for booleans.
 
-It is a programmer error to give a @key that isn't specified as
-having a boolean type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having a `b` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -46956,21 +47204,21 @@ Since: 2.26
 <function name="g_settings_get_child">
 <description>
 Creates a child settings object which has a base path of
-`base-path/@name`, where `base-path` is the base path of
-@settings.
+`base-path/name`, where `base-path` is the base path of
+@settings and `name` is as specified by the caller.
 
 The schema for the child settings object must have been declared
 in the schema of @settings using a `&lt;child&gt;` element.
 
-The created child settings object will inherit the #GSettings:delay-apply
-mode from @settings.
+The created child settings object will inherit the
+[property@Gio.Settings:delay-apply] mode from @settings.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="name">
@@ -46978,33 +47226,33 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> a 'child' settings object
+<return> a ‘child’ settings object
 
 </return>
 </function>
 
 <function name="g_settings_get_default_value">
 <description>
-Gets the &quot;default value&quot; of a key.
+Gets the ‘default value’ of a key.
 
-This is the value that would be read if g_settings_reset() were to be
+This is the value that would be read if [method@Gio.Settings.reset] were to be
 called on the key.
 
 Note that this may be a different value than returned by
-g_settings_schema_key_get_default_value() if the system administrator
+[method@Gio.SettingsSchemaKey.get_default_value] if the system administrator
 has provided a default value.
 
-Comparing the return values of g_settings_get_default_value() and
-g_settings_get_value() is not sufficient for determining if a value
+Comparing the return values of [method@Gio.Settings.get_default_value] and
+[method@Gio.Settings.get_value] is not sufficient for determining if a value
 has been set because the user may have explicitly set the value to
 something that happens to be equal to the default.  The difference
-here is that if the default changes in the future, the user's key
+here is that if the default changes in the future, the user’s key
 will still be set.
 
 This function may be useful for adding an indication to a UI of what
 the default value was before the user set it.
 
-It is a programmer error to give a @key that isn't contained in the
+It is a programmer error to give a @key that isn’t contained in the
 schema for @settings.
 
 Since: 2.40
@@ -47012,7 +47260,7 @@ Since: 2.40
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47029,17 +47277,17 @@ Since: 2.40
 <description>
 Gets the value that is stored at @key in @settings.
 
-A convenience variant of g_settings_get() for doubles.
+A convenience variant of [method@Gio.Settings.get] for doubles.
 
-It is a programmer error to give a @key that isn't specified as
-having a 'double' type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having a `d` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47060,7 +47308,7 @@ to the enum value that it represents.
 In order to use this function the type of the value must be a string
 and it must be marked in the schema file as an enumerated type.
 
-It is a programmer error to give a @key that isn't contained in the
+It is a programmer error to give a @key that isn’t contained in the
 schema for @settings or is not marked as an enumerated type.
 
 If the value stored in the configuration database is not a valid
@@ -47072,7 +47320,7 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47093,7 +47341,7 @@ to the flags value that it represents.
 In order to use this function the type of the value must be an array
 of strings and it must be marked in the schema file as a flags type.
 
-It is a programmer error to give a @key that isn't contained in the
+It is a programmer error to give a @key that isn’t contained in the
 schema for @settings or is not marked as a flags type.
 
 If the value stored in the configuration database is not a valid
@@ -47105,7 +47353,7 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47120,19 +47368,22 @@ Since: 2.26
 
 <function name="g_settings_get_has_unapplied">
 <description>
-Returns whether the #GSettings object has any unapplied
-changes.  This can only be the case if it is in 'delayed-apply' mode.
+Returns whether the [class@Gio.Settings] object has any unapplied
+changes.
+
+This can only be the case if it is in
+[‘delay-apply’ mode](class.Settings.html#delay-apply-mode).
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @settings has unapplied changes
+<return> true if @settings has unapplied changes, false otherwise
 
 </return>
 </function>
@@ -47141,17 +47392,17 @@ Since: 2.26
 <description>
 Gets the value that is stored at @key in @settings.
 
-A convenience variant of g_settings_get() for 32-bit integers.
+A convenience variant of [method@Gio.Settings.get] for 32-bit integers.
 
-It is a programmer error to give a @key that isn't specified as
-having a int32 type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having an `i` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47168,17 +47419,17 @@ Since: 2.26
 <description>
 Gets the value that is stored at @key in @settings.
 
-A convenience variant of g_settings_get() for 64-bit integers.
+A convenience variant of [method@Gio.Settings.get] for 64-bit integers.
 
-It is a programmer error to give a @key that isn't specified as
-having a int64 type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having an `x` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.50
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47202,30 +47453,30 @@ some processing on the value of the key (for example, parsing).  The
 indicates that the processing was unsuccessful (due to a parse error,
 for example) then the mapping is tried again with another value.
 
-This allows a robust 'fall back to defaults' behaviour to be
+This allows a robust ‘fall back to defaults’ behaviour to be
 implemented somewhat automatically.
 
-The first value that is tried is the user's setting for the key.  If
+The first value that is tried is the user’s setting for the key.  If
 the mapping function fails to map this value, other values may be
 tried in an unspecified order (system or site defaults, translated
 schema default values, untranslated schema default values, etc).
 
 If the mapping function fails for all possible values, one additional
-attempt is made: the mapping function is called with a %NULL value.
+attempt is made: the mapping function is called with a `NULL` value.
 If the mapping function still indicates failure at this point then
 the application will be aborted.
 
 The result parameter for the @mapping function is pointed to a
-#gpointer which is initially set to %NULL.  The same pointer is given
-to each invocation of @mapping.  The final value of that #gpointer is
-what is returned by this function.  %NULL is valid; it is returned
+`gpointer` which is initially set to `NULL`.  The same pointer is given
+to each invocation of @mapping.  The final value of that `gpointer` is
+what is returned by this function.  `NULL` is valid; it is returned
 just as any other value would be.
 
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47242,7 +47493,7 @@ settings database to the value used by the application
 </parameter_description>
 </parameter>
 </parameters>
-<return> the result, which may be %NULL
+<return> the result, which may be `NULL`
 </return>
 </function>
 
@@ -47252,12 +47503,12 @@ Queries the range of a key.
 
 Since: 2.28
 
-Deprecated:2.40:Use g_settings_schema_key_get_range() instead.
+Deprecated:2.40:Use [method@Gio.SettingsSchemaKey.get_range] instead.
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47272,17 +47523,17 @@ Deprecated:2.40:Use g_settings_schema_key_get_range() instead.
 <description>
 Gets the value that is stored at @key in @settings.
 
-A convenience variant of g_settings_get() for strings.
+A convenience variant of [method@Gio.Settings.get] for strings.
 
-It is a programmer error to give a @key that isn't specified as
-having a string type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having an `s` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47297,17 +47548,17 @@ Since: 2.26
 
 <function name="g_settings_get_strv">
 <description>
-A convenience variant of g_settings_get() for string arrays.
+A convenience variant of [method@Gio.Settings.get] for string arrays.
 
-It is a programmer error to give a @key that isn't specified as
-having an array of strings type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having an `as` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47316,7 +47567,7 @@ Since: 2.26
 </parameter>
 </parameters>
 <return> a
-newly-allocated, %NULL-terminated array of strings, the value that
+newly-allocated, `NULL`-terminated array of strings, the value that
 is stored at @key in @settings.
 
 </return>
@@ -47326,18 +47577,18 @@ is stored at @key in @settings.
 <description>
 Gets the value that is stored at @key in @settings.
 
-A convenience variant of g_settings_get() for 32-bit unsigned
+A convenience variant of [method@Gio.Settings.get] for 32-bit unsigned
 integers.
 
-It is a programmer error to give a @key that isn't specified as
-having a uint32 type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having a `u` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.30
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47354,18 +47605,18 @@ Since: 2.30
 <description>
 Gets the value that is stored at @key in @settings.
 
-A convenience variant of g_settings_get() for 64-bit unsigned
+A convenience variant of [method@Gio.Settings.get] for 64-bit unsigned
 integers.
 
-It is a programmer error to give a @key that isn't specified as
-having a uint64 type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having a `t` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.50
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47380,23 +47631,23 @@ Since: 2.50
 
 <function name="g_settings_get_user_value">
 <description>
-Checks the &quot;user value&quot; of a key, if there is one.
+Checks the ‘user value’ of a key, if there is one.
 
 The user value of a key is the last value that was set by the user.
 
-After calling g_settings_reset() this function should always return
-%NULL (assuming something is not wrong with the system
+After calling [method@Gio.Settings.reset] this function should always return
+`NULL` (assuming something is not wrong with the system
 configuration).
 
-It is possible that g_settings_get_value() will return a different
+It is possible that [method@Gio.Settings.get_value] will return a different
 value than this function.  This can happen in the case that the user
 set a value for a key that was subsequently locked down by the system
-administrator -- this function will return the user's old value.
+administrator — this function will return the user’s old value.
 
-This function may be useful for adding a &quot;reset&quot; option to a UI or
+This function may be useful for adding a ‘reset’ option to a UI or
 for providing indication that a particular value has been changed.
 
-It is a programmer error to give a @key that isn't contained in the
+It is a programmer error to give a @key that isn’t contained in the
 schema for @settings.
 
 Since: 2.40
@@ -47404,7 +47655,7 @@ Since: 2.40
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47412,7 +47663,7 @@ Since: 2.40
 </parameter_description>
 </parameter>
 </parameters>
-<return> the user's value, if set
+<return> the user’s value, if set
 
 </return>
 </function>
@@ -47421,7 +47672,7 @@ Since: 2.40
 <description>
 Gets the value that is stored in @settings for @key.
 
-It is a programmer error to give a @key that isn't contained in the
+It is a programmer error to give a @key that isn’t contained in the
 schema for @settings.
 
 Since: 2.26
@@ -47429,7 +47680,7 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47437,21 +47688,21 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GVariant
+<return> a new [struct@GLib.Variant]
 
 </return>
 </function>
 
 <function name="g_settings_is_writable">
 <description>
-Finds out if a key can be written or not
+Finds out if a key can be written.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="name">
@@ -47459,7 +47710,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the key @name is writable
+<return> true if the key @name is writable, false otherwise
 
 </return>
 </function>
@@ -47469,20 +47720,20 @@ Since: 2.26
 Gets the list of children on @settings.
 
 The list is exactly the list of strings for which it is not an error
-to call g_settings_get_child().
+to call [method@Gio.Settings.get_child].
 
-There is little reason to call this function from &quot;normal&quot; code, since
+There is little reason to call this function from ‘normal’ code, since
 you should already know what children are in your schema. This function
 may still be useful there for introspection reasons, however.
 
-You should free the return value with g_strfreev() when you are done
+You should free the return value with [func@GLib.strfreev] when you are done
 with it.
 
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 </parameters>
@@ -47495,19 +47746,19 @@ on @settings, in no defined order
 <description>
 Introspects the list of keys on @settings.
 
-You should probably not be calling this function from &quot;normal&quot; code
+You should probably not be calling this function from ‘normal’ code
 (since you should already know what keys are in your schema).  This
 function is intended for introspection reasons.
 
-You should free the return value with g_strfreev() when you are done
+You should free the return value with [func@GLib.strfreev] when you are done
 with it.
 
-Deprecated: 2.46: Use g_settings_schema_list_keys() instead.
+Deprecated: 2.46: Use [method@Gio.SettingsSchema.list_keys] instead.
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 </parameters>
@@ -47557,37 +47808,37 @@ must not be modified or freed.
 
 <function name="g_settings_new">
 <description>
-Creates a new #GSettings object with the schema specified by
+Creates a new [class@Gio.Settings] object with the schema specified by
 @schema_id.
 
 It is an error for the schema to not exist: schemas are an
 essential part of a program, as they provide type information.
 If schemas need to be dynamically loaded (for example, from an
-optional runtime dependency), g_settings_schema_source_lookup()
+optional runtime dependency), [method@Gio.SettingsSchemaSource.lookup]
 can be used to test for their existence before loading them.
 
-Signals on the newly created #GSettings object will be dispatched
-via the thread-default #GMainContext in effect at the time of the
-call to g_settings_new().  The new #GSettings will hold a reference
-on the context.  See g_main_context_push_thread_default().
+Signals on the newly created [class@Gio.Settings] object will be dispatched
+via the thread-default [struct@GLib.MainContext] in effect at the time of the
+call to [ctor@Gio.Settings.new].  The new [class@Gio.Settings] will hold a reference
+on the context.  See [method@GLib.MainContext.push_thread_default].
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="schema_id">
-<parameter_description> the id of the schema
+<parameter_description> the ID of the schema
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GSettings object
+<return> a new [class@Gio.Settings] object
 
 </return>
 </function>
 
 <function name="g_settings_new_full">
 <description>
-Creates a new #GSettings object with a given schema, backend and
+Creates a new [class@Gio.Settings] object with a given schema, backend and
 path.
 
 It should be extremely rare that you ever want to use this function.
@@ -47595,20 +47846,20 @@ It is made available for advanced use-cases (such as plugin systems
 that want to provide access to schemas loaded from custom locations,
 etc).
 
-At the most basic level, a #GSettings object is a pure composition of
-4 things: a #GSettingsSchema, a #GSettingsBackend, a path within that
-backend, and a #GMainContext to which signals are dispatched.
+At the most basic level, a [class@Gio.Settings] object is a pure composition of
+four things: a [struct@Gio.SettingsSchema], a [class@Gio.SettingsBackend], a path within that
+backend, and a [struct@GLib.MainContext] to which signals are dispatched.
 
 This constructor therefore gives you full control over constructing
-#GSettings instances.  The first 3 parameters are given directly as
+[class@Gio.Settings] instances.  The first 3 parameters are given directly as
 @schema, @backend and @path, and the main context is taken from the
-thread-default (as per g_settings_new()).
+thread-default (as per [ctor@Gio.Settings.new]).
 
-If @backend is %NULL then the default backend is used.
+If @backend is `NULL` then the default backend is used.
 
-If @path is %NULL then the path from the schema is used.  It is an
-error if @path is %NULL and the schema has no path of its own or if
-@path is non-%NULL and not equal to the path that the schema does
+If @path is `NULL` then the path from the schema is used.  It is an
+error if @path is `NULL` and the schema has no path of its own or if
+@path is non-`NULL` and not equal to the path that the schema does
 have.
 
 Since: 2.32
@@ -47616,11 +47867,11 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="schema">
-<parameter_description> a #GSettingsSchema
+<parameter_description> the schema describing the settings
 </parameter_description>
 </parameter>
 <parameter name="backend">
-<parameter_description> a #GSettingsBackend
+<parameter_description> the settings backend to use
 </parameter_description>
 </parameter>
 <parameter name="path">
@@ -47628,19 +47879,19 @@ Since: 2.32
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GSettings object
+<return> a new [class@Gio.Settings] object
 
 </return>
 </function>
 
 <function name="g_settings_new_with_backend">
 <description>
-Creates a new #GSettings object with the schema specified by
-@schema_id and a given #GSettingsBackend.
+Creates a new [class@Gio.Settings] object with the schema specified by
+@schema_id and a given [class@Gio.SettingsBackend].
 
-Creating a #GSettings object with a different backend allows accessing
+Creating a [class@Gio.Settings] object with a different backend allows accessing
 settings from a database other than the usual one. For example, it may make
-sense to pass a backend corresponding to the &quot;defaults&quot; settings database on
+sense to pass a backend corresponding to the ‘defaults’ settings database on
 the system to get a settings object that modifies the system default
 settings instead of the settings for this user.
 
@@ -47649,37 +47900,37 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="schema_id">
-<parameter_description> the id of the schema
+<parameter_description> the ID of the schema
 </parameter_description>
 </parameter>
 <parameter name="backend">
-<parameter_description> the #GSettingsBackend to use
+<parameter_description> the settings backend to use
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GSettings object
+<return> a new [class@Gio.Settings] object
 
 </return>
 </function>
 
 <function name="g_settings_new_with_backend_and_path">
 <description>
-Creates a new #GSettings object with the schema specified by
-@schema_id and a given #GSettingsBackend and path.
+Creates a new [class@Gio.Settings] object with the schema specified by
+@schema_id and a given [class@Gio.SettingsBackend] and path.
 
-This is a mix of g_settings_new_with_backend() and
-g_settings_new_with_path().
+This is a mix of [ctor@Gio.Settings.new_with_backend] and
+[ctor@Gio.Settings.new_with_path].
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="schema_id">
-<parameter_description> the id of the schema
+<parameter_description> the ID of the schema
 </parameter_description>
 </parameter>
 <parameter name="backend">
-<parameter_description> the #GSettingsBackend to use
+<parameter_description> the settings backend to use
 </parameter_description>
 </parameter>
 <parameter name="path">
@@ -47687,25 +47938,25 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GSettings object
+<return> a new [class@Gio.Settings] object
 
 </return>
 </function>
 
 <function name="g_settings_new_with_path">
 <description>
-Creates a new #GSettings object with the relocatable schema specified
+Creates a new [class@Gio.Settings] object with the relocatable schema specified
 by @schema_id and a given path.
 
 You only need to do this if you want to directly create a settings
-object with a schema that doesn't have a specified path of its own.
-That's quite rare.
+object with a schema that doesn’t have a specified path of its own.
+That’s quite rare.
 
 It is a programmer error to call this function for a schema that
 has an explicitly specified path.
 
 It is a programmer error if @path is not a valid path.  A valid path
-begins and ends with '/' and does not contain two consecutive '/'
+begins and ends with `/` and does not contain two consecutive `/`
 characters.
 
 Since: 2.26
@@ -47713,7 +47964,7 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="schema_id">
-<parameter_description> the id of the schema
+<parameter_description> the ID of the schema
 </parameter_description>
 </parameter>
 <parameter name="path">
@@ -47721,7 +47972,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GSettings object
+<return> a new [class@Gio.Settings] object
 
 </return>
 </function>
@@ -47733,12 +47984,12 @@ permitted range for @key.
 
 Since: 2.28
 
-Deprecated:2.40:Use g_settings_schema_key_range_check() instead.
+Deprecated:2.40:Use [method@Gio.SettingsSchemaKey.range_check] instead.
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47750,7 +48001,7 @@ Deprecated:2.40:Use g_settings_schema_key_range_check() instead.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @value is valid for @key
+<return> true if @value is valid for @key, false otherwise
 
 </return>
 </function>
@@ -47766,7 +48017,7 @@ administrator.
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
@@ -47779,17 +48030,18 @@ administrator.
 
 <function name="g_settings_revert">
 <description>
-Reverts all non-applied changes to the settings.  This function
-does nothing unless @settings is in 'delay-apply' mode; see
-g_settings_delay().  In the normal case settings are always applied
-immediately.
+Reverts all unapplied changes to the settings.
+
+This function does nothing unless @settings is in
+[‘delay-apply’ mode](class.Settings.html#delay-apply-mode).  In the normal
+case settings are always applied immediately.
 
 Change notifications will be emitted for affected keys.
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings instance
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 </parameters>
@@ -48393,11 +48645,11 @@ Since: 2.32
 <description>
 Sets @key in @settings to @value.
 
-A convenience function that combines g_settings_set_value() with
-g_variant_new().
+A convenience function that combines [method@Gio.Settings.set_value] with
+[ctor@GLib.Variant.new].
 
-It is a programmer error to give a @key that isn't contained in the
-schema for @settings or for the #GVariantType of @format to mismatch
+It is a programmer error to give a @key that isn’t contained in the
+schema for @settings or for the [struct@GLib.VariantType] of @format to mismatch
 the type given in the schema.
 
 Since: 2.26
@@ -48405,15 +48657,15 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the name of the key to set
+<parameter_description> the key to set the value for
 </parameter_description>
 </parameter>
 <parameter name="format">
-<parameter_description> a #GVariant format string
+<parameter_description> a [struct@GLib.Variant] format string
 </parameter_description>
 </parameter>
 <parameter name="Varargs">
@@ -48421,8 +48673,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if setting the key succeeded,
-%FALSE if the key was not writable
+<return> true if setting the key succeeded,
+false if the key was not writable
 
 </return>
 </function>
@@ -48431,21 +48683,21 @@ Since: 2.26
 <description>
 Sets @key in @settings to @value.
 
-A convenience variant of g_settings_set() for booleans.
+A convenience variant of [method@Gio.Settings.set] for booleans.
 
-It is a programmer error to give a @key that isn't specified as
-having a boolean type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having a `b` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the name of the key to set
+<parameter_description> the key to set the value for
 </parameter_description>
 </parameter>
 <parameter name="value">
@@ -48453,8 +48705,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if setting the key succeeded,
-%FALSE if the key was not writable
+<return> true if setting the key succeeded,
+false if the key was not writable
 
 </return>
 </function>
@@ -48463,21 +48715,21 @@ Since: 2.26
 <description>
 Sets @key in @settings to @value.
 
-A convenience variant of g_settings_set() for doubles.
+A convenience variant of [method@Gio.Settings.set] for doubles.
 
-It is a programmer error to give a @key that isn't specified as
-having a 'double' type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having a `d` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the name of the key to set
+<parameter_description> the key to set the value for
 </parameter_description>
 </parameter>
 <parameter name="value">
@@ -48485,8 +48737,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if setting the key succeeded,
-%FALSE if the key was not writable
+<return> true if setting the key succeeded,
+false if the key was not writable
 
 </return>
 </function>
@@ -48496,23 +48748,23 @@ Since: 2.26
 Looks up the enumerated type nick for @value and writes it to @key,
 within @settings.
 
-It is a programmer error to give a @key that isn't contained in the
+It is a programmer error to give a @key that isn’t contained in the
 schema for @settings or is not marked as an enumerated type, or for
 @value not to be a valid value for the named type.
 
 After performing the write, accessing @key directly with
-g_settings_get_string() will return the 'nick' associated with
+[method@Gio.Settings.get_string] will return the ‘nick’ associated with
 @value.
 
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> a key, within @settings
+<parameter_description> the key to set the value for
 </parameter_description>
 </parameter>
 <parameter name="value">
@@ -48520,7 +48772,7 @@ g_settings_get_string() will return the 'nick' associated with
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE, if the set succeeds
+<return> true if the set succeeds, false otherwise
 </return>
 </function>
 
@@ -48530,23 +48782,23 @@ Looks up the flags type nicks for the bits specified by @value, puts
 them in an array of strings and writes the array to @key, within
 @settings.
 
-It is a programmer error to give a @key that isn't contained in the
+It is a programmer error to give a @key that isn’t contained in the
 schema for @settings or is not marked as a flags type, or for @value
 to contain any bits that are not value for the named type.
 
 After performing the write, accessing @key directly with
-g_settings_get_strv() will return an array of 'nicks'; one for each
+[method@Gio.Settings.get_strv] will return an array of ‘nicks’; one for each
 bit in @value.
 
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> a key, within @settings
+<parameter_description> the key to set the value for
 </parameter_description>
 </parameter>
 <parameter name="value">
@@ -48554,7 +48806,7 @@ bit in @value.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE, if the set succeeds
+<return> true if the set succeeds, false otherwise
 </return>
 </function>
 
@@ -48562,21 +48814,21 @@ bit in @value.
 <description>
 Sets @key in @settings to @value.
 
-A convenience variant of g_settings_set() for 32-bit integers.
+A convenience variant of [method@Gio.Settings.set] for 32-bit integers.
 
-It is a programmer error to give a @key that isn't specified as
-having a int32 type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having an `i` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the name of the key to set
+<parameter_description> the key to set the value for
 </parameter_description>
 </parameter>
 <parameter name="value">
@@ -48584,8 +48836,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if setting the key succeeded,
-%FALSE if the key was not writable
+<return> true if setting the key succeeded,
+false if the key was not writable
 
 </return>
 </function>
@@ -48594,21 +48846,21 @@ Since: 2.26
 <description>
 Sets @key in @settings to @value.
 
-A convenience variant of g_settings_set() for 64-bit integers.
+A convenience variant of [method@Gio.Settings.set] for 64-bit integers.
 
-It is a programmer error to give a @key that isn't specified as
-having a int64 type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having an `x` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.50
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the name of the key to set
+<parameter_description> the key to set the value for
 </parameter_description>
 </parameter>
 <parameter name="value">
@@ -48616,8 +48868,8 @@ Since: 2.50
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if setting the key succeeded,
-%FALSE if the key was not writable
+<return> true if setting the key succeeded,
+false if the key was not writable
 
 </return>
 </function>
@@ -48626,21 +48878,21 @@ Since: 2.50
 <description>
 Sets @key in @settings to @value.
 
-A convenience variant of g_settings_set() for strings.
+A convenience variant of [method@Gio.Settings.set] for strings.
 
-It is a programmer error to give a @key that isn't specified as
-having a string type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having an `s` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the name of the key to set
+<parameter_description> the key to set the value for
 </parameter_description>
 </parameter>
 <parameter name="value">
@@ -48648,8 +48900,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if setting the key succeeded,
-%FALSE if the key was not writable
+<return> true if setting the key succeeded,
+false if the key was not writable
 
 </return>
 </function>
@@ -48658,31 +48910,31 @@ Since: 2.26
 <description>
 Sets @key in @settings to @value.
 
-A convenience variant of g_settings_set() for string arrays.  If
-@value is %NULL, then @key is set to be the empty array.
+A convenience variant of [method@Gio.Settings.set] for string arrays.  If
+@value is `NULL`, then @key is set to be the empty array.
 
-It is a programmer error to give a @key that isn't specified as
-having an array of strings type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having an `as` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the name of the key to set
+<parameter_description> the key to set the value for
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> the value to set it to, or %NULL
+<parameter_description> the value to set it to
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if setting the key succeeded,
-%FALSE if the key was not writable
+<return> true if setting the key succeeded,
+false if the key was not writable
 
 </return>
 </function>
@@ -48691,22 +48943,22 @@ Since: 2.26
 <description>
 Sets @key in @settings to @value.
 
-A convenience variant of g_settings_set() for 32-bit unsigned
+A convenience variant of [method@Gio.Settings.set] for 32-bit unsigned
 integers.
 
-It is a programmer error to give a @key that isn't specified as
-having a uint32 type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having a `u` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.30
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the name of the key to set
+<parameter_description> the key to set the value for
 </parameter_description>
 </parameter>
 <parameter name="value">
@@ -48714,8 +48966,8 @@ Since: 2.30
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if setting the key succeeded,
-%FALSE if the key was not writable
+<return> true if setting the key succeeded,
+false if the key was not writable
 
 </return>
 </function>
@@ -48724,22 +48976,22 @@ Since: 2.30
 <description>
 Sets @key in @settings to @value.
 
-A convenience variant of g_settings_set() for 64-bit unsigned
+A convenience variant of [method@Gio.Settings.set] for 64-bit unsigned
 integers.
 
-It is a programmer error to give a @key that isn't specified as
-having a uint64 type in the schema for @settings.
+It is a programmer error to give a @key that isn’t specified as
+having a `t` type in the schema for @settings (see [struct@GLib.VariantType]).
 
 Since: 2.50
 
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the name of the key to set
+<parameter_description> the key to set the value for
 </parameter_description>
 </parameter>
 <parameter name="value">
@@ -48747,8 +48999,8 @@ Since: 2.50
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if setting the key succeeded,
-%FALSE if the key was not writable
+<return> true if setting the key succeeded,
+false if the key was not writable
 
 </return>
 </function>
@@ -48757,7 +49009,7 @@ Since: 2.50
 <description>
 Sets @key in @settings to @value.
 
-It is a programmer error to give a @key that isn't contained in the
+It is a programmer error to give a @key that isn’t contained in the
 schema for @settings or for @value to have the incorrect type, per
 the schema.
 
@@ -48768,20 +49020,20 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="settings">
-<parameter_description> a #GSettings object
+<parameter_description> the settings object
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> the name of the key to set
+<parameter_description> the key to set the value for
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> a #GVariant of the correct type
+<parameter_description> a [struct@GLib.Variant] of the correct type
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if setting the key succeeded,
-%FALSE if the key was not writable
+<return> true if setting the key succeeded,
+false if the key was not writable
 
 </return>
 </function>
@@ -48790,12 +49042,12 @@ Since: 2.26
 <description>
 Ensures that all pending operations are complete for the default backend.
 
-Writes made to a #GSettings are handled asynchronously.  For this
+Writes made to a [class@Gio.Settings] are handled asynchronously.  For this
 reason, it is very unlikely that the changes have it to disk by the
-time g_settings_set() returns.
+time [method@Gio.Settings.set] returns.
 
 This call will block until all of the writes have made it to the
-backend.  Since the mainloop is not running, no change notifications
+backend.  Since the main loop is not running, no change notifications
 will be dispatched during this call (but some may be queued by the
 time the call is done).
 
@@ -48818,7 +49070,7 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="object">
-<parameter_description> the object
+<parameter_description> the object with property to unbind
 </parameter_description>
 </parameter>
 <parameter name="property">
@@ -50103,7 +50355,8 @@ Since: 2.22
 </parameter>
 </parameters>
 <return> the size of the native struct sockaddr that
-@address represents
+@address represents, or `-1` if @address
+is not valid
 
 </return>
 </function>
@@ -52850,6 +53103,14 @@ IPv6 and IPv4 (if each is available).
 This is useful if you need to have a socket for incoming connections
 but don't care about the specific port number.
 
+If possible, the [class@Gio.SocketListener] will listen on both IPv4 and
+IPv6 (listening on the same port on both). If listening on one of the socket
+families fails, the [class@Gio.SocketListener] will only listen on the other.
+If listening on both fails, an error will be returned.
+
+If you need to distinguish whether listening on IPv4 or IPv6 or both was
+successful, connect to [signal@Gio.SocketListener::event].
+
 @source_object will be passed out in the various calls
 to accept to identify this particular source, which is
 useful if you're listening on multiple addresses and do
@@ -52883,6 +53144,14 @@ ignore.
 Helper function for g_socket_listener_add_address() that
 creates a TCP/IP socket listening on IPv4 and IPv6 (if
 supported) on the specified port on all interfaces.
+
+If possible, the [class@Gio.SocketListener] will listen on both IPv4 and
+IPv6 (listening on the same port on both). If listening on one of the socket
+families fails, the [class@Gio.SocketListener] will only listen on the other.
+If listening on both fails, an error will be returned.
+
+If you need to distinguish whether listening on IPv4 or IPv6 or both was
+successful, connect to [signal@Gio.SocketListener::event].
 
 @source_object will be passed out in the various calls
 to accept to identify this particular source, which is
@@ -52924,6 +53193,9 @@ Since: 2.22
 Adds @socket to the set of sockets that we try to accept
 new clients from. The socket must be bound to a local
 address and listened to.
+
+For parallel calls to [class@Gio.SocketListener] methods to work, the socket
+must be in non-blocking mode. (See [property@Gio.Socket:blocking].)
 
 @source_object will be passed out in the various calls
 to accept to identify this particular source, which is
@@ -63882,7 +64154,7 @@ Empty string means the '(Default)' value.
 </parameter>
 <parameter name="value_data_size">
 <parameter_description> size of the buffer pointed
-by @value_data.
+by @value_data, in bytes.
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -63958,7 +64230,7 @@ Empty string means the '(Default)' value.
 </parameter>
 <parameter name="value_data_size">
 <parameter_description> size of the buffer pointed
-by @value_data.
+by @value_data, in bytes.
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -64734,65 +65006,101 @@ proceed forward
 
 <function name="g_zlib_compressor_get_file_info">
 <description>
-Returns the #GZlibCompressor:file-info property.
+Gets the [property@Gio.ZlibCompressor:file-info] property.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="compressor">
-<parameter_description> a #GZlibCompressor
+<parameter_description> a compressor
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileInfo, or %NULL
+<return> file info for the gzip header, if set
+</return>
+</function>
 
+<function name="g_zlib_compressor_get_os">
+<description>
+Gets the [property@Gio.ZlibCompressor:os] property.
+
+Since: 2.86
+
+</description>
+<parameters>
+<parameter name="compressor">
+<parameter_description> a compressor
+</parameter_description>
+</parameter>
+</parameters>
+<return> the previously set OS value, or `-1` if unset
 </return>
 </function>
 
 <function name="g_zlib_compressor_new">
 <description>
-Creates a new #GZlibCompressor.
+Creates a compressor.
 
 Since: 2.24
 
 </description>
 <parameters>
 <parameter name="format">
-<parameter_description> The format to use for the compressed data
+<parameter_description> the format to use for the compressed data
 </parameter_description>
 </parameter>
 <parameter name="level">
-<parameter_description> compression level (0-9), -1 for default
+<parameter_description> compression level (`0`-`9`), `-1` for default
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GZlibCompressor
-
+<return> a new [class@Gio.ZlibCompressor]
 </return>
 </function>
 
 <function name="g_zlib_compressor_set_file_info">
 <description>
-Sets @file_info in @compressor. If non-%NULL, and @compressor's
-#GZlibCompressor:format property is %G_ZLIB_COMPRESSOR_FORMAT_GZIP,
-it will be used to set the file name and modification time in
-the GZIP header of the compressed data.
+Sets the [property@Gio.ZlibCompressor:file-info] property.
 
 Note: it is an error to call this function while a compression is in
 progress; it may only be called immediately after creation of @compressor,
-or after resetting it with g_converter_reset().
+or after resetting it with [method@Gio.Converter.reset].
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="compressor">
-<parameter_description> a #GZlibCompressor
+<parameter_description> a compressor
 </parameter_description>
 </parameter>
 <parameter name="file_info">
-<parameter_description> a #GFileInfo
+<parameter_description> file info for the gzip header
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_zlib_compressor_set_os">
+<description>
+Sets the [property@Gio.ZlibCompressor:os] property.
+
+Note: it is an error to call this function while a compression is in
+progress; it may only be called immediately after creation of @compressor,
+or after resetting it with [method@Gio.Converter.reset].
+
+Since: 2.86
+
+</description>
+<parameters>
+<parameter name="compressor">
+<parameter_description> a compressor
+</parameter_description>
+</parameter>
+<parameter name="os">
+<parameter_description> the OS code to use, or `-1` to unset
 </parameter_description>
 </parameter>
 </parameters>
@@ -64801,11 +65109,7 @@ Since: 2.26
 
 <function name="g_zlib_decompressor_get_file_info">
 <description>
-Retrieves the #GFileInfo constructed from the GZIP header data
-of compressed data processed by @compressor, or %NULL if @decompressor's
-#GZlibDecompressor:format property is not %G_ZLIB_COMPRESSOR_FORMAT_GZIP,
-or the header data was not fully processed yet, or it not present in the
-data stream at all.
+Gets the [property@Gio.ZlibDecompressor:file-info] property.
 
 Since: 2.26
 
@@ -64816,26 +65120,24 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileInfo, or %NULL
-
+<return> file info from the gzip header, if available
 </return>
 </function>
 
 <function name="g_zlib_decompressor_new">
 <description>
-Creates a new #GZlibDecompressor.
+Creates a new decompressor.
 
 Since: 2.24
 
 </description>
 <parameters>
 <parameter name="format">
-<parameter_description> The format to use for the compressed data
+<parameter_description> the format to use for the compressed data
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GZlibDecompressor
-
+<return> a new [class@Gio.ZlibDecompressor]
 </return>
 </function>
 

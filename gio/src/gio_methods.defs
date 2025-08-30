@@ -1878,6 +1878,19 @@
   )
 )
 
+(define-enum MonitorLowMemoryLevel
+  (in-module "GMemory")
+  (c-name "GMemoryMonitorLowMemoryLevel")
+  (gtype-id "G_TYPE_MEMORY_MONITOR_LOW_MEMORY_LEVEL")
+  (values
+    '("invalid" "G_MEMORY_MONITOR_LOW_MEMORY_LEVEL_INVALID")
+    '("low" "G_MEMORY_MONITOR_LOW_MEMORY_LEVEL_LOW")
+    '("medium" "G_MEMORY_MONITOR_LOW_MEMORY_LEVEL_MEDIUM")
+    '("critical" "G_MEMORY_MONITOR_LOW_MEMORY_LEVEL_CRITICAL")
+    '("count" "G_MEMORY_MONITOR_LOW_MEMORY_LEVEL_COUNT")
+  )
+)
+
 (define-flags NameLookupFlags
   (in-module "GResolver")
   (c-name "GResolverNameLookupFlags")
@@ -10812,6 +10825,17 @@
   )
 )
 
+(define-function g_inet_address_new_from_bytes_with_ipv6_info
+  (c-name "g_inet_address_new_from_bytes_with_ipv6_info")
+  (return-type "GInetAddress*")
+  (parameters
+    '("const-guint8*" "bytes")
+    '("GSocketFamily" "family")
+    '("guint32" "flowinfo")
+    '("guint32" "scope_id")
+  )
+)
+
 (define-function g_inet_address_new_any
   (c-name "g_inet_address_new_any")
   (return-type "GInetAddress*")
@@ -10911,6 +10935,18 @@
   (of-object "GInetAddress")
   (c-name "g_inet_address_get_is_mc_site_local")
   (return-type "gboolean")
+)
+
+(define-method get_scope_id
+  (of-object "GInetAddress")
+  (c-name "g_inet_address_get_scope_id")
+  (return-type "guint32")
+)
+
+(define-method get_flowinfo
+  (of-object "GInetAddress")
+  (c-name "g_inet_address_get_flowinfo")
+  (return-type "guint32")
 )
 
 
@@ -12338,6 +12374,32 @@
 
 
 
+;; From gmemorymonitorbase.h
+
+(define-method send_event_to_user
+  (of-object "GMemoryMonitorBase")
+  (c-name "g_memory_monitor_base_send_event_to_user")
+  (return-type "none")
+  (parameters
+    '("GMemoryMonitorLowMemoryLevel" "warning_level")
+  )
+)
+
+(define-function g_memory_monitor_base_level_enum_to_byte
+  (c-name "g_memory_monitor_base_level_enum_to_byte")
+  (return-type "GMemoryMonitorWarningLevel")
+  (parameters
+    '("GMemoryMonitorLowMemoryLevel" "level")
+  )
+)
+
+(define-function g_memory_monitor_base_query_mem_ratio
+  (c-name "g_memory_monitor_base_query_mem_ratio")
+  (return-type "gdouble")
+)
+
+
+
 ;; From gmemorymonitordbus.h
 
 
@@ -12351,7 +12413,25 @@
 
 
 
+;; From gmemorymonitorpoll.h
+
+(define-function g_memory_monitor_poll_get_type
+  (c-name "g_memory_monitor_poll_get_type")
+  (return-type "GType")
+)
+
+
+
 ;; From gmemorymonitorportal.h
+
+
+
+;; From gmemorymonitorpsi.h
+
+(define-function g_memory_monitor_psi_get_type
+  (c-name "g_memory_monitor_psi_get_type")
+  (return-type "GType")
+)
 
 
 
@@ -21650,6 +21730,21 @@
   (return-type "none")
   (parameters
     '("GFileInfo*" "file_info")
+  )
+)
+
+(define-method get_os
+  (of-object "GZlibCompressor")
+  (c-name "g_zlib_compressor_get_os")
+  (return-type "int")
+)
+
+(define-method set_os
+  (of-object "GZlibCompressor")
+  (c-name "g_zlib_compressor_set_os")
+  (return-type "none")
+  (parameters
+    '("int" "os")
   )
 )
 
