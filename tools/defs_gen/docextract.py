@@ -3,6 +3,7 @@
 sources, so I can use them for other purposes.'''
 
 import sys, os, re
+import docenumdefs
 
 # Used to tell if the "Since: ..." portion of the gtkdoc function description
 # should be omitted.  This is useful for some C++ modules such as gstreamermm
@@ -17,12 +18,16 @@ no_since = False
 # option being specified.
 no_recursion = False
 
+# Dictionary with enum element names and the name of the enum that
+# the element (enumerator) belongs to.
+enum_dict = {}
+
 __all__ = ['extract']
 
 class GtkDoc:
     def __init__(self):
         self.name = None
-        # The block type ('function', 'signal', property', 'section', 'enum')
+        # The block type ('function', 'signal', property', 'section', 'enum', 'enum-member')
         self.block_type = ''
         self.params = []
         self.annotations = []
@@ -113,6 +118,7 @@ no_colon_since_pattern = re.compile(r'^Since\s+[.0-9]+\n?$')
 final_section_patterns = [ return_pattern, since_pattern, deprecated_pattern, rename_to_pattern ]
 
 def parse_file(fp, doc_dict):
+    cur_enum = None
     line = fp.readline()
     while line:
         cur_doc = GtkDoc()
@@ -131,8 +137,20 @@ def parse_file(fp, doc_dict):
             # skip_to_identifier(), the process_params() function will mark the
             # block as invalid if enum members are not all caps.  In that case
             # do not add the block.
-            if cur_doc.get_type() != 'invalid':
+            # An 'enum-member' that does not exist in enum_dict is probably
+            # a description of a preprocessor macro (#define).
+            # Don't add it as a parameter.
+            # An 'enum' without parameters is probably a description of
+            # a struct or class. Don't add it to doc_dict.
+            if cur_doc.get_type() == 'enum-member':
+                if cur_enum and enum_dict.get(cur_doc.name) == cur_enum.name:
+                    cur_enum.add_param(cur_doc.name, cur_doc.description, cur_doc.annotations)
+            elif cur_doc.get_type() != 'invalid' and (cur_doc.get_type() != 'enum' or cur_doc.params):
                 doc_dict[cur_doc.name] = cur_doc
+            if cur_doc.get_type() == 'enum':
+                cur_enum = cur_doc
+            elif cur_doc.get_type() != 'enum-member':
+                cur_enum = None
 
 # Given a list of annotations as string of the form 
 # '(annotation1) (annotation2) ...' return a list of annotations of the form
@@ -210,7 +228,10 @@ def skip_to_identifier(fp, line, cur_doc):
                 elif pattern == property_name_pattern:
                     cur_doc.set_type('property')
                 elif pattern == enum_name_pattern:
-                    cur_doc.set_type('enum')
+                    if cur_doc.name.isupper():
+                        cur_doc.set_type('enum-member')
+                    else:
+                        cur_doc.set_type('enum')
                 elif pattern == function_name_pattern:
                     cur_doc.set_type('function')
                 return line
@@ -227,10 +248,6 @@ def process_params(fp, line, cur_doc):
     if line: line = fp.readline()
     line = skip_to_nonblank(fp, line)
     if not line or comment_end_pattern.match(line):
-        # If there are no parameters and this block has been recognized as an
-        # enum block, then mark it as invalid.
-        if cur_doc.get_type() == 'enum':
-            cur_doc.set_type('invalid')
         return line
 
     # Remove initial ' * ' in first non-empty comment block line.
@@ -240,10 +257,6 @@ def process_params(fp, line, cur_doc):
     # param section is not reached (which could be triggered by anything that
     # doesn't match a '@param:..." line, even the end of the comment block).
     match = param_pattern.match(line)
-
-    # Mark the cur_doc type as invalid if no parameters are found.
-    if not match and cur_doc.get_type() == 'enum':
-        cur_doc.set_type('invalid')
 
     while line and match:
         name = match.group(1)
@@ -457,6 +470,18 @@ def process_final_sections(fp, line, cur_doc):
 
     return line
 
+def parse_enum_dir(dir, exclude_files, enum_dict):
+    for file in os.listdir(dir):
+        if file in ('.', '..'): continue
+        path = os.path.join(dir, file)
+        if path in exclude_files: continue
+        if os.path.isdir(path):
+            if not no_recursion:
+                parse_enum_dir(path, exclude_files, enum_dict)
+        elif file.endswith('.h'):
+            sys.stderr.write("Searching for enums in " + path + '\n')
+            docenumdefs.parse_file(open(path, 'r'), enum_dict)
+
 def parse_dir(dir, exclude_files, doc_dict):
     for file in os.listdir(dir):
         if file in ('.', '..'): continue
@@ -465,11 +490,16 @@ def parse_dir(dir, exclude_files, doc_dict):
         if os.path.isdir(path):
             if not no_recursion:
                 parse_dir(path, exclude_files, doc_dict)
-        elif len(file) > 2 and file[-2:] in ('.c', '.h'):
+        elif file.endswith(('.c', '.h')):
             sys.stderr.write("Processing " + path + '\n')
             parse_file(open(path, 'r'), doc_dict)
 
 def extract(dirs, exclude_files, doc_dict=None):
+    global enum_dict
+    enum_dict = {}
+    for dir in dirs:
+        parse_enum_dir(dir, exclude_files, enum_dict)
+
     if not doc_dict: doc_dict = {}
     for dir in dirs:
         parse_dir(dir, exclude_files, doc_dict)
