@@ -299,7 +299,7 @@ if maintainer_mode
   # all generated .cc files could be recompiled if one generated .h file has
   # been changed.
   built_dummy_h_file_target = custom_target('giomm-dummy_header.h',
-    input: giomm_used_built_h_file_targets,
+    input: giomm_built_h_file_targets,
     output: 'dummy_header.h',
     command: [
       python3, dummy_header_py,
