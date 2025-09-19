@@ -145,6 +145,8 @@ def parse_file(fp, doc_dict):
             if cur_doc.get_type() == 'enum-member':
                 if cur_enum and enum_dict.get(cur_doc.name) == cur_enum.name:
                     cur_enum.add_param(cur_doc.name, cur_doc.description, cur_doc.annotations)
+                    if not doc_dict.get(cur_enum.name):
+                        doc_dict[cur_enum.name] = cur_enum
             elif cur_doc.get_type() != 'invalid' and (cur_doc.get_type() != 'enum' or cur_doc.params):
                 doc_dict[cur_doc.name] = cur_doc
             if cur_doc.get_type() == 'enum':
