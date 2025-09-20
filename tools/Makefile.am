@@ -58,6 +58,7 @@ EXTRA_DIST = defs_gen/definitions.py \
   defs_gen/enumextract.py \
   defs_gen/h2def.py \
   defs_gen/scmexpr.py \
+  defs_gen/docenumdefs.py \
   defs_gen/docextract.py \
   defs_gen/docextract_to_xml.py
 
