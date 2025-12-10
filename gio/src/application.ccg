@@ -22,6 +22,7 @@
 #include <map>
 #include <mutex>
 #include <vector>
+#include <forward_list>
 
 using Flags = Gio::Application::Flags;
 
@@ -204,7 +205,7 @@ using OptionArgCallbackDataMap = std::map<Glib::ustring, OptionArgCallbackData*>
 OptionArgCallbackDataMap option_arg_callback_data;
 
 // Gio::Application instances may be used in different threads.
-// Accesses to option_arg_callback_data must be thread-safe.
+// Accesses to option_arg_callback_data and option_strings must be thread-safe.
 std::mutex option_arg_callback_data_mutex;
 
 extern "C"
@@ -276,6 +277,13 @@ Application_option_arg_callback(
   return false;
 }
 } // extern "C"
+
+// Compare with the definition of Glib::make_unique_ptr_gfree().
+using UniquePtrStrType = std::unique_ptr<gchar[], decltype(&g_free)>;
+using StrList = std::forward_list<UniquePtrStrType>;
+using StrListMap = std::map<Gio::Application*, StrList>;
+StrListMap option_strings;
+
 } // anonymous namespace
 
 namespace Gio
@@ -314,6 +322,9 @@ Application::~Application() noexcept
       option_arg_callback_data.erase(saved_iter);
     }
   }
+
+  // Delete the StrList that belongs to this application.
+  option_strings.erase(this);
 }
 
 // static
@@ -413,11 +424,40 @@ Application::add_main_option_entry(OptionType arg_type, const Glib::ustring& lon
   gchar short_name, const Glib::ustring& description, const Glib::ustring& arg_description,
   Glib::OptionEntry::Flags flags)
 {
-  // g_application_add_main_option() saves copies of the strings.
-  // No need to keep copies in Gio::Application.
-  g_application_add_main_option(gobj(), long_name.c_str(), short_name,
-    static_cast<GOptionFlags>(flags), static_cast<GOptionArg>(arg_type),
-    description.c_str(), Glib::c_str_or_nullptr(arg_description));
+  // g_application_add_main_option() is not used, because it does not accept
+  // description == nullptr. See https://gitlab.gnome.org/GNOME/glibmm/-/issues/124
+
+  // Create a temporary array, just so we can give the correct thing to
+  // g_application_add_main_option_entries():
+  GOptionEntry array[2];
+  std::memset(array, 0, 2 * sizeof(GOptionEntry)); // null-termination
+
+  // g_application_add_main_option_entries() does not take its own copy
+  // of the strings. We must keep them alive, and keep pointers to them,
+  // so we can delete them when the Application instance is deleted.
+
+  gchar* long_name_copy = g_strdup(long_name.c_str()); // must not be nullptr
+  gchar* description_copy = g_strdup(Glib::c_str_or_nullptr(description));
+  gchar* arg_description_copy = g_strdup(Glib::c_str_or_nullptr(arg_description));
+  {
+    std::lock_guard<std::mutex> lock(option_arg_callback_data_mutex);
+    auto& application_str_list = option_strings[this];
+    application_str_list.emplace_front(long_name_copy, g_free);
+    if (description_copy)
+      application_str_list.emplace_front(description_copy, g_free);
+    if (arg_description_copy)
+      application_str_list.emplace_front(arg_description_copy, g_free);
+  } // option_arg_callback_data_mutex.unlock()
+
+  // Fill in array[0].
+  array[0].arg = static_cast<GOptionArg>(arg_type);
+  array[0].long_name = long_name_copy;
+  array[0].short_name = short_name;
+  array[0].description = description_copy;
+  array[0].arg_description = arg_description_copy;
+  array[0].flags = static_cast<int>(flags);
+
+  g_application_add_main_option_entries(gobj(), array);
 }
 
 void
