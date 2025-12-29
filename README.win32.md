@@ -65,12 +65,14 @@ supported):
   * 2017: `15`, `<libname>-vc141-2_4.[dll|pdb|lib]`
   * 2019: `16`, `<libname>-vc142-2_4.[dll|pdb|lib]`
   * 2022: `17`: `<libname>-vc143-2_4.[dll|pdb|lib]`
+  * 2026: `18`: `<libname>-vc145-2_4.[dll|pdb|lib]`
 
 For Meson, the DLL/PDB filenames and .lib filenames will be like:
   * 2015: `<libname>-vc140-2.4-1.[dll|pdb]`, `<libname>-vc140-2.4.lib`
   * 2017: `<libname>-vc141-2.4-1.[dll|pdb]`, `<libname>-vc141-2.4.lib`
   * 2019: `<libname>-vc142-2.4-1.[dll|pdb]`, `<libname>-vc142-2.4.lib`
   * 2022: `<libname>-vc143-2.4-1.[dll|pdb]`, `<libname>-vc143-2.4.lib`
+  * 2026: `<libname>-vc145-2.4-1.[dll|pdb]`, `<libname>-vc145-2.4.lib`
 
 Notice that this is no longer always the `vc140` that was used before, to be consistent with
 other common C++ libraries such as Boost.  Earlier gtkmm versions may still use the former
