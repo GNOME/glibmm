@@ -22,13 +22,15 @@ SIGC_SERIES = $(SIGC_MAJOR_VERSION).$(SIGC_MINOR_VERSION)
 GLIBMM_API_VERSION = $(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)
 GLIB_API_VERSION = 2.0
 DEPS_MKFILE = deps-vs$(VSVER)-$(PLAT)-$(CFG).mak
+M4_PATH_MKFILE = find-m4-bindir-vs$(VSVER)-$(PLAT)-$(CFG).mak
+UNIX_TOOLS_PATH_MKFILE = check-unix-tools-bindir-vs$(VSVER)-$(PLAT)-$(CFG).mak
 
 # Gather up dependencies for their include directories and lib/bin dirs.
 !if [for %t in (SIGC GLIB) do @(echo !ifndef %t_INCLUDEDIR>>$(DEPS_MKFILE) & echo %t_INCLUDEDIR=^$^(BASE_INCLUDEDIR^)>>$(DEPS_MKFILE) & echo !endif>>$(DEPS_MKFILE))]
 !endif
 !if [for %t in (SIGC GLIB) do @(echo !ifndef %t_LIBDIR>>$(DEPS_MKFILE) & echo %t_LIBDIR=^$^(BASE_LIBDIR^)>>$(DEPS_MKFILE) & echo !endif>>$(DEPS_MKFILE))]
 !endif
-!if [for %t in (GLIB UNIX_TOOLS) do @(echo !ifndef %t_BINDIR>>$(DEPS_MKFILE) & echo %t_BINDIR=^$^(BASE_TOOLS_PATH^)>>$(DEPS_MKFILE) & echo !endif>>$(DEPS_MKFILE))]
+!if [for %t in (GLIB) do @(echo !ifndef %t_BINDIR>>$(DEPS_MKFILE) & echo %t_BINDIR=^$^(BASE_TOOLS_PATH^)>>$(DEPS_MKFILE) & echo !endif>>$(DEPS_MKFILE))]
 !endif
 
 !include $(DEPS_MKFILE)
@@ -43,7 +45,38 @@ DEBUG_SUFFIX =
 !endif
 
 !ifndef M4
+!ifdef UNIX_TOOLS_BINDIR
+M4 = $(UNIX_TOOLS_BINDIR)\m4.exe
+!else
 M4 = m4
+!endif
+!endif
+
+# Try to deduce full path to m4.exe, as needed
+!if [if not exist $(M4)\ if exist $(M4) echo M4_FULL_PATH = $(M4)>$(M4_PATH_MKFILE)]
+!endif
+!if [if exist $(M4).exe echo M4_FULL_PATH = $(M4).exe>$(M4_PATH_MKFILE)]
+!endif
+!if [if not exist $(M4_PATH_MKFILE) ((echo M4_FULL_PATH = \>$(M4_PATH_MKFILE)) & where $(M4)>>$(M4_PATH_MKFILE) 2>NUL)]
+!endif
+
+!include $(M4_PATH_MKFILE)
+
+!if [del /f/q $(M4_PATH_MKFILE)]
+!endif
+
+!if [if not "$(UNIX_TOOLS_BINDIR)" == "" if not "$(M4_FULL_PATH)" == "" echo UNIX_TOOLS_BINDIR_CHECKED = $(UNIX_TOOLS_BINDIR)>$(UNIX_TOOLS_PATH_MKFILE)]
+!endif
+
+!if [if "$(UNIX_TOOLS_BINDIR)" == "" if not "$(M4_FULL_PATH)" == "" (for %f in ($(M4_FULL_PATH)) do @echo UNIX_TOOLS_BINDIR_CHECKED = %~dpf>$(UNIX_TOOLS_PATH_MKFILE))]
+!endif
+
+!if [if not exist $(UNIX_TOOLS_PATH_MKFILE) (echo UNIX_TOOLS_BINDIR_CHECKED = >$(UNIX_TOOLS_PATH_MKFILE))]
+!endif
+
+!include $(UNIX_TOOLS_PATH_MKFILE)
+
+!if [del /f/q $(UNIX_TOOLS_PATH_MKFILE)]
 !endif
 
 GLIBMM_DEPS_INCLUDES =	\

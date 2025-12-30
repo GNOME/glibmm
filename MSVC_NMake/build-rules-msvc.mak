@@ -36,7 +36,9 @@ $<
 {..\glib\src\}.cc.m4{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj:
 	@if not exist $(@D)\ md $(@D)
 	@if not exist glibmm\glibmm.rc $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
-	@for %%s in ($(<D)\*.cc.m4 $(<D)\*.h.m4) do @if not exist ..\glib\glibmm\%%~ns if not exist ..\untracked\glib\glibmm\%%~ns if not exist $(@D)\%%~ns $(M4) -I$(<D:\=/) %%s $(<D:\=/)/template.macros.m4 > $(@D)\%%~ns
+	@if "$(UNIX_TOOLS_BINDIR_CHECKED)" == "" echo Warning: m4 is not in %PATH% or specified M4 or UNIX_TOOLS_BINDIR is not valid. Builds may fail!
+	@set PATH=$(PATH);$(UNIX_TOOLS_BINDIR_CHECKED)
+	@for %%s in ($(<D)\*.cc.m4 $(<D)\*.h.m4) do @if not exist ..\glib\glibmm\%%~ns if not exist ..\untracked\glib\glibmm\%%~ns if not exist $(@D)\%%~ns $(M4_FULL_PATH) -I$(<D:\=/) %%s $(<D:\=/)/template.macros.m4 > $(@D)\%%~ns
 	@if exist $(@D)\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(GLIBMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B)
 	@if exist ..\glib\glibmm\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(GLIBMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c ..\glib\glibmm\$(<B)
 	@if exist ..\untracked\glib\glibmm\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(GLIBMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c ..\untracked\glib\glibmm\$(<B)
@@ -45,7 +47,9 @@ $<
 	@if not exist $(@D)\private\ md $(@D)\private
 	@if not exist ..\tools\gmmproc $(MAKE) /f Makefile.vc CFG=$(CFG) ..\tools\gmmproc
 	@if not exist glibmm\glibmm.rc $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
-	@for %%s in ($(<D)\*.cc.m4 $(<D)\*.h.m4) do @if not exist ..\glib\glibmm\%%~ns if not exist ..\untracked\glib\glibmm\%%~ns if not exist $(@D)\%%~ns $(M4) -I$(<D:\=/) %%s $(<D:\=/)/template.macros.m4 > $(@D)\%%~ns
+	@if "$(UNIX_TOOLS_BINDIR_CHECKED)" == "" echo Warning: m4 is not in %PATH% or specified M4 or UNIX_TOOLS_BINDIR is not valid. Builds may fail!
+	@for %%s in ($(<D)\*.cc.m4 $(<D)\*.h.m4) do @if not exist ..\glib\glibmm\%%~ns if not exist ..\untracked\glib\glibmm\%%~ns if not exist $(@D)\%%~ns $(M4_FULL_PATH) -I$(<D:\=/) %%s $(<D:\=/)/template.macros.m4 > $(@D)\%%~ns
+	@set PATH=$(PATH);$(UNIX_TOOLS_BINDIR_CHECKED)
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\glib\glibmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -I ../tools/pm -- ../tools/gmmproc -I ../tools/m4 --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
 	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGLIBMM_CFLAGS) $(GLIBMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
 	@if exist ..\glib\glibmm\$(<B).cc $(CXX) $(LIBGLIBMM_CFLAGS) $(GLIBMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c ..\glib\glibmm\$(<B).cc
@@ -70,6 +74,8 @@ $<
 {..\gio\src\}.ccg{vs$(VSVER)\$(CFG)\$(PLAT)\giomm\}.obj:
 	@if not exist $(@D)\private\ md $(@D)\private
 	@if not exist ..\tools\gmmproc $(MAKE) /f Makefile.vc CFG=$(CFG) ..\tools\gmmproc
+	@if "$(UNIX_TOOLS_BINDIR_CHECKED)" == "" echo Warning: m4 is not in %PATH% or specified M4 or UNIX_TOOLS_BINDIR is not valid. Builds may fail!
+	@set PATH=$(PATH);$(UNIX_TOOLS_BINDIR_CHECKED)
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\gio\giomm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -I ../tools/pm -- ../tools/gmmproc -I ../tools/m4 --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
 	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGIOMM_CFLAGS) $(GIOMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
 	@if exist ..\gio\giomm\$(<B).cc $(CXX) $(LIBGIOMM_CFLAGS) $(GIOMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
