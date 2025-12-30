@@ -31,7 +31,7 @@ glibmm\glibmm.rc: ..\configure.ac glibmm\glibmm.rc.in glibmm\glibmmconfig.h
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GLIBMM_MINOR_VERSION\@/$(PKG_MINOR_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GLIBMM_MICRO_VERSION\@/$(PKG_MICRO_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@PACKAGE_VERSION\@/$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION).$(PKG_MICRO_VERSION)/g" $@
-	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GLIBMM_MODULE_NAME\@/glibmm-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GLIBMM_MODULE_NAME\@/glibmm-$(GLIBMM_API_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" del $@.bak
 
 glibmm\glibmmconfig.h: ..\configure.ac ..\glib\glibmmconfig.h.in
@@ -49,7 +49,7 @@ giomm\giomm.rc: ..\configure.ac
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GIOMM_MINOR_VERSION\@/$(PKG_MINOR_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GIOMM_MICRO_VERSION\@/$(PKG_MICRO_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@PACKAGE_VERSION\@/$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION).$(PKG_MICRO_VERSION)/g" $@
-	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GIOMM_MODULE_NAME\@/giomm-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GIOMM_MODULE_NAME\@/giomm-$(GLIBMM_API_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" del $@.bak
 
 # You may change GIOMM_DISABLE_DEPRECATED and GIOMM_STATIC_LIB if you know what you are doing
@@ -75,7 +75,7 @@ giomm\giommconfig.h: ..\configure.ac ..\gio\giommconfig.h.in
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@exec_prefix\@/$(PREFIX_REAL:\=\/)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@libdir\@/$(PREFIX_REAL:\=\/)\/share/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@M4\@/$(M4:\=\/)/g" $@
-	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GLIBMM_MODULE_NAME\@/glibmm-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GLIBMM_MODULE_NAME\@/glibmm-$(GLIBMM_API_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@PACKAGE_VERSION\@/$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION).$(PKG_MICRO_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" del $@.bak
 
