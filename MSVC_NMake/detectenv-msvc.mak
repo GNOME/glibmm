@@ -120,12 +120,11 @@ VALID_CFGSET = TRUE
 
 # One may change these items, but be sure to test
 # the resulting binaries
+CFLAGS_ADD_BASE = /std:c++17 /utf-8 /EHsc
 !if "$(CFG)" == "release" || "$(CFG)" == "Release"
-CFLAGS_ADD_NO_GL = /MD /O2 /MP /std:c++17 /utf-8
-CFLAGS_ADD = $(CFLAGS_ADD_NO_GL) /GL
+CFLAGS_ADD = /MD /O2 /MP $(CFLAGS_ADD_BASE) /GL
 !else
-CFLAGS_ADD = /MDd /Od /std:c++17 /utf-8
-CFLAGS_ADD_NO_GL = $(CFLAGS_ADD)
+CFLAGS_ADD = /MDd /Od $(CFLAGS_ADD_BASE)
 !endif
 
 !if "$(PLAT)" == "x64"
@@ -137,20 +136,14 @@ LDFLAGS_ARCH = /machine:x86
 !endif
 
 !if "$(VALID_CFGSET)" == "TRUE"
-CFLAGS_NOGL = $(CFLAGS_ADD_NO_GL) /W3 /Zi
 CFLAGS = $(CFLAGS_ADD) /W3 /Zi
-
 LDFLAGS_BASE = $(LDFLAGS_ARCH) /DEBUG
 
 !if "$(CFG)" == "debug" || "$(CFG)" == "Debug"
-ARFLAGS_NOLTCG = $(LDFLAGS_ARCH)
 ARFLAGS = $(LDFLAGS_ARCH)
-LDFLAGS_NOLTCG = $(LDFLAGS_BASE)
 LDFLAGS = $(LDFLAGS_BASE)
 !else
-ARFLAGS_NOLTCG = $(LDFLAGS_ARCH) /LTCG
-ARFLAGS = $(ARFLAGS_NOLTCG) /LTCG
-LDFLAGS_NOLTCG = $(LDFLAGS_BASE) /opt:ref
-LDFLAGS = $(LDFLAGS_NOLTCG) /LTCG
+ARFLAGS = $(LDFLAGS_ARCH) /LTCG
+LDFLAGS = $(LDFLAGS_BASE) /opt:ref /LTCG
 !endif
 !endif
