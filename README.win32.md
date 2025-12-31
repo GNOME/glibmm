@@ -99,31 +99,33 @@ following are optional if the paths of needed headers, libraries and tools are i
   * `BASE_TOOLS_PATH` (default: `$(PREFIX)\bin`: Location where tools can be located
   * `BASE_INCLUDES` (default: `$(PREFIX)\include`: Base directory where dependencies' headers can
   be located
-  * `BASE_LIBPATH` (default: `$(PREFIX)\lib`: Base directory where dependencies' libraries and
+  * `BASE_LIBDIR` (default: `$(PREFIX)\lib`: Base directory where dependencies' libraries and
   architecture-dependent or compiler-dependent headers can be located
   * `<DEP>_INCLUDEDIR` (default: `$(BASE_INCLUDES)`): Base directory where <DEP>'s headers can be
   found in their respective subdirectories as applicable, so for instance GLib's headers can be
   found in `$(GLIB_INCLUDEDIR)\glib-2.0` and `$(GLIB_INCLUDEDIR)\gio-win32-2.0`.  <DEP> here
-  currently covers GLIB and LIBSIGC
-  * `<DEP>_LIBDIR` (default: `$(BASE_LIBPATH)`): Base directory where <DEP>'s architecture-
+  currently covers GLIB and SIGC
+  * `<DEP>_LIBDIR` (default: `$(BASE_LIBDIR)`): Base directory where <DEP>'s architecture-
   and compiler-dependent headers and .lib's can be found in their respective subdirectories as
   applicable, so for instance GLib's `glibconfig.h` can be found in
-  `$(GLIB_LIBDIR)\glib-2.0\include`. <DEP> here currently covers GLIB and LIBSIGC.
+  `$(GLIB_LIBDIR)\glib-2.0\include`. <DEP> here currently covers GLIB and SIGC.
   * `<DEP>_BINDIR` (default: `$(BASE_TOOLS_PATH`)`): Base directory where <DEP>'s utility programs
   can be found. <DEP> here currently covers GLIB.
   * GLIB_COMPILE_SCHEMAS (default: `$(GLIB_BINDIR)\glib-compile-schemas`): Relative or full path
   where GLib's `glib-compile-schemas` tool can be located, i.e., if `glib-compile-schemas` is in
   `%PATH%`, you may opt to just pass in `GLIB_COMPILE_SCHEMAS=glib-compile-schemas`.
+  * M4, UNIX_TOOLS_BINDIR (default: `m4` [or `$(UNIX_TOOLS_BINDIR)\m4.exe` if `UNIX_TOOLS_BINDIR` is
+  specified] for `M4`): Location where the `m4` utility program can be located, if not already in
+  `%PATH%`. Needed if building from a GIT checkout.
+  It is currently recommended to use the `m4` that comes with an MSYS2/MSYS64 or Cygwin installation,
+  as other UNIXy tools can be used during the code generating process.
+  * PERL (default: `perl`): Location of the PERL interpreter if not in `%PATH%`.
+  Needed for all builds to generate various sources and headers. If building
+  from a GIT checkout, the `XML::Parser` PERL module needs to be installed as well, which depends on`
+  libexpat. You are responsible for ensuring that `XML::Parser` can be loaded during runtime.
 
 The NMake Makefiles now support building the glibmm libraries directly from a GIT checkout
 with a few manual steps required, namely:
-
-  * Ensure that you have a copy of Cygwin or MSYS/MSYS64 installed, including
-`m4.exe` and `sh.exe`.  You should also have a PERL for Windows installation
-as well, and your `%PATH%` should contain the paths to your PERL interpreter
-and the bin\ directory of your Cygwin or MSYS/MSYS64 installation, it is recommended
-that these paths are towards the end of your `%PATH%`. You need to install the
-`XML::Parser` PERL module as well for your PERL installation, which requires libexpat.
 
   * Make a new copy of the entire source tree to some location, where the build
 is to be done; then in `$(srcroot)\MSVC_NMake` run `nmake /f Makefile.vc CFG=[release|debug]`,
@@ -154,10 +156,10 @@ is thus not allowed._
 
 When building with Meson, if building from a GIT checkout or if building with `maintainer-mode`
 enabled, you will also need a PERL interpreter and the `m4.exe` and `sh.exe` from Cygwin or
-MSYS/MSYS64, and you will need to also install Doxygen, LLVM (likely needed by Doxygen) and
-GraphViz unless you pass in `-Dbuild-documentation=false` in your Meson configure command
-line.  You will still need to have `mm-common` installed with its `bin` directory in your
-`%PATH%`
+MSYS/MSYS64 in your `%PATH%`, and you will need to also install Doxygen, LLVM
+(likely needed by Doxygen) and GraphViz unless you pass in `-Dbuild-documentation=false`
+in your Meson configure command line.  You will still need to have `mm-common` installed with
+its `bin` directory in your `%PATH%` as well.
 
 ### Glibmm methods and signals not available on win32
 
