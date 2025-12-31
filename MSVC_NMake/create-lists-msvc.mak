@@ -43,89 +43,89 @@ glibmm_files_extra_ph_int = $(glibmm_files_extra_ph:/=\)
 
 # For glibmm
 
-!if [call create-lists.bat header glibmm.mak glibmm_OBJS]
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) glibmm_OBJS]
 !endif
 
-!if [for %c in ($(glibmm_files_built_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm\%~nc.obj]
+!if [for %c in ($(glibmm_files_built_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm\%~nc.obj]
 !endif
 
-!if [for %c in ($(glibmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm\%~nc.obj]
+!if [for %c in ($(glibmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm\%~nc.obj]
 !endif
 
-!if [@call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm\glibmm.res]
+!if [@call create-lists.bat file $(BUILD_MKFILE_SNIPPET) vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm\glibmm.res]
 !endif
 
-!if [call create-lists.bat footer glibmm.mak]
+!if [call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [call create-lists.bat header glibmm.mak glibmm_real_hg]
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) glibmm_real_hg]
 !endif
 
-!if [for %c in ($(glibmm_files_used_hg)) do @call create-lists.bat file glibmm.mak ..\glib\src\%c]
+!if [for %c in ($(glibmm_files_used_hg)) do @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ..\glib\src\%c]
 !endif
 
-!if [call create-lists.bat footer glibmm.mak]
+!if [call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
 # For giomm
 
-!if [call create-lists.bat header glibmm.mak giomm_OBJS]
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) giomm_OBJS]
 !endif
 
-!if [for %c in ($(giomm_generated_sources)) do @if "%~xc" == ".cc" @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\giomm\%~nc.obj]
+!if [for %c in ($(giomm_generated_sources)) do @if "%~xc" == ".cc" @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) vs^$(VSVER)\^$(CFG)\^$(PLAT)\giomm\%~nc.obj]
 !endif
 
-!if [for %c in ($(giomm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\giomm\%~nc.obj]
+!if [for %c in ($(giomm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) vs^$(VSVER)\^$(CFG)\^$(PLAT)\giomm\%~nc.obj]
 !endif
 
-!if [@call create-lists.bat file glibmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\giomm\giomm.res]
+!if [@call create-lists.bat file $(BUILD_MKFILE_SNIPPET) vs^$(VSVER)\^$(CFG)\^$(PLAT)\giomm\giomm.res]
 !endif
 
-!if [call create-lists.bat footer glibmm.mak]
+!if [call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [call create-lists.bat header glibmm.mak giomm_real_hg]
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) giomm_real_hg]
 !endif
 
-!if [for %c in ($(giomm_files_any_hg)) do @call create-lists.bat file glibmm.mak ..\gio\src\%c]
+!if [for %c in ($(giomm_files_any_hg)) do @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ..\gio\src\%c]
 !endif
 
-!if [call create-lists.bat footer glibmm.mak]
+!if [call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [for %d in ($(PREFIX)) do @echo PREFIX_REAL=%~dpnd>>glibmm.mak]
+!if [for %d in ($(PREFIX)) do @echo PREFIX_REAL=%~dpnd>>$(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [echo.>>glibmm.mak]
+!if [echo.>>$(BUILD_MKFILE_SNIPPET)]
 !endif
 
 # We skip building the following examples/tests:
 # child_watch, iochannel_stream: Builds on *NIX only
-!if [for %d in (examples tests) do @call create-lists.bat header glibmm.mak glibmm_%d & @(for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" call create-lists.bat file glibmm.mak vs$(VSVER)\$(CFG)\$(PLAT)\%t.exe) & @call create-lists.bat footer glibmm.mak]
+!if [for %d in (examples tests) do @call create-lists.bat header $(BUILD_MKFILE_SNIPPET) glibmm_%d & @(for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" call create-lists.bat file $(BUILD_MKFILE_SNIPPET) vs$(VSVER)\$(CFG)\$(PLAT)\%t.exe) & @call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [for %t in (dbus network thread) do @for %s in (..\examples\%t\*.cc) do @echo glibmm_examples = ^$(glibmm_examples) vs^$(VSVER)\^$(CFG)\^$(PLAT)\%~ns.exe>>glibmm.mak]
+!if [for %t in (dbus network thread) do @for %s in (..\examples\%t\*.cc) do @echo glibmm_examples = ^$(glibmm_examples) vs^$(VSVER)\^$(CFG)\^$(PLAT)\%~ns.exe>>$(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [echo.>>glibmm.mak]
+!if [echo.>>$(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [for %d in (examples tests) do @for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" for %s in (..\%d\%t\*.cc) do @echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm-%d\%t-%~ns.obj: %s>>glibmm.mak & @echo. if not exist ^$(@D)\ md ^$(@D)>>glibmm.mak & @echo.	^$(CXX) ^$(CFLAGS) ^$(GIOMM_INCLUDES) /Fo^$(@D)\%t-%~ns.obj /Fd^$(@D)\ ^$** /c>>glibmm.mak & @echo.>>glibmm.mak]
+!if [for %d in (examples tests) do @for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" for %s in (..\%d\%t\*.cc) do @echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm-%d\%t-%~ns.obj: %s>>$(BUILD_MKFILE_SNIPPET) & @echo. if not exist ^$(@D)\ md ^$(@D)>>$(BUILD_MKFILE_SNIPPET) & @echo.	^$(CXX) ^$(CFLAGS) ^$(GIOMM_INCLUDES) /Fo^$(@D)\%t-%~ns.obj /Fd^$(@D)\ ^$** /c>>$(BUILD_MKFILE_SNIPPET) & @echo.>>$(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [for %t in (dbus network thread) do @for %s in (..\examples\%t\*.cc) do @echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm-examples\%t-%~ns.obj: %s>>glibmm.mak & @echo. if not exist ^$(@D)\ md ^$(@D)>>glibmm.mak & @echo.	^$(CXX) ^$(CFLAGS) ^$(GIOMM_INCLUDES) /Fo^$(@D)\%t-%~ns.obj /Fd^$(@D)\ ^$** /c>>glibmm.mak & @echo.>>glibmm.mak]
+!if [for %t in (dbus network thread) do @for %s in (..\examples\%t\*.cc) do @echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm-examples\%t-%~ns.obj: %s>>$(BUILD_MKFILE_SNIPPET) & @echo. if not exist ^$(@D)\ md ^$(@D)>>$(BUILD_MKFILE_SNIPPET) & @echo.	^$(CXX) ^$(CFLAGS) ^$(GIOMM_INCLUDES) /Fo^$(@D)\%t-%~ns.obj /Fd^$(@D)\ ^$** /c>>$(BUILD_MKFILE_SNIPPET) & @echo.>>$(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [for %d in (examples tests) do @for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" call create-lists.bat header glibmm.mak %t_OBJS & @(for %s in (..\%d\%t\*.cc) do @call create-lists.bat file glibmm.mak vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-%d\%t-%~ns.obj) & @call create-lists.bat footer glibmm.mak]
+!if [for %d in (examples tests) do @for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" call create-lists.bat header $(BUILD_MKFILE_SNIPPET) %t_OBJS & @(for %s in (..\%d\%t\*.cc) do @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) vs$(VSVER)\$(CFG)\$(PLAT)\glibmm-%d\%t-%~ns.obj) & @call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [for %d in (examples tests) do @for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\%t.exe: ^$(GIOMM_LIB) ^$(GLIBMM_LIB) ^$(%t_OBJS)>>glibmm.mak & @echo.	link ^$(LDFLAGS) ^$** /libpath:^$^(GLIB_LIBDIR^) ^$(GIO_LIBS) /libpath:^$^(SIGC_LIBDIR^) ^$(SIGC_LIB) /out:^$@>>glibmm.mak & @echo.>>glibmm.mak]
+!if [for %d in (examples tests) do @for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\%t.exe: ^$(GIOMM_LIB) ^$(GLIBMM_LIB) ^$(%t_OBJS)>>$(BUILD_MKFILE_SNIPPET) & @echo.	link ^$(LDFLAGS) ^$** /libpath:^$^(GLIB_LIBDIR^) ^$(GIO_LIBS) /libpath:^$^(SIGC_LIBDIR^) ^$(SIGC_LIB) /out:^$@>>$(BUILD_MKFILE_SNIPPET) & @echo.>>$(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [for %t in (dbus network thread) do @for %s in (..\examples\%t\*.cc) do @echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\%~ns.exe: ^$(GIOMM_LIB) ^$(GLIBMM_LIB) vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm-examples\%t-%~ns.obj>>glibmm.mak & @echo.	link ^$(LDFLAGS) ^$** /libpath:^$^(GLIB_LIBDIR^) ^$(GIO_LIBS) /libpath:^$^(SIGC_LIBDIR^) ^$(SIGC_LIB) /out:^$@>>glibmm.mak & @echo.>>glibmm.mak]
+!if [for %t in (dbus network thread) do @for %s in (..\examples\%t\*.cc) do @echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\%~ns.exe: ^$(GIOMM_LIB) ^$(GLIBMM_LIB) vs^$(VSVER)\^$(CFG)\^$(PLAT)\glibmm-examples\%t-%~ns.obj>>$(BUILD_MKFILE_SNIPPET) & @echo.	link ^$(LDFLAGS) ^$** /libpath:^$^(GLIB_LIBDIR^) ^$(GIO_LIBS) /libpath:^$^(SIGC_LIBDIR^) ^$(SIGC_LIB) /out:^$@>>$(BUILD_MKFILE_SNIPPET) & @echo.>>$(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!include glibmm.mak
+!include $(BUILD_MKFILE_SNIPPET)
 
-!if [del /f /q glibmm.mak]
+!if [del /f /q $(BUILD_MKFILE_SNIPPET)]
 !endif
