@@ -23,6 +23,7 @@ GLIBMM_API_VERSION = $(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)
 GLIB_API_VERSION = 2.0
 DEPS_MKFILE = deps-vs$(VSVER)-$(PLAT)-$(CFG).mak
 M4_PATH_MKFILE = find-m4-bindir-vs$(VSVER)-$(PLAT)-$(CFG).mak
+BUILD_MKFILE_SNIPPET = glibmm-vs$(VSVER)-$(PLAT)-$(CFG).mak
 UNIX_TOOLS_PATH_MKFILE = check-unix-tools-bindir-vs$(VSVER)-$(PLAT)-$(CFG).mak
 
 # Gather up dependencies for their include directories and lib/bin dirs.
