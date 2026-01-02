@@ -15,66 +15,74 @@
 # <<
 {vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj::
 	@if not exist glibmm\glibmm.rc $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
-	$(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /c @<<
+	$(CXX) $(LIBGLIBMM_CFLAGS) $(GLIBMM_INCLUDES) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /c @<<
 $<
 <<
 
 {..\glib\glibmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj::
 	@if not exist glibmm\glibmm.rc $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
 	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\glibmm
-	$(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /c @<<
+	$(CXX) $(LIBGLIBMM_CFLAGS) $(GLIBMM_INCLUDES) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /c @<<
 $<
 <<
 
 {..\untracked\glib\glibmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj::
 	@if not exist glibmm\glibmm.rc $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
 	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\glibmm
-	$(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /c @<<
+	$(CXX) $(LIBGLIBMM_CFLAGS) $(GLIBMM_INCLUDES) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glibmm\ /c @<<
 $<
 <<
 
 {..\glib\src\}.cc.m4{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj:
 	@if not exist $(@D)\ md $(@D)
 	@if not exist glibmm\glibmm.rc $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
-	@for %%s in ($(<D)\*.cc.m4 $(<D)\*.h.m4) do @if not exist ..\glib\glibmm\%%~ns if not exist ..\untracked\glib\glibmm\%%~ns if not exist $(@D)\%%~ns $(M4) -I$(<D:\=/) %%s $(<D:\=/)/template.macros.m4 > $(@D)\%%~ns
-	@if exist $(@D)\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B)
-	@if exist ..\untracked\glib\glibmm\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\untracked\glib\glibmm\$(<B)
-	@if exist ..\glib\glibmm\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\glib\glibmm\$(<B)
+	@if "$(UNIX_TOOLS_BINDIR_CHECKED)" == "" echo Warning: m4 is not in %PATH% or specified M4 or UNIX_TOOLS_BINDIR is not valid. Builds may fail!
+	@set PATH=$(PATH);$(UNIX_TOOLS_BINDIR_CHECKED)
+	@for %%s in ($(<D)\*.cc.m4 $(<D)\*.h.m4) do @if not exist ..\glib\glibmm\%%~ns if not exist ..\untracked\glib\glibmm\%%~ns if not exist $(@D)\%%~ns $(M4_FULL_PATH) -I$(<D:\=/) %%s $(<D:\=/)/template.macros.m4 > $(@D)\%%~ns
+	@if exist $(@D)\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(GLIBMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B)
+	@if exist ..\glib\glibmm\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(GLIBMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c ..\glib\glibmm\$(<B)
+	@if exist ..\untracked\glib\glibmm\$(<B) $(CXX) $(LIBGLIBMM_CFLAGS) $(GLIBMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c ..\untracked\glib\glibmm\$(<B)
 
 {..\glib\src\}.ccg{vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\}.obj:
 	@if not exist $(@D)\private\ md $(@D)\private
 	@if not exist ..\tools\gmmproc $(MAKE) /f Makefile.vc CFG=$(CFG) ..\tools\gmmproc
+	@if not exist glibmm\glibmm.rc $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
+	@if "$(UNIX_TOOLS_BINDIR_CHECKED)" == "" echo Warning: m4 is not in %PATH% or specified M4 or UNIX_TOOLS_BINDIR is not valid. Builds may fail!
+	@for %%s in ($(<D)\*.cc.m4 $(<D)\*.h.m4) do @if not exist ..\glib\glibmm\%%~ns if not exist ..\untracked\glib\glibmm\%%~ns if not exist $(@D)\%%~ns $(M4_FULL_PATH) -I$(<D:\=/) %%s $(<D:\=/)/template.macros.m4 > $(@D)\%%~ns
+	@set PATH=$(PATH);$(UNIX_TOOLS_BINDIR_CHECKED)
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\glib\glibmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -I ../tools/pm -- ../tools/gmmproc -I ../tools/m4 --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
-	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
-	@if exist ..\glib\glibmm\$(<B).cc $(CXX) $(LIBGLIBMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\glib\glibmm\$(<B).cc
+	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGLIBMM_CFLAGS) $(GLIBMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
+	@if exist ..\glib\glibmm\$(<B).cc $(CXX) $(LIBGLIBMM_CFLAGS) $(GLIBMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c ..\glib\glibmm\$(<B).cc
 
 {vs$(VSVER)\$(CFG)\$(PLAT)\giomm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\giomm\}.obj::
-	$(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /c @<<
+	$(CXX) $(LIBGIOMM_CFLAGS) $(GIOMM_INCLUDES) /Fovs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /c @<<
 $<
 <<
 
 {..\gio\giomm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\giomm\}.obj::
 	if not exist vs$(VSVER)\$(CFG)\$(PLAT)\giomm\ md vs$(VSVER)\$(CFG)\$(PLAT)\giomm
-	$(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /c @<<
+	$(CXX) $(LIBGIOMM_CFLAGS) $(GIOMM_INCLUDES) /Fovs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /c @<<
 $<
 <<
 
 {..\untracked\gio\giomm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\giomm\}.obj::
 	if not exist vs$(VSVER)\$(CFG)\$(PLAT)\giomm\ md vs$(VSVER)\$(CFG)\$(PLAT)\giomm
-	$(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /c @<<
+	$(CXX) $(LIBGIOMM_CFLAGS) $(GIOMM_INCLUDES) /Fovs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\giomm\ /c @<<
 $<
 <<
 
 {..\gio\src\}.ccg{vs$(VSVER)\$(CFG)\$(PLAT)\giomm\}.obj:
 	@if not exist $(@D)\private\ md $(@D)\private
 	@if not exist ..\tools\gmmproc $(MAKE) /f Makefile.vc CFG=$(CFG) ..\tools\gmmproc
+	@if "$(UNIX_TOOLS_BINDIR_CHECKED)" == "" echo Warning: m4 is not in %PATH% or specified M4 or UNIX_TOOLS_BINDIR is not valid. Builds may fail!
+	@set PATH=$(PATH);$(UNIX_TOOLS_BINDIR_CHECKED)
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\gio\giomm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -I ../tools/pm -- ../tools/gmmproc -I ../tools/m4 --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
-	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
-	@if exist ..\gio\giomm\$(<B).cc $(CXX) $(LIBGIOMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
+	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGIOMM_CFLAGS) $(GIOMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
+	@if exist ..\gio\giomm\$(<B).cc $(CXX) $(LIBGIOMM_CFLAGS) $(GIOMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
 
 {..\tools\extra_defs_gen\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\}.obj::
 	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ md vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen
-	$(CXX) $(GLIBMM_BASE_CFLAGS) /DGLIBMM_GEN_EXTRA_DEFS_BUILD $(GLIBMM_EXTRA_INCLUDES) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ /c @<<
+	$(CXX) $(CFLAGS) /DGLIBMM_GEN_EXTRA_DEFS_BUILD $(GLIBMM_INCLUDES) /Fovs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\ /c @<<
 $<
 <<
 
@@ -93,7 +101,7 @@ $(GIOMM_LIB): $(GIOMM_DLL)
 
 $(GLIBMM_EXTRA_DEFS_GEN_LIB): $(GLIBMM_EXTRA_DEFS_GEN_DLL)
 $(GLIBMM_EXTRA_DEFS_GEN_DLL): vs$(VSVER)\$(CFG)\$(PLAT)\glib-extra-defs-gen\generate_extra_defs.obj
-	link /DLL $(LDFLAGS_NOLTCG) /libpath:$(GLIB_LIBDIR) $(GOBJECT_LIBS) /implib:$(GLIBMM_EXTRA_DEFS_GEN_LIB) -out:$@ @<<
+	link /DLL $(LDFLAGS) $(GOBJECT_LDFLAGS) /implib:$(GLIBMM_EXTRA_DEFS_GEN_LIB) -out:$@ @<<
 $**
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
@@ -107,13 +115,13 @@ $**
 # <<
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
 $(GLIBMM_DLL): $(glibmm_OBJS)
-	link /DLL $(LDFLAGS_NOLTCG) /libpath:$(GLIB_LIBDIR) $(GOBJECT_LIBS) /libpath:$(LIBSIGC_LIBDIR) $(LIBSIGC_LIB) /implib:$(GLIBMM_LIB) -out:$@ @<<
+	link /DLL $(LDFLAGS) $(GOBJECT_LDFLAGS) $(SIGC_LDFLAGS) /implib:$(GLIBMM_LIB) -out:$@ @<<
 $(glibmm_OBJS)
 <<
 
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
 $(GIOMM_DLL): $(GLIBMM_LIB) $(giomm_OBJS)
-	link /DLL $(LDFLAGS_NOLTCG) /libpath:$(GLIB_LIBDIR) $(GLIBMM_LIB) $(GIO_LIBS) /libpath:$(LIBSIGC_LIBDIR) $(LIBSIGC_LIB) /implib:$(GIOMM_LIB) -out:$@ @<<
+	link /DLL $(LDFLAGS) $(GLIBMM_LIB) $(GIO_LDFLAGS) $(SIGC_LDFLAGS) /implib:$(GIOMM_LIB) -out:$@ @<<
 $(giomm_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
