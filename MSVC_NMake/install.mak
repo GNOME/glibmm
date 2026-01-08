@@ -8,7 +8,7 @@ install: all
 	@if not exist $(PREFIX)\include\glibmm-$(GLIBMM_API_VERSION)\glibmm_generate_extra_defs\ @md $(PREFIX)\include\glibmm-$(GLIBMM_API_VERSION)\glibmm_generate_extra_defs
 	@if not exist $(PREFIX)\lib\giomm-$(GLIBMM_API_VERSION)\include\ md $(PREFIX)\lib\giomm-$(GLIBMM_API_VERSION)\include
 	@if not exist $(PREFIX)\include\giomm-$(GLIBMM_API_VERSION)\giomm\private\ @md $(PREFIX)\include\giomm-$(GLIBMM_API_VERSION)\giomm\private
-	@-for %d in (m4 pm) do @md $(PREFIX)\share\glibmm-$(GLIBMM_API_VERSION)\proc\%d
+	@-for %d in (m4 pm) do @md $(PREFIX)\lib\glibmm-$(GLIBMM_API_VERSION)\proc\%d
 	@copy /b $(OUTDIR)\$(GLIBMM_LIBNAME).dll $(PREFIX)\bin
 	@copy /b $(OUTDIR)\$(GLIBMM_LIBNAME).pdb $(PREFIX)\bin
 	@copy /b $(OUTDIR)\$(GLIBMM_LIBNAME).lib $(PREFIX)\lib
@@ -36,7 +36,7 @@ install: all
 	@copy ".\glibmm\glibmmconfig.h" "$(PREFIX)\lib\glibmm-$(GLIBMM_API_VERSION)\include\"
 	@copy ".\giomm\giommconfig.h" "$(PREFIX)\lib\giomm-$(GLIBMM_API_VERSION)\include\"
 	@copy "..\tools\extra_defs_gen\generate_extra_defs.h" "$(PREFIX)\include\glibmm-$(GLIBMM_API_VERSION)\glibmm_generate_extra_defs\"
-	@for %d in (m4 pm) do copy ..\tools\%d\* $(PREFIX)\share\glibmm-$(GLIBMM_API_VERSION)\proc\%d
-	@for %f in (gmmproc generate_wrap_init.pl) do @if exist ..\tools\%f copy ..\tools\%f $(PREFIX)\share\glibmm-$(GLIBMM_API_VERSION)\proc
-	@for %f in (gmmproc generate_wrap_init.pl) do @if not exist ..\tools\%f copy ..\tools\%f.in $(PREFIX)\share\glibmm-$(GLIBMM_API_VERSION)\proc\%f
-	@echo Please ensure gmmproc and generate_wrap_init.pl in $(PREFIX)\share\glibmm-$(GLIBMM_API_VERSION)\proc contain the correct paths
+	@for %d in (m4 pm) do copy ..\tools\%d\* $(PREFIX)\lib\glibmm-$(GLIBMM_API_VERSION)\proc\%d
+	@for %f in (gmmproc generate_wrap_init.pl) do @if exist ..\tools\%f copy ..\tools\%f $(PREFIX)\lib\glibmm-$(GLIBMM_API_VERSION)\proc
+	@for %f in (gmmproc generate_wrap_init.pl) do @if not exist ..\tools\%f copy ..\tools\%f.in $(PREFIX)\lib\glibmm-$(GLIBMM_API_VERSION)\proc\%f
+	@echo Please ensure gmmproc and generate_wrap_init.pl in $(PREFIX)\lib\glibmm-$(GLIBMM_API_VERSION)\proc contain the correct paths
