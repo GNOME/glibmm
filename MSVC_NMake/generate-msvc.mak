@@ -4,15 +4,15 @@
 # one is maintaining the NMake build files.
 
 # Compile schema for giomm settings example
-vs$(VSVER)\$(CFG)\$(PLAT)\gschema.compiled: ..\examples\settings\org.gtkmm.demo.gschema.xml
+$(OUTDIR)\gschema.compiled: ..\examples\settings\org.gtkmm.demo.gschema.xml
 	$(GLIB_COMPILE_SCHEMAS) --targetdir=$(@D) $(**D)
 
 # Generate wrap_init.cc files
 
-vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\wrap_init.cc: $(glibmm_real_hg) ..\tools\generate_wrap_init.pl
+$(OUTDIR)\glibmm\wrap_init.cc: $(glibmm_real_hg) ..\tools\generate_wrap_init.pl
 	@if not exist ..\glib\glibmm\wrap_init.cc $(PERL) -- "../tools/generate_wrap_init.pl" --namespace=Glib --parent_dir=glibmm $(glibmm_real_hg:\=/)>$@
 
-vs$(VSVER)\$(CFG)\$(PLAT)\giomm\wrap_init.cc: $(giomm_real_hg) ..\tools\generate_wrap_init.pl
+$(OUTDIR)\giomm\wrap_init.cc: $(giomm_real_hg) ..\tools\generate_wrap_init.pl
 	@if not exist ..\gio\giomm\wrap_init.cc $(PERL) -- "../tools/generate_wrap_init.pl" --namespace=Gio --parent_dir=giomm $(giomm_real_hg:\=/)>$@
 
 # Generate pre-generated resources and configuration headers (builds from GIT)
