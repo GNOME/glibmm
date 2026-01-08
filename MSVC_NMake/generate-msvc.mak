@@ -73,7 +73,7 @@ giomm\giommconfig.h: ..\configure.ac ..\gio\giommconfig.h.in
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@PERL\@/$(PERL:\=\/)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@prefix\@/$(PREFIX_REAL:\=\/)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@exec_prefix\@/$(PREFIX_REAL:\=\/)/g" $@
-	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@libdir\@/$(PREFIX_REAL:\=\/)\/share/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@libdir\@/$(PREFIX_REAL:\=\/)\/lib/g" $@
 	@if "$(DO_REAL_GEN)" == "1" if not "$(M4_FULL_PATH)" == "" $(PERL) -pi.bak -e "s/\@M4\@/$(M4_FULL_PATH:\=\/)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" if "$(M4_FULL_PATH)" == "" $(PERL) -pi.bak -e "s/\@M4\@/$(M4:\=\/)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GLIBMM_MODULE_NAME\@/glibmm-$(GLIBMM_API_VERSION)/g" $@
