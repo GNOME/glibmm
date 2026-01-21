@@ -42,6 +42,8 @@ MM_CONFIG_DOCTOOL_DIR([docs])
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 AC_SUBST([LIBGLIBMM_SO_VERSION], [4:0:3])
 AC_SUBST([MSVC_TOOLSET_VER], [''])
+AC_SUBST(DOXYGEN_HAVE_DOT, [YES])
+AM_SUBST_NOTMAKE(DOXYGEN_HAVE_DOT)
 
 AC_PROG_CXX
 MM_AX_CXX_COMPILE_STDCXX([11], [noext], [mandatory])
