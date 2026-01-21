@@ -154,8 +154,13 @@ if maintainer_mode and not mm_common_get.found()
 endif
 m4 = find_program('m4', required: maintainer_mode) # Used by gmmproc
 doxygen = find_program('doxygen', required: build_documentation)
-dot = find_program('dot', required: build_documentation) # Used by Doxygen
+dot = find_program('dot', required: false) # Used by Doxygen, if found
 xsltproc = find_program('xsltproc', required: build_documentation)
+
+if build_documentation and not dot.found()
+  message('The \'dot\' command is not found.\n  ' + \
+          'This will affect the look of the inheritance diagrams in the documentation.')
+endif
 
 # Where to find gmmproc and generate_wrap_init.pl.
 gmmproc_dir = project_build_root / 'tools'

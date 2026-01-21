@@ -4,7 +4,7 @@
 #        glibmm_hg_ccg_basenames, giomm_hg_ccg_basenames, build_documentation,
 #        glibmm_extra_h_files, giomm_extra_h_files, glibmm_built_h_file_targets,
 #        giomm_built_h_file_targets, glibmm_h_m4_files, install_datadir,
-#        python3, doc_reference_py
+#        python3, doc_reference_py, dot
 # Output: install_docdir, install_devhelpdir, if build_documentation: tag_file
 
 tag_file_modules = [
@@ -59,6 +59,7 @@ doc_conf_data.set('abs_top_builddir', built_files_root)
 doc_conf_data.set('abs_top_srcdir', project_source_root)
 doc_conf_data.set('GLIBMM_MODULE_NAME', book_name)
 doc_conf_data.set('DOXYGEN_TAGFILES', doxygen_tagfiles)
+doc_conf_data.set('DOXYGEN_HAVE_DOT', dot.found() ? 'YES' : 'NO')
 
 doxyfile = configure_file(
   input: 'Doxyfile.in',
