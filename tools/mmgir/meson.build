@@ -5,7 +5,8 @@ tinyxml2_dep = dependency('tinyxml2', required : true)
 mmgir_sources = files(
   'main.cc',
   'gen_defs.cc',
-  'parse_gir.cc'
+  'parse_gir.cc',
+  'type_resolver.cc',
 )
 
 # Define the executable
@@ -13,6 +14,6 @@ mmgir = executable('mmgir',
   mmgir_sources,
   dependencies: [cli11_dep, fmt_dep, tinyxml2_dep],
   override_options: ['cpp_std=c++17'],
-  install : false
+  install : false,
 )
 meson.override_find_program('mmgir', mmgir)

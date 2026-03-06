@@ -16,9 +16,11 @@
 
 #include "gen_defs.h"
 #include "parse_gir.h"
+#include "type_resolver.h"
 
 #include <CLI/CLI.hpp>
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 
 #include <filesystem>
 #include <fstream>
@@ -28,10 +30,11 @@
 
 namespace fs = std::filesystem;
 
-bool has_gir_extension(const std::string& arg)
-{
-    return fs::path(arg).extension() == ".gir";
-}
+namespace {
+
+constexpr const char* const GIR_EXT = ".gir";
+
+}  // namespace
 
 int main(int argc, char** argv)
 {
@@ -39,7 +42,6 @@ int main(int argc, char** argv)
 
     std::string gir_filepath;
     std::vector<std::string> supporting_girs;
-    std::vector<std::string> gir_search_paths;
 
     std::string enum_defs_filepath;
     std::string function_defs_filepath;
@@ -50,16 +52,22 @@ int main(int argc, char** argv)
     bool warn_ignored = false;
     bool warn_deprecated = false;
 
+    auto is_gir_file = [](const std::string& arg) {
+        if (fs::path(arg).extension() == GIR_EXT) {
+            return "";
+        } else {
+            return "Not a GIR file";
+        }
+    };
+
     app.add_option("--gir", gir_filepath, "Input GIR filepath")
         ->required()
         ->check(CLI::ExistingFile)
-        ->check([](const std::string& arg) {
-                if (has_gir_extension(arg)) {
-                    return "";
-                } else {
-                    return "Not a GIR file";
-                }
-            });
+        ->check(is_gir_file);
+    app.add_option("--additional-gir", supporting_girs,
+                   "Other GIR filepaths to help resolve types from other namespaces")
+        ->check(CLI::ExistingFile)
+        ->check(is_gir_file);
 
     app.add_option("--enum-defs", enum_defs_filepath, "Output filepath for enum defs")
         ->required();
@@ -87,6 +95,38 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    TypeResolver type_resolver;
+    std::vector<std::string> missing_namespaces;
+    missing_namespaces = type_resolver.register_repo_types(repo);
+
+    std::vector<gir::Repository> supporting_repos;
+    for (const std::string& supporting_file : supporting_girs) {
+        gir::Repository supporting_repo;
+
+        try {
+            fmt::println("Reading {}", supporting_file);
+            ParseArgs args{
+                supporting_file, warn_unknown, warn_ignored, warn_deprecated
+            };
+            supporting_repo = load_repository_from_file(args);
+        } catch (const GirParseError& e) {
+            fmt::println(stderr, "ERROR: {}", e.what());
+            return 1;
+        }
+
+        missing_namespaces = type_resolver.register_repo_types(supporting_repo);
+        supporting_repos.push_back(std::move(supporting_repo));
+    }
+
+    // type_resolver.dump_mappings();
+    type_resolver.dump_unknown_types();
+
+    if (missing_namespaces.size() > 0) {
+        fmt::println("ERROR: Missing GIR files for: {}",
+                     fmt::join(missing_namespaces, ", "));
+        return 1;
+    }
+
     {
         fmt::println("Dumping enum defs to {}", enum_defs_filepath);
         std::ofstream enum_defs_out(enum_defs_filepath);
@@ -100,7 +140,7 @@ int main(int argc, char** argv)
     {
         fmt::println("Dumping signal defs to {}", signal_defs_filepath);
         std::ofstream signal_defs_out(signal_defs_filepath);
-        generate_signal_defs(signal_defs_out, repo);
+        generate_signal_defs(signal_defs_out, repo, type_resolver);
     }
     if (vfunc_defs_filepath) {
         fmt::println("Dumping vfunc defs to {}", *vfunc_defs_filepath);

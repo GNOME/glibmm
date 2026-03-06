@@ -20,7 +20,10 @@
 
 #include <iostream>
 
+class TypeResolver;
+
 void generate_extended_enum_defs(std::ostream& os, const gir::Repository& repo);
 void generate_function_defs(std::ostream& os, const gir::Repository& repo);
-void generate_signal_defs(std::ostream& os, const gir::Repository& repo);
+void generate_signal_defs(std::ostream& os, const gir::Repository& repo,
+                          const TypeResolver& type_resolver);
 void generate_vfunc_defs(std::ostream& os, const gir::Repository& repo);

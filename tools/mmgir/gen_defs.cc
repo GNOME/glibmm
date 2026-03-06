@@ -16,6 +16,8 @@
 
 #include "gen_defs.h"
 
+#include "type_resolver.h"
+
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <fmt/ranges.h>
@@ -27,12 +29,6 @@
 #include <set>
 
 using namespace gir;
-
-// Helper to create a visitor from a set of lambdas
-template<class... Ts>
-struct overloads : Ts... { using Ts::operator()...; };
-template<class... Ts>
-overloads(Ts...) -> overloads<Ts...>;
 
 namespace {
 
@@ -127,15 +123,6 @@ std::string gen_c_type_cast(std::string_view c_type,
     return result;
 }
 
-template <class T>
-bool is_skippable(const T& obj)
-{
-    if (obj.info_attributes.is_skippable) return true;
-    // Ignore private objects
-    if (obj.name.at(0) == '_') return true;
-    return false;
-}
-
 std::string convert_bool(const std::optional<bool>& value,
                          bool default_value)
 {
@@ -160,7 +147,7 @@ std::string convert_bool(const std::optional<bool>& value,
 void generate_enum_def(std::ostream& os, const Enum& enumeration,
                        const Namespace& ns)
 {
-    if (enumeration.info_attributes.is_skippable) return;
+    if (is_skippable(enumeration)) return;
 
     fmt::print(os, "(define-enum {}\n", enumeration.name);
     if (ns.name) {
@@ -201,7 +188,7 @@ void generate_enum_def(std::ostream& os, const Enum& enumeration,
 void generate_bitfield_def(std::ostream& os, const Bitfield& bitfield,
                            const Namespace& ns)
 {
-    if (bitfield.info_attributes.is_skippable) return;
+    if (is_skippable(bitfield)) return;
 
     fmt::print(os, "(define-flags {}\n", bitfield.name);
     if (ns.name) {
@@ -241,7 +228,7 @@ void generate_bitfield_def(std::ostream& os, const Bitfield& bitfield,
 void generate_extended_enum_def(std::ostream& os, const Enum& enumeration,
                                 const std::optional<std::string>& namespace_name)
 {
-    if (enumeration.info_attributes.is_skippable) return;
+    if (is_skippable(enumeration)) return;
 
     fmt::print(os, "(define-enum-extended {}\n", enumeration.name);
     if (namespace_name) {
@@ -285,7 +272,7 @@ void generate_extended_enum_def(std::ostream& os, const Enum& enumeration,
 void generate_extended_bitfield_def(std::ostream& os, const Bitfield& bitfield,
                                     const std::optional<std::string>& namespace_name)
 {
-    if (bitfield.info_attributes.is_skippable) return;
+    if (is_skippable(bitfield)) return;
 
     fmt::print(os, "(define-flags-extended {}\n", bitfield.name);
     if (namespace_name) {
@@ -408,10 +395,10 @@ std::string process_return_type(const std::optional<CallableReturn>& return_type
 
 void generate_func_def(std::ostream& os, const FunctionInline& func)
 {
-    if (func.attributes.info_attributes.is_skippable) return;
+    if (is_skippable(func.attributes)) return;
 
     if (!func.attributes.c_identifier) {
-        fmt::println("ERROR: Free function '{}' has no C identifier",
+        fmt::println(stderr, "ERROR: Free function '{}' has no C identifier",
                      func.attributes.name);
     }
     std::string_view func_name = func.attributes.c_identifier.value();
@@ -443,10 +430,10 @@ void generate_constructor_def(std::ostream& os, const Constructor& constructor,
                               std::string_view object)
 {
     const FunctionInline& func = constructor.func.detail;
-    if (func.attributes.info_attributes.is_skippable) return;
+    if (is_skippable(func)) return;
 
     if (!func.attributes.c_identifier) {
-        fmt::println("ERROR: Constructor '{}' of '{}' has no C identifier",
+        fmt::println(stderr, "ERROR: Constructor '{}' of '{}' has no C identifier",
                      func.attributes.name, object);
     }
     std::string_view func_name = func.attributes.c_identifier.value();
@@ -478,10 +465,10 @@ void generate_constructor_def(std::ostream& os, const Constructor& constructor,
 void generate_method_def_using_func(std::ostream& os, const FunctionInline& func,
                                     std::string_view object)
 {
-    if (func.attributes.info_attributes.is_skippable) return;
+    if (is_skippable(func)) return;
 
     if (!func.attributes.c_identifier) {
-        fmt::println("ERROR: Method '{}' of '{}' has no C identifier",
+        fmt::println(stderr, "ERROR: Method '{}' of '{}' has no C identifier",
                      func.attributes.name, object);
     }
     std::string_view func_name = func.attributes.c_identifier.value();
@@ -526,7 +513,7 @@ void generate_vfunc_def(std::ostream& os, const VirtualMethod& vfunc,
                         std::string_view object)
 {
     const FunctionInline& func = vfunc.func.detail;
-    if (func.attributes.info_attributes.is_skippable) return;
+    if (is_skippable(func)) return;
 
     std::string_view func_name = func.attributes.name;
 
@@ -555,15 +542,23 @@ void generate_vfunc_def(std::ostream& os, const VirtualMethod& vfunc,
 // )
 
 void generate_property_def(std::ostream& os, const Property& property,
-                           std::string_view object)
+                           std::string_view ns_name, std::string_view object,
+                           const TypeResolver& type_resolver)
 {
-    if (property.info_attributes.is_skippable) return;
+    if (is_skippable(property)) return;
 
     fmt::print(os, "(define-property {}\n", property.name);
     fmt::print(os, "  (of-object \"{}\")\n", object);
-    // FIXME: Property types are in logical format (e.g. GLib.Variant) instead
-    //        of the C type (e.g. GParamVariant)
-    fmt::print(os, "  (prop-type \"{}\")\n", flatten_any_type(property.type));
+
+    std::optional<std::string> prop_type =
+        type_resolver.find_property_type(property, ns_name);
+    if (prop_type) {
+        fmt::print(os, "  (prop-type \"{}\")\n", *prop_type);
+    } else {
+        fmt::println(stderr, "ERROR: Property '{}.{}:{}' has unresolved type: {}",
+                     ns_name, object, property.name, flatten_any_type(property.type));
+    }
+
     fmt::print(os, "  (docs \"\")\n");
     fmt::print(os, "  (readable {})\n", convert_bool(property.is_readable, true));
     fmt::print(os, "  (writable {})\n", convert_bool(property.is_writable, false));
@@ -588,7 +583,7 @@ void generate_property_def(std::ostream& os, const Property& property,
 void generate_signal_def(std::ostream& os, const Signal& signal,
                          std::string_view object)
 {
-    if (signal.info_attributes.is_skippable) return;
+    if (is_skippable(signal)) return;
 
     fmt::print(os, "(define-signal {}\n", signal.name);
     fmt::print(os, "  (of-object \"{}\")\n", object);
@@ -686,8 +681,7 @@ void generate_interface_object_def(
     const std::optional<std::string>& namespace_name,
     const std::vector<std::string_view>& identifier_prefixes)
 {
-    if (interface.info_attributes.is_skippable) return;
-    if (interface.name.at(0) == '_') return;
+    if (is_skippable(interface)) return;
 
     std::string_view c_type = interface.glib_type_name;
     generate_standard_object_def(os, interface, c_type, namespace_name,
@@ -737,7 +731,7 @@ void generate_record_function_defs(std::ostream& os, const Record& record)
     if (is_skippable(record)) return;
 
     if (!record.c_type) {
-        fmt::println("ERROR: Record {} with no C type", record.name);
+        fmt::println(stderr, "ERROR: Record {} with no C type", record.name);
     }
     std::string_view type_name = record.c_type.value();
 
@@ -834,7 +828,7 @@ void generate_extended_enum_defs(std::ostream& os, const Repository& repo)
 void generate_function_defs(std::ostream& os, const gir::Repository& repo)
 {
     for (const Namespace& ns : repo.namespaces) {
-        const std::string ns_name = ns.name ? *(ns.name) : "";
+        const std::string ns_name = ns.name.value_or("");
         const auto identifier_prefixes = build_identifier_prefixes(repo, ns);
         fmt::println("Identifier prefixes: {}", fmt::join(identifier_prefixes, ", "));
         if (identifier_prefixes.empty()) {
@@ -888,14 +882,18 @@ void generate_function_defs(std::ostream& os, const gir::Repository& repo)
     }
 }
 
-void generate_signal_defs(std::ostream& os, const gir::Repository& repo)
+void generate_signal_defs(std::ostream& os, const gir::Repository& repo,
+                          const TypeResolver& type_resolver)
 {
     for (const Namespace& ns : repo.namespaces) {
+        const std::string ns_name = ns.name.value_or("");
+
         for (const Interface& interface : ns.interfaces) {
             if (is_skippable(interface)) continue;
 
             for (const Property& property : interface.properties) {
-                generate_property_def(os, property, interface.glib_type_name);
+                generate_property_def(os, property, ns_name, interface.glib_type_name,
+                                      type_resolver);
             }
 
             for (const Signal& signal : interface.signals) {
@@ -907,7 +905,8 @@ void generate_signal_defs(std::ostream& os, const gir::Repository& repo)
             if (is_skippable(klass)) continue;
 
             for (const Property& property : klass.properties) {
-                generate_property_def(os, property, klass.glib_type_name);
+                generate_property_def(os, property, ns_name, klass.glib_type_name,
+                                      type_resolver);
             }
 
             for (const Signal& signal : klass.signals) {

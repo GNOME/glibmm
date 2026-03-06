@@ -22,6 +22,12 @@
 #include <variant>
 #include <vector>
 
+// Helper to create a variant visitor from a set of lambdas
+template<class... Ts>
+struct overloads : Ts... { using Ts::operator()...; };
+template<class... Ts>
+overloads(Ts...) -> overloads<Ts...>;
+
 // Schema based on gir-1.2.rnc
 // https://gitlab.gnome.org/GNOME/gobject-introspection/-/blob/main/docs/gir-1.2.rnc
 namespace gir {
@@ -91,8 +97,7 @@ using AnyType = std::variant<Type*, ArrayType*>;
 
 struct Type
 {
-    // The name is the (possibly namespaced) GObject name of the type. I have
-    // not observed cases where it is empty.
+    // The name is the (possibly namespaced) GObject name of the type.
     //
     // Examples:
     //
@@ -101,6 +106,9 @@ struct Type
     // <type name="ActionEntry" c:type="GtkActionEntry"/>
     // <type name="Gdk.ModifierType" c:type="GdkModifierType"/>
     // <type name="GdkPixbuf.Pixbuf"/>
+    //
+    // The only instance where this is empty that has been observed so far is
+    // when the type is empty.
     std::optional<std::string> name;
     // May be empty (e.g. in properties) in which case the C type needs to be
     // resolved based on the GObject name from other types in the current or
@@ -116,10 +124,6 @@ struct Type
     // </type>
     // std::vector<AnyType> sub_type;
 };
-
-// <array>
-//   <type name="utf8"/>
-// </array>
 
 struct ArrayType
 {
@@ -487,5 +491,34 @@ struct Namespace
     std::vector<std::unique_ptr<Type>> types;
     std::vector<std::unique_ptr<ArrayType>> array_types;
 };
+
+template <class T>
+bool is_skippable(const T& obj)
+{
+    if (obj.info_attributes.is_skippable) return true;
+    // Ignore private objects
+    if (obj.name.at(0) == '_') return true;
+    return false;
+}
+
+template <>
+inline bool is_skippable(const FunctionInline& func)
+{
+    if (func.attributes.info_attributes.is_skippable) return true;
+    // Ignore private objects
+    if (func.attributes.name.at(0) == '_') return true;
+    return false;
+}
+
+template <>
+inline bool is_skippable(const Record& record)
+{
+    if (record.info_attributes.is_skippable) return true;
+    // Ignore private structs
+    if (record.is_opaque) return true;
+    if (!record.for_gtype_struct) return true;
+    if (record.name.at(0) == '_') return true;
+    return false;
+}
 
 }  // namespace gir

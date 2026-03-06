@@ -517,10 +517,16 @@ Type* Parser::parse_type(const XMLElement* element)
         if (parse_doc_elements(child, name, type->doc_elements)) {
             // Value set as side-effect
         } else if (name == TYPE_ELEMENT || name == ARRAY_ELEMENT) {
+            // Nested types are not supported
             warn_ignored(element, child);
         } else {
             warn_unknown(element, child);
         }
+    }
+
+    if (!type->name && !type->c_type) {
+        fmt::println("WARN (line={}): Type with neither name nor C type",
+                     element->GetLineNum());
     }
 
     Type* raw_ptr = type.get();
@@ -556,8 +562,10 @@ ArrayType* Parser::parse_array_type(const XMLElement* element)
          child = child->NextSiblingElement()) {
 
         std::string_view name{child->Name()};
-        if (parse_any_type(child, name, type->element_type)) {
-            // Value set as side-effect
+        if (name == TYPE_ELEMENT) {
+            type->element_type = parse_type(child);
+        } else if (name == ARRAY_ELEMENT) {
+            warn_ignored(element, child);
         } else {
             warn_unknown(element, child);
         }
