@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -42,6 +43,12 @@ enum class Scope { NOTIFIED, ASYNC, CALL, FOREVER };
 enum class Stability { STABLE, UNSTABLE, PRIVATE, UNKNOWN };
 enum class TransferOwnership { NONE, CONTAINER, FULL };
 
+struct Include
+{
+    std::string name;
+    std::optional<std::string> version;
+};
+
 struct Repository
 {
     std::optional<std::string> version;
@@ -50,6 +57,7 @@ struct Repository
     // Prefixes to filter out from C functions
     std::vector<std::string> symbol_prefixes;
 
+    std::vector<Include> includes;
     std::vector<Namespace> namespaces;
 };
 

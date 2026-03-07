@@ -22,15 +22,30 @@
 #include <string>
 #include <string_view>
 
+class TypeResolver;
+
 struct GirParseError : std::runtime_error {
     explicit GirParseError(const std::string& msg) : std::runtime_error(msg) {}
 };
 
 struct ParseArgs {
-    std::string_view filepath;
     bool warn_unknown = false;
     bool warn_ignored = false;
     bool warn_deprecated = false;
 };
 
-gir::Repository load_repository_from_file(const ParseArgs& args);
+constexpr const char* const GIR_EXT = ".gir";
+
+gir::Repository load_repository_from_file(std::string_view filepath,
+                                          const ParseArgs& args);
+
+void load_supporting_repositories(const std::vector<std::string>& paths,
+                                  const ParseArgs& args,
+                                  std::vector<gir::Repository>& supporting_repos,
+                                  TypeResolver& type_resolver);
+
+void search_for_included_namespaces(const std::vector<std::string>& paths,
+                                    const ParseArgs& args,
+                                    const gir::Repository& curr_repo,
+                                    std::vector<gir::Repository>& supporting_repos,
+                                    TypeResolver& type_resolver);

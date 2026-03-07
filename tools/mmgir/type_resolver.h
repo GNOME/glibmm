@@ -24,7 +24,6 @@
 #include <set>
 #include <string>
 #include <string_view>
-#include <vector>
 
 class TypeMapper;
 
@@ -66,13 +65,15 @@ public:
 
     TypeResolver();
 
-    // Returns namespace names of unknown types
-    std::vector<std::string> register_repo_types(const gir::Repository& repo);
+    void register_repo_types(const gir::Repository& repo);
 
     std::optional<std::string> find_property_type(const gir::Property& property,
                                                   std::string_view namespace_name) const;
 
     bool is_builtin_type(std::string_view name) const;
+    bool has_unknown_types() const { return m_unknown_types.size() > 0; }
+    // Returns namespace names of unknown types
+    std::set<std::string> missing_namespaces() const;
 
     void dump_mappings() const;
     void dump_unknown_types() const;

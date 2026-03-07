@@ -431,7 +431,7 @@ TypeResolver::TypeResolver() : m_has_errors(false)
 {
 }
 
-std::vector<std::string> TypeResolver::register_repo_types(const Repository& repo)
+void TypeResolver::register_repo_types(const Repository& repo)
 {
     for (const auto& ns : repo.namespaces) {
         if (!ns.name) {
@@ -441,18 +441,18 @@ std::vector<std::string> TypeResolver::register_repo_types(const Repository& rep
 
         TypeMapper mapper(ns, *this);
     }
+}
 
-
-    std::set<std::string> missing_namespaces;
+std::set<std::string> TypeResolver::missing_namespaces() const
+{
+    std::set<std::string> missing;
     for (const std::string& qualified_name : m_unknown_types) {
         size_t pos = qualified_name.find('.');
         if (pos != std::string::npos) {
-            missing_namespaces.insert(qualified_name.substr(0, pos));
+            missing.insert(qualified_name.substr(0, pos));
         }
     }
-
-    return std::vector<std::string>(missing_namespaces.begin(),
-                                    missing_namespaces.end());
+    return missing;
 }
 
 std::optional<std::string> TypeResolver::find_property_type(

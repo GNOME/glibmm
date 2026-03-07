@@ -16,11 +16,16 @@
 
 #include "parse_gir.h"
 
+#include "type_resolver.h"
+
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 #include <tinyxml2.h>
 
 #include <algorithm>
+#include <filesystem>
 #include <functional>
+#include <queue>
 
 #define LOG_ERROR(lineno, msg) \
     m_has_errors = true; \
@@ -33,6 +38,8 @@
 
 using namespace gir;
 using namespace tinyxml2;
+
+namespace fs = std::filesystem;
 
 namespace {
 
@@ -54,6 +61,7 @@ constexpr const char* const FUNCTION_ELEMENT = "function";
 constexpr const char* const FUNCTION_INLINE_ELEMENT = "function-inline";
 constexpr const char* const FUNCTION_MACRO_ELEMENT = "function-macro";
 constexpr const char* const IMPLEMENTS_ELEMENT = "implements";
+constexpr const char* const INCLUDE_ELEMENT = "include";
 constexpr const char* const INTERFACE_ELEMENT = "interface";
 constexpr const char* const INSTANCE_PARAMETER_ELEMENT = "instance-parameter";
 constexpr const char* const MEMBER_ELEMENT = "member";
@@ -64,6 +72,7 @@ constexpr const char* const PARAMETER_ELEMENT = "parameter";
 constexpr const char* const PREREQUISITE_ELEMENT = "prerequisite";
 constexpr const char* const PROPERTY_ELEMENT = "property";
 constexpr const char* const RECORD_ELEMENT = "record";
+constexpr const char* const REPOSITORY_ELEMENT = "repository";
 constexpr const char* const SIGNAL_ELEMENT = "glib:signal";
 constexpr const char* const SOURCE_POSITION_ELEMENT = "source-position";
 constexpr const char* const TYPE_ELEMENT = "type";
@@ -121,6 +130,7 @@ public:
     FunctionInline parse_inline_function(const XMLElement* element);
     Function parse_function(const XMLElement* element);
     Implements parse_implements(const XMLElement* element);
+    Include parse_include(const XMLElement* element);
     Interface parse_interface(const XMLElement* element);
     Member parse_member(const XMLElement* element);
     MethodInline parse_inline_method(const XMLElement* element);
@@ -219,6 +229,33 @@ private:
     bool m_warn_deprecated = false;
     bool m_has_errors = false;
 };
+
+class GirSearch {
+public:
+    GirSearch(TypeResolver& resolver, std::vector<Repository>& supporting_repos);
+
+    void add_includes(const Repository& repo);
+    void load_gir_xml_files(const std::vector<std::string>& search_dirs);
+    void run(const ParseArgs& args);
+
+private:
+    std::string combined_name(std::string_view name, std::string_view version);
+    bool mark_visited_namespace(std::string_view name, std::string_view version);
+
+    TypeResolver& m_type_resolver;
+    std::vector<Repository>& m_supporting_repos;
+
+    std::vector<std::pair<std::unique_ptr<XMLDocument>, std::string>> m_docs;
+    std::map<std::string, size_t> m_namespace_to_doc;
+
+    std::queue<Include> m_queue;
+    // Included namespace name to version
+    std::map<std::string, std::string> m_visited_includes;
+};
+
+bool is_legal_prefix_char(unsigned char c) {
+    return std::isalnum(c) || c == '_';
+}
 
 }  // namespace
 
@@ -328,9 +365,8 @@ std::vector<std::string> Parser::parse_id_prefixes(const XMLAttribute* attr)
     prefixes.emplace_back(value.substr(pos));
 
     for (const auto& prefix : prefixes) {
-        if (!std::all_of(prefix.begin(), prefix.end(),
-                         [](unsigned char c) { return std::isalnum(c); })) {
-            LOG_ERRORV(attr->GetLineNum(), "Bad symbol prefix {}", prefix);
+        if (!std::all_of(prefix.begin(), prefix.end(), is_legal_prefix_char)) {
+            LOG_ERRORV(attr->GetLineNum(), "Bad identifier prefix {}", prefix);
         }
     }
 
@@ -353,9 +389,8 @@ std::vector<std::string> Parser::parse_symbol_prefixes(const XMLAttribute* attr)
     prefixes.emplace_back(value.substr(pos));
 
     for (const auto& prefix : prefixes) {
-        if (!std::all_of(prefix.begin(), prefix.end(),
-                         [](unsigned char c) { return std::isalnum(c); })) {
-            LOG_ERRORV(attr->GetLineNum(), "Bad identifier prefix {}", prefix);
+        if (!std::all_of(prefix.begin(), prefix.end(), is_legal_prefix_char)) {
+            LOG_ERRORV(attr->GetLineNum(), "Bad symbol prefix {}", prefix);
         }
     }
 
@@ -364,7 +399,7 @@ std::vector<std::string> Parser::parse_symbol_prefixes(const XMLAttribute* attr)
 
 Repository Parser::parse_repo(const XMLDocument& doc)
 {
-    const XMLElement* root = doc.FirstChildElement("repository");
+    const XMLElement* root = doc.FirstChildElement(REPOSITORY_ELEMENT);
     if (!root) {
         throw GirParseError("Root element is not repository");
     }
@@ -390,7 +425,9 @@ Repository Parser::parse_repo(const XMLDocument& doc)
 
          std::string_view name{child->Name()};
 
-        if (name == NAMESPACE_ELEMENT) {
+        if (name == INCLUDE_ELEMENT) {
+            repo.includes.push_back(parse_include(child));
+        } if (name == NAMESPACE_ELEMENT) {
             repo.namespaces.push_back(parse_namespace(child));
         } else {
             warn_unknown(root, child);
@@ -1004,6 +1041,32 @@ Implements Parser::parse_implements(const XMLElement* element)
     }
 
     return impl;
+}
+
+Include Parser::parse_include(const XMLElement* element)
+{
+    Include include;
+
+    constexpr const char* const NAME_ATTR = "name";
+    populate_str_attr(element, NAME_ATTR, INCLUDE_ELEMENT, include.name);
+
+    for (const XMLAttribute* attr = element->FirstAttribute(); attr; attr = attr->Next()) {
+        std::string_view name{attr->Name()};
+
+        if (name == NAME_ATTR) {
+        } else if (name == "version") {
+            include.version = attr->Value();
+        } else {
+            warn_unknown(element, attr);
+        }
+    }
+
+    for (const XMLElement* child = element->FirstChildElement(); child;
+         child = child->NextSiblingElement()) {
+        warn_unknown(element, child);
+    }
+
+    return include;
 }
 
 Interface Parser::parse_interface(const XMLElement* element)
@@ -1657,10 +1720,139 @@ bool Parser::populate_str_attr(const XMLElement* element, std::string_view attr,
     }
 }
 
-Repository load_repository_from_file(const ParseArgs& args)
+GirSearch::GirSearch(TypeResolver& resolver, std::vector<Repository>& supporting_repos)
+    : m_type_resolver(resolver), m_supporting_repos(supporting_repos)
 {
+}
+
+void GirSearch::add_includes(const Repository& repo)
+{
+    for (const Namespace& ns : repo.namespaces) {
+        if (!ns.name) continue;
+        mark_visited_namespace(*(ns.name), ns.version.value_or(""));
+    }
+    for (const Include& include : repo.includes) {
+        m_queue.push(Include{include.name, include.version.value_or("")});
+    }
+}
+
+bool GirSearch::mark_visited_namespace(std::string_view name, std::string_view version)
+{
+    auto [it, did_insert] = m_visited_includes.emplace(name, version);
+    if (!did_insert) {
+        if (version != it->second) {
+            throw GirParseError(fmt::format(
+                "Conflicting namespace dependency {} ({} != {})",
+                name, version, it->second));
+        }
+    }
+    return did_insert;
+}
+
+// Load XML documents for all GIR files in search directories.
+//
+// Each namespace found in the document is mapped to the corresponding document
+// using <NAME>-<VERSION> as the key if a version exists. If not, it is mapped
+// using just the name as the key.
+void GirSearch::load_gir_xml_files(const std::vector<std::string>& search_dirs)
+{
+    for (const std::string& search_dir : search_dirs) {
+        fs::path dir_path(search_dir);
+        if (!fs::is_directory(dir_path)) continue;
+
+        for (const auto& dir_entry : fs::directory_iterator{dir_path}) {
+            if (dir_entry.path().extension().string() != GIR_EXT) continue;
+
+            auto doc = std::make_unique<XMLDocument>();
+            if (doc->LoadFile(dir_entry.path().c_str()) != XML_SUCCESS) continue;
+
+            const XMLElement* root = doc->FirstChildElement(REPOSITORY_ELEMENT);
+            if (!root) continue;
+
+            const size_t doc_index = m_docs.size();
+            bool found_namespace = false;
+
+            const XMLElement* ns_element =
+                root->FirstChildElement(NAMESPACE_ELEMENT);
+            while (ns_element) {
+                const char* name = ns_element->Attribute("name");
+                if (name) {
+                    const char* version = ns_element->Attribute("version");
+                    if (version) {
+                        std::string key = fmt::format("{}-{}", name, version);
+                        m_namespace_to_doc.emplace(key, doc_index);
+                    } else {
+                        m_namespace_to_doc.emplace(name, doc_index);
+                    }
+
+                    found_namespace = true;
+                }
+                ns_element = ns_element->NextSiblingElement(NAMESPACE_ELEMENT);
+            }
+
+            if (found_namespace) {
+                m_docs.emplace_back(std::move(doc), dir_entry.path().string());
+            }
+        }
+    }
+}
+
+void GirSearch::run(const ParseArgs& args)
+{
+    std::vector<std::string> missing_dependencies;
+    bool found_errors = false;
+
+    while (m_queue.size() > 0) {
+        Include dependency = m_queue.front();
+        m_queue.pop();
+
+        // Skip namespaces we've already loaded or tried to find before
+        if (!mark_visited_namespace(dependency.name, dependency.version.value_or("")))
+            continue;
+
+        std::string key;
+        if (dependency.version) {
+            key = fmt::format("{}-{}", dependency.name, *(dependency.version));
+        } else {
+            key = dependency.name;
+        }
+
+        auto it = m_namespace_to_doc.find(key);
+        if (it == m_namespace_to_doc.end()) {
+            missing_dependencies.push_back(key);
+            continue;
+        }
+
+        auto& [doc, filename] = m_docs.at(it->second);
+        fmt::println("Reading auto-discovered {}", filename);
+
+        Parser parser(args);
+        m_supporting_repos.push_back(parser.parse_repo(*doc));
+
+        if (parser.has_errors()) {
+            found_errors = true;
+        }
+
+        m_type_resolver.register_repo_types(m_supporting_repos.back());
+        add_includes(m_supporting_repos.back());
+    }
+
+    if (missing_dependencies.size() > 0) {
+        fmt::println("WARN: Missing dependencies: {}",
+                     fmt::join(missing_dependencies, ", "));
+    }
+    if (found_errors) {
+        throw GirParseError("Errors occured during parsing of dependency GIR files");
+    }
+}
+
+Repository load_repository_from_file(std::string_view filepath,
+                                     const ParseArgs& args)
+{
+    fmt::println("Reading {}", filepath);
+
     XMLDocument doc;
-    if (doc.LoadFile(args.filepath.data()) != XML_SUCCESS) {
+    if (doc.LoadFile(filepath.data()) != XML_SUCCESS) {
         throw GirParseError(doc.ErrorStr());
     }
 
@@ -1672,4 +1864,33 @@ Repository load_repository_from_file(const ParseArgs& args)
     }
 
     return repo;
+}
+
+void load_supporting_repositories(const std::vector<std::string>& paths,
+                                  const ParseArgs& args,
+                                  std::vector<gir::Repository>& supporting_repos,
+                                  TypeResolver& type_resolver)
+{
+    for (const std::string& supporting_file : paths) {
+        supporting_repos.emplace_back(load_repository_from_file(supporting_file, args));
+        type_resolver.register_repo_types(supporting_repos.back());
+    }
+}
+
+void search_for_included_namespaces(const std::vector<std::string>& paths,
+                                    const ParseArgs& args,
+                                    const Repository& current_repo,
+                                    std::vector<gir::Repository>& supporting_repos,
+                                    TypeResolver& type_resolver)
+{
+    if (!type_resolver.has_unknown_types()) return;
+
+    GirSearch search(type_resolver, supporting_repos);
+    search.add_includes(current_repo);
+    for (const Repository& repo : supporting_repos) {
+        search.add_includes(repo);
+    }
+
+    search.load_gir_xml_files(paths);
+    search.run(args);
 }

@@ -30,18 +30,13 @@
 
 namespace fs = std::filesystem;
 
-namespace {
-
-constexpr const char* const GIR_EXT = ".gir";
-
-}  // namespace
-
 int main(int argc, char** argv)
 {
     CLI::App app{"Generates C++ wrappers based on GObject introspection"};
 
     std::string gir_filepath;
     std::vector<std::string> supporting_girs;
+    std::vector<std::string> search_paths;
 
     std::string enum_defs_filepath;
     std::string function_defs_filepath;
@@ -68,6 +63,9 @@ int main(int argc, char** argv)
                    "Other GIR filepaths to help resolve types from other namespaces")
         ->check(CLI::ExistingFile)
         ->check(is_gir_file);
+    app.add_option("--gir-search-dir", search_paths,
+                   "Directories to search for missing GIR namespaces")
+        ->check(CLI::ExistingDirectory);
 
     app.add_option("--enum-defs", enum_defs_filepath, "Output filepath for enum defs")
         ->required();
@@ -85,45 +83,39 @@ int main(int argc, char** argv)
 
     CLI11_PARSE(app, argc, argv);
 
+    const ParseArgs args{warn_unknown, warn_ignored, warn_deprecated};
+
     gir::Repository repo;
     try {
-        fmt::println("Reading {}", gir_filepath);
-        ParseArgs args{gir_filepath, warn_unknown, warn_ignored, warn_deprecated};
-        repo = load_repository_from_file(args);
+        repo = load_repository_from_file(gir_filepath, args);
     } catch (const GirParseError& e) {
         fmt::println(stderr, "ERROR: {}", e.what());
         return 1;
     }
 
     TypeResolver type_resolver;
-    std::vector<std::string> missing_namespaces;
-    missing_namespaces = type_resolver.register_repo_types(repo);
+    type_resolver.register_repo_types(repo);
 
     std::vector<gir::Repository> supporting_repos;
-    for (const std::string& supporting_file : supporting_girs) {
-        gir::Repository supporting_repo;
-
-        try {
-            fmt::println("Reading {}", supporting_file);
-            ParseArgs args{
-                supporting_file, warn_unknown, warn_ignored, warn_deprecated
-            };
-            supporting_repo = load_repository_from_file(args);
-        } catch (const GirParseError& e) {
-            fmt::println(stderr, "ERROR: {}", e.what());
-            return 1;
-        }
-
-        missing_namespaces = type_resolver.register_repo_types(supporting_repo);
-        supporting_repos.push_back(std::move(supporting_repo));
+    try {
+        load_supporting_repositories(supporting_girs, args, supporting_repos,
+                                     type_resolver);
+    } catch (const GirParseError& e) {
+        fmt::println(stderr, "ERROR: {}", e.what());
+        return 1;
     }
 
-    // type_resolver.dump_mappings();
-    type_resolver.dump_unknown_types();
+    try {
+        search_for_included_namespaces(search_paths, args, repo, supporting_repos,
+                                       type_resolver);
+    } catch (const GirParseError& e) {
+        fmt::println(stderr, "ERROR: {}", e.what());
+        return 1;
+    }
 
-    if (missing_namespaces.size() > 0) {
-        fmt::println("ERROR: Missing GIR files for: {}",
-                     fmt::join(missing_namespaces, ", "));
+    if (type_resolver.has_unknown_types()) {
+        // type_resolver.dump_mappings();
+        type_resolver.dump_unknown_types();
         return 1;
     }
 
