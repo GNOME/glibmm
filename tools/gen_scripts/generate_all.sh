@@ -8,8 +8,10 @@ cd "$(dirname "$0")"
 ./glib_generate_enums.sh
 ./glib_generate_extra_defs.sh
 ./glib_generate_methods.sh
+#./glib_generate_vfuncs.sh # glibmm/glib has no generated virtual functions
 
 ./gio_generate_docs.sh
 ./gio_generate_enums.sh
 ./gio_generate_extra_defs.sh
 ./gio_generate_methods.sh
+./gio_generate_vfuncs.sh

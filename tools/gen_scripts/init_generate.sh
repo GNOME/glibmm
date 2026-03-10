@@ -33,6 +33,7 @@ fi
 gen_docs="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/defs_gen/docextract_to_xml.py"
 gen_methods="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/defs_gen/h2def.py"
 gen_enums="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/defs_gen/enumextract.py"
+gen_vfuncs="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/defs_gen/gir2defs_vfunc.py"
 
 # Where to find executables that generate extra defs (signals and properties).
 # glibmm is built with autotools.
