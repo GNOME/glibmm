@@ -40,7 +40,7 @@ int main(int argc, char** argv)
 
     std::string enum_defs_filepath;
     std::string function_defs_filepath;
-    std::string signal_defs_filepath;
+    std::optional<std::string> signal_defs_filepath;
     std::optional<std::string> vfunc_defs_filepath;
 
     bool warn_unknown = false;
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
     app.add_option("--function-defs", function_defs_filepath,
                    "Output filepath for function/method defs")->required();
     app.add_option("--signal-defs", signal_defs_filepath,
-                   "Output filepath for signal defs")->required();
+                   "Output filepath for signal defs");
     app.add_option("--vfunc-defs", vfunc_defs_filepath,
                    "Output filepath for virtual method defs");
 
@@ -129,9 +129,9 @@ int main(int argc, char** argv)
         std::ofstream function_defs_out(function_defs_filepath);
         generate_function_defs(function_defs_out, repo);
     }
-    {
-        fmt::println("Dumping signal defs to {}", signal_defs_filepath);
-        std::ofstream signal_defs_out(signal_defs_filepath);
+    if (signal_defs_filepath) {
+        fmt::println("Dumping signal defs to {}", *signal_defs_filepath);
+        std::ofstream signal_defs_out(*signal_defs_filepath);
         generate_signal_defs(signal_defs_out, repo, type_resolver);
     }
     if (vfunc_defs_filepath) {

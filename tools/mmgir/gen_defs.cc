@@ -346,6 +346,7 @@ std::string flatten_any_type(const AnyType& any_type)
 struct ParamProcessor
 {
     std::ostream& os;
+    std::optional<std::reference_wrapper<const CallableAttributes>> attributes;
     std::vector<Param>::const_iterator curr;
     std::vector<Param>::const_iterator end;
     std::string_view func;
@@ -354,6 +355,12 @@ struct ParamProcessor
     ParamProcessor(std::ostream& out, const std::vector<Param>& params,
                    std::string_view func_name)
         : os(out), curr(params.begin()), end(params.end()), func(func_name)
+    {}
+
+    ParamProcessor(std::ostream& out, const CallableAttributes& attr,
+                   const std::vector<Param>& params)
+        : os(out), attributes(std::cref(attr)), curr(params.begin()), end(params.end()),
+          func(attr.name)
     {}
 
     void print_param(std::string_view curr_indent, std::string_view single_indent);
@@ -409,7 +416,7 @@ void generate_func_def(std::ostream& os, const FunctionInline& func)
                process_return_type(func.return_type, NONE_RETURN));
 
     if (func.params) {
-        ParamProcessor param_processor(os, func.params->params, func_name);
+        ParamProcessor param_processor(os, func.attributes, func.params->params);
         param_processor.print_param("  ", "  ");
         param_processor.maybe_print_var_args("  ");
     }
@@ -445,7 +452,7 @@ void generate_constructor_def(std::ostream& os, const Constructor& constructor,
                process_return_type(func.return_type, NONE_RETURN));
 
     if (func.params) {
-        ParamProcessor param_processor(os, func.params->params, func_name);
+        ParamProcessor param_processor(os, func.attributes, func.params->params);
         param_processor.print_param("  ", "  ");
         param_processor.maybe_print_var_args("  ");
     }
@@ -480,7 +487,7 @@ void generate_method_def_using_func(std::ostream& os, const FunctionInline& func
                process_return_type(func.return_type, NONE_RETURN));
 
     if (func.params) {
-        ParamProcessor param_processor(os, func.params->params, func_name);
+        ParamProcessor param_processor(os, func.attributes, func.params->params);
         param_processor.print_param("  ", "  ");
         param_processor.maybe_print_var_args("  ");
     }
@@ -523,7 +530,7 @@ void generate_vfunc_def(std::ostream& os, const VirtualMethod& vfunc,
                process_return_type(func.return_type, VOID_RETURN));
 
     if (func.params) {
-        ParamProcessor param_processor(os, func.params->params, func_name);
+        ParamProcessor param_processor(os, func.attributes, func.params->params);
         param_processor.print_param("  ", "  ");
         param_processor.maybe_print_var_args("  ");
     }
@@ -799,6 +806,9 @@ void ParamProcessor::print_param(std::string_view curr_indent,
             [&](const VarArgs&) { has_var_args = true; }
         };
         std::visit(visitor, param.type.value());
+    }
+    if (attributes && attributes->get().can_throw.value_or(false)) {
+        fmt::print(os, "{}{}'(\"GError**\" \"error\")\n", curr_indent, single_indent);
     }
     fmt::print(os, "{})\n", curr_indent);
 }

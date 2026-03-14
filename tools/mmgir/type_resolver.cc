@@ -483,7 +483,7 @@ std::optional<std::string> TypeResolver::find_property_type(
                 }
             }
         },
-        [&](const ArrayType* array) {
+        [&](const ArrayType* /* array */) {
             result = to_string(GParam::BOXED);
         }
     };

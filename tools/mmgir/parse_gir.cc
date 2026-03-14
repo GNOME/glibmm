@@ -1671,8 +1671,10 @@ bool Parser::parse_source_position(const XMLAttribute* attr, std::string_view at
     }
 }
 
-bool Parser::parse_info_attributes(const XMLElement* element, const XMLAttribute* attr,
-                                   std::string_view attr_name, InfoAttributes& info)
+bool Parser::parse_info_attributes(const XMLElement* /* element */,
+                                   const XMLAttribute* attr,
+                                   std::string_view attr_name,
+                                   InfoAttributes& info)
 {
     if (attr_name == "introspectable") {
         info.is_skippable = parse_introspectable_as_skippable(attr);
