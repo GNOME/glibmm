@@ -518,15 +518,4 @@ inline bool is_skippable(const FunctionInline& func)
     return false;
 }
 
-template <>
-inline bool is_skippable(const Record& record)
-{
-    if (record.info_attributes.is_skippable) return true;
-    // Ignore private structs
-    if (record.is_opaque) return true;
-    if (!record.for_gtype_struct) return true;
-    if (record.name.at(0) == '_') return true;
-    return false;
-}
-
 }  // namespace gir
