@@ -32,6 +32,8 @@ using namespace gir;
 
 namespace {
 
+// Based on legacy def generation scripts (i.e. h2def.py), "none" is used in
+// place of void for some return types
 constexpr const char* NONE_RETURN = "none";
 constexpr const char* VOID_RETURN = "void";
 
@@ -144,6 +146,7 @@ std::string convert_bool(const std::optional<bool>& value,
 //   )
 // )
 
+[[maybe_unused]]
 void generate_enum_def(std::ostream& os, const Enum& enumeration,
                        const Namespace& ns)
 {
@@ -185,6 +188,7 @@ void generate_enum_def(std::ostream& os, const Enum& enumeration,
 //   )
 // )
 
+[[maybe_unused]]
 void generate_bitfield_def(std::ostream& os, const Bitfield& bitfield,
                            const Namespace& ns)
 {
@@ -329,8 +333,13 @@ std::string flatten_any_type(const AnyType& any_type)
             if (type->c_type) {
                 return *(type->c_type);
             } else if (type->name) {
+                fmt::println(stderr, "ERROR: Using name of type with no C type: {}",
+                             *(type->name));
                 return *(type->name);
             } else {
+                fmt::println(
+                    stderr,
+                    "ERROR: Using type with no name or C type! Falling back to void");
                 return "void";
             }
         },
@@ -373,8 +382,6 @@ struct ParamProcessor
     }
 };
 
-// Based on legacy def generation scripts (i.e. h2def.py), returns "none" if
-// there is no return type
 std::string process_return_type(const std::optional<CallableReturn>& return_type,
                                 const char* void_type)
 {
@@ -588,14 +595,22 @@ void generate_property_def(std::ostream& os, const Property& property,
 // )
 
 void generate_signal_def(std::ostream& os, const Signal& signal,
-                         std::string_view object)
+                         std::string_view object, std::string_view ns_name,
+                         const TypeResolver& type_resolver)
 {
     if (is_skippable(signal)) return;
 
     fmt::print(os, "(define-signal {}\n", signal.name);
     fmt::print(os, "  (of-object \"{}\")\n", object);
-    fmt::print(os, "  (return-type \"{}\")\n",
-               process_return_type(signal.return_type, VOID_RETURN));
+    std::optional<std::string> return_type =
+        type_resolver.resolve_return_type(signal.return_type, ns_name);
+    if (return_type) {
+        std::replace(return_type->begin(), return_type->end(), ' ', '-');
+        fmt::print(os, "  (return-type \"{}\")\n", *return_type);
+    } else {
+        fmt::println(stderr, "ERROR: Signal '{}.{}:{}' has unresolved return type",
+                     ns_name, object, signal.name);
+    }
 
     std::string flags;
     bool is_first_flag = true;
@@ -639,10 +654,36 @@ void generate_signal_def(std::ostream& os, const Signal& signal,
         fmt::print(os, "  (detailed {})\n", convert_bool(signal.is_detailed, false));
     }
 
+    auto print_param = [&](const AnyType& any_type, std::string_view param_name) {
+        std::optional<std::string> resolved =
+            type_resolver.resolve_callable_param_type(any_type, ns_name);
+        if (resolved) {
+            std::replace(resolved->begin(), resolved->end(), ' ', '-');
+            // All signal parameters that are registered as GTK_TYPE_STRING are
+            // actually const gchar*..
+            if (*resolved == "gchar*") {
+                resolved = "const-gchar*";
+            }
+            fmt::print(os, "    '(\"{}\" \"{}\")\n", *resolved, param_name);
+        } else {
+            fmt::println(
+                stderr, "ERROR: Signal '{}.{}:{}' has unresolved type for param '{}'",
+                ns_name, object, signal.name, param_name);
+        }
+    };
+
     if (signal.params && signal.params->params.size() > 0) {
-        ParamProcessor param_processor(os, signal.params->params, signal.name);
-        param_processor.print_param("  ", "  ");
-        // Signals can't have var args
+        fmt::print(os, "  (parameters\n");
+        for (const Param& param : signal.params->params) {
+            const auto visitor = overloads {
+                [&](const AnyType& any_type) {
+                    print_param(any_type, param.name.value());
+                },
+                [&](const VarArgs&) {}  // Signals can't have var args
+            };
+            std::visit(visitor, param.type.value());
+        }
+        fmt::print(os, "  )\n");
     }
 
     fmt::print(os, ")\n\n");
@@ -856,16 +897,6 @@ void generate_function_defs(std::ostream& os, const gir::Repository& repo)
             generate_class_object_def(os, klass, ns.name, identifier_prefixes);
         }
 
-        fmt::print(os, "\n;; Enums for namespace {}\n\n", ns_name);
-        for (const Enum& enumeration : ns.enums) {
-            generate_enum_def(os, enumeration, ns);
-        }
-
-        fmt::print(os, "\n;; Flags for namespace {}\n\n", ns_name);
-        for (const Bitfield& bitfield : ns.bitfields) {
-            generate_bitfield_def(os, bitfield, ns);
-        }
-
         fmt::print(os, "\n;; Functions for namespace {}\n\n", ns_name);
 
         for (const FunctionInline& func : ns.inline_functions) {
@@ -907,7 +938,8 @@ void generate_signal_defs(std::ostream& os, const gir::Repository& repo,
             }
 
             for (const Signal& signal : interface.signals) {
-                generate_signal_def(os, signal, interface.glib_type_name);
+                generate_signal_def(os, signal, interface.glib_type_name, ns_name,
+                                    type_resolver);
             }
         }
 
@@ -920,7 +952,8 @@ void generate_signal_defs(std::ostream& os, const gir::Repository& repo,
             }
 
             for (const Signal& signal : klass.signals) {
-                generate_signal_def(os, signal, klass.glib_type_name);
+                generate_signal_def(os, signal, klass.glib_type_name, ns_name,
+                                    type_resolver);
             }
         }
     }

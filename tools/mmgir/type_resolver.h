@@ -67,6 +67,34 @@ public:
 
     void register_repo_types(const gir::Repository& repo);
 
+    std::optional<std::string> resolve_any_type(
+        const gir::AnyType& any_type, std::string_view namespace_name) const;
+    /**
+     * Returns the C type or tries to find the C type based on the namespace name.
+     *
+     * If the type is resolved using a namespace name, the result will have a
+     * pointer appended if the type is a C struct or equivalent type alias.
+     *
+     * The result have spaces preserved (e.g. "const gchar*").
+     *
+     * @returns C type if found
+     */
+    std::optional<std::string> resolve_callable_param_type(
+        const gir::AnyType& param, std::string_view namespace_name) const;
+    /**
+     * Returns the C type or tries to find the C type based on the namespace name.
+     *
+     * The result have spaces preserved (e.g. "const gchar*").
+     *
+     * @param void_type Text to use if a return type is void ("none" is some cases).
+     *                  Defaults to "void" if not provided.
+     * @returns C type if found
+     */
+    std::optional<std::string> resolve_return_type(
+        std::optional<gir::CallableReturn> callable_return,
+        std::string_view namespace_name,
+        std::optional<std::string_view> void_type = std::nullopt) const;
+
     std::optional<std::string> find_property_type(const gir::Property& property,
                                                   std::string_view namespace_name) const;
 

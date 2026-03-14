@@ -34,6 +34,8 @@ using namespace gir;
 
 namespace {
 
+constexpr std::string_view VOID_TYPE = "void";
+
 std::string to_string(GParam spec)
 {
     switch (spec) {
@@ -82,6 +84,18 @@ std::string to_string(GParam spec)
         default:
             throw std::runtime_error("Unknown GParam");
     }
+}
+
+std::string qualify_non_builtin_name(std::string_view name,
+                                     std::string_view namespace_name)
+{
+    std::string qualified_name;
+    if (name.find('.') == std::string_view::npos) {
+        qualified_name = fmt::format("{}.{}", namespace_name, name);
+    } else {
+        qualified_name = name;
+    }
+    return qualified_name;
 }
 
 }  // namespace
@@ -455,6 +469,102 @@ std::set<std::string> TypeResolver::missing_namespaces() const
     return missing;
 }
 
+std::optional<std::string> TypeResolver::resolve_any_type(
+    const gir::AnyType& any_type, std::string_view namespace_name) const
+{
+    std::optional<std::string> result;
+
+    const auto visitor = overloads {
+        [&](const Type* type) {
+            result = find_type(type, namespace_name);
+        },
+        [&](const ArrayType* array) {
+            if (array->c_type) {
+                result = array->c_type;
+            } else {
+                std::optional<std::string> element_type =
+                    resolve_any_type(array->element_type, namespace_name);
+                if (element_type) {
+                    result = *element_type + "*";
+                }
+            }
+        }
+    };
+    std::visit(visitor, any_type);
+
+    return result;
+}
+
+std::optional<std::string> TypeResolver::resolve_callable_param_type(
+    const gir::AnyType& param, std::string_view namespace_name) const
+{
+    std::optional<std::string> result;
+
+    auto append_pointer = [&](const Type* type) {
+        if (!result) return;
+        if (type->c_type) return;
+
+        std::string_view name = type->name.value();
+        if (is_builtin_type(name)) return;
+
+        std::string qualified_name = qualify_non_builtin_name(name, namespace_name);
+
+        auto it = m_name_to_type_info.find(qualified_name);
+        if (it != m_name_to_type_info.end()) {
+            switch (it->second.param_spec) {
+                case GParam::BOXED:
+                case GParam::OBJECT:
+                    *result += "*";
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            result = std::nullopt;
+        }
+    };
+
+    const auto visitor = overloads {
+        [&](const Type* type) {
+            result = find_type(type, namespace_name);
+            append_pointer(type);
+        },
+        [&](const ArrayType* array) {
+            if (array->c_type) {
+                result = array->c_type;
+            } else {
+                std::optional<std::string> element_type =
+                    resolve_any_type(array->element_type, namespace_name);
+                if (element_type) {
+                    result = *element_type + "*";
+                }
+            }
+        }
+    };
+    std::visit(visitor, param);
+
+    return result;
+}
+
+std::optional<std::string> TypeResolver::resolve_return_type(
+    std::optional<gir::CallableReturn> callable_return,
+    std::string_view namespace_name,
+    std::optional<std::string_view> void_type) const
+{
+    std::optional<std::string> result;
+    if (!callable_return) {
+        result = VOID_TYPE;
+    } else {
+        result = resolve_any_type(callable_return->type, namespace_name);
+    }
+
+    if (void_type && result && *result == VOID_TYPE) {
+        result = *void_type;
+    }
+
+    return result;
+}
+
 std::optional<std::string> TypeResolver::find_property_type(
     const Property& property, std::string_view namespace_name) const
 {
@@ -469,12 +579,8 @@ std::optional<std::string> TypeResolver::find_property_type(
                 if (builtin_it != s_builtin_name_to_g_param.end()) {
                     result = to_string(builtin_it->second);
                 } else {
-                    std::string qualified_name;
-                    if (name.find('.') == std::string_view::npos) {
-                        qualified_name = fmt::format("{}.{}", namespace_name, name);
-                    } else {
-                        qualified_name = name;
-                    }
+                    std::string qualified_name =
+                        qualify_non_builtin_name(name, namespace_name);
 
                     auto it = m_name_to_type_info.find(qualified_name);
                     if (it != m_name_to_type_info.end()) {
@@ -506,12 +612,7 @@ std::optional<std::string> TypeResolver::find_type(
         if (builtin_it != s_builtin_type_to_c_type.end()) {
             result = builtin_it->second;
         } else {
-            std::string qualified_name;
-            if (gtype.find('.') == std::string_view::npos) {
-                qualified_name = fmt::format("{}.{}", namespace_name, gtype);
-            } else {
-                qualified_name = gtype;
-            }
+            std::string qualified_name = qualify_non_builtin_name(gtype, namespace_name);
 
             auto it = m_name_to_type_info.find(qualified_name);
             if (it != m_name_to_type_info.end()) {

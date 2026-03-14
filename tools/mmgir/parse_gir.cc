@@ -667,6 +667,10 @@ Param Parser::parse_param(const XMLElement* element)
         }
     }
 
+    if (!param.type) {
+        LOG_ERROR(element->GetLineNum(), "Param with no type");
+    }
+
     return param;
 }
 
@@ -1497,6 +1501,15 @@ Signal Parser::parse_signal(const XMLElement* element)
     if (found_inst_param) {
         LOG_ERRORV(element->GetLineNum(), "Signal '{}' takes instance parameter",
                    signal.name);
+    }
+    if (signal.params) {
+        for (const Param& param : signal.params->params) {
+            if (!param.type) continue;
+            if (std::holds_alternative<VarArgs>(*(param.type))) {
+                LOG_ERRORV(element->GetLineNum(), "Signal '{}' has var args",
+                           signal.name);
+            }
+        }
     }
 
     return signal;
