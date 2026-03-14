@@ -46,6 +46,6 @@ void load_supporting_repositories(const std::vector<std::string>& paths,
 
 void search_for_included_namespaces(const std::vector<std::string>& paths,
                                     const ParseArgs& args,
-                                    const gir::Repository& curr_repo,
+                                    const std::vector<gir::Repository>& input_repos,
                                     std::vector<gir::Repository>& supporting_repos,
                                     TypeResolver& type_resolver);

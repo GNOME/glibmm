@@ -555,7 +555,7 @@ Type* Parser::parse_type(const XMLElement* element)
             // Value set as side-effect
         } else if (name == TYPE_ELEMENT || name == ARRAY_ELEMENT) {
             // Nested types are not supported
-            warn_ignored(element, child);
+            warn_unknown(element, child);
         } else {
             warn_unknown(element, child);
         }
@@ -602,7 +602,7 @@ ArrayType* Parser::parse_array_type(const XMLElement* element)
         if (name == TYPE_ELEMENT) {
             type->element_type = parse_type(child);
         } else if (name == ARRAY_ELEMENT) {
-            warn_ignored(element, child);
+            type->element_type = parse_array_type(child);
         } else {
             warn_unknown(element, child);
         }
@@ -1722,7 +1722,8 @@ bool Parser::populate_str_attr(const XMLElement* element, std::string_view attr,
     }
 }
 
-GirSearch::GirSearch(TypeResolver& resolver, std::vector<Repository>& supporting_repos)
+GirSearch::GirSearch(TypeResolver& resolver,
+                     std::vector<Repository>& supporting_repos)
     : m_type_resolver(resolver), m_supporting_repos(supporting_repos)
 {
 }
@@ -1881,14 +1882,16 @@ void load_supporting_repositories(const std::vector<std::string>& paths,
 
 void search_for_included_namespaces(const std::vector<std::string>& paths,
                                     const ParseArgs& args,
-                                    const Repository& current_repo,
-                                    std::vector<gir::Repository>& supporting_repos,
+                                    const std::vector<Repository>& input_repos,
+                                    std::vector<Repository>& supporting_repos,
                                     TypeResolver& type_resolver)
 {
     if (!type_resolver.has_unknown_types()) return;
 
     GirSearch search(type_resolver, supporting_repos);
-    search.add_includes(current_repo);
+    for (const Repository& repo : input_repos) {
+        search.add_includes(repo);
+    }
     for (const Repository& repo : supporting_repos) {
         search.add_includes(repo);
     }

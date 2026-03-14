@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 {
     CLI::App app{"Generates C++ wrappers based on GObject introspection"};
 
-    std::string gir_filepath;
+    std::vector<std::string> gir_filepaths;
     std::vector<std::string> supporting_girs;
     std::vector<std::string> search_paths;
 
@@ -55,7 +55,7 @@ int main(int argc, char** argv)
         }
     };
 
-    app.add_option("--gir", gir_filepath, "Input GIR filepath")
+    app.add_option("--gir", gir_filepaths, "Input GIR filepath(s)")
         ->required()
         ->check(CLI::ExistingFile)
         ->check(is_gir_file);
@@ -85,16 +85,20 @@ int main(int argc, char** argv)
 
     const ParseArgs args{warn_unknown, warn_ignored, warn_deprecated};
 
-    gir::Repository repo;
+    std::vector<gir::Repository> input_repos;
     try {
-        repo = load_repository_from_file(gir_filepath, args);
+        for (const std::string& filepath : gir_filepaths) {
+            input_repos.push_back(load_repository_from_file(filepath, args));
+        }
     } catch (const GirParseError& e) {
         fmt::println(stderr, "ERROR: {}", e.what());
         return 1;
     }
 
     TypeResolver type_resolver;
-    type_resolver.register_repo_types(repo);
+    for (const gir::Repository& repo : input_repos) {
+        type_resolver.register_repo_types(repo);
+    }
 
     std::vector<gir::Repository> supporting_repos;
     try {
@@ -106,15 +110,14 @@ int main(int argc, char** argv)
     }
 
     try {
-        search_for_included_namespaces(search_paths, args, repo, supporting_repos,
-                                       type_resolver);
+        search_for_included_namespaces(search_paths, args, input_repos,
+                                       supporting_repos, type_resolver);
     } catch (const GirParseError& e) {
         fmt::println(stderr, "ERROR: {}", e.what());
         return 1;
     }
 
     if (type_resolver.has_unknown_types()) {
-        // type_resolver.dump_mappings();
         type_resolver.dump_unknown_types();
         return 1;
     }
@@ -122,22 +125,30 @@ int main(int argc, char** argv)
     {
         fmt::println("Dumping enum defs to {}", enum_defs_filepath);
         std::ofstream enum_defs_out(enum_defs_filepath);
-        generate_extended_enum_defs(enum_defs_out, repo);
+        for (const gir::Repository& repo : input_repos) {
+            generate_extended_enum_defs(enum_defs_out, repo);
+        }
     }
     {
         fmt::println("Dumping function defs to {}", function_defs_filepath);
         std::ofstream function_defs_out(function_defs_filepath);
-        generate_function_defs(function_defs_out, repo);
+        for (const gir::Repository& repo : input_repos) {
+            generate_function_defs(function_defs_out, repo);
+        }
     }
     if (signal_defs_filepath) {
         fmt::println("Dumping signal defs to {}", *signal_defs_filepath);
         std::ofstream signal_defs_out(*signal_defs_filepath);
-        generate_signal_defs(signal_defs_out, repo, type_resolver);
+        for (const gir::Repository& repo : input_repos) {
+            generate_signal_defs(signal_defs_out, repo, type_resolver);
+        }
     }
     if (vfunc_defs_filepath) {
         fmt::println("Dumping vfunc defs to {}", *vfunc_defs_filepath);
         std::ofstream vfunc_defs_out(*vfunc_defs_filepath);
-        generate_vfunc_defs(vfunc_defs_out, repo);
+        for (const gir::Repository& repo : input_repos) {
+            generate_vfunc_defs(vfunc_defs_out, repo);
+        }
     }
 
     return 0;
