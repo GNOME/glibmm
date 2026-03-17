@@ -31,7 +31,7 @@ single_line_comment_c = re.compile(r'/\*.*?\*/')
 single_line_comment_cpp = re.compile(r'//.*$')
 enum_begin = re.compile(r'^\s*typedef\s+enum')
 deprecated_type = re.compile(r'[A-Z]+_DEPRECATED_TYPE')
-extract_enum_name = re.compile(r'^.*?(\w+)')
+extract_enum_name = re.compile(r'^.*?(?:G_GNUC_FLAG_ENUM\s+)?(\w+)')
 white_spaces = re.compile(r'\s+')
 opening_bracket = re.compile(r'\s*{\s*')
 extract_module_name = re.compile(r'^([A-Z][a-z]*)')
@@ -159,7 +159,8 @@ def process(line, enum_def, module, omit):
   '''convert enums to lisp'''
 
   global tokens, has_warned_unknown_token
-  # The name is the first word after the closing bracket.
+  # The name is the first or second word after the closing bracket.
+  # It's the second word, if it's preceded by G_GNUC_FLAG_ENUM.
   # The name can be followed by *_DEPRECATED_TYPE* or *_AVAILABLE_TYPE*
   # before the semicolon.
   is_enum_name = extract_enum_name.search(enum_def)

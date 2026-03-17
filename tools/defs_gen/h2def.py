@@ -250,7 +250,7 @@ def find_enum_defs(buf, enums=[]):
 
     buf = re.sub('\n', ' ', buf)
 
-    enum_pat = re.compile(r'enum\s*{([^}]*)}\s*([A-Z][A-Za-z]*)(\s|;)')
+    enum_pat = re.compile(r'enum\s*{([^}]*)}\s*(?:G_GNUC_FLAG_ENUM\s+)?([A-Z][A-Za-z]*)(\s|;)')
     splitter = re.compile(r'\s*,\s', re.MULTILINE)
     pos = 0
     while pos < len(buf):
