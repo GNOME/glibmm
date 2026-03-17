@@ -314,6 +314,38 @@ public:
    */
   int get_char_number() const;
 
+  /** Retrieves the current offset from the beginning of the document, in bytes.
+   *
+   * The information is meant to accompany the values returned by
+   * get_line_number() and get_char_number(), and comes with the
+   * same accuracy guarantees.
+   *
+   * @newin{2,88}
+   */
+  gsize get_offset() const;
+
+  /** Retrieves the start position of the current start or end tag.
+   *
+   * This function can be used in the `start_element` or `end_element`
+   * callbacks to obtain location information for error reporting.
+   *
+   * Note that @a line_number and @a char_number are intended for human
+   * readable error messages and are therefore 1-based and in Unicode
+   * characters. @a offset on the other hand is meant for programmatic
+   * use, and thus is 0-based and in bytes.
+   *
+   * The information is meant to accompany the values returned by
+   * get_line_number() and get_char_number(), and comes with the
+   * same accuracy guarantees.
+   *
+   * @param[out] line_number The line number.
+   * @param[out] char_number The character number.
+   * @param[out] offset Offset from the beginning of the document.
+   *
+   * @newin{2,88}
+   */
+  void get_tag_start(gsize& line_number, gsize& char_number, gsize& offset) const;
+
   Parser*       get_parser()       { return parser_; }
   const Parser* get_parser() const { return parser_; }
 
