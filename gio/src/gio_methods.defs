@@ -1838,6 +1838,18 @@
   )
 )
 
+(define-enum CodePoint
+  (in-module "GEcn")
+  (c-name "GEcnCodePoint")
+  (gtype-id "G_TYPE_ECN_CODE_POINT")
+  (values
+    '("no-ecn" "G_ECN_NO_ECN")
+    '("ect-1" "G_ECN_ECT_1")
+    '("ect-0" "G_ECN_ECT_0")
+    '("ect-ce" "G_ECN_ECT_CE")
+  )
+)
+
 (define-enum FileStatField
   (in-module "GLocal")
   (c-name "GLocalFileStatField")
@@ -11960,6 +11972,58 @@
   (parameters
     '("gboolean" "do_wait")
   )
+)
+
+
+
+;; From giptosmessage.h
+
+(define-function g_ip_tos_message_new
+  (c-name "g_ip_tos_message_new")
+  (is-constructor-of "GIpTosMessage")
+  (return-type "GSocketControlMessage*")
+  (parameters
+    '("guint8" "dscp")
+    '("GEcnCodePoint" "ecn")
+  )
+)
+
+(define-method get_dscp
+  (of-object "GIPTosMessage")
+  (c-name "g_ip_tos_message_get_dscp")
+  (return-type "guint8")
+)
+
+(define-method get_ecn
+  (of-object "GIPTosMessage")
+  (c-name "g_ip_tos_message_get_ecn")
+  (return-type "GEcnCodePoint")
+)
+
+
+
+;; From gipv6tclassmessage.h
+
+(define-function g_ipv6_tclass_message_new
+  (c-name "g_ipv6_tclass_message_new")
+  (is-constructor-of "GIpv6TclassMessage")
+  (return-type "GSocketControlMessage*")
+  (parameters
+    '("guint8" "dscp")
+    '("GEcnCodePoint" "ecn")
+  )
+)
+
+(define-method get_dscp
+  (of-object "GIPv6TclassMessage")
+  (c-name "g_ipv6_tclass_message_get_dscp")
+  (return-type "guint8")
+)
+
+(define-method get_ecn
+  (of-object "GIPv6TclassMessage")
+  (c-name "g_ipv6_tclass_message_get_ecn")
+  (return-type "GEcnCodePoint")
 )
 
 
@@ -22195,6 +22259,11 @@
 
 (define-function g_memory_monitor_warning_level_get_type
   (c-name "g_memory_monitor_warning_level_get_type")
+  (return-type "GType")
+)
+
+(define-function g_ecn_code_point_get_type
+  (c-name "g_ecn_code_point_get_type")
   (return-type "GType")
 )
 

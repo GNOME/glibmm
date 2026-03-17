@@ -170,6 +170,8 @@
   (values
     '("active" "G_HOOK_FLAG_ACTIVE")
     '("in-call" "G_HOOK_FLAG_IN_CALL")
+    '("reserved1" "G_HOOK_FLAG_RESERVED1")
+    '("reserved2" "G_HOOK_FLAG_RESERVED2")
     '("mask" "G_HOOK_FLAG_MASK")
   )
 )
@@ -528,6 +530,7 @@
     '("dupnames" "G_REGEX_DUPNAMES")
     '("newline-cr" "G_REGEX_NEWLINE_CR")
     '("newline-lf" "G_REGEX_NEWLINE_LF")
+    '("newline-reserved1" "G_REGEX_NEWLINE_RESERVED1")
     '("newline-crlf" "G_REGEX_NEWLINE_CRLF")
     '("newline-anycrlf" "G_REGEX_NEWLINE_ANYCRLF")
     '("bsr-anycrlf" "G_REGEX_BSR_ANYCRLF")
@@ -700,6 +703,7 @@
     '("inherit-stdin" "G_TEST_SUBPROCESS_INHERIT_STDIN")
     '("inherit-stdout" "G_TEST_SUBPROCESS_INHERIT_STDOUT")
     '("inherit-stderr" "G_TEST_SUBPROCESS_INHERIT_STDERR")
+    '("inherit-descriptors" "G_TEST_SUBPROCESS_INHERIT_DESCRIPTORS")
   )
 )
 
@@ -868,6 +872,7 @@
     '("aksara-start" "G_UNICODE_BREAK_AKSARA_START")
     '("virama-final" "G_UNICODE_BREAK_VIRAMA_FINAL")
     '("virama" "G_UNICODE_BREAK_VIRAMA")
+    '("unambiguous-hyphen" "G_UNICODE_BREAK_UNAMBIGUOUS_HYPHEN")
   )
 )
 
@@ -1049,6 +1054,10 @@
     '("gurung-khema" "G_UNICODE_SCRIPT_GURUNG_KHEMA")
     '("kirat-rai" "G_UNICODE_SCRIPT_KIRAT_RAI")
     '("ol-onal" "G_UNICODE_SCRIPT_OL_ONAL")
+    '("sidetic" "G_UNICODE_SCRIPT_SIDETIC")
+    '("tolong-siki" "G_UNICODE_SCRIPT_TOLONG_SIKI")
+    '("tai-yo" "G_UNICODE_SCRIPT_TAI_YO")
+    '("beria-erfe" "G_UNICODE_SCRIPT_BERIA_ERFE")
   )
 )
 
@@ -7035,6 +7044,15 @@
   )
 )
 
+(define-function g_unix_fd_query_path
+  (c-name "g_unix_fd_query_path")
+  (return-type "char*")
+  (parameters
+    '("int" "fd")
+    '("GError**" "error")
+  )
+)
+
 
 
 ;; From glist.h
@@ -7899,6 +7917,11 @@
   (return-type "gint64")
 )
 
+(define-function g_get_monotonic_time_ns
+  (c-name "g_get_monotonic_time_ns")
+  (return-type "uint64_t")
+)
+
 (define-function g_get_real_time
   (c-name "g_get_real_time")
   (return-type "gint64")
@@ -8242,6 +8265,23 @@
   (parameters
     '("gint*" "line_number")
     '("gint*" "char_number")
+  )
+)
+
+(define-method get_offset
+  (of-object "GMarkupParseContext")
+  (c-name "g_markup_parse_context_get_offset")
+  (return-type "gsize")
+)
+
+(define-method get_tag_start
+  (of-object "GMarkupParseContext")
+  (c-name "g_markup_parse_context_get_tag_start")
+  (return-type "none")
+  (parameters
+    '("gsize*" "line_number")
+    '("gsize*" "char_number")
+    '("gsize*" "offset")
   )
 )
 
@@ -13208,6 +13248,11 @@
 
 (define-function g_test_trap_has_passed
   (c-name "g_test_trap_has_passed")
+  (return-type "gboolean")
+)
+
+(define-function g_test_trap_has_skipped
+  (c-name "g_test_trap_has_skipped")
   (return-type "gboolean")
 )
 

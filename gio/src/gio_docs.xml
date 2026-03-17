@@ -704,18 +704,6 @@ usually set by passing `--gapplication-replace` on the commandline.
 Since: 2.60
 </parameter_description>
 </parameter>
-<parameter name="G_APPLICATION_FLAGS_NONE">
-<parameter_description>Default flags.
-
-Deprecated: 2.74: Use [flags@Gio.ApplicationFlags.DEFAULT_FLAGS].
-</parameter_description>
-</parameter>
-<parameter name="G_APPLICATION_DEFAULT_FLAGS">
-<parameter_description>Default flags.
-
-Since: 2.74
-</parameter_description>
-</parameter>
 </parameters>
 </enum>
 
@@ -794,14 +782,6 @@ Since: 2.26
 <parameter name="G_BUS_NAME_OWNER_FLAGS_REPLACE">
 <parameter_description> If another message bus connection owns the name and have
 specified %G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT, then take the name from the other connection.
-</parameter_description>
-</parameter>
-<parameter name="G_BUS_NAME_OWNER_FLAGS_DO_NOT_QUEUE">
-<parameter_description>If another message bus connection owns the name, immediately return an error
-from [func@Gio.bus_own_name] rather than entering the waiting queue for that
-name.
-
-Since: 2.54
 </parameter_description>
 </parameter>
 </parameters>
@@ -3264,6 +3244,36 @@ Since: 2.48
 </description>
 </property>
 
+<enum name="GEcnCodePoint">
+<description>
+Possible values of Explicit Congestion Notification code points.
+
+These appear in `TOS` (IPv4) or `TCLASS` (IPv6) packet headers and
+are described in [RFC 3168](https://www.rfc-editor.org/rfc/rfc3168#section-5).
+
+Since: 2.88
+
+</description>
+<parameters>
+<parameter name="G_ECN_NO_ECN">
+<parameter_description> Not ECN-capable transport
+</parameter_description>
+</parameter>
+<parameter name="G_ECN_ECT_1">
+<parameter_description> ECN Capable Transport(1)
+</parameter_description>
+</parameter>
+<parameter name="G_ECN_ECT_0">
+<parameter_description> ECN Capable Transport(0)
+</parameter_description>
+</parameter>
+<parameter name="G_ECN_ECT_CE">
+<parameter_description> Congestion Experienced
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <property name="GEmblem:icon">
 <description>
 The actual icon of the emblem.
@@ -4154,7 +4164,7 @@ Since: 2.20
 </parameter_description>
 </parameter>
 <parameter name="num_tokens">
-<parameter_description> The number of tokens in @tokens
+<parameter_description> The number of tokens in @tokens (guaranteed to be non-negative)
 </parameter_description>
 </parameter>
 <parameter name="version">
@@ -4682,7 +4692,7 @@ then only items were removed.
 
 As an example, if the menu contains items a, b, c, d (in that
 order) and the signal (2, 1, 3) occurs then the new composition of
-the menu will be a, b, _, _, _, d (with each _ representing some
+the menu will be a, b, \_, \_, \_, d (with each _ representing some
 new item).
 
 Signal handlers may query the model (particularly the added items)
@@ -12259,7 +12269,7 @@ commandline then you should implement your own #GApplication subclass
 and override local_command_line(). In this case, you most likely want
 to return %TRUE from your local_command_line() implementation to
 suppress the default handling. See
-[gapplication-example-cmdline2.c][https://gitlab.gnome.org/GNOME/glib/-/blob/HEAD/gio/tests/gapplication-example-cmdline2.c]
+[gapplication-example-cmdline2.c](https://gitlab.gnome.org/GNOME/glib/-/blob/HEAD/gio/tests/gapplication-example-cmdline2.c)
 for an example.
 
 If, after the above is done, the use count of the application is zero
@@ -13271,8 +13281,8 @@ with a buffer set to @size.
 
 <function name="g_buffered_input_stream_peek">
 <description>
-Peeks in the buffer, copying data of size @count into @buffer,
-offset @offset bytes.
+Peeks in the buffered input, copying @count bytes of data from @offset bytes
+in the buffered input into @buffer.
 
 
 </description>
@@ -13283,19 +13293,20 @@ offset @offset bytes.
 </parameter>
 <parameter name="buffer">
 <parameter_description> a pointer to
-an allocated chunk of memory
+an allocated chunk of memory, which must be at least @count bytes long
 </parameter_description>
 </parameter>
 <parameter name="offset">
-<parameter_description> a #gsize
+<parameter_description> offset into the buffered input to peek from, or zero to peek from
+the next byte in the buffered input onwards
 </parameter_description>
 </parameter>
 <parameter name="count">
-<parameter_description> a #gsize
+<parameter_description> number of bytes to peek
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #gsize of the number of bytes peeked, or `-1` on error.
+<return> the number of bytes copied, which may be zero
 </return>
 </function>
 
@@ -15283,6 +15294,10 @@ This operation can fail if #GCredentials is not supported on the
 OS or if the native credentials type does not contain information
 about the UNIX user.
 
+As the signedness of `uid_t` is not specified by POSIX, it is recommended to
+check @error for failure rather than trying to check the return value,
+particularly in language bindings.
+
 Since: 2.26
 
 </description>
@@ -15296,7 +15311,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> The UNIX user identifier or `-1` if @error is set.
+<return> The UNIX user identifier or `(uid_t) -1` if @error is set.
 
 </return>
 </function>
@@ -19760,6 +19775,11 @@ reference should be freed with g_object_unref().
 <description>
 Gets D-Bus introspection information for the D-Bus interface
 implemented by @interface_.
+
+This can return %NULL if no #GDBusInterfaceInfo was provided during
+construction of @interface_ and is also not made available otherwise.
+For example, #GDBusProxy implements #GDBusInterface but allows for a %NULL
+#GDBusInterfaceInfo.
 
 Since: 2.30
 
@@ -27139,7 +27159,7 @@ falls to zero, the @list is deleted.
 <description>
 Checks if the matcher will match all of the keys in a given namespace.
 This will always return %TRUE if a wildcard character is in use (e.g. if
-matcher was created with &quot;standard::*&quot; and @ns is &quot;standard&quot;, or if matcher was created
+matcher was created with &quot;standard::\*&quot; and @ns is &quot;standard&quot;, or if matcher was created
 using &quot;*&quot; and namespace is anything.)
 
 TODO: this is awkwardly worded.
@@ -27224,16 +27244,16 @@ returns %FALSE if &quot;*&quot; was used when creating the matcher.
 <function name="g_file_attribute_matcher_new">
 <description>
 Creates a new file attribute matcher, which matches attributes
-against a given string. #GFileAttributeMatchers are reference
+against a given string. [GFileAttributeMatchers][struct@FileAttributeMatcher] are reference
 counted structures, and are created with a reference count of 1. If
-the number of references falls to 0, the #GFileAttributeMatcher is
+the number of references falls to 0, the [struct@FileAttributeMatcher] is
 automatically destroyed.
 
 The @attributes string should be formatted with specific keys separated
-from namespaces with a double colon. Several &quot;namespace::key&quot; strings may be
-concatenated with a single comma (e.g. &quot;standard::type,standard::is-hidden&quot;).
-The wildcard &quot;*&quot; may be used to match all keys and namespaces, or
-&quot;namespace::*&quot; will match all keys in a given namespace.
+from namespaces with a double colon. Several `&quot;namespace::key&quot;` strings may be
+concatenated with a single comma (e.g. `&quot;standard::type,standard::is-hidden&quot;`).
+The wildcard `&quot;*&quot;` may be used to match all keys and namespaces, or
+`&quot;namespace::*&quot;` will match all keys in a given namespace.
 
 ## Examples of file attribute matcher strings and results
 
@@ -28161,29 +28181,29 @@ Since: 2.22
 <function name="g_file_enumerate_children">
 <description>
 Gets the requested information about the files in a directory.
-The result is a #GFileEnumerator object that will give out
-#GFileInfo objects for all the files in the directory.
+The result is a [class@FileEnumerator] object that will give out
+[class@FileInfo] objects for all the files in the directory.
 
 The @attributes value is a string that specifies the file
 attributes that should be gathered. It is not an error if
 it's not possible to read a particular requested attribute
 from a file - it just won't be set. @attributes should
 be a comma-separated list of attributes or attribute wildcards.
-The wildcard &quot;*&quot; means all attributes, and a wildcard like
-&quot;standard::*&quot; means all attributes in the standard namespace.
-An example attribute query be &quot;standard::*,owner::user&quot;.
+The wildcard `*` means all attributes, and a wildcard like
+`&quot;standard::*&quot;` means all attributes in the standard namespace.
+An example attribute query be `&quot;standard::*,owner::user&quot;`.
 The standard attributes are available as defines, like
-%G_FILE_ATTRIBUTE_STANDARD_NAME. %G_FILE_ATTRIBUTE_STANDARD_NAME should
-always be specified if you plan to call g_file_enumerator_get_child() or
-g_file_enumerator_iterate() on the returned enumerator.
+[const@FILE_ATTRIBUTE_STANDARD_NAME]. [const@FILE_ATTRIBUTE_STANDARD_NAME] should
+always be specified if you plan to call [method@FileEnumerator.get_child] or
+[method@FileEnumerator.iterate] on the returned enumerator.
 
-If @cancellable is not %NULL, then the operation can be cancelled
+If @cancellable is not `NULL`, then the operation can be cancelled
 by triggering the cancellable object from another thread. If the
-operation was cancelled, the error %G_IO_ERROR_CANCELLED will be
+operation was cancelled, the error [error@Gio.IOErrorEnum.CANCELLED] will be
 returned.
 
-If the file does not exist, the %G_IO_ERROR_NOT_FOUND error will
-be returned. If the file is not a directory, the %G_IO_ERROR_NOT_DIRECTORY
+If the file does not exist, the [error@Gio.IOErrorEnum.NOT_FOUND] error will
+be returned. If the file is not a directory, the [error@Gio.IOErrorEnum.NOT_DIRECTORY]
 error will be returned. Other errors are possible too.
 
 
@@ -28212,7 +28232,7 @@ error will be returned. Other errors are possible too.
 </parameter>
 </parameters>
 <return> A #GFileEnumerator if successful,
-%NULL on error. Free the returned object with g_object_unref().
+%NULL on error. Free the returned object with [method@GObject.Object.unref].
 </return>
 </function>
 
@@ -28729,9 +28749,17 @@ Sets the file enumerator as having pending operations.
 <description>
 Checks if the two given #GFiles refer to the same file.
 
+This function can be used with [method@Gio.File.hash] to insert
+[iface@Gio.File]s efficiently in a hash table.
+
 Note that two #GFiles that differ can still refer to the same
 file on the filesystem due to various forms of filename
-aliasing.
+aliasing. For local files, this function essentially compares the file paths,
+so two [iface@Gio.File]s which point to different hard or soft links will not
+be considered equal, despite pointing to the same content.
+
+For determining whether two files are hardlinked, see
+[const@Gio.FILE_ATTRIBUTE_ID_FILE].
 
 This call does no blocking I/O.
 
@@ -29812,6 +29840,11 @@ It is an error to call this if the #GFileInfo does not contain
 <function name="g_file_info_get_is_backup">
 <description>
 Checks if a file is a backup file.
+
+The exact semantics of what constitutes a backup file are
+backend-specific. For local files, a file is considered a backup
+if its name ends with `~` and it is a regular file. This follows
+the POSIX convention used by text editors such as Emacs.
 
 It is an error to call this if the #GFileInfo does not contain
 %G_FILE_ATTRIBUTE_STANDARD_IS_BACKUP.
@@ -33128,7 +33161,7 @@ The @attributes value is a string that specifies the attributes
 that should be gathered. It is not an error if it's not possible
 to read a particular requested attribute from a file - it just
 won't be set. @attributes should be a comma-separated list of
-attributes or attribute wildcards. The wildcard &quot;*&quot; means all
+attributes or attribute wildcards. The wildcard &quot;\*&quot; means all
 attributes, and a wildcard like &quot;filesystem::*&quot; means all attributes
 in the filesystem namespace. The standard namespace for filesystem
 attributes is &quot;filesystem&quot;. Common attributes of interest are
@@ -33268,7 +33301,7 @@ even if the user doesn’t have permissions to access the file:
 - [const@Gio.FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME]
 
 @attributes should be a comma-separated list of attributes or attribute
-wildcards. The wildcard `&quot;*&quot;` means all attributes, and a wildcard like
+wildcards. The wildcard `&quot;\*&quot;` means all attributes, and a wildcard like
 `&quot;standard::*&quot;` means all attributes in the standard namespace.
 An example attribute query might be `&quot;standard::*,owner::user&quot;`.
 The standard attributes are available as defines, like
@@ -38037,6 +38070,120 @@ ignore.
 </parameters>
 <return> %TRUE on success, %FALSE otherwise.
 
+</return>
+</function>
+
+<function name="g_ip_tos_message_get_dscp">
+<description>
+Gets the differentiated services code point stored in @message.
+
+Since: 2.88
+
+</description>
+<parameters>
+<parameter name="message">
+<parameter_description> a type-of-service message
+</parameter_description>
+</parameter>
+</parameters>
+<return> A DSCP value as described in [RFC 2474](https://www.rfc-editor.org/rfc/rfc2474.html#section-3).
+
+</return>
+</function>
+
+<function name="g_ip_tos_message_get_ecn">
+<description>
+Gets the Explicit Congestion Notification code point stored in @message.
+
+Since: 2.88
+
+</description>
+<parameters>
+<parameter name="message">
+<parameter_description> a type-of-service message
+</parameter_description>
+</parameter>
+</parameters>
+<return> An ECN value as described in [RFC 3168](https://www.rfc-editor.org/rfc/rfc3168#section-5).
+
+</return>
+</function>
+
+<function name="g_ip_tos_message_new">
+<description>
+Creates a new type-of-service message with given DSCP and ECN values.
+
+Since: 2.88
+
+</description>
+<parameters>
+<parameter name="dscp">
+<parameter_description> the DSCP value of the message
+</parameter_description>
+</parameter>
+<parameter name="ecn">
+<parameter_description> the ECN value of the message
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new type-of-service message
+</return>
+</function>
+
+<function name="g_ipv6_tclass_message_get_dscp">
+<description>
+Gets the differentiated services code point stored in @message.
+
+Since: 2.88
+
+</description>
+<parameters>
+<parameter name="message">
+<parameter_description> a traffic class message
+</parameter_description>
+</parameter>
+</parameters>
+<return> A DSCP value as described in [RFC 2474](https://www.rfc-editor.org/rfc/rfc2474.html#section-3).
+
+</return>
+</function>
+
+<function name="g_ipv6_tclass_message_get_ecn">
+<description>
+Gets the Explicit Congestion Notification code point stored in @message.
+
+Since: 2.88
+
+</description>
+<parameters>
+<parameter name="message">
+<parameter_description> a traffic class message
+</parameter_description>
+</parameter>
+</parameters>
+<return> An ECN value as described in [RFC 3168](https://www.rfc-editor.org/rfc/rfc3168#section-5).
+
+</return>
+</function>
+
+<function name="g_ipv6_tclass_message_new">
+<description>
+Creates a new traffic class message with given DSCP and ECN values.
+
+Since: 2.88
+
+</description>
+<parameters>
+<parameter name="dscp">
+<parameter_description> the DSCP value of the message
+</parameter_description>
+</parameter>
+<parameter name="ecn">
+<parameter_description> the ECN value of the message
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new traffic class message
 </return>
 </function>
 

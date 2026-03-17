@@ -35,7 +35,7 @@
 ;; {
 ;;   G_BSEARCH_ARRAY_ALIGN_POWER2  = 1 << 0, /* align memory to power2 sizes */
 ;;   G_BSEARCH_ARRAY_AUTO_SHRINK  = 1 << 1   /* shrink array upon removal */
-;; } GBSearchArrayFlags;
+;; } G_GNUC_FLAG_ENUM GBSearchArrayFlags;
 
 (define-flags-extended BSearchArrayFlags
   (in-module "G")
@@ -257,7 +257,7 @@
 ;;   G_FILE_TEST_IS_DIR        = 1 << 2,
 ;;   G_FILE_TEST_IS_EXECUTABLE = 1 << 3,
 ;;   G_FILE_TEST_EXISTS        = 1 << 4
-;; } GFileTest;
+;; } G_GNUC_FLAG_ENUM GFileTest;
 
 (define-flags-extended FileTest
   (in-module "G")
@@ -278,7 +278,7 @@
 ;;   G_FILE_SET_CONTENTS_CONSISTENT = 1 << 0,
 ;;   G_FILE_SET_CONTENTS_DURABLE = 1 << 1,
 ;;   G_FILE_SET_CONTENTS_ONLY_EXISTING = 1 << 2
-;; } GFileSetContentsFlags
+;; } G_GNUC_FLAG_ENUM GFileSetContentsFlags
 ;; GLIB_AVAILABLE_ENUMERATOR_IN_2_66;
 
 (define-flags-extended LIB_AVAILABLE_ENUMERATOR_IN_2_66
@@ -299,8 +299,10 @@
 ;; {
 ;;   G_HOOK_FLAG_ACTIVE	    = 1 << 0,
 ;;   G_HOOK_FLAG_IN_CALL	    = 1 << 1,
+;;   G_HOOK_FLAG_RESERVED1     = 1 << 2, /*< private >*/
+;;   G_HOOK_FLAG_RESERVED2     = 1 << 3, /*< private >*/
 ;;   G_HOOK_FLAG_MASK	    = 0x0f
-;; } GHookFlagMask;
+;; } G_GNUC_FLAG_ENUM GHookFlagMask;
 
 (define-flags-extended HookFlagMask
   (in-module "G")
@@ -308,6 +310,8 @@
   (values
     '("active" "G_HOOK_FLAG_ACTIVE" "1 << 0")
     '("in-call" "G_HOOK_FLAG_IN_CALL" "1 << 1")
+    '("reserved1" "G_HOOK_FLAG_RESERVED1" "1 << 2")
+    '("reserved2" "G_HOOK_FLAG_RESERVED2" "1 << 3")
     '("mask" "G_HOOK_FLAG_MASK" "0x0f")
   )
 )
@@ -417,7 +421,7 @@
 ;;   G_IO_FLAG_MASK = (1 << 5) - 1,
 ;;   G_IO_FLAG_GET_MASK = G_IO_FLAG_MASK,
 ;;   G_IO_FLAG_SET_MASK = G_IO_FLAG_APPEND | G_IO_FLAG_NONBLOCK
-;; } GIOFlags;
+;; } G_GNUC_FLAG_ENUM GIOFlags;
 
 (define-flags-extended IOFlags
   (in-module "G")
@@ -468,7 +472,7 @@
 ;;   G_KEY_FILE_NONE              = 0,
 ;;   G_KEY_FILE_KEEP_COMMENTS     = 1 << 0,
 ;;   G_KEY_FILE_KEEP_TRANSLATIONS = 1 << 1
-;; } GKeyFileFlags;
+;; } G_GNUC_FLAG_ENUM GKeyFileFlags;
 
 (define-flags-extended KeyFileFlags
   (in-module "G")
@@ -587,7 +591,7 @@
 ;;   G_MARKUP_TREAT_CDATA_AS_TEXT              = 1 << 1,
 ;;   G_MARKUP_PREFIX_ERROR_POSITION            = 1 << 2,
 ;;   G_MARKUP_IGNORE_QUALIFIED                 = 1 << 3
-;; } GMarkupParseFlags;
+;; } G_GNUC_FLAG_ENUM GMarkupParseFlags;
 
 (define-flags-extended MarkupParseFlags
   (in-module "G")
@@ -644,7 +648,7 @@
 ;;   G_LOG_LEVEL_DEBUG             = 1 << 7,
 ;; 
 ;;   G_LOG_LEVEL_MASK              = ~(G_LOG_FLAG_RECURSION | G_LOG_FLAG_FATAL)
-;; } GLogLevelFlags;
+;; } G_GNUC_FLAG_ENUM GLogLevelFlags;
 
 (define-flags-extended LogLevelFlags
   (in-module "G")
@@ -689,7 +693,7 @@
 ;;   G_TRAVERSE_MASK       = 0x03,
 ;;   G_TRAVERSE_LEAFS      = G_TRAVERSE_LEAVES,
 ;;   G_TRAVERSE_NON_LEAFS  = G_TRAVERSE_NON_LEAVES
-;; } GTraverseFlags;
+;; } G_GNUC_FLAG_ENUM GTraverseFlags;
 
 (define-flags-extended TraverseFlags
   (in-module "G")
@@ -738,7 +742,7 @@
 ;;   G_OPTION_FLAG_OPTIONAL_ARG    = 1 << 5,
 ;;   G_OPTION_FLAG_NOALIAS	        = 1 << 6,
 ;;   G_OPTION_FLAG_DEPRECATED GLIB_AVAILABLE_ENUMERATOR_IN_2_84 = 1 << 7
-;; } GOptionFlags;
+;; } G_GNUC_FLAG_ENUM GOptionFlags;
 
 (define-flags-extended OptionFlags
   (in-module "G")
@@ -952,11 +956,12 @@
 ;;   G_REGEX_DUPNAMES          = 1 << 19,
 ;;   G_REGEX_NEWLINE_CR        = 1 << 20,
 ;;   G_REGEX_NEWLINE_LF        = 1 << 21,
+;;   G_REGEX_NEWLINE_RESERVED1 = 1 << 22,  /*< private >*/
 ;;   G_REGEX_NEWLINE_CRLF      = G_REGEX_NEWLINE_CR | G_REGEX_NEWLINE_LF,
-;;   G_REGEX_NEWLINE_ANYCRLF   = G_REGEX_NEWLINE_CR | 1 << 22,
+;;   G_REGEX_NEWLINE_ANYCRLF   = G_REGEX_NEWLINE_CR | G_REGEX_NEWLINE_RESERVED1,
 ;;   G_REGEX_BSR_ANYCRLF       = 1 << 23,
 ;;   G_REGEX_JAVASCRIPT_COMPAT GLIB_DEPRECATED_ENUMERATOR_IN_2_74 = 1 << 25
-;; } GRegexCompileFlags;
+;; } G_GNUC_FLAG_ENUM GRegexCompileFlags;
 
 (define-flags-extended RegexCompileFlags
   (in-module "G")
@@ -977,6 +982,7 @@
     '("dupnames" "G_REGEX_DUPNAMES" "1 << 19")
     '("newline-cr" "G_REGEX_NEWLINE_CR" "1 << 20")
     '("newline-lf" "G_REGEX_NEWLINE_LF" "1 << 21")
+    '("newline-reserved1" "G_REGEX_NEWLINE_RESERVED1" "1 << 22")
     '("newline-crlf" "G_REGEX_NEWLINE_CRLF" "0x300000")
     '("newline-anycrlf" "G_REGEX_NEWLINE_ANYCRLF" "0x500000")
     '("bsr-anycrlf" "G_REGEX_BSR_ANYCRLF" "1 << 23")
@@ -1003,7 +1009,7 @@
 ;;   G_REGEX_MATCH_PARTIAL_SOFT     = G_REGEX_MATCH_PARTIAL,
 ;;   G_REGEX_MATCH_PARTIAL_HARD     = 1 << 27,
 ;;   G_REGEX_MATCH_NOTEMPTY_ATSTART = 1 << 28
-;; } GRegexMatchFlags;
+;; } G_GNUC_FLAG_ENUM GRegexMatchFlags;
 
 (define-flags-extended RegexMatchFlags
   (in-module "G")
@@ -1273,7 +1279,7 @@
 ;;    * Since: 2.74
 ;;    */
 ;;   G_SPAWN_STDIN_FROM_DEV_NULL    = 1 << 11
-;; } GSpawnFlags;
+;; } G_GNUC_FLAG_ENUM GSpawnFlags;
 
 (define-flags-extended SpawnFlags
   (in-module "G")
@@ -1310,7 +1316,7 @@
 ;;   G_ASCII_SPACE  = 1 << 8,
 ;;   G_ASCII_UPPER  = 1 << 9,
 ;;   G_ASCII_XDIGIT = 1 << 10
-;; } GAsciiType;
+;; } G_GNUC_FLAG_ENUM GAsciiType;
 
 (define-flags-extended AsciiType
   (in-module "G")
@@ -1354,7 +1360,7 @@
 ;;   G_TEST_TRAP_SILENCE_STDOUT    = 1 << 7,
 ;;   G_TEST_TRAP_SILENCE_STDERR    = 1 << 8,
 ;;   G_TEST_TRAP_INHERIT_STDIN     = 1 << 9
-;; } GTestTrapFlags GLIB_DEPRECATED_TYPE_IN_2_38_FOR(GTestSubprocessFlags);
+;; } G_GNUC_FLAG_ENUM GTestTrapFlags GLIB_DEPRECATED_TYPE_IN_2_38_FOR(GTestSubprocessFlags);
 
 (define-flags-extended TestTrapFlags
   (in-module "G")
@@ -1372,8 +1378,9 @@
 ;;   G_TEST_SUBPROCESS_DEFAULT GLIB_AVAILABLE_ENUMERATOR_IN_2_74 = 0,
 ;;   G_TEST_SUBPROCESS_INHERIT_STDIN  = 1 << 0,
 ;;   G_TEST_SUBPROCESS_INHERIT_STDOUT = 1 << 1,
-;;   G_TEST_SUBPROCESS_INHERIT_STDERR = 1 << 2
-;; } GTestSubprocessFlags;
+;;   G_TEST_SUBPROCESS_INHERIT_STDERR = 1 << 2,
+;;   G_TEST_SUBPROCESS_INHERIT_DESCRIPTORS GLIB_AVAILABLE_ENUMERATOR_IN_2_88 = 1 << 3,
+;; } G_GNUC_FLAG_ENUM GTestSubprocessFlags;
 
 (define-flags-extended TestSubprocessFlags
   (in-module "G")
@@ -1383,6 +1390,7 @@
     '("inherit-stdin" "G_TEST_SUBPROCESS_INHERIT_STDIN" "1 << 0")
     '("inherit-stdout" "G_TEST_SUBPROCESS_INHERIT_STDOUT" "1 << 1")
     '("inherit-stderr" "G_TEST_SUBPROCESS_INHERIT_STDERR" "1 << 2")
+    '("inherit-descriptors" "G_TEST_SUBPROCESS_INHERIT_DESCRIPTORS" "1 << 3")
   )
 )
 
@@ -1635,7 +1643,8 @@
 ;;   G_UNICODE_BREAK_AKSARA_PRE_BASE,
 ;;   G_UNICODE_BREAK_AKSARA_START,
 ;;   G_UNICODE_BREAK_VIRAMA_FINAL,
-;;   G_UNICODE_BREAK_VIRAMA
+;;   G_UNICODE_BREAK_VIRAMA,
+;;   G_UNICODE_BREAK_UNAMBIGUOUS_HYPHEN GLIB_AVAILABLE_ENUMERATOR_IN_2_88,
 ;; } GUnicodeBreakType;
 
 (define-enum-extended UnicodeBreakType
@@ -1691,6 +1700,7 @@
     '("aksara-start" "G_UNICODE_BREAK_AKSARA_START" "45")
     '("virama-final" "G_UNICODE_BREAK_VIRAMA_FINAL" "46")
     '("virama" "G_UNICODE_BREAK_VIRAMA" "47")
+    '("unambiguous-hyphen" "G_UNICODE_BREAK_UNAMBIGUOUS_HYPHEN" "48")
   )
 )
 
@@ -1906,6 +1916,12 @@
 ;;   G_UNICODE_SCRIPT_GURUNG_KHEMA GLIB_AVAILABLE_ENUMERATOR_IN_2_84,   /* Gukh */
 ;;   G_UNICODE_SCRIPT_KIRAT_RAI GLIB_AVAILABLE_ENUMERATOR_IN_2_84,      /* Krai */
 ;;   G_UNICODE_SCRIPT_OL_ONAL GLIB_AVAILABLE_ENUMERATOR_IN_2_84,        /* Onao */
+;; 
+;;   /* Unicode 17.0 additions */
+;;   G_UNICODE_SCRIPT_SIDETIC GLIB_AVAILABLE_ENUMERATOR_IN_2_88,                /* Sidt */
+;;   G_UNICODE_SCRIPT_TOLONG_SIKI GLIB_AVAILABLE_ENUMERATOR_IN_2_88,            /* Tols */
+;;   G_UNICODE_SCRIPT_TAI_YO GLIB_AVAILABLE_ENUMERATOR_IN_2_88,                 /* Tayo */
+;;   G_UNICODE_SCRIPT_BERIA_ERFE GLIB_AVAILABLE_ENUMERATOR_IN_2_88,             /* Berf */
 ;; } GUnicodeScript;
 
 (define-enum-extended UnicodeScript
@@ -2085,6 +2101,10 @@
     '("gurung-khema" "G_UNICODE_SCRIPT_GURUNG_KHEMA" "169")
     '("kirat-rai" "G_UNICODE_SCRIPT_KIRAT_RAI" "170")
     '("ol-onal" "G_UNICODE_SCRIPT_OL_ONAL" "171")
+    '("sidetic" "G_UNICODE_SCRIPT_SIDETIC" "172")
+    '("tolong-siki" "G_UNICODE_SCRIPT_TOLONG_SIKI" "173")
+    '("tai-yo" "G_UNICODE_SCRIPT_TAI_YO" "174")
+    '("beria-erfe" "G_UNICODE_SCRIPT_BERIA_ERFE" "175")
   )
 )
 
@@ -2129,7 +2149,7 @@
 ;;   G_URI_FLAGS_ENCODED_PATH    = 1 << 6,
 ;;   G_URI_FLAGS_ENCODED_FRAGMENT = 1 << 7,
 ;;   G_URI_FLAGS_SCHEME_NORMALIZE GLIB_AVAILABLE_ENUMERATOR_IN_2_68 = 1 << 8,
-;; } GUriFlags;
+;; } G_GNUC_FLAG_ENUM GUriFlags;
 
 (define-flags-extended UriFlags
   (in-module "G")
@@ -2156,7 +2176,7 @@
 ;;   G_URI_HIDE_AUTH_PARAMS = 1 << 2,
 ;;   G_URI_HIDE_QUERY       = 1 << 3,
 ;;   G_URI_HIDE_FRAGMENT    = 1 << 4,
-;; } GUriHideFlags;
+;; } G_GNUC_FLAG_ENUM GUriHideFlags;
 
 (define-flags-extended UriHideFlags
   (in-module "G")
@@ -2177,7 +2197,7 @@
 ;;   G_URI_PARAMS_CASE_INSENSITIVE = 1 << 0,
 ;;   G_URI_PARAMS_WWW_FORM         = 1 << 1,
 ;;   G_URI_PARAMS_PARSE_RELAXED    = 1 << 2,
-;; } GUriParamsFlags;
+;; } G_GNUC_FLAG_ENUM GUriParamsFlags;
 
 (define-flags-extended UriParamsFlags
   (in-module "G")
@@ -2262,7 +2282,7 @@
 ;;   G_FORMAT_SIZE_BITS        = 1 << 2,
 ;;   G_FORMAT_SIZE_ONLY_VALUE GLIB_AVAILABLE_ENUMERATOR_IN_2_74 = 1 << 3,
 ;;   G_FORMAT_SIZE_ONLY_UNIT GLIB_AVAILABLE_ENUMERATOR_IN_2_74 = 1 << 4
-;; } GFormatSizeFlags;
+;; } G_GNUC_FLAG_ENUM GFormatSizeFlags;
 
 (define-flags-extended FormatSizeFlags
   (in-module "G")
