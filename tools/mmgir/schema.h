@@ -513,8 +513,8 @@ template <>
 inline bool is_skippable(const FunctionInline& func)
 {
     if (func.attributes.info_attributes.is_skippable) return true;
-    // Ignore private objects
-    if (func.attributes.name.at(0) == '_') return true;
+    // Ignore nameless and private functions
+    if (func.attributes.name.empty() || func.attributes.name.at(0) == '_') return true;
     return false;
 }
 

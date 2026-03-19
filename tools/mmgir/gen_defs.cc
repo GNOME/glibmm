@@ -577,7 +577,7 @@ void generate_property_def(std::ostream& os, const Property& property,
     fmt::print(os, "  (readable {})\n", convert_bool(property.is_readable, true));
     fmt::print(os, "  (writable {})\n", convert_bool(property.is_writable, false));
     fmt::print(os, "  (construct-only {})\n",
-               convert_bool(property.is_set_on_construction, false));
+               convert_bool(property.is_set_only_during_construction, false));
     if (property.default_value) {
         fmt::print(os, "  (default-value \"{}\")\n", *(property.default_value));
     }
@@ -702,7 +702,7 @@ void generate_standard_object_def(
     const std::optional<std::string>& namespace_name,
     const std::vector<std::string_view>& identifier_prefixes)
 {
-    fmt::print(os, "(define-object \"{}\")\n", obj.name);
+    fmt::print(os, "(define-object {}\n", obj.name);
     if (namespace_name) {
         fmt::print(os, "  (in-module \"{}\")\n", *namespace_name);
     }
@@ -819,7 +819,8 @@ void generate_class_function_defs(std::ostream& os, const Class& klass)
 void ParamProcessor::print_param(std::string_view curr_indent,
                                  std::string_view single_indent)
 {
-    if (curr == end) return;
+    const bool can_throw = attributes && attributes->get().can_throw.value_or(false);
+    if ((curr == end) && !can_throw) return;
 
     fmt::print(os, "{}(parameters\n", curr_indent);
     for (; curr != end; curr++) {
@@ -848,7 +849,7 @@ void ParamProcessor::print_param(std::string_view curr_indent,
         };
         std::visit(visitor, param.type.value());
     }
-    if (attributes && attributes->get().can_throw.value_or(false)) {
+    if (can_throw) {
         fmt::print(os, "{}{}'(\"GError**\" \"error\")\n", curr_indent, single_indent);
     }
     fmt::print(os, "{})\n", curr_indent);

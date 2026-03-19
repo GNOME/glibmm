@@ -278,8 +278,8 @@ bool Parser::parse_introspectable_as_skippable(const XMLAttribute* attr)
     std::string_view value{attr->Value()};
 
     if (value == "0") {
-        // Allowed to skip from language bindings
-        return true;
+        // Don't skip from language bindings
+        return false;
     } else if (value == "1") {
         return false;
     } else {
