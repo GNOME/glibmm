@@ -166,7 +166,6 @@ public:
                              InfoElements& info);
 
     std::optional<bool> parse_opt_bool(const XMLAttribute* attr);
-    bool parse_introspectable_as_skippable(const XMLAttribute* attr);
     Dir parse_dir(const XMLAttribute* attr);
     RunSignal parse_run_signal(const XMLAttribute* attr);
     Scope parse_scope(const XMLAttribute* attr);
@@ -270,21 +269,6 @@ std::optional<bool> Parser::parse_opt_bool(const XMLAttribute* attr)
     } else {
         LOG_ERRORV(attr->GetLineNum(), "Unknown bool {}", value);
         return std::nullopt;
-    }
-}
-
-bool Parser::parse_introspectable_as_skippable(const XMLAttribute* attr)
-{
-    std::string_view value{attr->Value()};
-
-    if (value == "0") {
-        // Don't skip from language bindings
-        return false;
-    } else if (value == "1") {
-        return false;
-    } else {
-        LOG_ERRORV(attr->GetLineNum(), "Unknown bool {}", value);
-        return false;
     }
 }
 
@@ -1690,7 +1674,7 @@ bool Parser::parse_info_attributes(const XMLElement* /* element */,
                                    InfoAttributes& info)
 {
     if (attr_name == "introspectable") {
-        info.is_skippable = parse_introspectable_as_skippable(attr);
+        info.is_introspectable = parse_opt_bool(attr);
         return true;
     } else if (attr_name == "deprecated") {
         info.is_deprecated = parse_opt_bool(attr);

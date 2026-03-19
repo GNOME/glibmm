@@ -69,7 +69,7 @@ struct Annotation
 
 struct InfoAttributes
 {
-    bool is_skippable = false;  // introspectable == "0"
+    std::optional<bool> is_introspectable;
     std::optional<bool> is_deprecated;
     std::optional<std::string> deprecated_version;
     std::string version;
@@ -503,7 +503,6 @@ struct Namespace
 template <class T>
 bool is_skippable(const T& obj)
 {
-    if (obj.info_attributes.is_skippable) return true;
     // Ignore private objects
     if (obj.name.at(0) == '_') return true;
     return false;
@@ -512,7 +511,6 @@ bool is_skippable(const T& obj)
 template <>
 inline bool is_skippable(const FunctionInline& func)
 {
-    if (func.attributes.info_attributes.is_skippable) return true;
     // Ignore nameless and private functions
     if (func.attributes.name.empty() || func.attributes.name.at(0) == '_') return true;
     return false;

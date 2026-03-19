@@ -582,6 +582,39 @@ void generate_vfunc_def(std::ostream& os, const VirtualMethod& vfunc,
     fmt::print(os, ")\n\n");
 }
 
+struct PropertyContext
+{
+    const TypeResolver* type_resolver;
+    std::string_view ns_name;
+    std::string_view object_name;
+    std::variant<const Interface*, const Class*> object;
+};
+
+std::optional<std::string> try_find_property_type_from_getter(
+    const Property& property, const PropertyContext& context)
+{
+    std::optional<std::string> result;
+    if (!property.getter_func) return result;
+
+    auto search = [&](const std::vector<Method>& methods) {
+        for (const Method& method : methods) {
+            if (method.get_property != property.name) continue;
+
+            result = context.type_resolver->resolve_return_type(
+                method.func.detail.return_type, context.ns_name);
+            if (result) return;
+        }
+    };
+
+    const auto visitor = overloads {
+        [&](const Interface* interface) { search(interface->methods); },
+        [&](const Class* klass) { search(klass->methods); }
+    };
+    std::visit(visitor, context.object);
+
+    return result;
+}
+
 // (define-property program-name
 //   (of-object "GtkAboutDialog")
 //   (prop-type "GParamString")
@@ -593,21 +626,25 @@ void generate_vfunc_def(std::ostream& os, const VirtualMethod& vfunc,
 // )
 
 void generate_property_def(std::ostream& os, const Property& property,
-                           std::string_view ns_name, std::string_view object,
-                           const TypeResolver& type_resolver)
+                           const PropertyContext& context)
 {
     if (is_skippable(property)) return;
+    if (!property.info_attributes.is_introspectable.value_or(true)) return;
 
     fmt::print(os, "(define-property {}\n", property.name);
-    fmt::print(os, "  (of-object \"{}\")\n", object);
+    fmt::print(os, "  (of-object \"{}\")\n", context.object_name);
 
     std::optional<std::string> prop_type =
-        type_resolver.find_property_type(property, ns_name);
+        context.type_resolver->find_property_type(property, context.ns_name);
+    if (!prop_type) {
+        prop_type = try_find_property_type_from_getter(property, context);
+    }
+
     if (prop_type) {
         fmt::print(os, "  (prop-type \"{}\")\n", *prop_type);
     } else {
-        fmt::println(stderr, "ERROR: Property '{}.{}:{}' has unresolved type: {}",
-                     ns_name, object, property.name, flatten_any_type(property.type));
+        fmt::println(stderr, "ERROR: Property '{}.{}:{}' has unresolved type",
+                     context.ns_name, context.object_name, property.name);
     }
 
     fmt::print(os, "  (docs \"\")\n");
@@ -917,14 +954,15 @@ void generate_extended_enum_defs(std::ostream& os, const Repository& repo)
 void generate_function_defs(std::ostream& os, const gir::Repository& repo)
 {
     for (const Namespace& ns : repo.namespaces) {
-        const std::string ns_name = ns.name.value_or("");
+        if (!ns.name) continue;
+
         const auto identifier_prefixes = build_identifier_prefixes(repo, ns);
         fmt::println("Identifier prefixes: {}", fmt::join(identifier_prefixes, ", "));
         if (identifier_prefixes.empty()) {
             fmt::println("WARN: No identifier prefixes provided!");
         }
 
-        fmt::print(os, "\n;; Objects for namespace {}\n\n", ns_name);
+        fmt::print(os, "\n;; Objects for namespace {}\n\n", *(ns.name));
         for (const Record& record : ns.records) {
             generate_record_object_def(os, record, ns.name, identifier_prefixes);
         }
@@ -935,7 +973,7 @@ void generate_function_defs(std::ostream& os, const gir::Repository& repo)
             generate_class_object_def(os, klass, ns.name, identifier_prefixes);
         }
 
-        fmt::print(os, "\n;; Functions for namespace {}\n\n", ns_name);
+        fmt::print(os, "\n;; Functions for namespace {}\n\n", *(ns.name));
 
         for (const FunctionInline& func : ns.inline_functions) {
             generate_func_def(os, func);
@@ -965,14 +1003,18 @@ void generate_signal_defs(std::ostream& os, const gir::Repository& repo,
                           const TypeResolver& type_resolver)
 {
     for (const Namespace& ns : repo.namespaces) {
-        const std::string ns_name = ns.name.value_or("");
+        if (!ns.name) continue;
+        std::string_view ns_name = *(ns.name);
 
         for (const Interface& interface : ns.interfaces) {
             if (is_skippable(interface)) continue;
 
+            PropertyContext prop_context {
+                &type_resolver, ns_name, interface.glib_type_name, &interface
+            };
+
             for (const Property& property : interface.properties) {
-                generate_property_def(os, property, ns_name, interface.glib_type_name,
-                                      type_resolver);
+                generate_property_def(os, property, prop_context);
             }
 
             for (const Signal& signal : interface.signals) {
@@ -984,9 +1026,12 @@ void generate_signal_defs(std::ostream& os, const gir::Repository& repo,
         for (const Class& klass : ns.classes) {
             if (is_skippable(klass)) continue;
 
+            PropertyContext prop_context {
+                &type_resolver, ns_name, klass.glib_type_name, &klass
+            };
+
             for (const Property& property : klass.properties) {
-                generate_property_def(os, property, ns_name, klass.glib_type_name,
-                                      type_resolver);
+                generate_property_def(os, property, prop_context);
             }
 
             for (const Signal& signal : klass.signals) {
