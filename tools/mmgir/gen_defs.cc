@@ -298,10 +298,47 @@ void generate_extended_bitfield_def(std::ostream& os, const Bitfield& bitfield,
         }
 
         std::string formatted_value;
-        int n = std::atoi(member.value.c_str());
+        constexpr int AUTO_DETECT_BASE = 0;
+        unsigned long n = 0;
+        try {
+            n = std::stoul(member.value.c_str(), nullptr, AUTO_DETECT_BASE);
+        } catch (const std::out_of_range& e) {
+            fmt::println(
+                stderr,
+                "ERROR: Failed to parse bitfield '{}' member '{}': {}",
+                bitfield.name,
+                converted_name,
+                e.what());
+            continue;
+        } catch (const std::invalid_argument& e) {
+            fmt::println(
+                stderr,
+                "ERROR: Failed to parse bitfield '{}' member '{}': {}",
+                bitfield.name,
+                converted_name,
+                e.what());
+            continue;
+        }
+
+        if (n > std::numeric_limits<std::uint32_t>::max()) {
+            fmt::println(
+                stderr,
+                "ERROR: Bitfield '{}' member '{}' requires more than 32 bits to represent: {}",
+                bitfield.name,
+                converted_name,
+                n);
+            continue;
+        }
+
         // Use 1 << N format for flags (i.e. power of two values)
+        // TODO(C++20): Use std::popcount instead
         if ((n > 0) && ((n & (n - 1)) == 0)) {
-            int position = static_cast<int>(std::log2(static_cast<double>(n)));
+            // TODO(C++20): Use std::countr_zero instead
+            unsigned int position = 0;
+            while (n > 1) {
+                n >>= 1;
+                ++position;
+            }
             formatted_value = fmt::format("1 << {}", position);
         } else {
             // Format as hex with 0x prefix
