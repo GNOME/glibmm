@@ -14,6 +14,8 @@
  * with this program; if not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "mmgir.h"
+
 #include "gen_defs.h"
 
 #include "type_resolver.h"
@@ -243,7 +245,7 @@ void generate_extended_enum_def(std::ostream& os, const Enum& enumeration,
 
     if (std::any_of(enumeration.members.begin(), enumeration.members.end(),
                     [](const Member& m) { return !m.nickname; })) {
-        fmt::println("WARN: Missing glib:nick for members in enum {}", enumeration.name);
+        LOG_WARNV("Missing glib:nick for members in enum {}", enumeration.name);
     }
 
     for (const Member& member : enumeration.members) {
@@ -287,8 +289,7 @@ void generate_extended_bitfield_def(std::ostream& os, const Bitfield& bitfield,
 
     if (std::any_of(bitfield.members.begin(), bitfield.members.end(),
                     [](const Member& m) { return !m.nickname; })) {
-        fmt::println("WARN: Missing glib:nick for members in bitfield {}",
-                     bitfield.name);
+        LOG_WARNV("Missing glib:nick for members in bitfield {}", bitfield.name);
     }
 
     for (const Member& member : bitfield.members) {
@@ -303,30 +304,18 @@ void generate_extended_bitfield_def(std::ostream& os, const Bitfield& bitfield,
         try {
             n = std::stoul(member.value.c_str(), nullptr, AUTO_DETECT_BASE);
         } catch (const std::out_of_range& e) {
-            fmt::println(
-                stderr,
-                "ERROR: Failed to parse bitfield '{}' member '{}': {}",
-                bitfield.name,
-                converted_name,
-                e.what());
+            LOG_ERRORV("Failed to parse bitfield '{}' member '{}': {}",
+                       bitfield.name, converted_name, e.what());
             continue;
         } catch (const std::invalid_argument& e) {
-            fmt::println(
-                stderr,
-                "ERROR: Failed to parse bitfield '{}' member '{}': {}",
-                bitfield.name,
-                converted_name,
-                e.what());
+            LOG_ERRORV("Failed to parse bitfield '{}' member '{}': {}",
+                       bitfield.name, converted_name, e.what());
             continue;
         }
 
         if (n > std::numeric_limits<std::uint32_t>::max()) {
-            fmt::println(
-                stderr,
-                "ERROR: Bitfield '{}' member '{}' requires more than 32 bits to represent: {}",
-                bitfield.name,
-                converted_name,
-                n);
+            LOG_ERRORV("Bitfield '{}' member '{}' requires more than 32 bits to represent: {}",
+                       bitfield.name, converted_name, n);
             continue;
         }
 
@@ -370,13 +359,10 @@ std::string flatten_any_type(const AnyType& any_type)
             if (type->c_type) {
                 return *(type->c_type);
             } else if (type->name) {
-                fmt::println(stderr, "ERROR: Using name of type with no C type: {}",
-                             *(type->name));
+                LOG_ERRORV("Using name of type with no C type: {}", *(type->name));
                 return *(type->name);
             } else {
-                fmt::println(
-                    stderr,
-                    "ERROR: Using type with no name or C type! Falling back to void");
+                LOG_ERROR("Using type with no name or C type! Falling back to void");
                 return "void";
             }
         },
@@ -449,8 +435,7 @@ void generate_func_def(std::ostream& os, const FunctionInline& func)
     if (is_skippable(func.attributes)) return;
 
     if (!func.attributes.c_identifier) {
-        fmt::println(stderr, "ERROR: Free function '{}' has no C identifier",
-                     func.attributes.name);
+        LOG_ERRORV("Free function '{}' has no C identifier", func.attributes.name);
     }
     std::string_view func_name = func.attributes.c_identifier.value();
 
@@ -484,8 +469,8 @@ void generate_constructor_def(std::ostream& os, const Constructor& constructor,
     if (is_skippable(func)) return;
 
     if (!func.attributes.c_identifier) {
-        fmt::println(stderr, "ERROR: Constructor '{}' of '{}' has no C identifier",
-                     func.attributes.name, object);
+        LOG_ERRORV("Constructor '{}' of '{}' has no C identifier",
+                   func.attributes.name, object);
     }
     std::string_view func_name = func.attributes.c_identifier.value();
 
@@ -519,8 +504,8 @@ void generate_method_def_using_func(std::ostream& os, const FunctionInline& func
     if (is_skippable(func)) return;
 
     if (!func.attributes.c_identifier) {
-        fmt::println(stderr, "ERROR: Method '{}' of '{}' has no C identifier",
-                     func.attributes.name, object);
+        LOG_ERRORV("Method '{}' of '{}' has no C identifier",
+                   func.attributes.name, object);
     }
     std::string_view func_name = func.attributes.c_identifier.value();
 
@@ -649,8 +634,8 @@ void generate_property_def(std::ostream& os, const Property& property,
     if (prop_type) {
         fmt::print(os, "  (prop-type \"{}\")\n", *prop_type);
     } else {
-        fmt::println(stderr, "ERROR: Property '{}.{}:{}' has unresolved type",
-                     context.ns_name, context.object_name, property.name);
+        LOG_ERRORV("Property '{}.{}:{}' has unresolved type",
+                   context.ns_name, context.object_name, property.name);
     }
 
     fmt::print(os, "  (docs \"\")\n");
@@ -697,8 +682,8 @@ void generate_signal_def(std::ostream& os, const Signal& signal,
         std::replace(return_type->begin(), return_type->end(), ' ', '-');
         fmt::print(os, "  (return-type \"{}\")\n", *return_type);
     } else {
-        fmt::println(stderr, "ERROR: Signal '{}.{}:{}' has unresolved return type",
-                     ns_name, object, signal.name);
+        LOG_ERRORV("Signal '{}.{}:{}' has unresolved type",
+                   ns_name, object, signal.name);
     }
 
     std::string flags;
@@ -755,9 +740,8 @@ void generate_signal_def(std::ostream& os, const Signal& signal,
             }
             fmt::print(os, "    '(\"{}\" \"{}\")\n", *resolved, param_name);
         } else {
-            fmt::println(
-                stderr, "ERROR: Signal '{}.{}:{}' has unresolved type for param '{}'",
-                ns_name, object, signal.name, param_name);
+            LOG_ERRORV("Signal '{}.{}:{}' has unresolved type for param '{}'",
+                       ns_name, object, signal.name, param_name);
         }
     };
 
@@ -868,7 +852,7 @@ void generate_record_function_defs(std::ostream& os, const Record& record)
     if (is_skippable(record)) return;
 
     if (!record.c_type) {
-        fmt::println(stderr, "ERROR: Record {} with no C type", record.name);
+        LOG_ERRORV("Record '{}' with no C type", record.name);
     }
     std::string_view type_name = record.c_type.value();
 
@@ -916,16 +900,13 @@ void ParamProcessor::print_param(std::string_view curr_indent,
         const Param& param = *curr;
 
         if (!param.type) {
-            fmt::println(stderr, "ERROR: Free function '{}' has param with no type",
-                         func);
+            LOG_ERRORV("Free function '{}' has param with no type", func);
         }
 
         const auto visitor = overloads {
             [&](const AnyType& any_type) {
                 if (!param.name) {
-                    fmt::println(stderr,
-                                 "ERROR: Free function '{}' has param with no name",
-                                 func);
+                    LOG_ERRORV("Free function '{}' has param with no name", func);
                 }
 
                 std::string converted = flatten_any_type(any_type);
@@ -950,7 +931,7 @@ void generate_extended_enum_defs(std::ostream& os, const Repository& repo)
         if (ns.name) {
             fmt::print(os, ";; Namespace {}\n", *(ns.name));
         } else {
-            fmt::println("WARN: Missing name for namespace");
+            LOG_WARN("Missing name for namespace");
             fmt::print(os, ";; Namespace\n");
         }
 
@@ -974,7 +955,7 @@ void generate_function_defs(std::ostream& os, const gir::Repository& repo)
         const auto identifier_prefixes = build_identifier_prefixes(repo, ns);
         fmt::println("Identifier prefixes: {}", fmt::join(identifier_prefixes, ", "));
         if (identifier_prefixes.empty()) {
-            fmt::println("WARN: No identifier prefixes provided!");
+            LOG_WARN("No identifier prefixes provided!");
         }
 
         fmt::print(os, "\n;; Objects for namespace {}\n\n", *(ns.name));

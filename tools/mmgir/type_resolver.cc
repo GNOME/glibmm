@@ -14,6 +14,8 @@
  * with this program; if not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "mmgir.h"
+
 #include "type_resolver.h"
 
 #include <fmt/format.h>
@@ -21,14 +23,13 @@
 #include <map>
 #include <set>
 
-#define LOG_ERROR(msg) \
+#define RECORD_ERROR(msg) \
     m_has_errors = true; \
-    fmt::println(stderr, "ERROR: {}", msg);
+    LOG_ERROR(msg);
 
-#define LOG_ERRORV(fmt_str, ...) \
+#define RECORD_ERRORV(fmt_str, ...) \
     m_has_errors = true; \
-    fmt::print(stderr, "ERROR: "); \
-    fmt::println(stderr, fmt_str, __VA_ARGS__);
+    LOG_ERRORV(fmt_str, __VA_ARGS__);
 
 using namespace gir;
 
@@ -166,9 +167,9 @@ void TypeMapper::record_mapping(std::string_view name,
     auto it = m_resolver.m_name_to_type_info.find(qualified_name);
     if (it != m_resolver.m_name_to_type_info.end()) {
         if (it->second.c_type != c_type) {
-            LOG_ERRORV("Type '{}' has inconsistent C types:", qualified_name);
-            LOG_ERRORV("  {}", it->second.c_type);
-            LOG_ERRORV("  {}", c_type);
+            RECORD_ERRORV("Type '{}' has inconsistent C types:", qualified_name);
+            RECORD_ERRORV("  {}", it->second.c_type);
+            RECORD_ERRORV("  {}", c_type);
         }
     } else {
         m_resolver.m_name_to_type_info.emplace(
@@ -449,7 +450,7 @@ void TypeResolver::register_repo_types(const Repository& repo)
 {
     for (const auto& ns : repo.namespaces) {
         if (!ns.name) {
-            LOG_ERROR("Skipping namespace without name");
+            RECORD_ERROR("Skipping namespace without name");
             continue;
         }
 

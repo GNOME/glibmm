@@ -14,6 +14,8 @@
  * with this program; if not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "mmgir.h"
+
 #include "parse_gir.h"
 
 #include "type_resolver.h"
@@ -27,14 +29,19 @@
 #include <functional>
 #include <queue>
 
-#define LOG_ERROR(lineno, msg) \
+#define PARSE_ERROR(lineno, msg) \
     m_has_errors = true; \
-    fmt::println(stderr, "ERROR (line={}): {}", lineno, msg);
+    LOG_ERRORV("[line={}] {}", lineno, msg);
 
-#define LOG_ERRORV(lineno, fmt_str, ...) \
+#define PARSE_ERRORV(lineno, fmt_str, ...) \
     m_has_errors = true; \
-    fmt::print(stderr, "ERROR (line={}): ", lineno); \
-    fmt::println(stderr, fmt_str, __VA_ARGS__);
+    LOG_ERRORV("[line={}] {}", lineno, __VA_ARGS__);
+
+#define PARSE_WARN(lineno, msg) \
+    LOG_WARNV("[line={}] {}", lineno, msg);
+
+#define PARSE_WARNV(lineno, fmt_str, ...) \
+    LOG_WARNV("[line={}] {}", lineno, __VA_ARGS__);
 
 using namespace gir;
 using namespace tinyxml2;
@@ -180,42 +187,43 @@ public:
 private:
     void warn_unknown(const XMLElement* parent, const XMLElement* child) {
         if (m_warn_unknown) {
-            fmt::println("WARN (line={}): Unknown '{}' child element '{}'",
-                         child->GetLineNum(), parent->Name(), child->Name());
+            PARSE_WARNV(child->GetLineNum(), "Unknown '{}' child element of '{}'",
+                        parent->Name(), child->Name());
         }
     }
     void warn_unknown(const XMLElement* parent, const XMLAttribute* attr) {
         if (m_warn_unknown) {
-            fmt::println("WARN (line={}): Unknown '{}' attribute '{}'",
-                         attr->GetLineNum(), parent->Name(), attr->Name());
+            PARSE_WARNV(attr->GetLineNum(), "Unknown '{}' attribute '{}'",
+                        parent->Name(), attr->Name());
         }
     }
 
     void warn_ignored(const XMLElement* parent, const XMLElement* child) {
         if (m_warn_ignored) {
-            fmt::println("WARN (line={}): Ignored '{}' child element '{}'",
-                         child->GetLineNum(), parent->Name(), child->Name());
+            PARSE_WARNV(child->GetLineNum(), "Ignored '{}' child element '{}'",
+                        parent->Name(), child->Name());
         }
     }
 
     void warn_ignored(const XMLElement* parent, const XMLAttribute* attr) {
         if (m_warn_ignored) {
-            fmt::println("WARN (line={}): Ignored '{}' attribute '{}'",
-                         attr->GetLineNum(), parent->Name(), attr->Name());
+            PARSE_WARNV(attr->GetLineNum(), "Ignored '{}' attribute '{}'",
+                        parent->Name(), attr->Name());
         }
     }
 
     void warn_deprecated(const XMLElement* parent, const XMLElement* child) {
         if (m_warn_ignored || m_warn_deprecated) {
-            fmt::println("WARN (line={}): Ignored '{}' deprecated child element '{}'",
-                         child->GetLineNum(), parent->Name(), child->Name());
+            PARSE_WARNV(child->GetLineNum(),
+                        "Ignored '{}' deprecated child element '{}'",
+                        parent->Name(), child->Name());
         }
     }
 
     void warn_deprecated(const XMLElement* parent, const XMLAttribute* attr) {
         if (m_warn_ignored || m_warn_deprecated) {
-            fmt::println("WARN (line={}): Ignored '{}' deprecated attribute '{}'",
-                         attr->GetLineNum(), parent->Name(), attr->Name());
+            PARSE_WARNV(attr->GetLineNum(), "Ignored '{}' deprecated attribute '{}'",
+                        parent->Name(), attr->Name());
         }
     }
 
@@ -267,7 +275,7 @@ std::optional<bool> Parser::parse_opt_bool(const XMLAttribute* attr)
     } else if (value == "1") {
         return true;
     } else {
-        LOG_ERRORV(attr->GetLineNum(), "Unknown bool {}", value);
+        PARSE_ERRORV(attr->GetLineNum(), "Unknown bool {}", value);
         return std::nullopt;
     }
 }
@@ -280,7 +288,7 @@ Dir Parser::parse_dir(const XMLAttribute* attr)
     if (value == "out") return Dir::OUT;
     if (value == "inout") return Dir::INOUT;
 
-    LOG_ERRORV(attr->GetLineNum(), "Unknown direction {}", value);
+    PARSE_ERRORV(attr->GetLineNum(), "Unknown direction {}", value);
     return Dir::INOUT;
 }
 
@@ -292,7 +300,7 @@ RunSignal Parser::parse_run_signal(const XMLAttribute* attr)
     if (value == "last") return RunSignal::LAST;
     if (value == "cleanup") return RunSignal::CLEANUP;
 
-    LOG_ERRORV(attr->GetLineNum(), "Unknown when {}", value);
+    PARSE_ERRORV(attr->GetLineNum(), "Unknown when {}", value);
     return RunSignal::FIRST;
 }
 
@@ -305,7 +313,7 @@ Scope Parser::parse_scope(const XMLAttribute* attr)
     if (value == "call") return Scope::CALL;
     if (value == "forever") return Scope::FOREVER;
 
-    LOG_ERRORV(attr->GetLineNum(), "Unknown scope {}", value);
+    PARSE_ERRORV(attr->GetLineNum(), "Unknown scope {}", value);
     return Scope::CALL;
 }
 
@@ -317,7 +325,7 @@ Stability Parser::parse_stability(const XMLAttribute* attr)
     if (value == "Unstable") return Stability::UNSTABLE;
     if (value == "Private") return Stability::PRIVATE;
 
-    LOG_ERRORV(attr->GetLineNum(), "Unknown stability {}", value);
+    PARSE_ERRORV(attr->GetLineNum(), "Unknown stability {}", value);
     return Stability::UNKNOWN;
 }
 
@@ -329,7 +337,7 @@ TransferOwnership Parser::parse_ownership(const XMLAttribute* attr)
     if (value == "container") return TransferOwnership::CONTAINER;
     if (value == "full") return TransferOwnership::FULL;
 
-    LOG_ERRORV(attr->GetLineNum(), "Unknown ownership {}", value);
+    PARSE_ERRORV(attr->GetLineNum(), "Unknown ownership {}", value);
     return TransferOwnership::NONE;
 }
 
@@ -350,7 +358,7 @@ std::vector<std::string> Parser::parse_id_prefixes(const XMLAttribute* attr)
 
     for (const auto& prefix : prefixes) {
         if (!std::all_of(prefix.begin(), prefix.end(), is_legal_prefix_char)) {
-            LOG_ERRORV(attr->GetLineNum(), "Bad identifier prefix {}", prefix);
+            PARSE_ERRORV(attr->GetLineNum(), "Bad identifier prefix {}", prefix);
         }
     }
 
@@ -374,7 +382,7 @@ std::vector<std::string> Parser::parse_symbol_prefixes(const XMLAttribute* attr)
 
     for (const auto& prefix : prefixes) {
         if (!std::all_of(prefix.begin(), prefix.end(), is_legal_prefix_char)) {
-            LOG_ERRORV(attr->GetLineNum(), "Bad symbol prefix {}", prefix);
+            PARSE_ERRORV(attr->GetLineNum(), "Bad symbol prefix {}", prefix);
         }
     }
 
@@ -546,8 +554,7 @@ Type* Parser::parse_type(const XMLElement* element)
     }
 
     if (!type->name && !type->c_type) {
-        fmt::println("WARN (line={}): Type with neither name nor C type",
-                     element->GetLineNum());
+        PARSE_WARN(element->GetLineNum(), "Type with neither name nor C type");
     }
 
     Type* raw_ptr = type.get();
@@ -652,7 +659,7 @@ Param Parser::parse_param(const XMLElement* element)
     }
 
     if (!param.type) {
-        LOG_ERROR(element->GetLineNum(), "Param with no type");
+        PARSE_ERROR(element->GetLineNum(), "Param with no type");
     }
 
     return param;
@@ -927,7 +934,7 @@ Documentation Parser::parse_doc(const XMLElement* element)
 
     const char* text = element->GetText();
     if (!text) {
-        LOG_ERROR(element->GetLineNum(), "Doc is missing text");
+        PARSE_ERROR(element->GetLineNum(), "Doc is missing text");
     } else {
         doc.text = text;
     }
@@ -982,8 +989,8 @@ FunctionInline Parser::parse_inline_function(const XMLElement* element)
     }
 
     if (found_inst_param) {
-        LOG_ERRORV(element->GetLineNum(), "Free function '{}' takes instance parameter",
-                   function.attributes.name);
+        PARSE_ERRORV(element->GetLineNum(), "Free function '{}' takes instance parameter",
+                      function.attributes.name);
     }
 
     return function;
@@ -1006,8 +1013,8 @@ Function Parser::parse_function(const XMLElement* element)
     }
 
     if (found_inst_param) {
-        LOG_ERRORV(element->GetLineNum(), "Free function '{}' takes instance parameter",
-                   function.detail.attributes.name);
+        PARSE_ERRORV(element->GetLineNum(), "Free function '{}' takes instance parameter",
+                      function.detail.attributes.name);
     }
 
     return function;
@@ -1184,8 +1191,8 @@ MethodInline Parser::parse_inline_method(const XMLElement* element)
     }
 
     if (!found_inst_param) {
-        LOG_ERRORV(element->GetLineNum(), "Method '{}' missing instance parameter",
-                   method.func.detail.attributes.name);
+        PARSE_ERRORV(element->GetLineNum(), "Method '{}' missing instance parameter",
+                      method.func.detail.attributes.name);
     }
 
     return method;
@@ -1222,8 +1229,8 @@ Method Parser::parse_method(const XMLElement* element)
     }
 
     if (!found_inst_param) {
-        LOG_ERRORV(element->GetLineNum(), "Method '{}' missing instance parameter",
-                   method.func.detail.attributes.name);
+        PARSE_ERRORV(element->GetLineNum(), "Method '{}' missing instance parameter",
+                      method.func.detail.attributes.name);
     }
 
     return method;
@@ -1289,7 +1296,7 @@ Namespace Parser::parse_namespace(const XMLElement* element)
     }
 
     if (!ns.name) {
-        LOG_ERROR(element->GetLineNum(), "Namespace without a name is not supported!");
+        PARSE_ERROR(element->GetLineNum(), "Namespace without a name is not supported!");
     }
 
     return ns;
@@ -1483,15 +1490,15 @@ Signal Parser::parse_signal(const XMLElement* element)
     }
 
     if (found_inst_param) {
-        LOG_ERRORV(element->GetLineNum(), "Signal '{}' takes instance parameter",
-                   signal.name);
+        PARSE_ERRORV(element->GetLineNum(), "Signal '{}' takes instance parameter",
+                      signal.name);
     }
     if (signal.params) {
         for (const Param& param : signal.params->params) {
             if (!param.type) continue;
             if (std::holds_alternative<VarArgs>(*(param.type))) {
-                LOG_ERRORV(element->GetLineNum(), "Signal '{}' has var args",
-                           signal.name);
+                PARSE_ERRORV(element->GetLineNum(), "Signal '{}' has var args",
+                              signal.name);
             }
         }
     }
@@ -1528,9 +1535,9 @@ VirtualMethod Parser::parse_virtual_method(const XMLElement* element)
     }
 
     if (!found_inst_param) {
-        LOG_ERRORV(element->GetLineNum(),
-                   "Virtual method '{}' missing instance parameter",
-                   method.func.detail.attributes.name);
+        PARSE_ERRORV(element->GetLineNum(),
+                      "Virtual method '{}' missing instance parameter",
+                      method.func.detail.attributes.name);
     }
 
     return method;
@@ -1608,8 +1615,8 @@ bool Parser::parse_doc_elements(const XMLElement* element, std::string_view elem
     } else if (element_name == "doc-version" || element_name == "doc-stability"
                || element_name == "doc-deprecated") {
         if (m_warn_ignored) {
-            fmt::println("WARN (line={}): Ignored child element '{}'",
-                         element->GetLineNum(), element_name);
+            PARSE_WARNV(element->GetLineNum(), "Ignored child element '{}'",
+                        element_name);
         }
         return true;
     } else {
@@ -1711,7 +1718,7 @@ bool Parser::populate_str_attr(const XMLElement* element, std::string_view attr,
 {
     const char* value = element->Attribute(attr.data());
     if (!value) {
-        LOG_ERRORV(element->GetLineNum(), "{} is missing {}", pod, attr);
+        PARSE_ERRORV(element->GetLineNum(), "{} is missing {}", pod, attr);
         return false;
     } else {
         dest = value;
@@ -1838,8 +1845,7 @@ void GirSearch::run(const ParseArgs& args)
     }
 
     if (missing_dependencies.size() > 0) {
-        fmt::println("WARN: Missing dependencies: {}",
-                     fmt::join(missing_dependencies, ", "));
+        LOG_WARNV("Missing dependencies: {}", fmt::join(missing_dependencies, ", "));
     }
     if (found_errors) {
         throw GirParseError("Errors occured during parsing of dependency GIR files");
