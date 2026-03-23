@@ -298,44 +298,13 @@ void generate_extended_bitfield_def(std::ostream& os, const Bitfield& bitfield,
             std::replace(converted_name.begin(), converted_name.end(), '_', '-');
         }
 
-        std::string formatted_value;
-        constexpr int AUTO_DETECT_BASE = 0;
-        unsigned long n = 0;
-        try {
-            n = std::stoul(member.value.c_str(), nullptr, AUTO_DETECT_BASE);
-        } catch (const std::out_of_range& e) {
-            LOG_ERRORV("Failed to parse bitfield '{}' member '{}': {}",
-                       bitfield.name, converted_name, e.what());
-            continue;
-        } catch (const std::invalid_argument& e) {
-            LOG_ERRORV("Failed to parse bitfield '{}' member '{}': {}",
-                       bitfield.name, converted_name, e.what());
-            continue;
-        }
+        std::optional<std::string> formatted_value =
+            format_bitfield_members(bitfield.name, converted_name, member.value);
 
-        if (n > std::numeric_limits<std::uint32_t>::max()) {
-            LOG_ERRORV("Bitfield '{}' member '{}' requires more than 32 bits to represent: {}",
-                       bitfield.name, converted_name, n);
-            continue;
+        if (formatted_value) {
+            fmt::print(os, "    '(\"{}\" \"{}\" \"{}\")\n",
+                       converted_name, member.c_identifier, *formatted_value);
         }
-
-        // Use 1 << N format for flags (i.e. power of two values)
-        // TODO(C++20): Use std::popcount instead
-        if ((n > 0) && ((n & (n - 1)) == 0)) {
-            // TODO(C++20): Use std::countr_zero instead
-            unsigned int position = 0;
-            while (n > 1) {
-                n >>= 1;
-                ++position;
-            }
-            formatted_value = fmt::format("1 << {}", position);
-        } else {
-            // Format as hex with 0x prefix
-            formatted_value = fmt::format("{:#x}", n);
-        }
-
-        fmt::print(os, "    '(\"{}\" \"{}\" \"{}\")\n",
-                   converted_name, member.c_identifier, formatted_value);
     }
 
     fmt::print(os, "  )\n");
@@ -1057,4 +1026,89 @@ void generate_vfunc_defs(std::ostream& os, const gir::Repository& repo)
             }
         }
     }
+}
+
+std::optional<std::string> format_bitfield_members(
+    std::string_view bitfield_name,
+    std::string_view member_name,
+    std::string_view member_value)
+{
+    auto format_as_signed_negative = [&](std::string_view name, std::string_view value,
+                                         unsigned long n)
+        -> std::optional<std::string>
+    {
+        std::optional<std::string> formatted_value;
+
+        // Negate the value (two's complement back to positive magnitude)
+        unsigned long magnitude = ~n + 1;
+        if (magnitude > std::numeric_limits<std::int32_t>::max()) {
+            LOG_ERRORV(
+                "Bitfield '{}' member '{}' requires more than 32 bits to represent: {}",
+                bitfield_name, name, value);
+            return formatted_value;
+        }
+
+        // Format as hex with 0x prefix
+        formatted_value = fmt::format("-{:#x}", magnitude);
+
+        return formatted_value;
+    };
+
+    auto format_as_unsigned = [&](std::string_view name, std::string_view value,
+                                  unsigned long n)
+        -> std::optional<std::string>
+    {
+        std::optional<std::string> formatted_value;
+
+        if (n > static_cast<unsigned long>(std::numeric_limits<std::uint32_t>::max())) {
+            LOG_ERRORV(
+                "Bitfield '{}' member '{}' requires more than 32 bits to represent: {}",
+                bitfield_name, name, value);
+            return formatted_value;
+        }
+
+        // Use 1 << N format for flags (i.e. power of two values)
+        // TODO(C++20): Use std::popcount instead
+        if ((n > 0) && ((n & (n - 1)) == 0)) {
+            // TODO(C++20): Use std::countr_zero instead
+            unsigned int position = 0;
+            while (n > 1) {
+                n >>= 1;
+                ++position;
+            }
+            formatted_value = fmt::format("1 << {}", position);
+        } else {
+            // Format as hex with 0x prefix
+            formatted_value = fmt::format("{:#x}", n);
+        }
+
+        return formatted_value;
+    };
+
+    constexpr int AUTO_DETECT_BASE = 0;
+    unsigned long n = 0;
+    try {
+        n = std::stoul(member_value.data(), nullptr, AUTO_DETECT_BASE);
+    } catch (const std::out_of_range& e) {
+        LOG_ERRORV("Failed to parse bitfield '{}' member '{}': {}",
+                   bitfield_name, member_name, e.what());
+        return std::nullopt;
+    } catch (const std::invalid_argument& e) {
+        LOG_ERRORV("Failed to parse bitfield '{}' member '{}': {}",
+                   bitfield_name, member_name, e.what());
+        return std::nullopt;
+    }
+
+    std::optional<std::string> formatted_value;
+
+    // We assume bit fields should be treated/parsed as unsigned integers.
+    // However, sometimes the gir string has a negative sign. Parse as a
+    // signed integer instead of match enumextract.py.
+    if (member_value.find('-') == 0) {
+        formatted_value = format_as_signed_negative(member_name, member_value, n);
+    } else {
+        formatted_value = format_as_unsigned(member_name, member_value, n);
+    }
+
+    return formatted_value;
 }

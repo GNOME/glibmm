@@ -19,6 +19,8 @@
 #include "schema.h"
 
 #include <iostream>
+#include <optional>
+#include <string_view>
 
 class TypeResolver;
 
@@ -27,3 +29,10 @@ void generate_function_defs(std::ostream& os, const gir::Repository& repo);
 void generate_signal_defs(std::ostream& os, const gir::Repository& repo,
                           const TypeResolver& type_resolver);
 void generate_vfunc_defs(std::ostream& os, const gir::Repository& repo);
+
+// Exposed for unit testing purposes
+
+std::optional<std::string> format_bitfield_members(
+    std::string_view bitfield_name,
+    std::string_view member_name,
+    std::string_view member_value);
