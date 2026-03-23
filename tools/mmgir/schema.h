@@ -359,7 +359,7 @@ struct Property
     std::optional<bool> is_set_only_during_construction;
     std::optional<std::string> setter_func;
     std::optional<std::string> getter_func;
-    std::optional<std::string> default_value;
+    std::optional<std::string> default_value;  // Can have a value of "NULL"
     std::optional<TransferOwnership> ownership;
 
     InfoElements info_elements;

@@ -570,6 +570,9 @@ void generate_vfunc_def(std::ostream& os, const VirtualMethod& vfunc,
 
     fmt::print(os, "(define-vfunc {}\n", func_name);
     fmt::print(os, "  (of-object \"{}\")\n", object);
+    if (func.attributes.info_attributes.is_deprecated.value_or(false)) {
+        fmt::print(os, "  (deprecated #t)\n");
+    }
     fmt::print(os, "  (return-type \"{}\")\n",
                process_return_type(func.return_type, VOID_RETURN));
 
@@ -633,6 +636,9 @@ void generate_property_def(std::ostream& os, const Property& property,
 
     fmt::print(os, "(define-property {}\n", property.name);
     fmt::print(os, "  (of-object \"{}\")\n", context.object_name);
+    if (property.info_attributes.is_deprecated.value_or(false)) {
+        fmt::print(os, "  (deprecated #t)\n");
+    }
 
     std::optional<std::string> prop_type =
         context.type_resolver->find_property_type(property, context.ns_name);
@@ -653,7 +659,13 @@ void generate_property_def(std::ostream& os, const Property& property,
     fmt::print(os, "  (construct-only {})\n",
                convert_bool(property.is_set_only_during_construction, false));
     if (property.default_value) {
-        fmt::print(os, "  (default-value \"{}\")\n", *(property.default_value));
+        // Behaviour from generate_extra_defs.cc:
+        // A NULL property default value becomes an empty string
+        if (*(property.default_value) == "NULL") {
+            fmt::print(os, "  (default-value \"\")\n");
+        } else {
+            fmt::print(os, "  (default-value \"{}\")\n", *(property.default_value));
+        }
     }
     fmt::print(os, ")\n\n");
 }
@@ -676,6 +688,9 @@ void generate_signal_def(std::ostream& os, const Signal& signal,
 
     fmt::print(os, "(define-signal {}\n", signal.name);
     fmt::print(os, "  (of-object \"{}\")\n", object);
+    if (signal.info_attributes.is_deprecated.value_or(false)) {
+        fmt::print(os, "  (deprecated #t)\n");
+    }
     std::optional<std::string> return_type =
         type_resolver.resolve_return_type(signal.return_type, ns_name);
     if (return_type) {
