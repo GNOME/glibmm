@@ -15,6 +15,7 @@
  */
 
 #include "gen_defs.h"
+#include "mmgir.h"
 #include "parse_gir.h"
 #include "type_resolver.h"
 
@@ -91,7 +92,7 @@ int main(int argc, char** argv)
             input_repos.push_back(load_repository_from_file(filepath, args));
         }
     } catch (const GirParseError& e) {
-        fmt::println(stderr, "ERROR: {}", e.what());
+        LOG_ERRORV("{}", e.what());
         return 1;
     }
 
@@ -105,7 +106,7 @@ int main(int argc, char** argv)
         load_supporting_repositories(supporting_girs, args, supporting_repos,
                                      type_resolver);
     } catch (const GirParseError& e) {
-        fmt::println(stderr, "ERROR: {}", e.what());
+        LOG_ERRORV("{}", e.what());
         return 1;
     }
 
@@ -113,7 +114,7 @@ int main(int argc, char** argv)
         search_for_included_namespaces(search_paths, args, input_repos,
                                        supporting_repos, type_resolver);
     } catch (const GirParseError& e) {
-        fmt::println(stderr, "ERROR: {}", e.what());
+        LOG_ERRORV("{}", e.what());
         return 1;
     }
 

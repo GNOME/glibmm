@@ -35,7 +35,9 @@ namespace gir {
 
 struct ArrayType;
 struct Namespace;
+struct Record;
 struct Type;
+struct Union;
 
 enum class Dir { IN, OUT, INOUT };
 enum class RunSignal { FIRST, LAST, CLEANUP };
@@ -382,6 +384,25 @@ struct Signal
     std::optional<CallableReturn> return_type;
 };
 
+struct Union
+{
+    InfoAttributes info_attributes;
+    std::optional<std::string> name;
+    std::optional<std::string> c_type;
+    std::optional<std::string> symbol_prefix;
+    std::optional<std::string> glib_type_name;
+    std::optional<std::string> glib_type_func;
+    std::optional<std::string> copy_function;
+    std::optional<std::string> free_function;
+
+    InfoElements info_elements;
+    std::vector<Constructor> constructors;
+    std::vector<Method> methods;
+    std::vector<MethodInline> inline_methods;
+    std::vector<Function> functions;
+    std::vector<FunctionInline> inline_functions;
+};
+
 struct Record
 {
     InfoAttributes info_attributes;
@@ -389,6 +410,7 @@ struct Record
     std::optional<std::string> c_type;
     std::optional<std::string> glib_type_name;
     std::optional<std::string> glib_type_func;
+    std::optional<std::string> symbol_prefix;
     std::optional<std::string> for_gtype_struct;
     std::optional<std::string> copy_function;
     std::optional<std::string> free_function;
@@ -466,6 +488,7 @@ struct Class
     std::vector<VirtualMethod> virtual_methods;
     std::vector<Property> properties;
     std::vector<Signal> signals;
+    std::vector<Union> unions;
     std::vector<Record> records;
 };
 
@@ -491,6 +514,7 @@ struct Namespace
     std::vector<Enum> enums;
     std::vector<Function> functions;
     std::vector<FunctionInline> inline_functions;
+    std::vector<Union> unions;
     std::vector<Bitfield> bitfields;
     std::vector<Annotation> annotations;
     std::vector<DocSection> doc_sections;
@@ -503,7 +527,8 @@ struct Namespace
 template <class T>
 bool is_skippable(const T& obj)
 {
-    // Ignore private objects
+    // Ignore nameless and private objects
+    if (obj.name.empty()) return true;
     if (obj.name.at(0) == '_') return true;
     return false;
 }
@@ -513,6 +538,16 @@ inline bool is_skippable(const FunctionInline& func)
 {
     // Ignore nameless and private functions
     if (func.attributes.name.empty() || func.attributes.name.at(0) == '_') return true;
+    return false;
+}
+
+template <>
+inline bool is_skippable(const Union& plain_union)
+{
+    // Ignore nameless and private unions
+    if (!plain_union.name) return true;
+    if (plain_union.name->empty()) return true;
+    if (plain_union.name->at(0) == '_') return true;
     return false;
 }
 

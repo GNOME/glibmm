@@ -201,6 +201,11 @@ void TypeMapper::extract_simple_types()
     for (const Bitfield& bitfield : m_namespace.bitfields) {
         record_mapping(bitfield.name, bitfield.c_type, GParam::FLAGS);
     }
+    for (const Union& plain_union : m_namespace.unions) {
+        if (plain_union.name && plain_union.c_type) {
+            record_mapping(*(plain_union.name), *(plain_union.c_type), GParam::BOXED);
+        }
+    }
     for (const Record& record : m_namespace.records) {
         if (record.c_type) {
             record_mapping(record.name, *(record.c_type), GParam::BOXED);
@@ -264,6 +269,17 @@ void TypeMapper::find_unknown_types()
         find_for_functions(bitfield);
     }
 
+    auto find_for_union = [&](const Union& plain_union) {
+        if (is_skippable(plain_union)) return;
+
+        find_for_functions(plain_union);
+        find_for_methods(plain_union);
+        find_for_constructors(plain_union);
+    };
+    for (const Union& plain_union : m_namespace.unions) {
+        find_for_union(plain_union);
+    }
+
     auto find_for_record = [&](const Record& record) {
         if (is_skippable(record)) return;
 
@@ -293,6 +309,9 @@ void TypeMapper::find_unknown_types()
         find_for_methods(klass);
         find_for_virtual_methods(klass);
         find_for_constructors(klass);
+        for (const Union& plain_union : klass.unions) {
+            find_for_union(plain_union);
+        }
         for (const Record& record : klass.records) {
             find_for_record(record);
         }

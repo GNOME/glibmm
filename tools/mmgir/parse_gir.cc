@@ -147,6 +147,7 @@ public:
     Property parse_property(const XMLElement* element);
     Record parse_record(const XMLElement* element);
     Signal parse_signal(const XMLElement* element);
+    Union parse_union(const XMLElement* element);
     VirtualMethod parse_virtual_method(const XMLElement* element);
 
     CallableAttributes parse_callable_attributes(
@@ -904,10 +905,12 @@ Class Parser::parse_class(const XMLElement* element)
             klass.properties.push_back(parse_property(child));
         } else if (name == SIGNAL_ELEMENT) {
             klass.signals.push_back(parse_signal(child));
+        } else if (name == UNION_ELEMENT) {
+            klass.unions.push_back(parse_union(child));
         } else if (name == RECORD_ELEMENT) {
             klass.records.push_back(parse_record(child));
         } else if (name == FIELD_ELEMENT || name == CALLBACK_ELEMENT
-                   || name == CONSTANT_ELEMENT || name == UNION_ELEMENT) {
+                   || name == CONSTANT_ELEMENT) {
             warn_ignored(element, child);
         } else {
             warn_unknown(element, child);
@@ -1281,6 +1284,8 @@ Namespace Parser::parse_namespace(const XMLElement* element)
             ns.inline_functions.push_back(parse_inline_function(child));
         } else if (name == FUNCTION_MACRO_ELEMENT) {
             warn_ignored(element, child);
+        } else if (name == UNION_ELEMENT) {
+            ns.unions.push_back(parse_union(child));
         } else if (name == BITFIELD_ELEMENT) {
             ns.bitfields.push_back(parse_bitfield(child));
         } else if (name == ANNOTATION_ELEMENT) {
@@ -1399,7 +1404,7 @@ Record Parser::parse_record(const XMLElement* element)
         } else if (name == "glib:get-type") {
             record.glib_type_func = attr->Value();
         } else if (name == "c:symbol-prefix") {
-            warn_ignored(element, attr);
+            record.symbol_prefix = attr->Value();
         } else if (name == "foreign") {
             record.is_foreign = parse_opt_bool(attr);
         } else if (name == "glib:is-gtype-struct-for") {
@@ -1438,6 +1443,7 @@ Record Parser::parse_record(const XMLElement* element)
             warn_unknown(element, child);
         }
     }
+
     return record;
 }
 
@@ -1504,6 +1510,65 @@ Signal Parser::parse_signal(const XMLElement* element)
     }
 
     return signal;
+}
+
+Union Parser::parse_union(const XMLElement* element)
+{
+    Union parsed;
+
+    for (const XMLAttribute* attr = element->FirstAttribute(); attr; attr = attr->Next()) {
+        std::string_view name{attr->Name()};
+
+        if (parse_info_attributes(element, attr, name, parsed.info_attributes)) {
+            // Value set as side-effect
+        } else if (name == "name") {
+            parsed.name = attr->Value();
+        } else if (name == "c:type") {
+            parsed.c_type = attr->Value();
+        } else if (name == "c:symbol-prefix") {
+            parsed.symbol_prefix = attr->Value();
+        } else if (name == "glib:type-name") {
+            parsed.glib_type_name = attr->Value();
+        } else if (name == "glib:get-type") {
+            parsed.glib_type_func = attr->Value();
+        } else if (name == "copy-function") {
+            parsed.copy_function = attr->Value();
+        } else if (name == "free-function") {
+            parsed.free_function = attr->Value();
+        } else {
+            warn_unknown(element, attr);
+        }
+    }
+
+    for (const XMLElement* child = element->FirstChildElement(); child;
+         child = child->NextSiblingElement()) {
+
+        std::string_view name{child->Name()};
+
+        if (parse_info_elements(child, name, parsed.info_elements)) {
+            // Value set as side-effect
+        } else if (name == FIELD_ELEMENT) {
+            warn_ignored(element, child);
+        } else if (name == CONSTRUCTOR_ELEMENT) {
+            parsed.constructors.push_back(parse_constructor(child));
+        } else if (name == METHOD_ELEMENT) {
+            parsed.methods.push_back(parse_method(child));
+        } else if (name == METHOD_INLINE_ELEMENT) {
+            parsed.inline_methods.push_back(parse_inline_method(child));
+        } else if (name == FUNCTION_ELEMENT) {
+            parsed.functions.push_back(parse_function(child));
+        } else if (name == FUNCTION_INLINE_ELEMENT) {
+            parsed.inline_functions.push_back(parse_inline_function(child));
+        } else if (name == RECORD_ELEMENT) {
+            // Unions inside records sometimes don't have names which breaks
+            // gir-1.2 rnc rules... see Graphene-1.0.gir (PathPoint)
+            warn_ignored(element, child);
+        } else {
+            warn_unknown(element, child);
+        }
+    }
+
+    return parsed;
 }
 
 VirtualMethod Parser::parse_virtual_method(const XMLElement* element)
