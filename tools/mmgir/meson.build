@@ -2,9 +2,12 @@ catch2_dep = dependency('catch2-with-main',
   default_options : ['install=false', 'tests=false'],
   required : true,
 )
-cli11_dep = dependency('cli11', required : true)
+cli11_dep = dependency('CLI11', required : true)
 fmt_dep = dependency('fmt', required : true)
-tinyxml2_dep = dependency('tinyxml2', required : true)
+tinyxml2_dep = dependency('tinyxml2',
+  default_options : ['tests=false'],
+  required : true,
+)
 
 mmgir_sources = files(
   'gen_defs.cc',
