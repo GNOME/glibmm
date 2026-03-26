@@ -5,7 +5,9 @@
 #         gmmproc_conf_data, gmmproc, generate_wrap_init_pl
 
 subdir('extra_defs_gen')
-subdir('mmgir')
+if get_option('build-mmgir')
+  subdir('mmgir')
+endif
 
 install_procdir = install_libdir / glibmm_pcname / 'proc'
 
