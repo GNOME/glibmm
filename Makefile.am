@@ -67,8 +67,14 @@ EXTRA_DIST = \
   gio/meson.build \
   gio/giommconfig.h.meson \
   gio/giomm/meson.build \
+  subprojects/catch2.wrap \
+  subprojects/cli11.wrap \
+  subprojects/fmt.wrap \
   subprojects/glib.wrap \
+  subprojects/mm-common.wrap \
   subprojects/sigc++-3.0.wrap \
+  subprojects/tinyxml2.wrap \
+  subprojects/packagefiles/fmt/meson.build \
   tests/meson.build \
   tools/meson.build \
   tools/build_scripts/compile-schemas.py \
@@ -83,6 +89,18 @@ EXTRA_DIST = \
   tools/conf_tests/have_template_sequence_ctors.cc \
   tools/conf_tests/have_wide_stream.cc \
   tools/extra_defs_gen/meson.build \
+  tools/mmgir/gen_defs.cc \
+  tools/mmgir/gen_defs.h \
+  tools/mmgir/main.cc \
+  tools/mmgir/meson.build \
+  tools/mmgir/mmgir.h \
+  tools/mmgir/parse_gir.cc \
+  tools/mmgir/parse_gir.h \
+  tools/mmgir/README.md \
+  tools/mmgir/schema.h \
+  tools/mmgir/test_gen_defs.cc \
+  tools/mmgir/type_resolver.cc \
+  tools/mmgir/type_resolver.h \
   untracked/README
 
 # Auto-generate the ChangeLog file from the git log on make dist
