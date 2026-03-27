@@ -10,11 +10,15 @@
 #                         i.e. 3 levels above this file.
 # GMMPROC_GEN_BUILD_DIR   Top directory where built files are searched for.
 #                         Default value: $GMMPROC_GEN_SOURCE_DIR
+# GMMPROC_GEN_INSTALL_DIR Top directory where installed files are searched for.
+#                         Default value: $HOME/jhbuild/install
 #
 # If you use jhbuild, you can set these environment variables equal to jhbuild's
-# configuration variables checkoutroot and buildroot, respectively.
+# configuration variables checkoutroot, buildroot and prefix, respectively.
 # Usually you can leave GMMPROC_GEN_SOURCE_DIR undefined.
-# If you have set buildroot=None, GMMPROC_GEN_BUILD_DIR can also be undefined.
+# If you have set buildroot=None, GMMPROC_GEN_BUILD_DIR can be undefined.
+# If you have not defined prefix in $HOME/.config/jhbuildrc, and there is no /opt/gnome
+# directory, GMMPROC_GEN_INSTALL_DIR can be undefined.
 
 # Root directory of glibmm source files.
 root_dir="$(dirname "$0")/../.."
@@ -29,15 +33,23 @@ if [ -z "$GMMPROC_GEN_BUILD_DIR" ]; then
   GMMPROC_GEN_BUILD_DIR="$GMMPROC_GEN_SOURCE_DIR"
 fi
 
+# Where to search for installed files.
+if [ -z "$GMMPROC_GEN_INSTALL_DIR" ]; then
+  GMMPROC_GEN_INSTALL_DIR="$HOME/jhbuild/install"
+fi
+
 # Scripts in glibmm. These are source files.
 gen_docs="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/defs_gen/docextract_to_xml.py"
 gen_methods="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/defs_gen/h2def.py"
 gen_enums="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/defs_gen/enumextract.py"
 
 # Where to find executables that generate extra defs (signals and properties).
-# glibmm is built with autotools.
+# glibmm can be built with autotools.
 # autotools support, but don't require, non-source-dir builds.
 extra_defs_gen_dir="$GMMPROC_GEN_BUILD_DIR/glibmm/tools/extra_defs_gen"
+
+# Where to find the executable that generates defs files from GIR files.
+gen_with_mmgir="$GMMPROC_GEN_BUILD_DIR/glibmm/tools/mmgir/mmgir"
 
 source_prefix="$GMMPROC_GEN_SOURCE_DIR/glib"
 build_prefix="$GMMPROC_GEN_BUILD_DIR/glib"
