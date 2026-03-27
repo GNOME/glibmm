@@ -95,7 +95,7 @@ release_gcc_build:
   extends: .build_default
   stage: build
   variables:
-    DEPENDENCIES: $MESON_DEPS  $MMGIR_DEPS wget
+    DEPENDENCIES: $MESON_DEPS wget
   script:
     # Get libsigc++'s Doxygen tag file. It's published with the reference documentation.
     - DOXYTAG_PATH=$(pkg-config --variable=doxytagfile sigc++-3.0)
@@ -107,7 +107,7 @@ release_gcc_build:
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     # Don't use warning_level and werror. They are applied also to subprojects.
     # meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal -Dwarning_level=3 -Dwerror=true
-    - meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal -Dbuild-mmgir=true $GLIB_MESON_OPTIONS
+    - meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal $GLIB_MESON_OPTIONS
     - meson compile
     - 'meson test --suite glibmm:'
     - meson install --quiet
@@ -120,14 +120,14 @@ release_clang_build:
   extends: .build_default
   stage: build
   variables:
-    DEPENDENCIES: $MESON_DEPS clang
+    DEPENDENCIES: $MESON_DEPS $MMGIR_DEPS clang
   script:
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     # Accept warnings. See https://gitlab.gnome.org/GNOME/glibmm/-/issues/98
     # Don't use warning_level and werror. They are applied also to subprojects.
     # CC=clang CXX=clang++ meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max -Dwarning_level=3
-    - CC=clang CXX=clang++ meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max $GLIB_MESON_OPTIONS
+    - CC=clang CXX=clang++ meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max -Dbuild-mmgir=true $GLIB_MESON_OPTIONS
     - meson compile
     - 'meson test --suite glibmm:'
     - meson install --quiet
