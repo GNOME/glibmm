@@ -1836,7 +1836,7 @@ void GirSearch::load_gir_xml_files(const std::vector<std::string>& search_dirs)
             if (dir_entry.path().extension().string() != GIR_EXT) continue;
 
             auto doc = std::make_unique<XMLDocument>();
-            if (doc->LoadFile(dir_entry.path().c_str()) != XML_SUCCESS) continue;
+            if (doc->LoadFile(dir_entry.path().u8string().c_str()) != XML_SUCCESS) continue;
 
             const XMLElement* root = doc->FirstChildElement(REPOSITORY_ELEMENT);
             if (!root) continue;

@@ -245,6 +245,7 @@ if is_msvc
                                      # dangerous ones glaring, distributed with GLib
     '/EHsc',  # avoid warnings caused by exception handling model used
     '/utf-8', # Avoid C4819 unicode conversion warnings when building on CJK locales
+    '/wd4018', # Signed/unsigned mismatch
     '/wd4589', # Constructor of abstract class 'bb' ignores
                # initializer for virtual base class 'aa'
     '/wd4702', # unreachable code
