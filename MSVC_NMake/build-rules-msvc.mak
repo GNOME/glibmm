@@ -86,6 +86,12 @@ $<
 $<
 <<
 
+{..\tools\mmgir\}.cc{$(OUTDIR)\mmgir\}.obj::
+	@if not exist $(OUTDIR)\mmgir\ md $(OUTDIR)\mmgir
+	$(CXX) $(CFLAGS) $(MMGIR_DEPS_INCLUDES) /Fo$(OUTDIR)\mmgir\ /Fd$(OUTDIR)\mmgir\ /c @<<
+$<
+<<
+
 {.\glibmm\}.rc{$(OUTDIR)\glibmm\}.res:
 	@if not exist $(OUTDIR)\glibmm\ md $(OUTDIR)\glibmm
 	rc /fo$@ $<
@@ -106,6 +112,17 @@ $**
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
 
+$(OUTDIR)\mmgir.exe: $(mmgir_main_OBJ) $(mmgir_common_OBJS)
+	link $(LDFLAGS) $(MMGIR_LDFLAGS) /out:$@ @<<
+$**
+<<
+	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
+
+$(OUTDIR)\mmgir_test.exe: $(mmgir_test_OBJ) $(mmgir_common_OBJS)
+	link $(LDFLAGS) $(MMGIR_TEST_LDFLAGS) /out:$@ @<<
+$**
+<<
+	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
 # Rules for linking DLLs
 # Format is as follows (the mt command is needed for MSVC 2005/2008 builds):
@@ -146,6 +163,8 @@ clean:
 	@-if exist $(OUTDIR)\glibmm-tests del /f /q $(OUTDIR)\glibmm-tests\*.obj
 	@-if exist $(OUTDIR)\glibmm-tests del /f /q $(OUTDIR)\glibmm-tests\*.pdb
 	@-del /f /q $(OUTDIR)\gschemas.compiled
+	@-del /f /q $(OUTDIR)\mmgir\*.obj
+	@-del /f /q $(OUTDIR)\mmgir\*.pdb
 	@-del /f /q $(OUTDIR)\glibmm-examples\*.obj
 	@-del /f /q $(OUTDIR)\glibmm-examples\*.pdb
 	@-del $(OUTDIR)\glib-extra-defs-gen\*.pdb
@@ -163,6 +182,7 @@ clean:
 	@-del /f /q $(OUTDIR)\glibmm\private\*.h
 	@-del /f /q $(OUTDIR)\glibmm\*.h
 	@-if exist $(OUTDIR)\glibmm-tests rd $(OUTDIR)\glibmm-tests
+	@-rd $(OUTDIR)\mmgir
 	@-rd $(OUTDIR)\glibmm-examples
 	@-rd $(OUTDIR)\glib-extra-defs-gen
 	@-rd $(OUTDIR)\giomm\private

@@ -29,9 +29,9 @@ BUILD_MKFILE_SNIPPET = glibmm-vs$(VSVER)-$(PLAT)-$(CFG).mak
 UNIX_TOOLS_PATH_MKFILE = check-unix-tools-bindir-vs$(VSVER)-$(PLAT)-$(CFG).mak
 
 # Gather up dependencies for their include directories and lib/bin dirs.
-!if [for %t in (SIGC GLIB) do @(echo !ifndef %t_INCLUDEDIR>>$(DEPS_MKFILE) & echo %t_INCLUDEDIR=^$^(BASE_INCLUDEDIR^)>>$(DEPS_MKFILE) & echo !endif>>$(DEPS_MKFILE))]
+!if [for %t in (SIGC GLIB CLI11 FMT CATCH2 TINYXML2) do @(echo !ifndef %t_INCLUDEDIR>>$(DEPS_MKFILE) & echo %t_INCLUDEDIR=^$^(BASE_INCLUDEDIR^)>>$(DEPS_MKFILE) & echo !endif>>$(DEPS_MKFILE))]
 !endif
-!if [for %t in (SIGC GLIB) do @(echo !ifndef %t_LIBDIR>>$(DEPS_MKFILE) & echo %t_LIBDIR=^$^(BASE_LIBDIR^)>>$(DEPS_MKFILE) & echo !endif>>$(DEPS_MKFILE))]
+!if [for %t in (SIGC GLIB FMT CATCH2 TINYXML2) do @(echo !ifndef %t_LIBDIR>>$(DEPS_MKFILE) & echo %t_LIBDIR=^$^(BASE_LIBDIR^)>>$(DEPS_MKFILE) & echo !endif>>$(DEPS_MKFILE))]
 !endif
 !if [for %t in (GLIB) do @(echo !ifndef %t_BINDIR>>$(DEPS_MKFILE) & echo %t_BINDIR=^$^(BASE_TOOLS_PATH^)>>$(DEPS_MKFILE) & echo !endif>>$(DEPS_MKFILE))]
 !endif
@@ -106,6 +106,12 @@ GIOMM_INCLUDES =	\
 	$(GLIBMM_BASE_INCLUDES)	\
 	$(GLIBMM_DEPS_INCLUDES)
 
+MMGIR_DEPS_INCLUDES =	\
+	/FImsvc_recommended_pragmas.h	\
+	/I$(CLI11_INCLUDEDIR) /I$(CATCH2_INCLUDEDIR)	\
+	/I$(FMT_INCLUDEDIR) /I$(TINYXML2_INCLUDEDIR)	\
+	/I$(GLIB_INCLUDEDIR)\glib-$(GLIB_API_VERSION)
+
 LIBGLIBMM_CFLAGS = $(CFLAGS) /DGLIBMM_BUILD /DSIZEOF_WCHAR_T=2
 LIBGIOMM_CFLAGS = $(LIBGLIBMM_CFLAGS:/DGLIBMM_=/DGIOMM_)
 
@@ -162,8 +168,23 @@ SIGC_LDFLAGS = /libpath:$(SIGC_LIBDIR)
 GLIB_LDFLAGS = /libpath:$(GLIB_LIBDIR)
 !endif
 
+# FMT/TinyXML2/Catch2 for mmgir
+!if "$(FMT_LIBDIR)" != "$(BASE_LIBDIR)"
+FMT_LDFLAGS = /libpath:$(FMT_LIBDIR)
+!endif
+!if "$(TINYXML2_LIBDIR)" != "$(BASE_LIBDIR)"
+TINYXML2_LDFLAGS = /libpath:$(TINYXML2_LIBDIR)
+!endif
+!if "$(CATCH2_LIBDIR)" != "$(BASE_LIBDIR)"
+CATCH2_LDFLAGS = /libpath:$(CATCH2_LIBDIR)
+!endif
+
 GOBJECT_LIBS = gobject-2.0.lib gmodule-2.0.lib glib-2.0.lib
 GIO_LIBS = gio-2.0.lib $(GOBJECT_LIBS)
+FMT_LIB = fmt.lib
+TINYXML2_LIB = tinyxml2.lib
+CATCH2_LIBS = Catch2Main.lib Catch2.lib
+
 GOBJECT_LDFLAGS = $(GLIB_LDFLAGS) $(GOBJECT_LIBS) $(BASE_LDFLAGS)
 GIO_LDFLAGS =  $(GLIB_LDFLAGS) $(GIO_LIBS) $(BASE_LDFLAGS)
 SIGC_LDFLAGS = $(SIGC_LDFLAGS) $(SIGC_LIB)
@@ -171,7 +192,17 @@ SIGC_LDFLAGS = $(SIGC_LDFLAGS) $(SIGC_LIB)
 GLIBMM_EX_LIBS = $(GLIBMM_LIB) $(SIGC_LDFLAGS) $(GOBJECT_LDFLAGS)
 GIOMM_EX_LIBS = $(GIOMM_LIB) $(GLIBMM_LIB) $(SIGC_LDFLAGS) $(GIO_LDFLAGS)
 
+MMGIR_LDFLAGS = $(FMT_LDFLAGS) $(FMT_LIB) $(TINYXML2_LDFLAGS) $(TINYXML2_LIB)
+MMGIR_TEST_LDFLAGS = $(MMGIR_LDFLAGS) $(CATCH2_LDFLAGS) $(CATCH2_LIBS) /subsystem:console
+
 # Set a default location for glib-compile-schemas, if not specified
 !ifndef GLIB_COMPILE_SCHEMAS
 GLIB_COMPILE_SCHEMAS = $(GLIB_BINDIR)\glib-compile-schemas
+!endif
+
+EXTRA_TARGETS =
+EXTRA_TESTS =
+!ifdef BUILD_MMGIR
+EXTRA_TARGETS = $(EXTRA_TARGETS) $(OUTDIR)\mmgir.exe
+EXTRA_TESTS = $(EXTRA_TESTS) $(OUTDIR)\mmgir_test.exe
 !endif
