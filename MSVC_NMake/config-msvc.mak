@@ -200,7 +200,7 @@ MMGIR_TEST_LDFLAGS = $(MMGIR_LDFLAGS) $(CATCH2_LDFLAGS) $(CATCH2_LIBS) /subsyste
 GLIB_COMPILE_SCHEMAS = $(GLIB_BINDIR)\glib-compile-schemas
 !endif
 
-EXTRA_TARGETS =
+EXTRA_TARGETS = $(OUTDIR)\generate_defs_glib.exe $(OUTDIR)\generate_defs_gio.exe
 EXTRA_TESTS =
 !ifdef BUILD_MMGIR
 EXTRA_TARGETS = $(EXTRA_TARGETS) $(OUTDIR)\mmgir.exe
