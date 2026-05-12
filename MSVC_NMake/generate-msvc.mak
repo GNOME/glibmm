@@ -4,15 +4,15 @@
 # one is maintaining the NMake build files.
 
 # Compile schema for giomm settings example
-vs$(VSVER)\$(CFG)\$(PLAT)\gschema.compiled: ..\examples\settings\org.gtkmm.demo.gschema.xml
+$(OUTDIR)\gschema.compiled: ..\examples\settings\org.gtkmm.demo.gschema.xml
 	$(GLIB_COMPILE_SCHEMAS) --targetdir=$(@D) $(**D)
 
 # Generate wrap_init.cc files
 
-vs$(VSVER)\$(CFG)\$(PLAT)\glibmm\wrap_init.cc: $(glibmm_real_hg) ..\tools\generate_wrap_init.pl
+$(OUTDIR)\glibmm\wrap_init.cc: $(glibmm_real_hg) ..\tools\generate_wrap_init.pl
 	@if not exist ..\glib\glibmm\wrap_init.cc $(PERL) -- "../tools/generate_wrap_init.pl" --namespace=Glib --parent_dir=glibmm $(glibmm_real_hg:\=/)>$@
 
-vs$(VSVER)\$(CFG)\$(PLAT)\giomm\wrap_init.cc: $(giomm_real_hg) ..\tools\generate_wrap_init.pl
+$(OUTDIR)\giomm\wrap_init.cc: $(giomm_real_hg) ..\tools\generate_wrap_init.pl
 	@if not exist ..\gio\giomm\wrap_init.cc $(PERL) -- "../tools/generate_wrap_init.pl" --namespace=Gio --parent_dir=giomm $(giomm_real_hg:\=/)>$@
 
 # Generate pre-generated resources and configuration headers (builds from GIT)
@@ -74,7 +74,7 @@ giomm\giommconfig.h: ..\configure.ac ..\gio\giommconfig.h.in
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@PERL\@/$(PERL:\=\/)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@prefix\@/$(PREFIX_REAL:\=\/)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@exec_prefix\@/$(PREFIX_REAL:\=\/)/g" $@
-	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@libdir\@/$(PREFIX_REAL:\=\/)\/share/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@libdir\@/$(PREFIX_REAL:\=\/)\/lib/g" $@
 	@if "$(DO_REAL_GEN)" == "1" if not "$(M4_FULL_PATH)" == "" $(PERL) -pi.bak -e "s/\@M4\@/$(M4_FULL_PATH:\=\/)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" if "$(M4_FULL_PATH)" == "" $(PERL) -pi.bak -e "s/\@M4\@/$(M4:\=\/)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GLIBMM_MODULE_NAME\@/glibmm-$(GLIBMM_API_VERSION)/g" $@
