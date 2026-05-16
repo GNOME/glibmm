@@ -175,3 +175,5 @@ GIOMM_EX_LIBS = $(GIOMM_LIB) $(GLIBMM_LIB) $(SIGC_LDFLAGS) $(GIO_LDFLAGS)
 !ifndef GLIB_COMPILE_SCHEMAS
 GLIB_COMPILE_SCHEMAS = $(GLIB_BINDIR)\glib-compile-schemas
 !endif
+
+EXTRA_TARGETS = $(OUTDIR)\generate_defs_glib.exe $(OUTDIR)\generate_defs_gio.exe

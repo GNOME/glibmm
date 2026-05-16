@@ -82,7 +82,7 @@ $<
 
 {..\tools\extra_defs_gen\}.cc{$(OUTDIR)\glib-extra-defs-gen\}.obj::
 	@if not exist $(OUTDIR)\glib-extra-defs-gen\ md $(OUTDIR)\glib-extra-defs-gen
-	$(CXX) $(CFLAGS) /DGLIBMM_GEN_EXTRA_DEFS_BUILD $(GLIBMM_INCLUDES) /Fo$(OUTDIR)\glib-extra-defs-gen\ /Fd$(OUTDIR)\glib-extra-defs-gen\ /c @<<
+	$(CXX) $(CFLAGS) $(GLIBMM_INCLUDES) /Fo$(OUTDIR)\glib-extra-defs-gen\ /Fd$(OUTDIR)\glib-extra-defs-gen\ /c @<<
 $<
 <<
 
@@ -95,6 +95,9 @@ $<
 	rc /fo$@ $<
 
 $(OUTDIR)\glib-extra-defs-gen\generate_extra_defs.obj:  ..\tools\extra_defs_gen\generate_extra_defs.cc  ..\tools\extra_defs_gen\generate_extra_defs.h
+	@if not exist $(@D)\ md $(@D)
+	$(CXX) $(CFLAGS) /DGLIBMM_GEN_EXTRA_DEFS_BUILD $(GLIBMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ ..\tools\extra_defs_gen\$(@B).cc /c
+
 # Rules for building .lib files
 $(GLIBMM_LIB): $(GLIBMM_DLL)
 $(GIOMM_LIB): $(GIOMM_DLL)
@@ -105,6 +108,18 @@ $(GLIBMM_EXTRA_DEFS_GEN_DLL): $(OUTDIR)\glib-extra-defs-gen\generate_extra_defs.
 $**
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
+
+$(OUTDIR)\generate_defs_glib.exe: $(OUTDIR)\glib-extra-defs-gen\generate_defs_glib.obj $(GLIBMM_EXTRA_DEFS_GEN_LIB)
+	link $(LDFLAGS) $(GOBJECT_LDFLAGS) /out:$@ @<<
+$**
+<<
+	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
+
+$(OUTDIR)\generate_defs_gio.exe: $(OUTDIR)\glib-extra-defs-gen\generate_defs_gio.obj $(GLIBMM_EXTRA_DEFS_GEN_LIB)
+	link $(LDFLAGS) $(GIO_LDFLAGS) /out:$@ @<<
+$**
+<<
+	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
 # Rules for linking DLLs
 # Format is as follows (the mt command is needed for MSVC 2005/2008 builds):
