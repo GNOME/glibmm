@@ -60,7 +60,11 @@ in the NMake command line.  In order to build the giomm settings example
 program, the `glib-compile-schemas` tool needs to reside in `$(PREFIX)\bin`, or
 it must be specified via passing in `GLIB_COMPILE_SCHEMAS=...` in the NMake
 command line.  If using C++ dependencies that are built with Meson, specify
-`USE_MESON_LIBS=1` in your NMake command line.
+`USE_MESON_LIBS=1` in your NMake command line. If building the `mmgir` tool is
+desired, specify `BUILD_MMGIR=1` in your NMake command line-notice that the
+CLI11 headers, along with the libfmt and TinyXML2 libraries, are required.
+The Catch2 libraries will also be required if building the tests with
+`BUILD_MMGIR=1` is specified.
 
 The following list lists the `$(VSVER)` and the `vc14x` in the NMake-built DLLs and .lib's that
 corresponds to the Visual Studio version used (Visual Studio versions before 2017 are not
@@ -106,11 +110,11 @@ following are optional if the paths of needed headers, libraries and tools are i
   * `<DEP>_INCLUDEDIR` (default: `$(BASE_INCLUDES)`): Base directory where <DEP>'s headers can be
   found in their respective subdirectories as applicable, so for instance GLib's headers can be
   found in `$(GLIB_INCLUDEDIR)\glib-2.0` and `$(GLIB_INCLUDEDIR)\gio-win32-2.0`.  <DEP> here
-  currently covers GLIB and SIGC
+  currently covers GLIB, SIGC, CLI11, Catch2, FMT and TINYXML2
   * `<DEP>_LIBDIR` (default: `$(BASE_LIBDIR)`): Base directory where <DEP>'s architecture-
   and compiler-dependent headers and .lib's can be found in their respective subdirectories as
   applicable, so for instance GLib's `glibconfig.h` can be found in
-  `$(GLIB_LIBDIR)\glib-2.0\include`. <DEP> here currently covers GLIB and SIGC.
+  `$(GLIB_LIBDIR)\glib-2.0\include`. <DEP> here currently covers GLIB, SIGC, CATCH2, FMT and TINYXML2.
   * `<DEP>_BINDIR` (default: `$(BASE_TOOLS_PATH`)`): Base directory where <DEP>'s utility programs
   can be found. <DEP> here currently covers GLIB.
   * GLIB_COMPILE_SCHEMAS (default: `$(GLIB_BINDIR)\glib-compile-schemas`): Relative or full path

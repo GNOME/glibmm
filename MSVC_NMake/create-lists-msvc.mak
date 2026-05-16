@@ -99,6 +99,28 @@ glibmm_files_extra_ph_int = $(glibmm_files_extra_ph:/=\)
 !if [echo.>>$(BUILD_MKFILE_SNIPPET)]
 !endif
 
+# Build the mmgir tool and test
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) mmgir_common_OBJS]
+!endif
+
+!if [for %c in (gen_defs.cc parse_gir.cc type_resolver.cc) do @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ^$(OUTDIR)\mmgir\%~nc.obj]
+!endif
+
+!if [call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
+!endif
+
+!if [echo mmgir_main_OBJ=^$(OUTDIR)\mmgir\main.obj>>$(BUILD_MKFILE_SNIPPET)]
+!endif
+
+!if [echo.>>$(BUILD_MKFILE_SNIPPET)]
+!endif
+
+!if [echo mmgir_test_OBJ=^$(OUTDIR)\mmgir\test_gen_defs.obj>>$(BUILD_MKFILE_SNIPPET)]
+!endif
+
+!if [echo.>>$(BUILD_MKFILE_SNIPPET)]
+!endif
+
 # We skip building the following examples/tests:
 # child_watch, iochannel_stream: Builds on *NIX only
 !if [for %d in (examples tests) do @call create-lists.bat header $(BUILD_MKFILE_SNIPPET) glibmm_%d & @(for /f %t in ('dir /ad /b ..\%d') do @if not "%t" == "child_watch" if not "%t" == "dbus" if not "%t" == "iochannel_stream" if not "%t" == "network" if not "%t" == "thread" call create-lists.bat file $(BUILD_MKFILE_SNIPPET) $(OUTDIR)\%t.exe) & @call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]

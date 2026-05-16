@@ -82,7 +82,13 @@ $<
 
 {..\tools\extra_defs_gen\}.cc{$(OUTDIR)\glib-extra-defs-gen\}.obj::
 	@if not exist $(OUTDIR)\glib-extra-defs-gen\ md $(OUTDIR)\glib-extra-defs-gen
-	$(CXX) $(CFLAGS) /DGLIBMM_GEN_EXTRA_DEFS_BUILD $(GLIBMM_INCLUDES) /Fo$(OUTDIR)\glib-extra-defs-gen\ /Fd$(OUTDIR)\glib-extra-defs-gen\ /c @<<
+	$(CXX) $(CFLAGS) $(GLIBMM_INCLUDES) /Fo$(OUTDIR)\glib-extra-defs-gen\ /Fd$(OUTDIR)\glib-extra-defs-gen\ /c @<<
+$<
+<<
+
+{..\tools\mmgir\}.cc{$(OUTDIR)\mmgir\}.obj::
+	@if not exist $(OUTDIR)\mmgir\ md $(OUTDIR)\mmgir
+	$(CXX) $(CFLAGS) $(MMGIR_DEPS_INCLUDES) /Fo$(OUTDIR)\mmgir\ /Fd$(OUTDIR)\mmgir\ /c @<<
 $<
 <<
 
@@ -95,6 +101,9 @@ $<
 	rc /fo$@ $<
 
 $(OUTDIR)\glib-extra-defs-gen\generate_extra_defs.obj:  ..\tools\extra_defs_gen\generate_extra_defs.cc  ..\tools\extra_defs_gen\generate_extra_defs.h
+	@if not exist $(@D)\ md $(@D)
+	$(CXX) $(CFLAGS) /DGLIBMM_GEN_EXTRA_DEFS_BUILD $(GLIBMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ ..\tools\extra_defs_gen\$(@B).cc /c
+
 # Rules for building .lib files
 $(GLIBMM_LIB): $(GLIBMM_DLL)
 $(GIOMM_LIB): $(GIOMM_DLL)
@@ -106,6 +115,29 @@ $**
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
 
+$(OUTDIR)\mmgir.exe: $(mmgir_main_OBJ) $(mmgir_common_OBJS)
+	link $(LDFLAGS) $(MMGIR_LDFLAGS) /out:$@ @<<
+$**
+<<
+	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
+
+$(OUTDIR)\mmgir_test.exe: $(mmgir_test_OBJ) $(mmgir_common_OBJS)
+	link $(LDFLAGS) $(MMGIR_TEST_LDFLAGS) /out:$@ @<<
+$**
+<<
+	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
+
+$(OUTDIR)\generate_defs_glib.exe: $(OUTDIR)\glib-extra-defs-gen\generate_defs_glib.obj $(GLIBMM_EXTRA_DEFS_GEN_LIB)
+	link $(LDFLAGS) $(GOBJECT_LDFLAGS) /out:$@ @<<
+$**
+<<
+	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
+
+$(OUTDIR)\generate_defs_gio.exe: $(OUTDIR)\glib-extra-defs-gen\generate_defs_gio.obj $(GLIBMM_EXTRA_DEFS_GEN_LIB)
+	link $(LDFLAGS) $(GIO_LDFLAGS) /out:$@ @<<
+$**
+<<
+	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
 # Rules for linking DLLs
 # Format is as follows (the mt command is needed for MSVC 2005/2008 builds):
@@ -146,6 +178,8 @@ clean:
 	@-if exist $(OUTDIR)\glibmm-tests del /f /q $(OUTDIR)\glibmm-tests\*.obj
 	@-if exist $(OUTDIR)\glibmm-tests del /f /q $(OUTDIR)\glibmm-tests\*.pdb
 	@-del /f /q $(OUTDIR)\gschemas.compiled
+	@-del /f /q $(OUTDIR)\mmgir\*.obj
+	@-del /f /q $(OUTDIR)\mmgir\*.pdb
 	@-del /f /q $(OUTDIR)\glibmm-examples\*.obj
 	@-del /f /q $(OUTDIR)\glibmm-examples\*.pdb
 	@-del $(OUTDIR)\glib-extra-defs-gen\*.pdb
@@ -163,6 +197,7 @@ clean:
 	@-del /f /q $(OUTDIR)\glibmm\private\*.h
 	@-del /f /q $(OUTDIR)\glibmm\*.h
 	@-if exist $(OUTDIR)\glibmm-tests rd $(OUTDIR)\glibmm-tests
+	@-rd $(OUTDIR)\mmgir
 	@-rd $(OUTDIR)\glibmm-examples
 	@-rd $(OUTDIR)\glib-extra-defs-gen
 	@-rd $(OUTDIR)\giomm\private

@@ -37,16 +37,16 @@ help:
 	@echo.
 	@echo [DEP]_INCLUDEDIR: Optional, base directories where headers of various
 	@echo dependencies can be found, default is $$(BASE_INCLUDEDIR). DEP includes
-	@echo GLIB and SIGC. Their subdirs, such as 'glib-2.0' for GLib, will be searched
-	@echo for, meaning $$(GLIB_INCLUDEDIR)\glib-2.0 will be looked for the GLib headers,
-	@echo and so on.
+	@echo GLIB, SIGC, CLI11, CATCH2, FMT and TINYXML2. Their subdirs, such as 'glib-2.0'
+	@echo for GLib will be searched for, meaning $$(GLIB_INCLUDEDIR)\glib-2.0 will be,
+	@echo looked for the GLib headers and so on.
 	@echo.
 	@echo [DEP]_LIBDIR: Optional, base directories where .libs of various
 	@echo dependencies can be found, along with architecture-dependent headers, default is
-	@echo $$(BASE_LIBDIR). DEP includes GLIB and SIGC. The subdirs, for the archtecture-
-	@echo dependent headers, such as 'glib-2.0\include' for GLib, will be searched for,
-	@echo meaning $$(GLIB_LIBDIR)\glib-2.0\include will be looked for the GLib architecture-
-	@echo dependent headers, and so on.
+	@echo $$(BASE_LIBDIR). DEP includes GLIB, SIGC, CATCH2, FMT and TINYXML2. The subdirs,
+	@echo for the archtecture-dependent headers, such as 'glib-2.0\include' for GLib, will
+	@echo be searched for, meaning $$(GLIB_LIBDIR)\glib-2.0\include will be looked for the
+	@echo GLib architecture-dependent headers, and so on.
 	@echo.
 	@echo GLIB_BIN_DIR: Directory where GLib executable tools can be found; can be overridden
 	@echo with GLIB_COMPILE_SCHEMAS as well, as needed.
@@ -63,6 +63,10 @@ help:
 	@echo.
 	@echo USE_MESON_LIBS: Use DLLs and LIBs of C++ dependencies that are built with Meson,
 	@echo as applicable.
+	@echo.
+	@echo BUILD_MMGIR: Build the mmgir tool. Requires the CLI11 headers as well as the libfmt
+	@echo and TinyXML2 libraries. Also build the mmgir_test test program when building the
+	@echo tests, which will also require the Catch2 libraries.
 	@echo ======
 	@echo A 'clean' target is supported to remove all generated files, intermediate
 	@echo object files and binaries for the specified configuration.
