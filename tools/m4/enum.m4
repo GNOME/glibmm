@@ -125,7 +125,7 @@ template <>
 class __ENUM_DECL_PREFIX__ Value<__NAMESPACE__::__ENUM_CLASS_CPPNAME__> : public __ENUM_VALUE_BASE__
 {
 public:
-  static GType value_type() G_GNUC_CONST;
+  static GType value_type();
 };
 ifelse(`$9',,,`_DEPRECATE_IFDEF_END')`'dnl
 

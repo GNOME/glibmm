@@ -186,7 +186,7 @@ public:
 ifdef(`__OPAQUE_FUNC_GTYPE__',`dnl
   /** Get the GType for this class, for use with the underlying GObject type system.
    */
-  static GType get_type() G_GNUC_CONST;
+  static GType get_type();
 
 ')dnl endif __OPAQUE_FUNC_GTYPE__
 ifelse(__OPAQUE_FUNC_NEW,NONE,`dnl

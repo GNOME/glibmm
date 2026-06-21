@@ -112,8 +112,8 @@ public:
 // static RefPtr<Object> create(); //You must reimplement this in each derived class.
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  static GType get_type() G_GNUC_CONST;
-  static GType get_base_type() G_GNUC_CONST;
+  static GType get_type();
+  static GType get_base_type();
 #endif
 
   // GObject* gobj_copy(); //Give a ref-ed copy to someone. Use for direct struct access.

@@ -78,7 +78,7 @@ public:
   using T = std::remove_cv_t<std::remove_pointer_t<PtrT>>;
   using CppType = PtrT;
 
-  static inline GType value_type() G_GNUC_CONST;
+  static inline GType value_type();
 
   inline void set(CppType data);
   inline CppType get() const;
@@ -129,7 +129,7 @@ public:
 #endif
   using CppType = T;
 
-  static GType value_type() G_GNUC_CONST;
+  static GType value_type();
 
   inline void set(const CppType& data);
   inline CppType get() const;
