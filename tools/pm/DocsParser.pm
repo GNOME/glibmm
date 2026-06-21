@@ -880,7 +880,7 @@ sub substitute_identifiers($$)
     # Enumerator names
     s/[#%]([A-Z]+)_([A-Z\d_]+)\b/&DocsParser::substitute_enumerator_name($1, $2)/eg;
     s/`([A-Z]+)_([A-Z\d_]+)`/"`" . &DocsParser::substitute_enumerator_name($1, $2) . "`"/eg;
-    s/\[(`?)enum@([A-Z]\w*)\.([A-Z]\w*)\.([A-Z\d_]+)\1]/"$1" . &DocsParser::substitute_enumerator_name3($2, $3, $4) . "$1"/eg;
+    s/\[(`?)(?:enum|flags)@([A-Z]\w*)\.([A-Z]\w*)\.([\w-]+)\1]/"$1" . &DocsParser::substitute_enumerator_name3($2, $3, $4) . "$1"/eg;
 
     s/\bG:://g; #Rename G::Something to Something.
 
@@ -914,12 +914,15 @@ sub substitute_type_name($$$)
 
 sub substitute_enumerator_name3($$$)
 {
-  # For instance Gtk, FontRendering, MANUAL.
-  # Convert to GTK, FONT_RENDERING_MANUAL before calling substitute_enumerator_name().
+  # For instance Gtk, DirectionType, tab-backward
+  # or Gtk, DirectionType, tab_backward
+  # or Gtk, DirectionType, TAB_BACKWARD
+  # Convert to GTK, DIRECTION_TYPE_TAB_BACKWARD before calling substitute_enumerator_name().
   my ($module, $type_name, $enumerator) = @_;
 
   $type_name =~ s/([a-z])([A-Z])/$1_$2/g;
-  return substitute_enumerator_name(uc($module), uc($type_name) . "_" . $enumerator);
+  $enumerator =~ s/-/_/g;
+  return substitute_enumerator_name(uc($module), uc($type_name) . "_" . uc($enumerator));
 }
 
 sub substitute_enumerator_name($$)
