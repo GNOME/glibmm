@@ -397,6 +397,15 @@ ParseContext::get_tag_start(gsize& line_number, gsize& char_number, gsize& offse
   return g_markup_parse_context_get_tag_start(gobject_, &line_number, &char_number, &offset);
 }
 
+std::array<size_t,6> ParseContext::get_attribute_position(unsigned int attr) const
+{
+  std::array<size_t,6> result;
+  g_markup_parse_context_get_attribute_position(gobject_, attr,
+    &result[0], &result[1], &result[2], &result[3], &result[4], &result[5]);
+  return result;
+}
+
+
 // static
 void
 ParseContext::destroy_notify_callback(void* data)

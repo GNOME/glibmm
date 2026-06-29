@@ -18,6 +18,7 @@ _DEFS(glibmm,glib)
 
 #include <glibmm/error.h>
 #include <sigc++/sigc++.h>
+#include <array>
 #include <map>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -65,30 +66,7 @@ namespace Glib
  */
 _WRAP_GERROR(MarkupError, GMarkupError, G_MARKUP_ERROR, NO_GTYPE, decl_prefix GLIBMM_API)
 
-/*! @var MarkupError::Code MarkupError::BAD_UTF8
- * Text being parsed was not valid UTF-8.
- */
-/*! @var MarkupError::Code MarkupError::EMPTY
- * Document contained nothing, or only whitespace.
- */
-/*! @var MarkupError::Code MarkupError::PARSE
- * Document was ill-formed.
- */
-/*! @var MarkupError::Code MarkupError::UNKNOWN_ELEMENT
- * This error should be set by Glib::Markup::Parser virtual methods;
- * element wasn't known.
- */
-/*! @var MarkupError::Code MarkupError::UNKNOWN_ATTRIBUTE
- * This error should be set by Glib::Markup::Parser virtual methods;
- * attribute wasn't known.
- */
-/*! @var MarkupError::Code MarkupError::INVALID_CONTENT
- * This error should be set by Glib::Markup::Parser virtual methods;
- * something was wrong with contents of the document, e.g. invalid attribute value.
- */
-
 /** @} group Markup */
-
 
 namespace Markup
 {
@@ -330,7 +308,7 @@ public:
    * callbacks to obtain location information for error reporting.
    *
    * Note that @a line_number and @a char_number are intended for human
-   * readable error messages and are therefore 1-based and in Unicode
+   * readable error messages and are therefore 1-based and in %Unicode
    * characters. @a offset on the other hand is meant for programmatic
    * use, and thus is 0-based and in bytes.
    *
@@ -345,6 +323,36 @@ public:
    * @newin{2,88}
    */
   void get_tag_start(gsize& line_number, gsize& char_number, gsize& offset) const;
+
+  /** Retrieves the start and end positions of an attribute assignment
+   * in a start tag.
+   *
+   * This function can be used in the `start_element` callback to
+   * obtain location information for error reporting.
+   *
+   * Calling it outside of the `start_element` callback
+   * has undefined results.
+   *
+   * Note that @a line_number and @a char_number are intended for human
+   * readable error messages and are therefore 1-based and in %Unicode
+   * characters. @a offset on the other hand is meant for programmatic
+   * use, and thus is 0-based and in bytes.
+   *
+   * The information is meant to accompany the values returned by
+   * get_line_number() and get_char_number(), and comes with the
+   * same accuracy guarantees.
+   *
+   * @param attr The index of the attribute to query.
+   * @return A 6-element array.
+   *         - Element 0: start_line: The line number of the attribute assignment start.
+   *         - Element 1: start_char: The character number of the attribute assignment start.
+   *         - Element 2: start_offset: Offset of the attribute assignment start.
+   *         - Element 3: end_line: The line number of the attribute assignment end.
+   *         - Element 4: end_char: The character number of the attribute assignment end.
+   *         - Element 5: end_offset: Offset of the attribute assignment end.
+   * @newin{2,90}
+   */
+  std::array<size_t,6> get_attribute_position(unsigned int attr) const;
 
   Parser*       get_parser()       { return parser_; }
   const Parser* get_parser() const { return parser_; }
