@@ -1,48 +1,46 @@
-;; From gbinding.h
+;; Namespace GObject
 
-;; Original typedef:
-;; typedef enum { /*< prefix=G_BINDING >*/
-;;   G_BINDING_DEFAULT        = 0,
-;; 
-;;   G_BINDING_BIDIRECTIONAL  = 1 << 0,
-;;   G_BINDING_SYNC_CREATE    = 1 << 1,
-;;   G_BINDING_INVERT_BOOLEAN = 1 << 2
-;; } G_GNUC_FLAG_ENUM GBindingFlags;
+;; Enums
+
+
+;; Flags
 
 (define-flags-extended BindingFlags
-  (in-module "G")
+  (in-module "GObject")
   (c-name "GBindingFlags")
   (values
     '("default" "G_BINDING_DEFAULT" "0x0")
     '("bidirectional" "G_BINDING_BIDIRECTIONAL" "1 << 0")
-    '("sync-create" "G_BINDING_SYNC_CREATE" "1 << 1")
-    '("invert-boolean" "G_BINDING_INVERT_BOOLEAN" "1 << 2")
+    '("sync_create" "G_BINDING_SYNC_CREATE" "1 << 1")
+    '("invert_boolean" "G_BINDING_INVERT_BOOLEAN" "1 << 2")
   )
 )
 
-;; From gparam.h
+(define-flags-extended ConnectFlags
+  (in-module "GObject")
+  (c-name "GConnectFlags")
+  (values
+    '("default" "G_CONNECT_DEFAULT" "0x0")
+    '("after" "G_CONNECT_AFTER" "1 << 0")
+    '("swapped" "G_CONNECT_SWAPPED" "1 << 1")
+  )
+)
 
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_PARAM_READABLE            = 1 << 0,
-;;   G_PARAM_WRITABLE            = 1 << 1,
-;;   G_PARAM_READWRITE           = (G_PARAM_READABLE | G_PARAM_WRITABLE),
-;;   G_PARAM_CONSTRUCT	      = 1 << 2,
-;;   G_PARAM_CONSTRUCT_ONLY      = 1 << 3,
-;;   G_PARAM_LAX_VALIDATION      = 1 << 4,
-;;   G_PARAM_STATIC_NAME	      = 1 << 5,
-;;   G_PARAM_PRIVATE GOBJECT_DEPRECATED_ENUMERATOR_IN_2_26 = G_PARAM_STATIC_NAME,
-;;   G_PARAM_STATIC_NICK	      = 1 << 6,
-;;   G_PARAM_STATIC_BLURB	      = 1 << 7,
-;;   /* User defined flags go here */
-;;   G_PARAM_EXPLICIT_NOTIFY     = 1 << 30,
-;;   /* Avoid warning with -Wpedantic for gcc6 */
-;;   G_PARAM_DEPRECATED          = (gint)(1u << 31)
-;; } G_GNUC_FLAG_ENUM GParamFlags;
+(define-flags-extended IOCondition
+  (in-module "GObject")
+  (c-name "GIOCondition")
+  (values
+    '("in" "G_IO_IN" "1 << 0")
+    '("out" "G_IO_OUT" "1 << 2")
+    '("pri" "G_IO_PRI" "1 << 1")
+    '("err" "G_IO_ERR" "1 << 3")
+    '("hup" "G_IO_HUP" "1 << 4")
+    '("nval" "G_IO_NVAL" "1 << 5")
+  )
+)
 
 (define-flags-extended ParamFlags
-  (in-module "G")
+  (in-module "GObject")
   (c-name "GParamFlags")
   (values
     '("readable" "G_PARAM_READABLE" "1 << 0")
@@ -52,34 +50,16 @@
     '("construct-only" "G_PARAM_CONSTRUCT_ONLY" "1 << 3")
     '("lax-validation" "G_PARAM_LAX_VALIDATION" "1 << 4")
     '("static-name" "G_PARAM_STATIC_NAME" "1 << 5")
-    '("private" "G_PARAM_PRIVATE" "0x20")
+    '("private" "G_PARAM_PRIVATE" "1 << 5")
     '("static-nick" "G_PARAM_STATIC_NICK" "1 << 6")
     '("static-blurb" "G_PARAM_STATIC_BLURB" "1 << 7")
     '("explicit-notify" "G_PARAM_EXPLICIT_NOTIFY" "1 << 30")
-    '("deprecated" "G_PARAM_DEPRECATED" "(gint)(1u << 31)")
+    '("deprecated" "G_PARAM_DEPRECATED" "1 << 31")
   )
 )
 
-;; From gsignal.h
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_SIGNAL_RUN_FIRST	= 1 << 0,
-;;   G_SIGNAL_RUN_LAST	= 1 << 1,
-;;   G_SIGNAL_RUN_CLEANUP	= 1 << 2,
-;;   G_SIGNAL_NO_RECURSE	= 1 << 3,
-;;   G_SIGNAL_DETAILED	= 1 << 4,
-;;   G_SIGNAL_ACTION	= 1 << 5,
-;;   G_SIGNAL_NO_HOOKS	= 1 << 6,
-;;   G_SIGNAL_MUST_COLLECT = 1 << 7,
-;;   G_SIGNAL_DEPRECATED   = 1 << 8,
-;;   /* normal signal flags until 1 << 16 */
-;;   G_SIGNAL_ACCUMULATOR_FIRST_RUN    = 1 << 17,
-;; } G_GNUC_FLAG_ENUM GSignalFlags;
-
 (define-flags-extended SignalFlags
-  (in-module "G")
+  (in-module "GObject")
   (c-name "GSignalFlags")
   (values
     '("run-first" "G_SIGNAL_RUN_FIRST" "1 << 0")
@@ -95,37 +75,8 @@
   )
 )
 
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_CONNECT_DEFAULT GOBJECT_AVAILABLE_ENUMERATOR_IN_2_74 = 0,
-;;   G_CONNECT_AFTER	= 1 << 0,
-;;   G_CONNECT_SWAPPED	= 1 << 1
-;; } G_GNUC_FLAG_ENUM GConnectFlags;
-
-(define-flags-extended ConnectFlags
-  (in-module "G")
-  (c-name "GConnectFlags")
-  (values
-    '("default" "G_CONNECT_DEFAULT" "0x0")
-    '("after" "G_CONNECT_AFTER" "1 << 0")
-    '("swapped" "G_CONNECT_SWAPPED" "1 << 1")
-  )
-)
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_SIGNAL_MATCH_ID	   = 1 << 0,
-;;   G_SIGNAL_MATCH_DETAIL	   = 1 << 1,
-;;   G_SIGNAL_MATCH_CLOSURE   = 1 << 2,
-;;   G_SIGNAL_MATCH_FUNC	   = 1 << 3,
-;;   G_SIGNAL_MATCH_DATA	   = 1 << 4,
-;;   G_SIGNAL_MATCH_UNBLOCKED = 1 << 5
-;; } G_GNUC_FLAG_ENUM GSignalMatchType;
-
 (define-flags-extended SignalMatchType
-  (in-module "G")
+  (in-module "GObject")
   (c-name "GSignalMatchType")
   (values
     '("id" "G_SIGNAL_MATCH_ID" "1 << 0")
@@ -137,71 +88,38 @@
   )
 )
 
-;; From gtype.h
-
-;; Original typedef:
-;; typedef enum	/*< skip >*/
-;; {
-;;   G_TYPE_DEBUG_NONE	= 0,
-;;   G_TYPE_DEBUG_OBJECTS	= 1 << 0,
-;;   G_TYPE_DEBUG_SIGNALS	= 1 << 1,
-;;   G_TYPE_DEBUG_INSTANCE_COUNT = 1 << 2,
-;;   G_TYPE_DEBUG_MASK	= 0x07
-;; } G_GNUC_FLAG_ENUM GTypeDebugFlags GOBJECT_DEPRECATED_TYPE_IN_2_36;
-
 (define-flags-extended TypeDebugFlags
-  (in-module "G")
+  (in-module "GObject")
   (c-name "GTypeDebugFlags")
   (values
     '("none" "G_TYPE_DEBUG_NONE" "0x0")
     '("objects" "G_TYPE_DEBUG_OBJECTS" "1 << 0")
     '("signals" "G_TYPE_DEBUG_SIGNALS" "1 << 1")
     '("instance-count" "G_TYPE_DEBUG_INSTANCE_COUNT" "1 << 2")
-    '("mask" "G_TYPE_DEBUG_MASK" "0x07")
+    '("mask" "G_TYPE_DEBUG_MASK" "0x7")
   )
 )
-
-;; Original typedef:
-;; typedef enum    /*< skip >*/
-;; {
-;;   /* There is no G_TYPE_FUNDAMENTAL_FLAGS_NONE: this is implemented to use
-;;    * the same bits as GTypeFlags */
-;;   G_TYPE_FLAG_CLASSED           = (1 << 0),
-;;   G_TYPE_FLAG_INSTANTIATABLE    = (1 << 1),
-;;   G_TYPE_FLAG_DERIVABLE         = (1 << 2),
-;;   G_TYPE_FLAG_DEEP_DERIVABLE    = (1 << 3)
-;; } G_GNUC_FLAG_ENUM GTypeFundamentalFlags;
-
-(define-flags-extended TypeFundamentalFlags
-  (in-module "G")
-  (c-name "GTypeFundamentalFlags")
-  (values
-    '("classed" "G_TYPE_FLAG_CLASSED" "(1 << 0)")
-    '("instantiatable" "G_TYPE_FLAG_INSTANTIATABLE" "(1 << 1)")
-    '("derivable" "G_TYPE_FLAG_DERIVABLE" "(1 << 2)")
-    '("deep-derivable" "G_TYPE_FLAG_DEEP_DERIVABLE" "(1 << 3)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum    /*< skip >*/
-;; {
-;;   G_TYPE_FLAG_NONE GOBJECT_AVAILABLE_ENUMERATOR_IN_2_74 = 0,
-;;   G_TYPE_FLAG_ABSTRACT = (1 << 4),
-;;   G_TYPE_FLAG_VALUE_ABSTRACT = (1 << 5),
-;;   G_TYPE_FLAG_FINAL GOBJECT_AVAILABLE_ENUMERATOR_IN_2_70 = (1 << 6),
-;;   G_TYPE_FLAG_DEPRECATED GOBJECT_AVAILABLE_ENUMERATOR_IN_2_76 = (1 << 7)
-;; } G_GNUC_FLAG_ENUM GTypeFlags;
 
 (define-flags-extended TypeFlags
-  (in-module "G")
+  (in-module "GObject")
   (c-name "GTypeFlags")
   (values
     '("none" "G_TYPE_FLAG_NONE" "0x0")
-    '("abstract" "G_TYPE_FLAG_ABSTRACT" "(1 << 4)")
-    '("value-abstract" "G_TYPE_FLAG_VALUE_ABSTRACT" "(1 << 5)")
-    '("final" "G_TYPE_FLAG_FINAL" "(1 << 6)")
-    '("deprecated" "G_TYPE_FLAG_DEPRECATED" "(1 << 7)")
+    '("abstract" "G_TYPE_FLAG_ABSTRACT" "1 << 4")
+    '("value-abstract" "G_TYPE_FLAG_VALUE_ABSTRACT" "1 << 5")
+    '("final" "G_TYPE_FLAG_FINAL" "1 << 6")
+    '("deprecated" "G_TYPE_FLAG_DEPRECATED" "1 << 7")
+  )
+)
+
+(define-flags-extended TypeFundamentalFlags
+  (in-module "GObject")
+  (c-name "GTypeFundamentalFlags")
+  (values
+    '("classed" "G_TYPE_FLAG_CLASSED" "1 << 0")
+    '("instantiatable" "G_TYPE_FLAG_INSTANTIATABLE" "1 << 1")
+    '("derivable" "G_TYPE_FLAG_DERIVABLE" "1 << 2")
+    '("deep-derivable" "G_TYPE_FLAG_DEEP_DERIVABLE" "1 << 3")
   )
 )
 

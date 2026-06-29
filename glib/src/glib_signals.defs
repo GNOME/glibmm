@@ -1,15 +1,14 @@
-;; From GBinding
-
-(define-property source
+(define-property flags
   (of-object "GBinding")
-  (prop-type "GParamObject")
+  (prop-type "GParamFlags")
   (docs "")
   (readable #t)
   (writable #t)
   (construct-only #t)
+  (default-value "G_BINDING_DEFAULT")
 )
 
-(define-property target
+(define-property source
   (of-object "GBinding")
   (prop-type "GParamObject")
   (docs "")
@@ -28,6 +27,15 @@
   (default-value "")
 )
 
+(define-property target
+  (of-object "GBinding")
+  (prop-type "GParamObject")
+  (docs "")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
 (define-property target-property
   (of-object "GBinding")
   (prop-type "GParamString")
@@ -38,44 +46,55 @@
   (default-value "")
 )
 
-(define-property flags
-  (of-object "GBinding")
-  (prop-type "GParamFlags")
+(define-property source
+  (of-object "GBindingGroup")
+  (prop-type "GParamObject")
+  (docs "")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-signal notify
+  (of-object "GObject")
+  (return-type "void")
+  (flags "Run First, Action, No Hooks, No Recurse")
+  (detailed #t)
+  (parameters
+    '("GParam*" "pspec")
+  )
+)
+
+(define-property target
+  (of-object "GSignalGroup")
+  (prop-type "GParamObject")
+  (docs "")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property target-type
+  (of-object "GSignalGroup")
+  (prop-type "GParamGType")
   (docs "")
   (readable #t)
   (writable #t)
   (construct-only #t)
-  (default-value "G_BINDING_DEFAULT")
 )
 
-;; GBytes is neither a GObject nor a GInterface. Not checked for signals and properties.
+(define-signal bind
+  (of-object "GSignalGroup")
+  (return-type "void")
+  (flags "Run Last")
+  (parameters
+    '("GObject*" "instance")
+  )
+)
 
-;; GChecksum is neither a GObject nor a GInterface. Not checked for signals and properties.
-
-;; GDate is neither a GObject nor a GInterface. Not checked for signals and properties.
-
-;; GDateTime is neither a GObject nor a GInterface. Not checked for signals and properties.
-
-;; GIOChannel is neither a GObject nor a GInterface. Not checked for signals and properties.
-
-;; GKeyFile is neither a GObject nor a GInterface. Not checked for signals and properties.
-
-;; GMainContext is neither a GObject nor a GInterface. Not checked for signals and properties.
-
-;; GMainLoop is neither a GObject nor a GInterface. Not checked for signals and properties.
-
-;; GMatchInfo is neither a GObject nor a GInterface. Not checked for signals and properties.
-
-;; GRegex is neither a GObject nor a GInterface. Not checked for signals and properties.
-
-;; GSource is neither a GObject nor a GInterface. Not checked for signals and properties.
-
-;; GThread is neither a GObject nor a GInterface. Not checked for signals and properties.
-
-;; GVariant is neither a GObject nor a GInterface. Not checked for signals and properties.
-
-;; GVariantBuilder is neither a GObject nor a GInterface. Not checked for signals and properties.
-
-;; GVariantDict is neither a GObject nor a GInterface. Not checked for signals and properties.
-
+(define-signal unbind
+  (of-object "GSignalGroup")
+  (return-type "void")
+  (flags "Run Last")
+)
 

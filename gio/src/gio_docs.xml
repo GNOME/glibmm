@@ -655,8 +655,9 @@ message to arrive.
 <parameter name="G_APPLICATION_HANDLES_OPEN">
 <parameter_description> This application handles opening files (in
 the primary instance). Note that this flag only affects the default
-implementation of local_command_line(), and has no effect if
-%G_APPLICATION_HANDLES_COMMAND_LINE is given.
+implementation of local_command_line(). It can be useful even when
+using `G_APPLICATION_HANDLES_COMMAND_LINE` to handle
+`org.freedesktop.Application.open`.
 See g_application_run() for details.
 </parameter_description>
 </parameter>
@@ -9955,7 +9956,9 @@ given @appinfo, `FALSE` if not.
 <description>
 Creates a new [iface@Gio.AppInfo] from the given information.
 
-Note that for @commandline, the quoting rules of the `Exec` key of the
+When constructing @commandline, quote any filenames or potentially-
+untrusted input using [func@GLib.shell_quote], and note that the
+quoting rules of the `Exec` key of the
 [freedesktop.org Desktop Entry Specification](http://freedesktop.org/Standards/desktop-entry-spec)
 are applied. For example, if the @commandline contains
 percent-encoded URIs, the percent-character must be doubled in order to prevent it from
@@ -11159,6 +11162,7 @@ consumed, they will no longer be visible to the default handling
 
 It is important to use the proper GVariant format when retrieving
 the options with g_variant_dict_lookup():
+
 - for %G_OPTION_ARG_NONE, use `b`
 - for %G_OPTION_ARG_STRING, use `&amp;s`
 - for %G_OPTION_ARG_INT, use `i`
@@ -20509,37 +20513,39 @@ g_object_unref().
 Utility function to calculate how many bytes are needed to
 completely deserialize the D-Bus message stored at @blob.
 
+An error will be returned if @blob contains invalid data, or if not enough
+data is available to determine the size.
+
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="blob">
-<parameter_description> A blob representing a binary D-Bus message.
+<parameter_description> a blob representing a
+binary D-Bus message.
 </parameter_description>
 </parameter>
 <parameter name="blob_len">
-<parameter_description> The length of @blob (must be at least 16).
+<parameter_description> the length of @blob (must be at least 16 bytes)
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> Return location for error or %NULL.
+<parameter_description> return location for error, or `NULL`
 </parameter_description>
 </parameter>
 </parameters>
-<return> Number of bytes needed or -1 if @error is set (e.g. if
-@blob contains invalid data or not enough data is available to
-determine the size).
-
+<return> Number of bytes needed or `-1` if @error is set
 </return>
 </function>
 
 <function name="g_dbus_message_copy">
 <description>
-Copies @message. The copy is a deep copy and the returned
-#GDBusMessage is completely identical except that it is guaranteed
-to not be locked.
+Copies @message with a deep copy.
 
-This operation can fail if e.g. @message contains file descriptors
+The returned D-Bus message is completely identical to @message except that it
+is guaranteed to not be locked.
+
+This operation can fail if (for example) @message contains file descriptors
 and the per-process or system-wide open files limit is reached.
 
 Since: 2.26
@@ -20547,17 +20553,15 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> Return location for error or %NULL.
+<parameter_description> return location for error or `NULL`
 </parameter_description>
 </parameter>
 </parameters>
-<return> A new #GDBusMessage or %NULL if @error is set.
-Free with g_object_unref().
-
+<return> A new D-Bus message
 </return>
 </function>
 
@@ -20573,13 +20577,12 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> The string item or %NULL if the first item in the body of
-@message is not a string.
-
+<return> The string item, or `NULL` if the first item in the body
+of @message is not a string
 </return>
 </function>
 
@@ -20594,13 +20597,12 @@ Since: 2.80
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A `GDBusMessage`.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> The object path item or `NULL` if the first item in the
-body of @message is not an object path.
-
+<return> The object path item, or `NULL` if the first item in the
+body of @message is not an object path
 </return>
 </function>
 
@@ -20613,13 +20615,12 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GVariant or %NULL if the body is
-empty. Do not free, it is owned by @message.
-
+<return> A [type@GLib.Variant], or `NULL` if the
+body is empty
 </return>
 </function>
 
@@ -20631,47 +20632,47 @@ Gets the byte order of @message.
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> The byte order.
+<return> The byte order
 </return>
 </function>
 
 <function name="g_dbus_message_get_destination">
 <description>
-Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_DESTINATION header field.
+Convenience getter for the [enum@Gio.DBusMessageHeaderField.DESTINATION]
+header field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> The value.
-
+<return> The value
 </return>
 </function>
 
 <function name="g_dbus_message_get_error_name">
 <description>
-Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_ERROR_NAME header field.
+Convenience getter for the [enum@Gio.DBusMessageHeaderField.ERROR_NAME]
+header field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> The value.
-
+<return> The value
 </return>
 </function>
 
@@ -20684,12 +20685,12 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> Flags that are set (typically values from the #GDBusMessageFlags enumeration bitwise ORed together).
-
+<return> Flags that are set (typically values from the
+[flags@Gio.DBusMessageFlags] enumeration bitwise ORed together)
 </return>
 </function>
 
@@ -20697,25 +20698,25 @@ Since: 2.26
 <description>
 Gets a header field on @message.
 
-The caller is responsible for checking the type of the returned #GVariant
-matches what is expected.
+The caller is responsible for checking the type of the returned
+[type@GLib.Variant] matches what is expected.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="header_field">
-<parameter_description> A 8-bit unsigned integer (typically a value from the #GDBusMessageHeaderField enumeration)
+<parameter_description> a 8-bit unsigned integer (typically a value from the
+[enum@Gio.DBusMessageHeaderField] enumeration)
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GVariant with the value if the header was found, %NULL
-otherwise. Do not free, it is owned by @message.
-
+<return> A [type@GLib.Variant] with the value, or
+`NULL` if the header was not found
 </return>
 </function>
 
@@ -20723,75 +20724,76 @@ otherwise. Do not free, it is owned by @message.
 <description>
 Gets an array of all header fields on @message that are set.
 
+Each element in the array is an `unsigned char`.
+
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> An array of header fields
-terminated by %G_DBUS_MESSAGE_HEADER_FIELD_INVALID.  Each element
-is a #guchar. Free with g_free().
-
+<return> An array of header
+fields terminated by [enum@Gio.DBusMessageHeaderField.INVALID]
 </return>
 </function>
 
 <function name="g_dbus_message_get_interface">
 <description>
-Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_INTERFACE header field.
+Convenience getter for the [enum@Gio.DBusMessageHeaderField.INTERFACE] header
+field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> The value.
-
+<return> The value
 </return>
 </function>
 
 <function name="g_dbus_message_get_locked">
 <description>
-Checks whether @message is locked. To monitor changes to this
-value, connect to the #GObject::notify signal to listen for changes
-on the #GDBusMessage:locked property.
+Checks whether @message is locked.
+
+To monitor changes to this value, connect to the
+[signal@GObject.Object::notify] signal to listen for changes on the
+[property@Gio.DBusMessage:locked] property.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @message is locked, %FALSE otherwise.
-
+<return> true if @message is locked, false otherwise
 </return>
 </function>
 
 <function name="g_dbus_message_get_member">
 <description>
-Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_MEMBER header field.
+Convenience getter for the [enum@Gio.DBusMessageHeaderField.MEMBER] header
+field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> The value.
-
+<return> The value
 </return>
 </function>
 
@@ -20804,84 +20806,84 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> A 8-bit unsigned integer (typically a value from the #GDBusMessageType enumeration).
-
+<return> A 8-bit unsigned integer (typically a value from the
+[enum@Gio.DBusMessageType] enumeration)
 </return>
 </function>
 
 <function name="g_dbus_message_get_num_unix_fds">
 <description>
-Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_NUM_UNIX_FDS header field.
+Convenience getter for the [enum@Gio.DBusMessageHeaderField.NUM_UNIX_FDS]
+header field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> The value.
-
+<return> The value
 </return>
 </function>
 
 <function name="g_dbus_message_get_path">
 <description>
-Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_PATH header field.
+Convenience getter for the [enum@Gio.DBusMessageHeaderField.PATH] header
+field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> The value.
-
+<return> The value
 </return>
 </function>
 
 <function name="g_dbus_message_get_reply_serial">
 <description>
-Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL header field.
+Convenience getter for the [enum@Gio.DBusMessageHeaderField.REPLY_SERIAL]
+header field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> The value.
-
+<return> The value
 </return>
 </function>
 
 <function name="g_dbus_message_get_sender">
 <description>
-Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_SENDER header field.
+Convenience getter for the [enum@Gio.DBusMessageHeaderField.SENDER] header
+field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> The value.
-
+<return> The value
 </return>
 </function>
 
@@ -20894,32 +20896,31 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #guint32.
-
+<return> The serial number, which should not be zero
 </return>
 </function>
 
 <function name="g_dbus_message_get_signature">
 <description>
-Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE header field.
+Convenience getter for the [enum@Gio.DBusMessageHeaderField.SIGNATURE header
+field.
 
-This will always be non-%NULL, but may be an empty string.
+This will always be non-`NULL`, but may be an empty string.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> The value.
-
+<return> The value
 </return>
 </function>
 
@@ -20929,10 +20930,10 @@ Gets the UNIX file descriptors associated with @message, if any.
 
 This method is only available on UNIX.
 
-The file descriptors normally correspond to %G_VARIANT_TYPE_HANDLE
-values in the body of the message. For example,
-if g_variant_get_handle() returns 5, that is intended to be a reference
-to the file descriptor that can be accessed by
+The file descriptors normally correspond to `G_VARIANT_TYPE_HANDLE`
+values in the body of the message. For example, if
+[method@GLib.Variant.get_handle] returns 5, that is intended to be a
+reference to the file descriptor that can be accessed by
 `g_unix_fd_list_get (list, 5, ...)`.
 
 Since: 2.26
@@ -20940,26 +20941,27 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GUnixFDList or %NULL if no file descriptors are
-associated. Do not free, this object is owned by @message.
-
+<return> A [class@Gio.UnixFDList] or `NULL` if no
+file descriptors are associated
 </return>
 </function>
 
 <function name="g_dbus_message_lock">
 <description>
-If @message is locked, does nothing. Otherwise locks the message.
+Locks the message.
+
+If @message is locked already, this does nothing.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 </parameters>
@@ -20968,215 +20970,215 @@ Since: 2.26
 
 <function name="g_dbus_message_new">
 <description>
-Creates a new empty #GDBusMessage.
+Creates a new empty D-Bus message.
 
 Since: 2.26
 
 </description>
 <parameters>
 </parameters>
-<return> A #GDBusMessage. Free with g_object_unref().
-
+<return> The D-Bus message
 </return>
 </function>
 
 <function name="g_dbus_message_new_from_blob">
 <description>
-Creates a new #GDBusMessage from the data stored at @blob. The byte
-order that the message was in can be retrieved using
-g_dbus_message_get_byte_order().
+Creates a new D-Bus message from the data stored at @blob.
+
+You must have previously called [func@Gio.DBusMessage.bytes_needed] on @blob,
+and ensure that @blob is at least as long as the return value from that
+function indicates. In particular, that means that @blob must be at least 16
+bytes long (but will typically be much longer).
+
+The byte order that the message was in can be retrieved using
+[method@Gio.DBusMessage.get_byte_order].
 
 If the @blob cannot be parsed, contains invalid fields, or contains invalid
-headers, %G_IO_ERROR_INVALID_ARGUMENT will be returned.
+headers, [error@Gio.IOErrorEnum.INVALID_ARGUMENT] will be returned.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="blob">
-<parameter_description> A blob representing a binary D-Bus message.
+<parameter_description> a blob representing a
+binary D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="blob_len">
-<parameter_description> The length of @blob.
+<parameter_description> the length of @blob, in bytes
 </parameter_description>
 </parameter>
 <parameter name="capabilities">
-<parameter_description> A #GDBusCapabilityFlags describing what protocol features are supported.
+<parameter_description> flags describing what protocol features are supported
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> Return location for error or %NULL.
+<parameter_description> return location for error, or `NULL`
 </parameter_description>
 </parameter>
 </parameters>
-<return> A new #GDBusMessage or %NULL if @error is set. Free with
-g_object_unref().
-
+<return> The D-Bus message
 </return>
 </function>
 
 <function name="g_dbus_message_new_method_call">
 <description>
-Creates a new #GDBusMessage for a method call.
+Creates a new D-Bus message for a method call.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="name">
-<parameter_description> A valid D-Bus name or %NULL.
+<parameter_description> a valid D-Bus name, or `NULL` if no destination is needed
 </parameter_description>
 </parameter>
 <parameter name="path">
-<parameter_description> A valid object path.
+<parameter_description> a valid object path
 </parameter_description>
 </parameter>
 <parameter name="interface_">
-<parameter_description> A valid D-Bus interface name or %NULL.
+<parameter_description> a valid D-Bus interface name, or `NULL` if none is
+needed
 </parameter_description>
 </parameter>
 <parameter name="method">
-<parameter_description> A valid method name.
+<parameter_description> a valid method name
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GDBusMessage. Free with g_object_unref().
-
+<return> The D-Bus message
 </return>
 </function>
 
 <function name="g_dbus_message_new_method_error">
 <description>
-Creates a new #GDBusMessage that is an error reply to @method_call_message.
+Creates a new D-Bus message that is an error reply to @method_call_message.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="method_call_message">
-<parameter_description> A message of type %G_DBUS_MESSAGE_TYPE_METHOD_CALL to
-create a reply message to.
+<parameter_description> a message of type [enum@Gio.DBusMessageType.METHOD_CALL]
+to create a reply message to
 </parameter_description>
 </parameter>
 <parameter name="error_name">
-<parameter_description> A valid D-Bus error name.
+<parameter_description> a valid D-Bus error name
 </parameter_description>
 </parameter>
 <parameter name="error_message_format">
-<parameter_description> The D-Bus error message in a printf() format.
+<parameter_description> the D-Bus error message in a `printf()` format
 </parameter_description>
 </parameter>
 <parameter name="Varargs">
-<parameter_description> Arguments for @error_message_format.
+<parameter_description> arguments for @error_message_format
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GDBusMessage. Free with g_object_unref().
-
+<return> The D-Bus message
 </return>
 </function>
 
 <function name="g_dbus_message_new_method_error_literal">
 <description>
-Creates a new #GDBusMessage that is an error reply to @method_call_message.
+Creates a new D-Bus message that is an error reply to @method_call_message.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="method_call_message">
-<parameter_description> A message of type %G_DBUS_MESSAGE_TYPE_METHOD_CALL to
-create a reply message to.
+<parameter_description> a message of type [enum@Gio.DBusMessageType.METHOD_CALL]
+to create a reply message to
 </parameter_description>
 </parameter>
 <parameter name="error_name">
-<parameter_description> A valid D-Bus error name.
+<parameter_description> a valid D-Bus error name
 </parameter_description>
 </parameter>
 <parameter name="error_message">
-<parameter_description> The D-Bus error message.
+<parameter_description> the D-Bus error message
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GDBusMessage. Free with g_object_unref().
-
+<return> The D-Bus message
 </return>
 </function>
 
 <function name="g_dbus_message_new_method_error_valist">
 <description>
-Like g_dbus_message_new_method_error() but intended for language bindings.
+Like [ctor@Gio.DBusMessage.new_method_error] but intended for language
+bindings.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="method_call_message">
-<parameter_description> A message of type %G_DBUS_MESSAGE_TYPE_METHOD_CALL to
-create a reply message to.
+<parameter_description> a message of type [enum@Gio.DBusMessageType.METHOD_CALL]
+to create a reply message to
 </parameter_description>
 </parameter>
 <parameter name="error_name">
-<parameter_description> A valid D-Bus error name.
+<parameter_description> a valid D-Bus error name
 </parameter_description>
 </parameter>
 <parameter name="error_message_format">
-<parameter_description> The D-Bus error message in a printf() format.
+<parameter_description> the D-Bus error message in a `printf()` format
 </parameter_description>
 </parameter>
 <parameter name="var_args">
-<parameter_description> Arguments for @error_message_format.
+<parameter_description> arguments for @error_message_format
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GDBusMessage. Free with g_object_unref().
-
+<return> The D-Bus message
 </return>
 </function>
 
 <function name="g_dbus_message_new_method_reply">
 <description>
-Creates a new #GDBusMessage that is a reply to @method_call_message.
+Creates a new D-Bus message that is a reply to @method_call_message.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="method_call_message">
-<parameter_description> A message of type %G_DBUS_MESSAGE_TYPE_METHOD_CALL to
-create a reply message to.
+<parameter_description> a message of type [enum@Gio.DBusMessageType.METHOD_CALL]
+to create a reply message to
 </parameter_description>
 </parameter>
 </parameters>
-<return>  #GDBusMessage. Free with g_object_unref().
-
+<return> The D-Bus message
 </return>
 </function>
 
 <function name="g_dbus_message_new_signal">
 <description>
-Creates a new #GDBusMessage for a signal emission.
+Creates a new D-Bus message for a signal emission.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="path">
-<parameter_description> A valid object path.
+<parameter_description> a valid object path
 </parameter_description>
 </parameter>
 <parameter name="interface_">
-<parameter_description> A valid D-Bus interface name.
+<parameter_description> a valid D-Bus interface name
 </parameter_description>
 </parameter>
 <parameter name="signal">
-<parameter_description> A valid signal name.
+<parameter_description> a valid signal name
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GDBusMessage. Free with g_object_unref().
-
+<return> The D-Bus message
 </return>
 </function>
 
@@ -21184,9 +21186,8 @@ Since: 2.26
 <description>
 Produces a human-readable multi-line description of @message.
 
-The contents of the description has no ABI guarantees, the contents
-and formatting is subject to change at any time. Typical output
-looks something like this:
+The contents and formatting are subject to change at any time and no ABI
+guarantees are given. Typical output looks something like this:
 ```
 Type:    method-call
 Flags:   none
@@ -21222,24 +21223,25 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="indent">
-<parameter_description> Indentation level.
+<parameter_description> indentation level
 </parameter_description>
 </parameter>
 </parameters>
-<return> A string that should be freed with [func@GLib.free].
-
+<return> Human readable description
+of @message
 </return>
 </function>
 
 <function name="g_dbus_message_set_body">
 <description>
-Sets the body @message. As a side-effect the
-%G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE header field is set to the
-type string of @body (or cleared if @body is %NULL).
+Sets the body of @message.
+
+As a side-effect the [enum@Gio.DBusMessageHeaderField.SIGNATURE] header field
+is set to the type string of @body (or cleared if @body is `NULL`).
 
 If @body is floating, @message assumes ownership of @body.
 
@@ -21248,11 +21250,12 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="body">
-<parameter_description> Either %NULL or a #GVariant that is a tuple.
+<parameter_description> a [type@GLib.Variant] containing a tuple, or `NULL` if no body is
+needed
 </parameter_description>
 </parameter>
 </parameters>
@@ -21266,11 +21269,11 @@ Sets the byte order of @message.
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="byte_order">
-<parameter_description> The byte order.
+<parameter_description> the byte order
 </parameter_description>
 </parameter>
 </parameters>
@@ -21279,18 +21282,19 @@ Sets the byte order of @message.
 
 <function name="g_dbus_message_set_destination">
 <description>
-Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_DESTINATION header field.
+Convenience setter for the [enum@Gio.DBusMessageHeaderField.DESTINATION]
+header field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> The value to set.
+<parameter_description> the value to set
 </parameter_description>
 </parameter>
 </parameters>
@@ -21299,18 +21303,19 @@ Since: 2.26
 
 <function name="g_dbus_message_set_error_name">
 <description>
-Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_ERROR_NAME header field.
+Convenience setter for the [enum@Gio.DBusMessageHeaderField.ERROR_NAME]
+header field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> The value to set.
+<parameter_description> the value to set
 </parameter_description>
 </parameter>
 </parameters>
@@ -21326,12 +21331,12 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> Flags for @message that are set (typically values from the #GDBusMessageFlags
-enumeration bitwise ORed together).
+<parameter_description> flags for @message that are set (typically values from the
+[flags@Gio.DBusMessageFlags] enumeration bitwise ORed together)
 </parameter_description>
 </parameter>
 </parameters>
@@ -21349,15 +21354,17 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="header_field">
-<parameter_description> A 8-bit unsigned integer (typically a value from the #GDBusMessageHeaderField enumeration)
+<parameter_description> a 8-bit unsigned integer (typically a value from the
+[enum@Gio.DBusMessageHeaderField enumeration)
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> A #GVariant to set the header field or %NULL to clear the header field.
+<parameter_description> a [type@GLib.Variant] to set the header field, or `NULL`
+to clear the header field.
 </parameter_description>
 </parameter>
 </parameters>
@@ -21366,18 +21373,19 @@ Since: 2.26
 
 <function name="g_dbus_message_set_interface">
 <description>
-Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_INTERFACE header field.
+Convenience setter for the [enum@Gio.DBusMessageHeaderField.INTERFACE] header
+field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> The value to set.
+<parameter_description> the value to set
 </parameter_description>
 </parameter>
 </parameters>
@@ -21386,18 +21394,19 @@ Since: 2.26
 
 <function name="g_dbus_message_set_member">
 <description>
-Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_MEMBER header field.
+Convenience setter for the [enum@Gio.DBusMessageHeaderField.MEMBER] header
+field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> The value to set.
+<parameter_description> the value to set
 </parameter_description>
 </parameter>
 </parameters>
@@ -21413,11 +21422,12 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="type">
-<parameter_description> A 8-bit unsigned integer (typically a value from the #GDBusMessageType enumeration).
+<parameter_description> a 8-bit unsigned integer (typically a value from the
+[enum@Gio.DBusMessageType] enumeration)
 </parameter_description>
 </parameter>
 </parameters>
@@ -21426,18 +21436,19 @@ Since: 2.26
 
 <function name="g_dbus_message_set_num_unix_fds">
 <description>
-Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_NUM_UNIX_FDS header field.
+Convenience setter for the [enum@Gio.DBusMessageHeaderField.NUM_UNIX_FDS]
+header field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> The value to set.
+<parameter_description> the value to set
 </parameter_description>
 </parameter>
 </parameters>
@@ -21446,18 +21457,19 @@ Since: 2.26
 
 <function name="g_dbus_message_set_path">
 <description>
-Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_PATH header field.
+Convenience setter for the [enum@Gio.DBusMessageHeaderField.PATH] header
+field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> The value to set.
+<parameter_description> the value to set
 </parameter_description>
 </parameter>
 </parameters>
@@ -21466,18 +21478,19 @@ Since: 2.26
 
 <function name="g_dbus_message_set_reply_serial">
 <description>
-Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL header field.
+Convenience setter for the [enum@Gio.DBusMessageHeaderField.REPLY_SERIAL]
+header field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> The value to set.
+<parameter_description> the value to set
 </parameter_description>
 </parameter>
 </parameters>
@@ -21486,18 +21499,19 @@ Since: 2.26
 
 <function name="g_dbus_message_set_sender">
 <description>
-Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_SENDER header field.
+Convenience setter for the [enum@Gio.DBusMessageHeaderField.SENDER] header
+field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> The value to set.
+<parameter_description> the value to set
 </parameter_description>
 </parameter>
 </parameters>
@@ -21516,11 +21530,11 @@ Since: 2.26
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="serial">
-<parameter_description> A #guint32, which must not be zero.
+<parameter_description> a serial number, which must not be zero
 </parameter_description>
 </parameter>
 </parameters>
@@ -21529,18 +21543,19 @@ Since: 2.26
 
 <function name="g_dbus_message_set_signature">
 <description>
-Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE header field.
+Convenience setter for the [enum@Gio.DBusMessageHeaderField.SIGNATURE] header
+field.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> The value to set.
+<parameter_description> the value to set
 </parameter_description>
 </parameter>
 </parameters>
@@ -21549,28 +21564,29 @@ Since: 2.26
 
 <function name="g_dbus_message_set_unix_fd_list">
 <description>
-Sets the UNIX file descriptors associated with @message. As a
-side-effect the %G_DBUS_MESSAGE_HEADER_FIELD_NUM_UNIX_FDS header
+Sets the UNIX file descriptors associated with @message.
+
+As a side-effect the [enum@Gio.DBusMessageHeaderField.NUM_UNIX_FDS] header
 field is set to the number of fds in @fd_list (or cleared if
-@fd_list is %NULL).
+@fd_list is `NULL`).
 
 This method is only available on UNIX.
 
 When designing D-Bus APIs that are intended to be interoperable,
 please note that non-GDBus implementations of D-Bus can usually only
 access file descriptors if they are referenced by a value of type
-%G_VARIANT_TYPE_HANDLE in the body of the message.
+`G_VARIANT_TYPE_HANDLE` in the body of the message.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="fd_list">
-<parameter_description> A #GUnixFDList or %NULL.
+<parameter_description> A [class@Gio.UnixFDList], or `NULL` to clear
 </parameter_description>
 </parameter>
 </parameters>
@@ -21579,62 +21595,63 @@ Since: 2.26
 
 <function name="g_dbus_message_to_blob">
 <description>
-Serializes @message to a blob. The byte order returned by
-g_dbus_message_get_byte_order() will be used.
+Serializes @message to a blob.
+
+The byte order returned by [method@Gio.DBusMessage.get_byte_order] will be
+used.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="out_size">
-<parameter_description> Return location for size of generated blob.
+<parameter_description> return location for size of generated blob, in bytes
 </parameter_description>
 </parameter>
 <parameter name="capabilities">
-<parameter_description> A #GDBusCapabilityFlags describing what protocol features are supported.
+<parameter_description> flags describing what protocol features are supported
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> Return location for error.
+<parameter_description> return location for error
 </parameter_description>
 </parameter>
 </parameters>
 <return> A pointer to a
 valid binary D-Bus message of @out_size bytes generated by @message
-or %NULL if @error is set. Free with g_free().
-
 </return>
 </function>
 
 <function name="g_dbus_message_to_gerror">
 <description>
-If @message is not of type %G_DBUS_MESSAGE_TYPE_ERROR does
-nothing and returns %FALSE.
+Encodes the error in @message as a [type@GLib.Error].
 
-Otherwise this method encodes the error in @message as a #GError
-using g_dbus_error_set_dbus_error() using the information in the
-%G_DBUS_MESSAGE_HEADER_FIELD_ERROR_NAME header field of @message as
-well as the first string item in @message's body.
+If @message is of type [enum@Gio.DBusMessageType.ERROR], this function
+calls [func@Gio.DBusError.set_dbus_error] using the information in the
+[enum@Gio.DBusMessageHeaderField.ERROR_NAME] header field of @message as
+well as the first string item in @message’s body.
+
+If @message is not of type [enum@Gio.DBusMessageType.ERROR], this function
+does nothing and returns false.
 
 Since: 2.26
 
 </description>
 <parameters>
 <parameter name="message">
-<parameter_description> A #GDBusMessage.
+<parameter_description> a D-Bus message
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> The #GError to set.
+<parameter_description> the [type@GLib.Error] to set
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @error was set, %FALSE otherwise.
-
+<return> true if @error was set, false otherwise
 </return>
 </function>
 
@@ -33849,57 +33866,6 @@ contents (without copying) for the duration of the call.
 <return></return>
 </function>
 
-<function name="g_file_replace_contents_bytes_async">
-<description>
-Same as g_file_replace_contents_async() but takes a #GBytes input instead.
-This function will keep a ref on @contents until the operation is done.
-Unlike g_file_replace_contents_async() this allows forgetting about the
-content without waiting for the callback.
-
-When this operation has completed, @callback will be called with
-@user_user data, and the operation can be finalized with
-g_file_replace_contents_finish().
-
-Since: 2.40
-
-</description>
-<parameters>
-<parameter name="file">
-<parameter_description> input #GFile
-</parameter_description>
-</parameter>
-<parameter name="contents">
-<parameter_description> a #GBytes
-</parameter_description>
-</parameter>
-<parameter name="etag">
-<parameter_description> a new [entity tag](#entity-tags) for the @file, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="make_backup">
-<parameter_description> %TRUE if a backup should be created
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> a set of #GFileCreateFlags
-</parameter_description>
-</parameter>
-<parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore
-</parameter_description>
-</parameter>
-<parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> the data to pass to callback function
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="g_file_replace_contents_finish">
 <description>
 Finishes an asynchronous replace of the given @file. See
@@ -38001,53 +37967,6 @@ ignore
 <return> %TRUE if pending was previously unset and is now set.
 
 </return>
-</function>
-
-<function name="g_io_stream_splice_async">
-<description>
-Asynchronously splice the output stream of @stream1 to the input stream of
-@stream2, and splice the output stream of @stream2 to the input stream of
-@stream1.
-
-When the operation is finished @callback will be called.
-You can then call g_io_stream_splice_finish() to get the
-result of the operation.
-
-Since: 2.28
-
-</description>
-<parameters>
-<parameter name="stream1">
-<parameter_description> a #GIOStream.
-</parameter_description>
-</parameter>
-<parameter name="stream2">
-<parameter_description> a #GIOStream.
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> a set of #GIOStreamSpliceFlags.
-</parameter_description>
-</parameter>
-<parameter name="io_priority">
-<parameter_description> the io priority of the request.
-</parameter_description>
-</parameter>
-<parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
-</parameter_description>
-</parameter>
-<parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback
-to call when the request is satisfied
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> the data to pass to callback function
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="g_io_stream_splice_finish">
@@ -52156,7 +52075,7 @@ Since: 2.22
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GSocket or %NULL on error.
+<return> the underlying socket
 
 </return>
 </function>
@@ -52474,22 +52393,25 @@ Since: 2.22
 
 <function name="g_socket_get_fd">
 <description>
-Returns the underlying OS socket object. On unix this
-is a socket file descriptor, and on Windows this is
-a Winsock2 SOCKET handle. This may be useful for
-doing platform specific or otherwise unusual operations
-on the socket.
+Gets the underlying OS socket descriptor.
+
+On Unix this is a socket file descriptor, and on Windows this is
+a Winsock2 `SOCKET` handle.
+
+This may be useful for doing platform specific or otherwise unusual
+operations on the socket.
 
 Since: 2.22
 
 </description>
 <parameters>
 <parameter name="socket">
-<parameter_description> a #GSocket.
+<parameter_description> a socket
 </parameter_description>
 </parameter>
 </parameters>
-<return> the file descriptor of the socket.
+<return> the file descriptor of the socket, or `-1` if the socket has not yet
+been initialised or has been closed
 
 </return>
 </function>
@@ -57772,6 +57694,7 @@ Update the actual icon name list, based on the requested names (from
 construction, or later added with g_themed_icon_prepend_name() and
 g_themed_icon_append_name()).
 The order of the list matters, indicating priority:
+
 - The first requested icon is first in priority.
 - If &quot;use-default-fallbacks&quot; is #TRUE, then it is followed by all its
 fallbacks (starting from top to lower context levels).
@@ -64437,6 +64360,7 @@ since then, %FALSE if it either wasn't changed or wasn't watched at all.
 <description>
 Creates an object that represents a registry key specified by @path.
 @path must start with one of the following pre-defined names:
+
 - HKEY_CLASSES_ROOT
 - HKEY_CURRENT_CONFIG
 - HKEY_CURRENT_USER
@@ -64446,6 +64370,7 @@ Creates an object that represents a registry key specified by @path.
 - HKEY_PERFORMANCE_NLSTEXT
 - HKEY_PERFORMANCE_TEXT
 - HKEY_USERS
+
 @path must not end with '\\'.
 
 
@@ -64469,6 +64394,7 @@ be opened. Free with g_object_unref().
 <description>
 Creates an object that represents a registry key specified by @path.
 @path must start with one of the following pre-defined names:
+
 - HKEY_CLASSES_ROOT
 - HKEY_CURRENT_CONFIG
 - HKEY_CURRENT_USER
@@ -64478,6 +64404,7 @@ Creates an object that represents a registry key specified by @path.
 - HKEY_PERFORMANCE_NLSTEXT
 - HKEY_PERFORMANCE_TEXT
 - HKEY_USERS
+
 @path must not end with L'\\'.
 
 
