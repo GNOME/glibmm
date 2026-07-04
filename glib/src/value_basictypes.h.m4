@@ -34,7 +34,7 @@ class GLIBMM_API Value<$1> : public ValueBase
 public:
   using CppType = $1;
 
-  static GType value_type() G_GNUC_CONST;
+  static GType value_type();
 
   void set($1 data);
   $1 get() const;

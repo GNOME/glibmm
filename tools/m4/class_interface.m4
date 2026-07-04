@@ -292,10 +292,10 @@ _IMPORT(SECTION_DTOR_DOCUMENTATION)
 
   /** Get the GType for this class, for use with the underlying GObject type system.
    */
-  static GType get_type()      G_GNUC_CONST;
+  static GType get_type();
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  static GType get_base_type() G_GNUC_CONST;
+  static GType get_base_type();
 #endif
 
   ///Provides access to the underlying C GObject.

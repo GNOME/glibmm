@@ -64,7 +64,7 @@ public:
   // Glib::Value and _WRAP_PROPERTY in Glib::Binding without a
   // Value<RefPtr<ObjectBase>> specialization.
   // The Value<RefPtr<T>> specialization requires T::get_base_type().
-  static GType get_base_type() G_GNUC_CONST;
+  static GType get_base_type();
 #endif
 
 protected:

@@ -208,7 +208,7 @@ public:
 
   /** Get the GType for this class, for use with the underlying GObject type system.
    */
-  static GType get_type() G_GNUC_CONST;
+  static GType get_type();
 
 ifdef(`__BOOL_CUSTOM_DEFAULT_CTOR__',`dnl
 ',`dnl else
