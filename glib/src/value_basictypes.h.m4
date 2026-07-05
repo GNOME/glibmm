@@ -35,7 +35,7 @@ public:
   using CppType = $1;
   using CType = g$2;
 
-  static GType value_type() G_GNUC_CONST;
+  static GType value_type();
 
   void set($1 data);
   $1 get() const;

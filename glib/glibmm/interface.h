@@ -70,8 +70,8 @@ public:
 // static Glib::Interface* wrap_new(GTypeInterface*);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  static GType get_type() G_GNUC_CONST;
-  static GType get_base_type() G_GNUC_CONST;
+  static GType get_type();
+  static GType get_base_type();
 #endif
 
   inline GObject* gobj() { return gobject_; }

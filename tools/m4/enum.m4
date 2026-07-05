@@ -83,7 +83,7 @@ template <>
 class $8 Value<__NAMESPACE__::__ENUM_CPPNAME__> : public __ENUM_VALUE_BASE__
 {
 public:
-  static GType value_type() G_GNUC_CONST;
+  static GType value_type();
 };
 ifelse(`$7',,,`_DEPRECATE_IFDEF_END')`'dnl
 

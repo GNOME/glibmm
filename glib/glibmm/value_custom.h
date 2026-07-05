@@ -66,7 +66,7 @@ public:
   using CppType = PtrT;
   using CType = void*;
 
-  static inline GType value_type() G_GNUC_CONST;
+  static inline GType value_type();
 
   inline void set(CppType data);
   inline CppType get() const;
@@ -105,7 +105,7 @@ public:
   using CppType = T;
   using CType = T*;
 
-  static GType value_type() G_GNUC_CONST;
+  static GType value_type();
 
   inline void set(const CppType& data);
   inline CppType get() const;

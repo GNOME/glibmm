@@ -100,7 +100,7 @@ protected:
 class GLIBMM_API ValueBase_Boxed : public ValueBase
 {
 public:
-  static GType value_type() G_GNUC_CONST;
+  static GType value_type();
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   GParamSpec* create_param_spec(const Glib::ustring& name) const;
@@ -119,7 +119,7 @@ protected:
 class GLIBMM_API ValueBase_Object : public ValueBase
 {
 public:
-  static GType value_type() G_GNUC_CONST;
+  static GType value_type();
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   GParamSpec* create_param_spec(const Glib::ustring& name) const;
@@ -141,7 +141,7 @@ class GLIBMM_API ValueBase_Enum : public ValueBase
 {
 public:
   using CType = gint;
-  static GType value_type() G_GNUC_CONST;
+  static GType value_type();
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   GParamSpec* create_param_spec(const Glib::ustring& name) const;
@@ -162,7 +162,7 @@ class GLIBMM_API ValueBase_Flags : public ValueBase
 {
 public:
   using CType = guint;
-  static GType value_type() G_GNUC_CONST;
+  static GType value_type();
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   GParamSpec* create_param_spec(const Glib::ustring& name) const;
@@ -183,7 +183,7 @@ class GLIBMM_API ValueBase_String : public ValueBase
 {
 public:
   using CType = const gchar*;
-  static GType value_type() G_GNUC_CONST;
+  static GType value_type();
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   GParamSpec* create_param_spec(const Glib::ustring& name) const;
@@ -203,7 +203,7 @@ protected:
 class GLIBMM_API ValueBase_Variant : public ValueBase
 {
 public:
-  static GType value_type() G_GNUC_CONST;
+  static GType value_type();
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   GParamSpec* create_param_spec(const Glib::ustring& name, const Glib::ustring& nick,
