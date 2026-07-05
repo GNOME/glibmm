@@ -16,6 +16,7 @@
 
 #include <glibmm/object.h>
 #include <giomm/icon.h>
+#include <gio/gio.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -42,6 +43,9 @@ class GIOMM_API Emblem
 {
   _CLASS_GOBJECT(Emblem, GEmblem, G_EMBLEM, Glib::Object, GObject, , , GIOMM_API)
   _IMPLEMENTS_INTERFACE(Icon)
+  _DO_NOT_DERIVE_GTYPE dnl// GEmblem is a final type since glib 2.89.2
+  _ABI_AS_WITH_DERIVED_GTYPE dnl// Remove when we can break ABI
+  _STRUCT_NOT_HIDDEN
 
 protected:
   /** Creates a new emblem for @a icon.
