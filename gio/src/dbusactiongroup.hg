@@ -21,6 +21,17 @@
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+// Necessary if compiled against glib < 2.89.1, where GDBusActionGroup is not
+// a final type, and GDBusActionGroupClass is not defined by G_DECLARE_FINAL_TYPE().
+// (It was declared a final type somewhere between 2.89.1 and 2.89.2.
+// The compiler will probably complain if you compile against a glib 2.89.1
+// where GDBusActionGroup is not a final type.)
+#if !GLIB_CHECK_VERSION(2,89,1)
+using GDBusActionGroupClass = struct _GDBusActionGroupClass;
+#endif
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
 namespace Gio
 {
 
@@ -43,6 +54,9 @@ class GIOMM_API ActionGroup
   _CLASS_GOBJECT(ActionGroup, GDBusActionGroup, G_DBUS_ACTION_GROUP, Glib::Object, GObject, , , GIOMM_API)
   _IMPLEMENTS_INTERFACE(Gio::ActionGroup)
   _IMPLEMENTS_INTERFACE(Gio::RemoteActionGroup)
+  _DO_NOT_DERIVE_GTYPE dnl// GDBusActionGroup is a final type since glib 2.89.2
+  _ABI_AS_WITH_DERIVED_GTYPE dnl// Remove when we can break ABI
+  _STRUCT_NOT_HIDDEN
 
 protected:
   _CTOR_DEFAULT
