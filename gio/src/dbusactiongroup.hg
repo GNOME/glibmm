@@ -22,13 +22,14 @@ _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-// Necessary if compiled against glib < 2.89.1, where GDBusActionGroup is not
-// a final type, and GDBusActionGroupClass is not defined by G_DECLARE_FINAL_TYPE().
-// (It was declared a final type somewhere between 2.89.1 and 2.89.2.
-// The compiler will probably complain if you compile against a glib 2.89.1
-// where GDBusActionGroup is not a final type.)
-#if !GLIB_CHECK_VERSION(2,89,1)
-using GDBusActionGroupClass = struct _GDBusActionGroupClass;
+// GDBusActionGroup was declared a final type between GLib 2.89.1 and 2.89.2.
+// Before that, GDBusActionGroupClass was not declared in GLib.
+// The preprocessor macro G_DBUS_ACTION_GROUP_CLASS was defined, though.
+#if !GLIB_CHECK_VERSION(2,89,1) || (!GLIB_CHECK_VERSION(2,89,2) && defined(G_DBUS_ACTION_GROUP_CLASS))
+  // glib < 2.89.1 or (glib == 2.89.1 and G_DBUS_ACTION_GROUP_CLASS is a preprocessor macro)
+  // GDBusActionGroup is not a final type,
+  // GDBusActionGroupClass is not declared in GLib.
+  using GDBusActionGroupClass = struct _GDBusActionGroupClass;
 #endif
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
