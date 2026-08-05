@@ -4,7 +4,8 @@
 #        generate_binding_py, handle_built_files_py, m4_files, pm_files,
 #        glibmm_libversion, install_includedir, python3, giomm_rc, gmmproc_dir,
 #        is_host_windows, gmmproc, generate_wrap_init_pl, giomm_libname,
-#        macos_darwin_versions
+#        macos_darwin_versions, pkgconfig, base_pkgconfig_vars,
+#        base_pkgconfig_uninstalled_vars, giomm_build_dep_private
 # Output: giomm_hg_ccg_basenames, giomm_extra_h_files, built_files_root,
 #         giomm_built_h_file_targets, giomm_own_dep
 
@@ -311,7 +312,7 @@ if maintainer_mode
     implicit_include_directories: false,
     include_directories: extra_include_dirs,
     cpp_args: giomm_cpp_flags,
-    dependencies: giomm_build_dep,
+    dependencies: giomm_build_dep + giomm_build_dep_private,
     link_with: glibmm_library,
     install: true,
   )
@@ -362,7 +363,7 @@ else # not maintainer_mode
     implicit_include_directories: false,
     include_directories: extra_include_dirs,
     cpp_args: giomm_cpp_flags,
-    dependencies: giomm_build_dep,
+    dependencies: giomm_build_dep + giomm_build_dep_private,
     link_with: glibmm_library,
     install: true,
   )
@@ -370,6 +371,19 @@ else # not maintainer_mode
   built_h_cc_dir = src_untracked_giomm
 
 endif
+
+pkgconfig.generate(
+  giomm_library,
+  name: 'giomm',
+  url: 'https://gtkmm.gnome.org/',
+  description: 'C++ binding for gio',
+  filebase: giomm_pcname,
+  subdirs: giomm_pcname,
+  extra_cflags: '-I${libdir}/@0@/include'.format(giomm_pcname),
+  requires: giomm_build_dep + glibmm_library,
+  variables: base_pkgconfig_vars,
+  uninstalled_variables: base_pkgconfig_uninstalled_vars,
+)
 
 # Install built .h and _p.h files.
 meson.add_install_script(
@@ -394,5 +408,5 @@ giomm_own_dep = declare_dependency(
   sources: glibmm_built_h_file_targets + giomm_used_built_h_file_targets,
   link_with: [glibmm_library, giomm_library],
   include_directories: extra_include_dirs,
-  dependencies: giomm_build_dep,
+  dependencies: giomm_build_dep + giomm_build_dep_private,
 )
