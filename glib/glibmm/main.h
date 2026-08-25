@@ -125,6 +125,67 @@ public:
   void connect_once(
     const sigc::slot<void()>& slot, unsigned int interval, int priority = PRIORITY_DEFAULT);
 
+  /** Connects a timeout handler with nanosecond granularity.
+   *
+   * Unlike connect(), this operates at nanosecond granularity.
+   * Note that timeout functions may be delayed, due to the processing of other
+   * event sources. Thus they should not be relied on for precise timing.
+   * After each call to the timeout function, the time of the next
+   * timeout is recalculated based on the current time and the given interval
+   * (it does not try to 'catch up' time lost in delays).
+   *
+   * @code
+   * bool timeout_handler() { ... }
+   * Glib::signal_timeout().connect_ns(sigc::ptr_fun(&timeout_handler), 5'000'000);
+   * @endcode
+   * is equivalent to:
+   * @code
+   * bool timeout_handler() { ... }
+   * const auto timeout_source = Glib::TimeoutSource::create(5);
+   * timeout_source->connect(sigc::ptr_fun(&timeout_handler));
+   * timeout_source->attach(Glib::MainContext::get_default());
+   * @endcode
+   *
+   * This method is not thread-safe. You should call it, or manipulate the
+   * returned sigc::connection object, only from the thread where the SignalTimeout
+   * object's MainContext runs.
+   *
+   * @param slot A slot to call when @a interval has elapsed.
+   * If <tt>timeout_handler()</tt> returns <tt>false</tt> the handler is disconnected.
+   * @param interval The timeout in nanoseconds.
+   * @param priority The priority of the new event source.
+   * @return A connection handle, which can be used to disconnect the handler.
+   *
+   * @newin{2,90}
+   */
+  sigc::connection connect_ns(
+    const sigc::slot<bool()>& slot, uint64_t interval, int priority = PRIORITY_DEFAULT);
+
+  /** Connects a timeout handler that runs only once with nanosecond granularity.
+   *
+   * This method takes a function pointer to a function with a void return
+   * and no parameters. After running once it is not called again.
+   *
+   * Because sigc::trackable is not thread-safe, if the slot represents a
+   * non-static method of a class deriving from sigc::trackable, and the slot is
+   * created by sigc::mem_fun(), connect_ns_once() should only be called from
+   * the thread where the SignalTimeout object's MainContext runs. You can use,
+   * say, boost::bind() or std::bind() or a lambda expression
+   * instead of sigc::mem_fun().
+   *
+   * @see connect_ns()
+   * @param slot A slot to call when @a interval has elapsed. For example:
+   * @code
+   * void on_timeout_once()
+   * @endcode
+   * @param interval The timeout in nanoseconds.
+   * @param priority The priority of the new event source.
+   *
+   * @newin{2,90}
+   */
+  void connect_ns_once(
+    const sigc::slot<void()>& slot, uint64_t interval, int priority = PRIORITY_DEFAULT);
+
   /** Connects a timeout handler with whole second granularity.
    *
    * Unlike connect(), this operates at whole second granularity.
@@ -839,6 +900,21 @@ protected:
    * @newin{2,28}
    */
   GLIBMM_API gint64 get_time() const;
+
+  /** Gets the time to be used when checking this source.
+   *
+   * The advantage of calling this function over calling
+   * g_get_monotonic_time_ns() directly is
+   * that when checking multiple sources, GLib can cache a single value
+   * instead of having to repeatedly get the system monotonic time.
+   *
+   * The time here is the system monotonic time, if available, or some
+   * other reasonable alternative otherwise. See g_get_monotonic_time_ns().
+   *
+   * @return The monotonic time in nanoseconds.
+   * @newin{2,90}
+   */
+  GLIBMM_API uint64_t get_time_ns() const;
 
   GLIBMM_API virtual bool prepare(int& timeout) = 0;
   GLIBMM_API virtual bool check() = 0;

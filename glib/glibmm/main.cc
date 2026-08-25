@@ -420,6 +420,36 @@ SignalTimeout::connect_once(const sigc::slot<void()>& slot, unsigned int interva
   glibmm_signal_connect_once(slot, priority, source, context_);
 }
 
+sigc::connection
+SignalTimeout::connect_ns(const sigc::slot<bool()>& slot, uint64_t interval, int priority)
+{
+  SourceConnectionNode* const conn_node = new SourceConnectionNode(slot);
+  const sigc::connection connection(*conn_node->get_slot());
+
+  GSource* const source = g_timeout_source_new_ns(interval);
+
+  if (priority != G_PRIORITY_DEFAULT)
+    g_source_set_priority(source, priority);
+
+  g_source_set_callback(
+    source, &glibmm_source_callback, conn_node,
+    &glibmm_source_destroy_notify_callback);
+
+  conn_node->install(source);
+  g_source_attach(source, context_);
+  g_source_unref(source); // GMainContext holds a reference
+
+  return connection;
+}
+
+void
+SignalTimeout::connect_ns_once(
+  const sigc::slot<void()>& slot, uint64_t interval, int priority)
+{
+  GSource* const source = g_timeout_source_new_ns(interval);
+  glibmm_signal_connect_once(slot, priority, source, context_);
+}
+
 /* Note that this is our equivalent of g_timeout_add_seconds(). */
 sigc::connection
 SignalTimeout::connect_seconds(const sigc::slot<bool()>& slot, unsigned int interval, int priority)
@@ -1056,6 +1086,14 @@ Source::get_time() const
     return g_source_get_time(const_cast<GSource*>(gobject_));
   else
     return g_get_monotonic_time();
+}
+
+uint64_t Source::get_time_ns() const
+{
+  if (g_source_get_context(const_cast<GSource*>(gobject_)))
+    return g_source_get_time_ns(const_cast<GSource*>(gobject_));
+  else
+    return g_get_monotonic_time_ns();
 }
 
 inline // static

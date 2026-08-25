@@ -32,6 +32,11 @@
 #include <gio/gunixsocketaddress.h>
 #endif
 
+#include <glibmmconfig.h> // May define GLIBMM_OS_COCOA
+#if !defined(G_OS_WIN32) && !defined(GLIBMM_OS_COCOA)
+#include <gio/gdesktopappinfo.h>
+#endif
+
 int
 main(int, char**)
 {
@@ -46,6 +51,7 @@ main(int, char**)
 
   std::cout << get_defs(G_TYPE_ASYNC_RESULT) << get_defs(G_TYPE_ACTION)
             << get_defs(G_TYPE_ACTION_GROUP) << get_defs(G_TYPE_APPLICATION)
+            << get_defs(G_TYPE_APPLICATION_COMMAND_LINE)
             << get_defs(G_TYPE_APP_INFO_MONITOR) << get_defs(G_TYPE_CANCELLABLE)
             << get_defs(G_TYPE_BUFFERED_INPUT_STREAM) << get_defs(G_TYPE_BUFFERED_OUTPUT_STREAM)
             << get_defs(G_TYPE_BYTES_ICON)
@@ -65,7 +71,9 @@ main(int, char**)
             << get_defs(G_TYPE_UNIX_INPUT_STREAM) << get_defs(G_TYPE_UNIX_OUTPUT_STREAM)
             << get_defs(G_TYPE_UNIX_SOCKET_ADDRESS)
 #endif
-
+#if !defined(G_OS_WIN32) && !defined(GLIBMM_OS_COCOA)
+            << get_defs(G_TYPE_DESKTOP_APP_INFO)
+#endif
             << get_defs(G_TYPE_INPUT_STREAM) << get_defs(G_TYPE_LIST_MODEL)
             << get_defs(G_TYPE_LIST_STORE) << get_defs(G_TYPE_LOADABLE_ICON)
             << get_defs(G_TYPE_MEMORY_INPUT_STREAM) << get_defs(G_TYPE_MEMORY_OUTPUT_STREAM)

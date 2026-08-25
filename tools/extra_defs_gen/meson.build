@@ -44,5 +44,6 @@ executable('generate_defs_gio', 'generate_defs_gio.cc',
   dependencies: giomm_build_dep,
   link_with: glibmm_generate_extra_defs_library,
   implicit_include_directories: false,
+  include_directories: ['..' / '..' / 'glib'], # generate_defs_gio.cc includes glibmmconfig.h
   install: false,
 )

@@ -68,6 +68,8 @@ public:
 
   _WRAP_METHOD(int get_length() const, g_unix_fd_list_get_length)
   _WRAP_METHOD(int get(int index) const, g_unix_fd_list_get, errthrow "Gio::Error")
+  _WRAP_METHOD(int peek(size_t index) const, g_unix_fd_list_peek)
+  _WRAP_METHOD(int lookup(size_t index) const, g_unix_fd_list_lookup)
 
   /** Returns the array of file descriptors that is contained in this object.
    *
@@ -96,9 +98,8 @@ public:
   std::vector<int> steal_fds();
   _IGNORE(g_unix_fd_list_steal_fds)
 
-  _WRAP_METHOD_DOCS_ONLY(g_unix_fd_list_append)
-  ///@throw Glib::Error.
-  _WRAP_METHOD(int append(int fd), g_unix_fd_list_append, errthrow "Gio::Error")
+  _WRAP_METHOD(int append(int fd), g_unix_fd_list_append, errthrow "Glib::Error")
+  _WRAP_METHOD(size_t append_take(int fd), g_unix_fd_list_append_take)
 };
 
 } // namespace Gio

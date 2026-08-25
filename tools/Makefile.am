@@ -49,6 +49,8 @@ extra_defs_gen_generate_defs_glib_LDADD   = $(GLIBMM_LIBS) $(lib_LTLIBRARIES)
 
 extra_defs_gen_generate_defs_gio_SOURCES = extra_defs_gen/generate_defs_gio.cc
 extra_defs_gen_generate_defs_gio_LDADD   = $(GIOMM_LIBS) $(lib_LTLIBRARIES)
+# generate_defs_gio.cc includes glibmmconfig.h
+extra_defs_gen_generate_defs_gio_CPPFLAGS = -I$(top_builddir)/glib $(GIOMM_CFLAGS)
 
 AM_CPPFLAGS = -I$(top_builddir) $(GIOMM_CFLAGS)
 AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
