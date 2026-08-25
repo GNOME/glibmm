@@ -1354,15 +1354,6 @@ delayed until g_dbus_connection_start_message_processing() is called.
 as a server, require the UID of the peer to be the same as the UID of the server. (Since: 2.68)
 </parameter_description>
 </parameter>
-<parameter name="G_DBUS_CONNECTION_FLAGS_CROSS_NAMESPACE">
-<parameter_description> When authenticating, try to use
-protocols that work across a Linux user namespace boundary, even if this
-reduces interoperability with older D-Bus implementations. This currently
-affects client-side `EXTERNAL` authentication, for which this flag makes
-connections to a server in another user namespace succeed, but causes
-a deadlock when connecting to a GDBus server older than 2.73.3. Since: 2.74
-</parameter_description>
-</parameter>
 </parameters>
 </enum>
 
@@ -5366,6 +5357,16 @@ Since: 2.22
 </description>
 </property>
 
+<property name="GNotificationBackend:application">
+<description>
+The application object this notification backend handles
+notifications for.
+
+Since: 2.90
+
+</description>
+</property>
+
 <enum name="GNotificationPriority">
 <description>
 Priority levels for #GNotifications.
@@ -7557,10 +7558,6 @@ Since: 2.28
 
 </description>
 <parameters>
-<parameter name="G_TLS_CERTIFICATE_NO_FLAGS">
-<parameter_description> No flags set. Since: 2.74
-</parameter_description>
-</parameter>
 <parameter name="G_TLS_CERTIFICATE_UNKNOWN_CA">
 <parameter_description> The signing certificate authority is
 not known.
@@ -7687,9 +7684,9 @@ binding type
 </parameter_description>
 </parameter>
 <parameter name="G_TLS_CHANNEL_BINDING_TLS_EXPORTER">
-<parameter_description>
-[`tls-exporter`](https://www.rfc-editor.org/rfc/rfc9266.html) binding
-type. Since: 2.74
+<parameter_description>[`tls-exporter`](https://www.rfc-editor.org/rfc/rfc9266.html) binding type.
+
+Since: 2.74
 </parameter_description>
 </parameter>
 </parameters>
@@ -35072,6 +35069,8 @@ completion exists.
 <description>
 Gets an array of completion strings for a given initial text.
 
+The strings are returned in an undefined order.
+
 
 </description>
 <parameters>
@@ -35084,8 +35083,8 @@ Gets an array of completion strings for a given initial text.
 </parameter_description>
 </parameter>
 </parameters>
-<return> array of strings with possible completions for @initial_text.
-This array must be freed by g_strfreev() when finished. 
+<return> array of strings with
+possible completions for @initial_text
 </return>
 </function>
 
@@ -36427,7 +36426,13 @@ Checks if an input stream has pending actions.
 
 <function name="g_input_stream_is_closed">
 <description>
-Checks if an input stream is closed.
+Checks if an input stream has been closed.
+
+This only indicates whether the stream has been closed from this end by
+calling [method@Gio.InputStream.close]. If the stream is a pipe or socket,
+for example, and the process on the other end has closed its end, this method
+will still return false. Methods which try to read from the input stream will
+return any remaining data, end-of-file or an error, however.
 
 
 </description>
@@ -36437,7 +36442,7 @@ Checks if an input stream is closed.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the stream is closed.
+<return> true if the stream has been closed; false otherwise
 </return>
 </function>
 
@@ -37928,7 +37933,11 @@ Since: 2.22
 
 <function name="g_io_stream_is_closed">
 <description>
-Checks if a stream is closed.
+Checks if a stream has been closed.
+
+This only indicates whether the I/O stream has been closed at the top level
+by calling [method@Gio.IOStream.close]. If the underlying input and output
+streams have been closed separately, this method will still return false.
 
 Since: 2.22
 
@@ -37939,7 +37948,7 @@ Since: 2.22
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the stream is closed.
+<return> true if the stream has been closed; false otherwise
 
 </return>
 </function>
@@ -42103,6 +42112,12 @@ Since: 2.44
 <description>
 Gets the default #GNetworkMonitor for the system.
 
+Some implementations complete their initialization asynchronously:
+properties such as #GNetworkMonitor:network-available may start at their
+default values and update shortly afterwards, with notify emissions, once
+the state is resolved from the thread-default main context of this first
+call.
+
 Since: 2.32
 
 </description>
@@ -42391,6 +42406,17 @@ Since: 2.40
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_notification_backend_dup_application">
+<description>
+
+</description>
+<parameters>
+</parameters>
+<return>
+The application object this notification backend handles notifications for.
+</return>
 </function>
 
 <function name="g_notification_new">
@@ -42902,7 +42928,13 @@ Checks if an output stream has pending actions.
 
 <function name="g_output_stream_is_closed">
 <description>
-Checks if an output stream has already been closed.
+Checks if an output stream has been closed.
+
+This only indicates whether the stream has been closed from this end by
+calling [method@Gio.OutputStream.close]. If the stream is a pipe or socket,
+for example, and the process on the other end has closed its end, this method
+will still return false. Methods which try to write to the output stream will
+return an error, however.
 
 
 </description>
@@ -42912,7 +42944,7 @@ Checks if an output stream has already been closed.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @stream is closed. %FALSE otherwise. 
+<return> true if the stream has been closed; false otherwise
 </return>
 </function>
 
@@ -60932,7 +60964,7 @@ Since: 2.26
 <description>
 Adds a file descriptor to @list.
 
-The file descriptor is duplicated using dup(). You keep your copy
+The file descriptor is duplicated using `dup()`. You keep your copy
 of the descriptor and the copy contained in @list will be closed
 when @list is finalized.
 
@@ -60940,7 +60972,7 @@ A possible cause of failure is exceeding the per-process or
 system-wide file descriptor limit.
 
 The index of the file descriptor in the list is returned.  If you use
-this index with g_unix_fd_list_get() then you will receive back a
+this index with [method@Gio.UnixFDList.get] then you will receive back a
 duplicated copy of the same file descriptor.
 
 Since: 2.24
@@ -60948,7 +60980,7 @@ Since: 2.24
 </description>
 <parameters>
 <parameter name="list">
-<parameter_description> a #GUnixFDList
+<parameter_description> a [class@Gio.UnixFDList]
 </parameter_description>
 </parameter>
 <parameter name="fd">
@@ -60956,12 +60988,43 @@ Since: 2.24
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError pointer
+<parameter_description> a [type@GLib.Error]
 </parameter_description>
 </parameter>
 </parameters>
-<return> the index of the appended fd in case of success, else -1
+<return> the index of the appended fd in case of success, else `-1`
 (and @error is set)
+
+</return>
+</function>
+
+<function name="g_unix_fd_list_append_take">
+<description>
+Adds a file descriptor to @list.
+
+After this call, @fd belongs to the @list and may no longer be closed by the
+caller.
+
+The file descriptor @fd should be set to close-on-exec.
+
+The index of the file descriptor in the list is returned. If you use this
+index with [method@Gio.UnixFDList.get] then you will receive back a
+duplicated copy of the same file descriptor.
+
+Since: 2.90
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a [class@Gio.UnixFDList]
+</parameter_description>
+</parameter>
+<parameter name="fd">
+<parameter_description> a valid open file descriptor
+</parameter_description>
+</parameter>
+</parameters>
+<return> the index of the appended @fd
 
 </return>
 </function>
@@ -60971,11 +61034,12 @@ Since: 2.24
 Gets a file descriptor out of @list.
 
 @index_ specifies the index of the file descriptor to get.  It is a
-programmer error for @index_ to be out of range; see
-g_unix_fd_list_get_length().
+programmer error for @index_ to be out of range. Either use
+[method@Gio.UnixFDList.lookup] to do a checked lookup, or check the index
+against the list length using [method@Gio.UnixFDList.get_length].
 
-The file descriptor is duplicated using dup() and set as
-close-on-exec before being returned.  You must call close() on it
+The file descriptor is duplicated using `dup()` and set as
+close-on-exec before being returned.  You must call `close()` on it
 when you are done.
 
 A possible cause of failure is exceeding the per-process or
@@ -60986,7 +61050,7 @@ Since: 2.24
 </description>
 <parameters>
 <parameter name="list">
-<parameter_description> a #GUnixFDList
+<parameter_description> a [method@Gio.UnixFDList.get]
 </parameter_description>
 </parameter>
 <parameter name="index_">
@@ -60994,11 +61058,11 @@ Since: 2.24
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError pointer
+<parameter_description> a [type@GLib.Error]
 </parameter_description>
 </parameter>
 </parameters>
-<return> the file descriptor, or -1 in case of error
+<return> the file descriptor, or `-1` in case of error
 
 </return>
 </function>
@@ -61013,7 +61077,7 @@ Since: 2.24
 </description>
 <parameters>
 <parameter name="list">
-<parameter_description> a #GUnixFDList
+<parameter_description> a [class@Gio.UnixFDList]
 </parameter_description>
 </parameter>
 </parameters>
@@ -61022,26 +61086,54 @@ Since: 2.24
 </return>
 </function>
 
+<function name="g_unix_fd_list_lookup">
+<description>
+Looks up a file descriptor in @list at position @index_.
+
+@index_ specifies the index of the file descriptor to get. If no file
+descriptor exists at this index, `-1` is returned.
+
+After this call, the descriptor remains the property of @list. The caller
+must not close it. The descriptor is valid only until @list is changed in any
+way.
+
+Since: 2.90
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a [class@Gio.UnixFDList]
+</parameter_description>
+</parameter>
+<parameter name="index_">
+<parameter_description> the file descriptor index
+</parameter_description>
+</parameter>
+</parameters>
+<return> the file descriptor, or `-1` if not found
+
+</return>
+</function>
+
 <function name="g_unix_fd_list_new">
 <description>
-Creates a new #GUnixFDList containing no file descriptors.
+Creates a new [class@Gio.UnixFDList] containing no file descriptors.
 
 Since: 2.24
 
 </description>
 <parameters>
 </parameters>
-<return> a new #GUnixFDList
+<return> a new [class@Gio.UnixFDList]
 
 </return>
 </function>
 
 <function name="g_unix_fd_list_new_from_array">
 <description>
-Creates a new #GUnixFDList containing the file descriptors given in
-@fds.  The file descriptors become the property of the new list and
-may no longer be used by the caller.  The array itself is owned by
-the caller.
+Creates a new [class@Gio.UnixFDList] containing the file descriptors given
+in @fds. The file descriptors become the property of the new list and may no
+longer be used by the caller. The array itself is owned by the caller.
 
 Each file descriptor in the array should be set to close-on-exec.
 
@@ -61056,11 +61148,42 @@ Since: 2.24
 </parameter_description>
 </parameter>
 <parameter name="n_fds">
-<parameter_description> the length of #fds, or -1
+<parameter_description> the length of @fds, or `-1`
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GUnixFDList
+<return> a new [class@Gio.UnixFDList]
+
+</return>
+</function>
+
+<function name="g_unix_fd_list_peek">
+<description>
+Gets a file descriptor out of @list.
+
+@index_ specifies the index of the file descriptor to get. It is a programmer
+error for @index_ to be out of range; see [method@Gio.UnixFDList.get_length].
+
+This will always return a valid (non-negative) file descriptor.
+
+After this call, the descriptor remains the property of @list. The caller
+must not close it. The descriptor is valid only until @list is changed in any
+way.
+
+Since: 2.90
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a [class@Gio.UnixFDList]
+</parameter_description>
+</parameter>
+<parameter name="index_">
+<parameter_description> the index into the list
+</parameter_description>
+</parameter>
+</parameters>
+<return> the file descriptor
 
 </return>
 </function>
@@ -61074,11 +61197,11 @@ After this call, the descriptors remain the property of @list.  The
 caller must not close them and must not free the array.  The array is
 valid only until @list is changed in any way.
 
-If @length is non-%NULL then it is set to the number of file
+If @length is non-`NULL` then it is set to the number of file
 descriptors in the returned array. The returned array is also
-terminated with -1.
+terminated with `-1`.
 
-This function never returns %NULL. In case there are no file
+This function never returns `NULL`. In case there are no file
 descriptors contained in @list, an empty array is returned.
 
 Since: 2.24
@@ -61086,12 +61209,12 @@ Since: 2.24
 </description>
 <parameters>
 <parameter name="list">
-<parameter_description> a #GUnixFDList
+<parameter_description> a [class@Gio.UnixFDList]
 </parameter_description>
 </parameter>
 <parameter name="length">
 <parameter_description> pointer to the length of the returned
-array, or %NULL
+array, or `NULL`
 </parameter_description>
 </parameter>
 </parameters>
@@ -61110,16 +61233,16 @@ After this call, the descriptors are no longer contained in
 @list. Further calls will return an empty list (unless more
 descriptors have been added).
 
-The return result of this function must be freed with g_free().
+The return result of this function must be freed with `g_free()`.
 The caller is also responsible for closing all of the file
 descriptors.  The file descriptors in the array are set to
 close-on-exec.
 
-If @length is non-%NULL then it is set to the number of file
+If @length is non-`NULL` then it is set to the number of file
 descriptors in the returned array. The returned array is also
-terminated with -1.
+terminated with `-1`.
 
-This function never returns %NULL. In case there are no file
+This function never returns `NULL`. In case there are no file
 descriptors contained in @list, an empty array is returned.
 
 Since: 2.24
@@ -61127,12 +61250,12 @@ Since: 2.24
 </description>
 <parameters>
 <parameter name="list">
-<parameter_description> a #GUnixFDList
+<parameter_description> a [class@Gio.UnixFDList]
 </parameter_description>
 </parameter>
 <parameter name="length">
 <parameter_description> pointer to the length of the returned
-array, or %NULL
+array, or `NULL`
 </parameter_description>
 </parameter>
 </parameters>

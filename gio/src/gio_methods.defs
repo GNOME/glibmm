@@ -157,6 +157,12 @@
   (gtype-id "G_TYPE_CREDENTIALS_CLASS")
 )
 
+(define-object DBusActionGroupClass
+  (in-module "Gio")
+  (c-name "GDBusActionGroupClass")
+  (gtype-id "G_TYPE_DBUS_ACTION_GROUP_CLASS")
+)
+
 (define-object DBusAnnotationInfo
   (in-module "Gio")
   (c-name "GDBusAnnotationInfo")
@@ -18421,19 +18427,28 @@
 (define-method append
   (of-object "GUnixFDList")
   (c-name "g_unix_fd_list_append")
-  (return-type "gint")
+  (return-type "int")
   (parameters
-    '("gint" "fd")
+    '("int" "fd")
     '("GError**" "error")
+  )
+)
+
+(define-method append_take
+  (of-object "GUnixFDList")
+  (c-name "g_unix_fd_list_append_take")
+  (return-type "size_t")
+  (parameters
+    '("int" "fd")
   )
 )
 
 (define-method get
   (of-object "GUnixFDList")
   (c-name "g_unix_fd_list_get")
-  (return-type "gint")
+  (return-type "int")
   (parameters
-    '("gint" "index_")
+    '("int" "index_")
     '("GError**" "error")
   )
 )
@@ -18441,24 +18456,42 @@
 (define-method get_length
   (of-object "GUnixFDList")
   (c-name "g_unix_fd_list_get_length")
-  (return-type "gint")
+  (return-type "int")
+)
+
+(define-method lookup
+  (of-object "GUnixFDList")
+  (c-name "g_unix_fd_list_lookup")
+  (return-type "int")
+  (parameters
+    '("size_t" "index_")
+  )
+)
+
+(define-method peek
+  (of-object "GUnixFDList")
+  (c-name "g_unix_fd_list_peek")
+  (return-type "int")
+  (parameters
+    '("size_t" "index_")
+  )
 )
 
 (define-method peek_fds
   (of-object "GUnixFDList")
   (c-name "g_unix_fd_list_peek_fds")
-  (return-type "const-gint*")
+  (return-type "const-int*")
   (parameters
-    '("gint*" "length")
+    '("int*" "length")
   )
 )
 
 (define-method steal_fds
   (of-object "GUnixFDList")
   (c-name "g_unix_fd_list_steal_fds")
-  (return-type "gint*")
+  (return-type "int*")
   (parameters
-    '("gint*" "length")
+    '("int*" "length")
   )
 )
 
@@ -18473,8 +18506,8 @@
   (is-constructor-of "GUnixFDList")
   (return-type "GUnixFDList*")
   (parameters
-    '("const-gint*" "fds")
-    '("gint" "n_fds")
+    '("const-int*" "fds")
+    '("int" "n_fds")
   )
 )
 
