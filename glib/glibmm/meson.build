@@ -7,7 +7,8 @@
 #        macos_darwin_versions, pkgconfig, base_pkgconfig_vars,
 #        base_pkgconfig_uninstalled_vars, glibmm_build_dep_private
 # Output: glibmm_hg_ccg_basenames, glibmm_extra_h_files, built_files_root,
-#         glibmm_built_h_file_targets, glibmm_h_m4_files, glibmm_own_dep
+#         glibmm_built_h_file_targets, glibmm_h_m4_files, glibmm_own_dep,
+#         glibmm_built_dummy_h_file_target, glibmm_library
 
 glibmm_defs_basefiles = [
   'glib.defs',
@@ -247,7 +248,7 @@ if maintainer_mode
   # If glibmm_built_h_file_targets would be listed as sources to glibmm_library,
   # all generated .cc files could be recompiled if one generated .h file has
   # been changed.
-  built_dummy_h_file_target = custom_target('glibmm-dummy_header.h',
+  glibmm_built_dummy_h_file_target = custom_target('glibmm-dummy_header.h',
     input: glibmm_built_h_file_targets,
     output: 'dummy_header.h',
     command: [
@@ -261,7 +262,7 @@ if maintainer_mode
   extra_include_dirs = ['..']
 
   glibmm_library = library(glibmm_libname, extra_glibmm_objects,
-    glibmm_built_cc_file_targets, glibmm_extra_cc_files, built_dummy_h_file_target,
+    glibmm_built_cc_file_targets, glibmm_extra_cc_files, glibmm_built_dummy_h_file_target,
     implicit_include_directories: false,
     include_directories: extra_include_dirs,
     cpp_args: glibmm_cpp_args,

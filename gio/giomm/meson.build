@@ -5,7 +5,9 @@
 #        glibmm_libversion, install_includedir, python3, giomm_rc, gmmproc_dir,
 #        is_host_windows, gmmproc, generate_wrap_init_pl, giomm_libname,
 #        macos_darwin_versions, pkgconfig, base_pkgconfig_vars,
-#        base_pkgconfig_uninstalled_vars, giomm_build_dep_private
+#        base_pkgconfig_uninstalled_vars, giomm_build_dep_private,
+#        glibmm_built_dummy_h_file_target, glibmm_library,
+#        glibmm_built_h_file_targets
 # Output: giomm_hg_ccg_basenames, giomm_extra_h_files, built_files_root,
 #         giomm_built_h_file_targets, giomm_own_dep
 
@@ -297,7 +299,7 @@ if maintainer_mode
   # headers for both libraries are able to be listed as source here.
   giomm_built_dummy_h_file_target = custom_target('giomm-dummy_header.h',
     input: giomm_built_h_file_targets,
-    output: 'giomm_dummy_header.h',
+    output: 'dummy_header.h',
     command: [
       python3, dummy_header_py,
       '@OUTPUT@',
@@ -308,7 +310,7 @@ if maintainer_mode
 
   extra_include_dirs = ['..', '..' / '..' / 'glib']
 
-  giomm_library = library(giomm_libname, extra_giomm_objects, built_dummy_h_file_target,
+  giomm_library = library(giomm_libname, extra_giomm_objects, glibmm_built_dummy_h_file_target,
     giomm_used_built_cc_file_targets, giomm_extra_cc_files, giomm_built_dummy_h_file_target,
     version: glibmm_libversion,
     darwin_versions: macos_darwin_versions,
